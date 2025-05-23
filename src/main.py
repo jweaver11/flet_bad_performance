@@ -4,17 +4,7 @@ from characters import characters_view
 from characters import Character
 from nav_rail import rail
 from workspace import workspace
-
-# Class for the hud?
-class Hud:
-    class Top_Row:
-        def __init__(self):
-            self.items = []
-
-
-    class Left_Column:
-        def __init__(self):
-            self.items = []
+from menu_bar import menubar
 
 # Class for each seperate story/project
 class Story:
@@ -46,7 +36,8 @@ story.CreateCharacter("my brand new characters name")
 # MAIN FUNCTION TO RENDER PAGE ---------------------------------------------------------
 def main(page: ft.Page):
 
-    # page.add(menu_bar)
+    # page.add(ft.Row([menubar, appbar]))
+    page.add(ft.Row([menubar]))
 
     # Adds our navbar and the workspace for the rest of the space
     page.add(
