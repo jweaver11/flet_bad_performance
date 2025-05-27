@@ -6,7 +6,7 @@ rail = ft.NavigationRail(
     label_type=ft.NavigationRailLabelType.ALL,
     min_width=100,
     min_extended_width=400,
-    leading=ft.FloatingActionButton(
+    trailing=ft.FloatingActionButton(
         icon=ft.Icons.CREATE, text="Add", on_click=lambda e: print("FAB clicked!")
     ),
     group_alignment=-0.9,
@@ -36,11 +36,6 @@ rail = ft.NavigationRail(
             selected_icon=ft.Icon(ft.Icons.SETTINGS),
             label_content=ft.Text("Settings"),
         ),
-        ft.NavigationRailDestination(
-            icon=ft.Icons.SETTINGS_OUTLINED,
-            selected_icon=ft.Icon(ft.Icons.SETTINGS),
-            label_content=ft.Text("Add Workspace"),
-        )
     ],
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )
