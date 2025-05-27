@@ -4,6 +4,8 @@ import flet as ft
 
 def create_welcome_page(page: ft.Page):
     
+
+   # create project from templates: novel, comic, animation, blank, etc.  
     page.title = "Basic outlined buttons"
 
     outlined_button = ft.OutlinedButton(
