@@ -14,17 +14,17 @@ rail = ft.NavigationRail(
         ft.NavigationRailDestination(
             icon=ft.Icons.FAVORITE_BORDER,
             selected_icon=ft.Icons.FAVORITE,
-            label="First",
+            label="Characters",
         ),
         ft.NavigationRailDestination(
             icon=ft.Icon(ft.Icons.BOOKMARK_BORDER),
             selected_icon=ft.Icon(ft.Icons.BOOKMARK),
-            label="Second",
+            label="Content",
         ),
         ft.NavigationRailDestination(
             icon=ft.Icons.SETTINGS_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.SETTINGS),
-            label_content=ft.Text("Settings"),
+            label_content=ft.Text("Scenes"),
         ),
         ft.NavigationRailDestination(
             icon=ft.Icons.FAVORITE_BORDER,
@@ -32,15 +32,15 @@ rail = ft.NavigationRail(
             label="First",
         ),
         ft.NavigationRailDestination(
-            icon=ft.Icon(ft.Icons.BOOKMARK_BORDER),
-            selected_icon=ft.Icon(ft.Icons.BOOKMARK),
-            label="Second",
-        ),
-        ft.NavigationRailDestination(
             icon=ft.Icons.SETTINGS_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.SETTINGS),
             label_content=ft.Text("Settings"),
         ),
+        ft.NavigationRailDestination(
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SETTINGS),
+            label_content=ft.Text("Add Workspace"),
+        )
     ],
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )

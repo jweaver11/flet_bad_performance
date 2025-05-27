@@ -3,6 +3,7 @@ and to the right of the navigation rail '''
 
 import flet as ft
 
+# Using pagelets somehow someway somehwere
 workspace = ft.Column(
     [
         ft.Text("Body!"),
