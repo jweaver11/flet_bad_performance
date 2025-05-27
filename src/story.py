@@ -1,5 +1,5 @@
-from characters import characters_view
-from characters import Character
+from workspaces.characters import characters_view
+from workspaces.characters import Character
 
 # Class for each seperate story/project
 class Story:

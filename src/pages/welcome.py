@@ -1,22 +1,13 @@
 '''The welcome page for app. Will start here if user has no projects'''
 import flet as ft
 
+def welcome_page(page: ft.Page):
 
-def create_welcome_page(page: ft.Page):
-    
-
-   # create project from templates: novel, comic, animation, blank, etc.  
-    page.title = "Basic outlined buttons"
-
-    outlined_button = ft.OutlinedButton(
-        text="Outlined button",
-        on_click=lambda e: print("Outlined button clicked!"),
+    return ft.View(
+        "/welcome",
+        [
+            ft.Text("Welcome page"),
+            ft.ElevatedButton("Go Home", on_click=lambda _: page.go("/")),
+            ft.ElevatedButton("Go to settings", on_click=lambda _: page.go("/settings")),
+        ]
     )
-    page.add(
-        ft.OutlinedButton(text="Outlined button"),
-        ft.OutlinedButton("Disabled button", disabled=True),
-    )
-    
-    hello = ft.Text("Hello, World!")
-    page.add(hello)
-    print(hello in page)  # True

@@ -12,6 +12,10 @@ def create_menu_bar(page: ft.Page):
         )
         page.update()
 
+    def handle_file_open_click(e):
+        page.route = "/welcome"
+        page.update()
+
     def handle_bugs_click(e):
         # Print to console
         print(f"{e.control.content.value}.on_click. Theyre under my skin")
@@ -19,6 +23,10 @@ def create_menu_bar(page: ft.Page):
             # Pop up on bottom of app and disappear quickly
             ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked! claw them out now"))
         )
+        page.update()
+
+    def handle_settings_click(e):
+        page.route = "/settings"
         page.update()
 
 
@@ -32,12 +40,14 @@ def create_menu_bar(page: ft.Page):
     def handle_submenu_hover(e):
         print(f"{e.control.content.value}.on_hover")
 
+
+
     # Create our menu bar with submenu items
     menubar = ft.MenuBar(
        # Format menubar
         expand=True,
         style=ft.MenuStyle(
-            alignment=ft.alignment.top_left,
+            alignment=ft.alignment.center,
             mouse_cursor={
                 ft.ControlState.HOVERED: ft.MouseCursor.WAIT,
                 ft.ControlState.DEFAULT: ft.MouseCursor.ZOOM_OUT,
@@ -47,6 +57,9 @@ def create_menu_bar(page: ft.Page):
             # Parent submenu item with child items on hover
             ft.SubmenuButton(
                 content=ft.Text("File"),
+                style=ft.ButtonStyle(
+                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
+                ),
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
@@ -81,7 +94,7 @@ def create_menu_bar(page: ft.Page):
                         style=ft.ButtonStyle(
                             bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
                         ),
-                        on_click=handle_menu_item_click,
+                        on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Quit"),
@@ -95,6 +108,9 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.SubmenuButton(
                 content=ft.Text("Edit"),
+                style=ft.ButtonStyle(
+                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
+                ),
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
@@ -119,6 +135,9 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.SubmenuButton(
                 content=ft.Text("Upload"),
+                style=ft.ButtonStyle(
+                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
+                ),
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
@@ -175,6 +194,9 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.SubmenuButton(
                 content=ft.Text("View"),
+                style=ft.ButtonStyle(
+                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
+                ),
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
@@ -204,10 +226,13 @@ def create_menu_bar(page: ft.Page):
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
                 ),
-                on_click=handle_menu_item_click,
+                on_click=handle_settings_click,
             ),
             ft.SubmenuButton(
                 content=ft.Text("Feedback"),
+                style=ft.ButtonStyle(
+                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
+                ),
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
