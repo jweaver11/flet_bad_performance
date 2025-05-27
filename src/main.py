@@ -4,7 +4,7 @@ from characters import characters_view
 from characters import Character
 from nav_rail import rail
 from workspace import workspace
-from menu_bar import menubar
+from menu_bar import create_menu_bar
 
 # Class for each seperate story/project
 class Story:
@@ -35,6 +35,9 @@ story.CreateCharacter("my brand new characters name")
 
 # MAIN FUNCTION TO RENDER PAGE ---------------------------------------------------------
 def main(page: ft.Page):
+
+
+    menubar = create_menu_bar(page)
 
     # page.add(ft.Row([menubar, appbar]))
     page.add(ft.Row([menubar]))
