@@ -1,4 +1,5 @@
 import flet as ft
+import os
 
 # list of all characters in the project
 characters = []
@@ -39,7 +40,11 @@ origin = {
 }
 '''
 
-
+# Saving characters locally
+app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
+my_file_path = os.path.join(app_data_path, "test_file.txt")
+with open(my_file_path, "w") as f:
+    f.write("My characters will go here")
 
 def characters_view(page):
     return ft.View(

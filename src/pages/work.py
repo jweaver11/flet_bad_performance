@@ -7,6 +7,7 @@ from hud.nav_rail import rail
 from hud.rail_handler import workspace_rail
 from models.characters import characters
 from models.characters import Character
+import models.characters
 
 # Using pagelets somehow someway somehwere
 workspaces = ft.Column(
