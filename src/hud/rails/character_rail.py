@@ -54,5 +54,3 @@ character_rail = ft.NavigationRail(
     ],
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )
-
-workspace_rail = character_rail

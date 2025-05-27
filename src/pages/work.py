@@ -4,7 +4,7 @@ and to the right of the navigation rail '''
 import flet as ft
 from hud.menu_bar import create_menu_bar
 from hud.nav_rail import rail
-from hud.workspace_rail import workspace_rail
+from hud.rail_handler import workspace_rail
 from models.characters import characters
 from models.characters import Character
 
