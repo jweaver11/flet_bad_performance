@@ -19,9 +19,10 @@ def main(page: ft.Page):
         ft.Row
         (
             [
-                rail,
-                ft.VerticalDivider(width=10),
-                workspace,
+                rail,   # Navigation rail on the left side of the page
+                ft.VerticalDivider(width=10), # Divider between the nav rail and workspace
+                workspace,  # Workspace for the main content of the page
+                #footer
             ],
             expand=True
         )
