@@ -1,5 +1,5 @@
 import flet as ft
-from models.characters import characters  # Import the characters list
+from pagelets.characters import characters  # Import the characters list
 
 button_ref = ft.Ref[ft.ElevatedButton]()
 textfield_ref = ft.Ref[ft.TextField]()
@@ -40,6 +40,7 @@ character_rail = ft.NavigationRail(
     min_width=70,
     min_extended_width=300,
     group_alignment=-0.9,
+    expand=True,
     trailing=ft.Column([
         ft.ElevatedButton(
             "Create Character",
@@ -52,7 +53,7 @@ character_rail = ft.NavigationRail(
             ref=textfield_ref,
             visible=False,
             hint_text="Enter Character Name",
-            width=150,
+            width=200,
             on_submit=on_textfield_submit,
             on_tap_outside=on_textfield_deselect,
         )
