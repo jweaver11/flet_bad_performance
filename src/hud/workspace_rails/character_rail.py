@@ -28,8 +28,9 @@ def on_textfield_submit(e):
 character_rail = ft.NavigationRail(
     selected_index=0,
     label_type=ft.NavigationRailLabelType.ALL,
-    min_width=100,
-    min_extended_width=400,
+    min_width=70,
+    min_extended_width=300,
+    group_alignment=-0.9,
     trailing=ft.Column([
         ft.ElevatedButton(
             "Create Character",
@@ -42,16 +43,31 @@ character_rail = ft.NavigationRail(
             ref=textfield_ref,
             visible=False,
             hint_text="Enter Character Name",
-            width=200,
+            width=150,
             on_submit=on_textfield_submit
         )
     ]),
-    group_alignment=0,
     destinations=[
-        ft.NavigationRailDestination(label="Filter Characters"),    # Option to filter how all characters are show below (main, side, background, good, evil, neutral)
-        ft.NavigationRailDestination(label="Character 1"),
-        ft.NavigationRailDestination(label="Character 2"),
-        ft.NavigationRailDestination(label="Character 3"),
+        ft.NavigationRailDestination(
+            label="Filter Characters",  # Option to filter how all characters are show below (main, side, background, good, evil, neutral)
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SETTINGS)
+        ),  
+        ft.NavigationRailDestination(
+            label="Character 1", 
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SETTINGS)
+        ),
+        ft.NavigationRailDestination(
+            label="Character 2", 
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SETTINGS)
+        ),
+        ft.NavigationRailDestination(
+            label="Character 3",
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SETTINGS)
+        ),
     ],
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )

@@ -97,6 +97,22 @@ def create_menu_bar(page: ft.Page):
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
+                        content=ft.Text("Import"),
+                        leading=ft.Icon(ft.Icons.CLOSE),
+                        style=ft.ButtonStyle(
+                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
+                        ),
+                        on_click=handle_file_open_click,
+                    ),
+                    ft.MenuItemButton(
+                        content=ft.Text("Export"),
+                        leading=ft.Icon(ft.Icons.CLOSE),
+                        style=ft.ButtonStyle(
+                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
+                        ),
+                        on_click=handle_file_open_click,
+                    ),
+                    ft.MenuItemButton(
                         content=ft.Text("Quit"),
                         leading=ft.Icon(ft.Icons.CLOSE),
                         style=ft.ButtonStyle(
