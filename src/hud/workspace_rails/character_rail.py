@@ -24,6 +24,15 @@ def on_textfield_submit(e):
     button_ref.current.visible = True
     button_ref.current.update()
 
+# When textbox is clicked off and nothing in it, reset to button
+def on_textfield_deselect(e):
+    name = textfield_ref.current.value
+    if name == "":
+        textfield_ref.current.visible = False
+        button_ref.current.visible = True
+        textfield_ref.current.update()
+        button_ref.current.update()
+
 # Rail for when the character workspace is selected
 character_rail = ft.NavigationRail(
     selected_index=0,
@@ -44,7 +53,8 @@ character_rail = ft.NavigationRail(
             visible=False,
             hint_text="Enter Character Name",
             width=150,
-            on_submit=on_textfield_submit
+            on_submit=on_textfield_submit,
+            on_tap_outside=on_textfield_deselect,
         )
     ]),
     destinations=[
