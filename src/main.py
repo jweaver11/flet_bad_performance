@@ -11,7 +11,7 @@ from pages.settings import settings_page
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
-    page.title = "Project - Name : Saved status"    # Set title
+    page.title = "StoryBoard : Project - Name : Saved status"    # Set title
     page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)    # Set theme
 
     def route_change(route):

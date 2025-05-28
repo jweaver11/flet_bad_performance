@@ -48,9 +48,10 @@ character_rail = ft.NavigationRail(
     ]),
     group_alignment=0,
     destinations=[
-        ft.NavigationRailDestination(label="Main Characters"),
-        ft.NavigationRailDestination(label="Side Characters"),
-        ft.NavigationRailDestination(label="Background Characters"),
+        ft.NavigationRailDestination(label="Filter Characters"),    # Option to filter how all characters are show below (main, side, background, good, evil, neutral)
+        ft.NavigationRailDestination(label="Character 1"),
+        ft.NavigationRailDestination(label="Character 2"),
+        ft.NavigationRailDestination(label="Character 3"),
     ],
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )

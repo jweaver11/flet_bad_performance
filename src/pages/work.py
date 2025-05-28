@@ -42,9 +42,9 @@ def work_page(page: ft.Page):
             ft.Row(
                 [
                     rail,   # Add navigation rail to page
-                    ft.VerticalDivider(width=10),
-                    workspace_rail,
-                    workspaces,
+                    ft.VerticalDivider(width=10),   # Divider between rails
+                    workspace_rail, # Whichever workspace is selected from the navigation rail above
+                    workspaces, # The workspaces to the right of the rail
                 ],
                 expand=True
             )
