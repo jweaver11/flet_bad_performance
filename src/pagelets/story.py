@@ -1,6 +1,6 @@
 ''' Master Story/Project class for projects'''
-from models.characters import characters_view
-from models.characters import Character
+from pagelets.characters import characters_view
+from pagelets.characters import Character
 
 # Class for each seperate story/project
 class Story:

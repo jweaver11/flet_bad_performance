@@ -1,13 +1,10 @@
 import flet as ft
 import os
 
-# list of all characters in the project
-characters = []
-
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):
-        self.name : str = name
+        self.name = name
         
     # picture : ft.Image?
     age : int

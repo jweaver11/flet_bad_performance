@@ -4,7 +4,7 @@ and to the right of the navigation rail '''
 import flet as ft
 from hud.menu_bar import create_menu_bar
 from hud.navigation_rail import navigation_rail
-from widgets.widget_rails.character_rail import character_rail
+from rails.character_rail import character_rail
 
 
 navigation_rail_container = ft.Container(
@@ -34,8 +34,6 @@ workspaces = ft.Container(
     )
 )
     
-
-
 
 
 # Render page that is main working page of the app

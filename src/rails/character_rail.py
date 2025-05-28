@@ -1,5 +1,13 @@
 import flet as ft
-from pagelets.characters import characters  # Import the characters list
+from pagelets.characters import Character
+
+characters = []
+characters.append(Character("Bill"))
+characters.append(Character("Johnny"))
+characters.append(Character("William"))
+
+for character in characters:
+    print(character.name)
 
 button_ref = ft.Ref[ft.ElevatedButton]()
 textfield_ref = ft.Ref[ft.TextField]()

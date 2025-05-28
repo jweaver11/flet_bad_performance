@@ -1,6 +1,5 @@
 # The main 'story' page. The default page that all others work through
 import flet as ft
-import time
 
 from pages.work import work_page
 from pages.welcome import welcome_page
