@@ -10,6 +10,7 @@ from models.characters import Character
 import models.characters
 
 # Using pagelets somehow someway somehwere
+# Add workspace containers for pop out options
 workspaces = ft.Column(
     [
         ft.Text("Body!"),
@@ -25,7 +26,6 @@ def work_page(page: ft.Page):
 
     # Set and add the menu bar at top of the page
     menubar = create_menu_bar(page)
-    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
 
     Character_one = Character("Johnny")
     characters.append(Character("Karate"))  # Create object and write to list in one line

@@ -1,15 +1,18 @@
 # The main 'story' page. The default page that all others work through
 import flet as ft
+import time
 
 from pages.work import work_page
 from pages.welcome import welcome_page
 from pages.settings import settings_page
                 
+# timer = time.Timer()
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
-    page.title = "Project - Name"
+    page.title = "Project - Name : Saved status"    # Set title
+    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)    # Set theme
 
     def route_change(route):
         page.views.clear()
