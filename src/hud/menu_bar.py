@@ -6,9 +6,9 @@ def create_menu_bar(page: ft.Page):
     
     # Handler logic for each menu item clicked
     def handle_menu_item_click(e):
-        print(f"{e.control.content.value}.on_click")
+        print(f"{e.control.content.content.value}.on_click")
         page.open(
-            ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
+            ft.SnackBar(content=ft.Text(f"{e.control.content.content.value} was clicked!"))
         )
         page.update()
 
@@ -18,10 +18,10 @@ def create_menu_bar(page: ft.Page):
 
     def handle_bugs_click(e):
         # Print to console
-        print(f"{e.control.content.value}.on_click. Theyre under my skin")
+        print(f"{e.control.content.content.value}.on_click. Theyre under my skin")
         page.open(
             # Pop up on bottom of app and disappear quickly
-            ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked! claw them out now"))
+            ft.SnackBar(content=ft.Text(f"{e.control.content.content.value} was clicked! claw them out now"))
         )
         page.update()
 
@@ -32,13 +32,13 @@ def create_menu_bar(page: ft.Page):
 
     # Handlers called automatically for submenu events
     def handle_submenu_open(e):
-        print(f"{e.control.content.value}.on_open")
+        print(f"{e.control.content.content.value}.on_open")
 
     def handle_submenu_close(e):
-        print(f"{e.control.content.value}.on_close")
+        print(f"{e.control.content.content.value}.on_close")
 
     def handle_submenu_hover(e):
-        print(f"{e.control.content.value}.on_hover")
+        print(f"{e.control.content.content.value}.on_hover")
 
 
 
@@ -56,7 +56,10 @@ def create_menu_bar(page: ft.Page):
         controls=[
             # Parent submenu item with child items on hover
             ft.SubmenuButton(
-                content=ft.Text("File"),
+                content=ft.Container(
+                    content=ft.Text("File"),
+                    alignment=ft.alignment.center
+                ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
                 ),
@@ -123,7 +126,10 @@ def create_menu_bar(page: ft.Page):
                 ],
             ),
             ft.SubmenuButton(
-                content=ft.Text("Edit"),
+                content=ft.Container(
+                    content=ft.Text("Edit"),
+                    alignment=ft.alignment.center
+                ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
                 ),
@@ -150,7 +156,10 @@ def create_menu_bar(page: ft.Page):
                 ],
             ),
             ft.SubmenuButton(
-                content=ft.Text("Upload"),
+                content=ft.Container(
+                    content=ft.Text("Upload"),
+                    alignment=ft.alignment.center
+                ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
                 ),
@@ -209,7 +218,10 @@ def create_menu_bar(page: ft.Page):
                 ],
             ),
             ft.SubmenuButton(
-                content=ft.Text("View"),
+                content=ft.Container(
+                    content=ft.Text("View"),
+                    alignment=ft.alignment.center
+                ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
                 ),
@@ -238,14 +250,20 @@ def create_menu_bar(page: ft.Page):
                 ],
             ),
             ft.MenuItemButton(
-                content=ft.Text("Settings"),
+                content=ft.Container(
+                    content=ft.Text("Settings"),
+                    alignment=ft.alignment.center
+                ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
                 ),
                 on_click=handle_settings_click,
             ),
             ft.SubmenuButton(
-                content=ft.Text("Feedback"),
+                content=ft.Container(
+                    content=ft.Text("Feedback"),
+                    alignment=ft.alignment.center
+                ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
                 ),
