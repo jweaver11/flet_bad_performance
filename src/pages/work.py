@@ -3,7 +3,7 @@ and to the right of the navigation rail '''
 
 import flet as ft
 from hud.menu_bar import create_menu_bar
-from hud.navigation_rail import navigation_rail
+from hud.workspaces_rail import navigation_rail
 from rails.character_rail import character_rail
 
 
@@ -29,7 +29,7 @@ workspaces = ft.Container(
         controls=[
             ft.Column(width=160, controls=[character_rail]),
             ft.VerticalDivider(width=1, thickness=2),
-            ft.Column(controls=[ft.Text("workspaces container")])
+            ft.Column(controls=[ft.Text("Pagelets container")])
         ]
     )
 )
@@ -62,10 +62,6 @@ def work_page(page: ft.Page):
                     workspaces,
                 ],
             ),
-
-            #nav_rail_container,
-
-           # work_rail_container
         ],
 )
 

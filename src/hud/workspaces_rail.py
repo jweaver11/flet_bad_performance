@@ -45,7 +45,7 @@ navigation_rail = ft.NavigationRail(
     on_change=lambda e: print("Selected destination:", e.control.selected_index),
     trailing=ft.FloatingActionButton(
         icon=ft.Icons.CREATE, 
-        text="Add Widgets (premade)", 
+        text="Add Workspace (premade)", 
         on_click=lambda e: print("FAB clicked!"),
         scale=.85
     ),
