@@ -2,7 +2,7 @@
 import flet as ft
 
 # Design the navigation rail on the left
-navigation_rail = ft.NavigationRail(
+workspaces_rail = ft.NavigationRail(
     selected_index=0,
     expand=True,
     label_type=ft.NavigationRailLabelType.ALL,
@@ -27,7 +27,7 @@ navigation_rail = ft.NavigationRail(
         ),
         ft.NavigationRailDestination(
             icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS),
-            label_content=ft.Text("Timeline"),
+            label_content=ft.Text("Plot & Timeline"),
         ),
         ft.NavigationRailDestination(
             icon=ft.Icons.FAVORITE_BORDER, selected_icon=ft.Icons.FAVORITE,
@@ -51,6 +51,15 @@ navigation_rail = ft.NavigationRail(
     ),
 )
 
-
-
-
+# Container for active workspace that is open on application
+workspaces_rail_container = ft.Container(
+    border = ft.border.all(0, ft.Colors.RED_200),
+    alignment=ft.alignment.center,  # Aligns content to the 
+    width=160,
+    content=ft.Row(
+        controls=[
+            workspaces_rail,
+            ft.VerticalDivider(width=0, thickness=2),
+        ]
+    ),
+)

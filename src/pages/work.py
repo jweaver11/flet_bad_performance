@@ -3,37 +3,38 @@ and to the right of the navigation rail '''
 
 import flet as ft
 from hud.menu_bar import create_menu_bar
-from hud.workspaces_rail import navigation_rail
-from workspace_rails.character_rail import character_rail
+from hud.workspaces_rail import workspaces_rail_container
+from workspace_rails.character_rail import characters_rail
 
 
-navigation_rail_container = ft.Container(
-    border = ft.border.all(0, ft.Colors.GREY_200),
-    alignment=ft.alignment.center,  # Aligns content to the 
-    width=160,
-    content=ft.Row(
-        controls=[
-            navigation_rail,
-            ft.VerticalDivider(width=0, thickness=2),
-        ]
-    ),
-)
-
-# Using pagelets somehow someway somehwere
-# Add workspace containers for pop out options
-workspaces = ft.Container(
-    border = ft.border.all(0, ft.Colors.BLUE),
+# Container for 1 or more pagelets open on main right side of screen
+pagelets_container = ft.Container(
+    border = ft.border.all(0, ft.Colors.BLUE_200),
     # Add more widgets here as needed
     expand=True,
     content=ft.Row(
         controls=[
-            ft.Column(width=160, controls=[character_rail]),
-            ft.VerticalDivider(width=1, thickness=2),
             ft.Column(controls=[ft.Text("Pagelets container")])
         ]
     )
 )
-    
+
+# Using pagelets somehow someway somehwere
+# Add workspace containers for pop out options
+workspace_container = ft.Container(
+    border = ft.border.all(0, ft.Colors.GREEN_200),
+    # Add more widgets here as needed
+    expand=True,
+    width=160,
+    content=ft.Row(
+        spacing=0,
+        controls=[
+            ft.Column(controls=[characters_rail]),
+            ft.VerticalDivider(width=1, thickness=2),
+            ft.Column(controls=[pagelets_container], expand=True)
+        ]
+    )
+)
 
 
 # Render page that is main working page of the app
@@ -45,21 +46,18 @@ def work_page(page: ft.Page):
     # Renders our work page
     return ft.View(
         "/work",
-
-        [
+        controls=[
             # Add the menu bar to the top
             ft.Row([menubar]),
 
             # Add everything else to the page, from left to right
-            # The controls this adds should be dynamic and switch from page to page
             ft.Row(
                 spacing=0,  # No spacing between containers
                 expand=True,    # Cover the rest of the page
                 # The rest of the controls (widgets) to the page
                 controls=[
-                    navigation_rail_container,
-
-                    workspaces,
+                    workspaces_rail_container,
+                    workspace_container,
                 ],
             ),
         ],

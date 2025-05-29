@@ -1,6 +1,8 @@
-''' Handles different workspace rails for the HUD, other than the main navigation rail'''
+''' Handles different workspace rails for the HUD, 
+other than the main navigation rail of all the workspaces'''
+
 import flet as ft
-from hud.workspace_rails.character_rail import character_rail  # Import the characters list
+from workspace_rails.character_rail import characters_rail  # Import the characters list
 
 
-workspace_rail = character_rail
+workspace_rail = characters_rail

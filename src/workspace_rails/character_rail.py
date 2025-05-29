@@ -6,14 +6,23 @@ characters.append(Character("Bill"))
 characters.append(Character("Johnny"))
 characters.append(Character("William"))
 
-for character in characters:
-    print(character.name)
-
 button_ref = ft.Ref[ft.ElevatedButton]()
 textfield_ref = ft.Ref[ft.TextField]()
 
+# Creates a character for workspace rail
+def add_destinations():
+    for character in characters:
+        char_destinations = ft.NavigationRailDestination(
+            label=character.name,
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SETTINGS)
+        )
+        print(character.name)
+
+    return char_destinations
+
 # Control when 'Create Character' button is clicked
-def on_button_click(e):
+def add_character_click(e):
     button_ref.current.visible = False
     button_ref.current.update()
     textfield_ref.current.visible = True
@@ -41,31 +50,24 @@ def on_textfield_deselect(e):
         textfield_ref.current.update()
         button_ref.current.update()
 
+
+listtile = ft.ListTile(
+    title=ft.Text("Character 4"), data="Character 4",
+    # on_click=add_character_click
+),
+
+#new_char_rail = ft.Control[]
+
+
 # Rail for when the character workspace is selected
-character_rail = ft.NavigationRail(
+characters_rail = ft.NavigationRail(
     selected_index=0,
     label_type=ft.NavigationRailLabelType.ALL,
     min_width=70,
     min_extended_width=300,
     group_alignment=-0.9,
     expand=True,
-    leading=ft.Column([
-        ft.ElevatedButton(
-            "Create Character",
-            ref=button_ref,
-            visible=True,
-            width=200,
-            on_click=on_button_click
-        ),
-        ft.TextField(
-            ref=textfield_ref,
-            visible=False,
-            hint_text="Enter Character Name",
-            width=200,
-            on_submit=on_textfield_submit,
-            on_tap_outside=on_textfield_deselect,
-        )
-    ]),
+    #leading=Filter drop downs
     destinations=[
         ft.NavigationRailDestination(
             label="Filter Characters",  # Option to filter how all characters are show below (main, side, background, good, evil, neutral)
@@ -77,33 +79,27 @@ character_rail = ft.NavigationRail(
             icon=ft.Icons.SETTINGS_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.SETTINGS)
         ),
-        ft.NavigationRailDestination(
-            label="Character 2", 
-            icon=ft.Icons.SETTINGS_OUTLINED,
-            selected_icon=ft.Icon(ft.Icons.SETTINGS)
-        ),
-        ft.NavigationRailDestination(
-            label="Character 3",
-            icon=ft.Icons.SETTINGS_OUTLINED,
-            selected_icon=ft.Icon(ft.Icons.SETTINGS)
-        ),
+        add_destinations(),
     ],
-    trailing=ft.Column([
-        ft.ElevatedButton(
-            "Add Pagelet",
-            ref=button_ref,
-            visible=True,
-            width=200,
-            on_click=on_button_click
-        ),
-        ft.TextField(
-            ref=textfield_ref,
-            visible=False,
-            hint_text="Enter Character Name",
-            width=200,
-            on_submit=on_textfield_submit,
-            on_tap_outside=on_textfield_deselect,
-        )
-    ]),
+    trailing=ft.Column(
+        alignment=ft.alignment.center,  # Aligns content to center
+        controls=[
+            ft.ElevatedButton(
+                "Create Character",
+                ref=button_ref,
+                visible=True,
+                width=200,
+                on_click=add_character_click
+            ),
+            ft.TextField(
+                ref=textfield_ref,
+                visible=False,
+                hint_text="Enter Character Name",
+                width=200,
+                on_submit=on_textfield_submit,
+                on_tap_outside=on_textfield_deselect,
+            ),
+        ]
+    ), 
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )

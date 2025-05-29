@@ -37,6 +37,12 @@ origin = {
 }
 '''
 
+add_pagelet_custom_option = ft.ElevatedButton(
+    "Add Pagelet",
+    visible=True,
+    width=200,
+),
+
 # Saving characters locally
 app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
 my_file_path = os.path.join(app_data_path, "test_file.txt")
