@@ -7,7 +7,7 @@ characters.append(Character("Billy"))
 characters.append(Character("Johnny"))
 characters.append(Character("William"))
 
-button_ref = ft.Ref[ft.ElevatedButton]()
+button_ref = ft.Ref[ft.TextButton]()
 textfield_ref = ft.Ref[ft.TextField]()
 
 # Control when 'Create Character' button is clicked
@@ -62,26 +62,6 @@ characters_rail = ft.NavigationRail(
             selected_icon=ft.Icon(ft.Icons.SETTINGS)
         ),
     ],
-    trailing=ft.Column(
-        alignment=ft.alignment.center,  # Aligns content to center
-        controls=[
-            ft.ElevatedButton(
-                "Create Character",
-                ref=button_ref,
-                visible=True,
-                width=200,
-                on_click=add_character_click
-            ),
-            ft.TextField(
-                ref=textfield_ref,
-                visible=False,
-                hint_text="Enter Character Name",
-                width=200,
-                on_submit=on_textfield_submit,
-                on_tap_outside=on_textfield_deselect,
-            ),
-        ]
-    ), 
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )
 
@@ -90,6 +70,16 @@ char_rail = [
     ft.TextButton("Character 1", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
     ft.TextButton("Character 2", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
     ft.TextButton("Character 3", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
+    ft.TextButton("Create Character", icon=ft.Icons.WAVES_OUTLINED, style=button_style, ref=button_ref,
+                  on_click=add_character_click),
+    
+    ft.TextField(
+        ref=textfield_ref,
+        visible=False,
+        hint_text="Enter Character Name",
+        width=200,
+        on_submit=on_textfield_submit,
+        on_tap_outside=on_textfield_deselect,
+    ),
 ]
-
     
