@@ -1,5 +1,6 @@
 import flet as ft
 from pagelets.characters import Character
+from styles.styles import button_style
 
 characters = []
 characters.append(Character("Billy"))
@@ -38,13 +39,6 @@ def on_textfield_deselect(e):
         textfield_ref.current.update()
         button_ref.current.update()
 
-
-listtile = ft.ListTile(
-    title=ft.Text("Character 4"), data="Character 4",
-    # on_click=add_character_click
-),
-
-#new_char_rail = ft.Control[]
 
 
 # Rail for when the character workspace is selected
@@ -90,3 +84,12 @@ characters_rail = ft.NavigationRail(
     ), 
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )
+
+# List of controls for the rail container
+char_rail = [
+    ft.TextButton("Character 1", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
+    ft.TextButton("Character 2", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
+    ft.TextButton("Character 3", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
+]
+
+    

@@ -14,15 +14,13 @@ class Character:
     occupation: str
     # origin = origin
     notes : str
+    shown : bool
 
-    '''# Used for filtering 
-    main_character : bool
-    side_character : bool
-    background_character : bool
-    good : bool
-    evil : bool
-    neutral : bool
+    # unique data types, (not str)
+    color : str
+    icon : str
 
+    '''
     # Add ons that won't show by default
     race: str
     species : str
@@ -34,6 +32,19 @@ origin = {
     "Birth date": "",
     "Hometown": "",
     "Education": "",
+}
+
+tags = {
+    main_character : bool
+    side_character : bool
+    background_character : bool
+    good : bool
+    evil : bool
+    neutral : bool
+    man : bool
+    woman : bool
+    alive : bool
+    dead : bool
 }
 '''
 

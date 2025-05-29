@@ -28,7 +28,7 @@ workspace_container = ft.Container(
     content=ft.Row(
         spacing=0,
         controls=[
-            ft.Column(controls=[workspace_rail]),  # Adds the rail for whichever workspace selected
+            ft.Column(controls=workspace_rail),  # Adds the rail for whichever workspace selected
             ft.VerticalDivider(width=0, thickness=2),   # Divider between rail and work area
             ft.Column(controls=[pagelets_container], expand=True)   # Adds container for work area
         ]
