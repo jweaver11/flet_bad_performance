@@ -2,24 +2,12 @@ import flet as ft
 from pagelets.characters import Character
 
 characters = []
-characters.append(Character("Bill"))
+characters.append(Character("Billy"))
 characters.append(Character("Johnny"))
 characters.append(Character("William"))
 
 button_ref = ft.Ref[ft.ElevatedButton]()
 textfield_ref = ft.Ref[ft.TextField]()
-
-# Creates a character for workspace rail
-def add_destinations():
-    for character in characters:
-        char_destinations = ft.NavigationRailDestination(
-            label=character.name,
-            icon=ft.Icons.SETTINGS_OUTLINED,
-            selected_icon=ft.Icon(ft.Icons.SETTINGS)
-        )
-        print(character.name)
-
-    return char_destinations
 
 # Control when 'Create Character' button is clicked
 def add_character_click(e):
@@ -79,7 +67,6 @@ characters_rail = ft.NavigationRail(
             icon=ft.Icons.SETTINGS_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.SETTINGS)
         ),
-        add_destinations(),
     ],
     trailing=ft.Column(
         alignment=ft.alignment.center,  # Aligns content to center

@@ -4,14 +4,15 @@ and to the right of the navigation rail '''
 import flet as ft
 from hud.menu_bar import create_menu_bar
 from hud.workspaces_rail import workspaces_rail_container
-from workspace_rails.character_rail import characters_rail
+from handlers.rail_handler import workspace_rail
 
 
-# Container for 1 or more pagelets open on main right side of screen
+# Container for 1 or more pagelets open on main right side of screen (work area)
 pagelets_container = ft.Container(
     border = ft.border.all(0, ft.Colors.BLUE_200),
-    # Add more widgets here as needed
     expand=True,
+    padding=4,
+    margin=10,
     content=ft.Row(
         controls=[
             ft.Column(controls=[ft.Text("Pagelets container")])
@@ -19,21 +20,20 @@ pagelets_container = ft.Container(
     )
 )
 
-# Using pagelets somehow someway somehwere
-# Add workspace containers for pop out options
+# Parent container for entire page minus the menubar and workspaces rail
 workspace_container = ft.Container(
     border = ft.border.all(0, ft.Colors.GREEN_200),
-    # Add more widgets here as needed
     expand=True,
     width=160,
     content=ft.Row(
         spacing=0,
         controls=[
-            ft.Column(controls=[characters_rail]),
-            ft.VerticalDivider(width=1, thickness=2),
-            ft.Column(controls=[pagelets_container], expand=True)
+            ft.Column(controls=[workspace_rail]),  # Adds the rail for whichever workspace selected
+            ft.VerticalDivider(width=0, thickness=2),   # Divider between rail and work area
+            ft.Column(controls=[pagelets_container], expand=True)   # Adds container for work area
         ]
     )
+    # [] of active pagelets, save to user so they wont vanish
 )
 
 
@@ -47,17 +47,16 @@ def work_page(page: ft.Page):
     return ft.View(
         "/work",
         controls=[
-            # Add the menu bar to the top
-            ft.Row([menubar]),
+            ft.Row([menubar]),  # Add menu bar at top of page
 
             # Add everything else to the page, from left to right
             ft.Row(
-                spacing=0,  # No spacing between containers
-                expand=True,    # Cover the rest of the page
-                # The rest of the controls (widgets) to the page
+                spacing=0, 
+                expand=True,  
+
                 controls=[
-                    workspaces_rail_container,
-                    workspace_container,
+                    workspaces_rail_container,  # Sub-Rail for active workspace
+                    workspace_container,    # Work area for pagelets
                 ],
             ),
         ],
