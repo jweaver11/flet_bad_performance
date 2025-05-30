@@ -54,3 +54,5 @@ tags = {
 # with open(my_file_path, "w") as f:
     # f.write("My characters will go here")
 
+class character_pagelet:
+    print("do something")

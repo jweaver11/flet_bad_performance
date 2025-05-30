@@ -50,16 +50,3 @@ all_workspaces_rail = ft.NavigationRail(
         scale=.85
     ),
 )
-
-# Container for active workspace that is open on application
-all_workspaces_rail_container = ft.Container(
-    border = ft.border.all(0, ft.Colors.RED_200),
-    alignment=ft.alignment.center,  # Aligns content to the 
-    width=160,
-    content=ft.Row(
-        controls=[
-            all_workspaces_rail,
-            ft.VerticalDivider(width=0, thickness=2),
-        ]
-    ),
-)

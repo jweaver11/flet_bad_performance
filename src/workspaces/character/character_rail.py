@@ -17,13 +17,12 @@ def delete_on_click(e):
 
 
 # Control when 'Create Character' button is clicked
-def add_character_button_click(page, e):
+def add_character_button_click(e):
     button_ref.current.visible = False
     button_ref.current.update()
     textfield_ref.current.visible = True
     textfield_ref.current.focus()
     textfield_ref.current.update()
-    page.update()
 
 # Control submits in textfield when creating character
 def add_character_textfield_submit(e):
@@ -31,13 +30,14 @@ def add_character_textfield_submit(e):
     if name:
         story.create_character(name)    # Add char to char list of story object
         print("added", story.character_list[-1].name, "to story object")
-        characters_rail.insert(len(characters_rail) - 3, new_char)  # Add char to char rail
+        characters_rail.insert(len(characters_rail) - 3, name)  # Add char to char rail
         print("Added ", name, "to character rail")
     textfield_ref.current.value = ""
     textfield_ref.current.visible = False
     textfield_ref.current.update()
     button_ref.current.visible = True
     button_ref.current.update()
+
 
 # When textbox is clicked off and nothing in it, reset to button
 def on_textfield_deselect(e):

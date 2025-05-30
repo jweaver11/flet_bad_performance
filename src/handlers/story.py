@@ -35,8 +35,4 @@ class Story:
         self.character_list.append(Character(name))
         # print(self.character_list[self.character_list(len)].name)
 
-            
-
-# Creating new character object within story object
-story = Story("My story name")
-
+story = Story("my title")
