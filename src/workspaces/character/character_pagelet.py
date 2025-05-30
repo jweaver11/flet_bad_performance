@@ -48,20 +48,9 @@ tags = {
 }
 '''
 
-add_pagelet_custom_option = ft.ElevatedButton(
-    "Add Pagelet",
-    visible=True,
-    width=200,
-),
-
 # Saving characters locally
 app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
-my_file_path = os.path.join(app_data_path, "test_file.txt")
+my_file_path = os.path.join(app_data_path, "characters.json")
 with open(my_file_path, "w") as f:
     f.write("My characters will go here")
 
-def characters_view(page):
-    return ft.View(
-        "/",
-        [ft.Text("This is Page One"), ft.ElevatedButton("Go to Page Two", on_click=lambda _: page.go("/two"))]
-    )

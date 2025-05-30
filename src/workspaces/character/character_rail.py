@@ -1,11 +1,10 @@
 import flet as ft
 from workspaces.character.character_pagelet import Character
 from styles.styles import button_style
+from handlers.story import Story
 
 characters = []
-characters.append(Character("Billy"))
-characters.append(Character("Johnny"))
-characters.append(Character("William"))
+story = Story
 
 button_ref = ft.Ref[ft.TextButton]()
 textfield_ref = ft.Ref[ft.TextField]()
