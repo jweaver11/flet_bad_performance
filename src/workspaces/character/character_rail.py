@@ -65,6 +65,8 @@ characters_rail = ft.NavigationRail(
     on_change=lambda e: print("Selected destination:", e.control.selected_index)
 )
 
+# Function to add characters to char_rail. Returns a control. Call it through iteration of characters[]
+
 # List of controls for the rail container
 char_rail = [
     ft.TextButton("Character 1", icon=ft.Icons.WAVES_OUTLINED, style=button_style),
