@@ -1,3 +1,3 @@
 import flet as ft
 
-button_style = ft.ButtonStyle(color=ft.Colors.BLUE_200)
+button_style = ft.ButtonStyle(color=ft.Colors.WHITE)

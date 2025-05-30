@@ -12,24 +12,30 @@ class Story:
         print(self.character_list[0].name)
         self.character_list.append(Character("Johnny")) #temp
         print(self.character_list[1].name)
+        self.character_list.append(Character("Willy")) #temp
+        print(self.character_list[2].name)
+        self.character_list.append(Character("Tubby")) #temp
+        print(self.character_list[3].name)
+        #active_workspace = "character" ?
 
     
+    # Index workspaces to see which is active
+
     # Workspaces within each story object
     # content
     character_list = []
     # plot_Timeline = ?
     # world_building = ?
     # drawing_board = ?
-    Notes = []
+    # Notes = []
     # Other workspaces??
 
     # Adds a new character object to story object
     def create_character(self, name):
         self.character_list.append(Character(name))
-        print(self.character_list[2].name)
+        # print(self.character_list[self.character_list(len)].name)
 
-        
-    
+            
 
 # Creating new character object within story object
 story = Story("My story name")
