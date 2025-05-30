@@ -1,6 +1,5 @@
 import flet as ft
-from workspaces.character.character_pagelet import Character
-from styles.styles import button_style
+from workspaces.character.character_styles import button_style
 from handlers.story import story
 
 # References for button and text field
@@ -18,12 +17,13 @@ def delete_on_click(e):
 
 
 # Control when 'Create Character' button is clicked
-def add_character_button_click(e):
+def add_character_button_click(page, e):
     button_ref.current.visible = False
     button_ref.current.update()
     textfield_ref.current.visible = True
     textfield_ref.current.focus()
     textfield_ref.current.update()
+    page.update()
 
 # Control submits in textfield when creating character
 def add_character_textfield_submit(e):

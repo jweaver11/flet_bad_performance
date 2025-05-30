@@ -21,7 +21,6 @@ pagelets_container = ft.Container(
     )
 )
 
-
 # Parent container for entire page minus the menubar and workspaces rail
 active_workspace_container = ft.Container(
     border = ft.border.all(0, ft.Colors.GREEN_200),
@@ -49,23 +48,30 @@ active_workspace_container = ft.Container(
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
-    title = "StoryBoard -- " + story.title + " -- Saved status"
+    title = "StoryBoard -- " + story.title + " -- Saved status" # Set our title as a string
     page.title = title  # Set title
     page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)    # Set theme
 
     # Create our menu bar for the top of the page
     menubar = create_menu_bar(page)
 
+    # Add our top menubar to the page
     page.add(ft.Row([menubar]))
-    page.add(ft.Row(
-                spacing=0, 
-                expand=True,  
 
-                controls=[
-                    all_workspaces_rail_container,  # Sub-Rail for active workspace
-                    active_workspace_container,    # Work area for pagelets
-                ],
-            ),)
+    # Add the rest of the page
+    page.add(ft.Row(
+        spacing=0, 
+        expand=True,  
+
+
+        controls=[
+            all_workspaces_rail_container,  # Main rail of all available workspaces
+            
+            # The rest of the page. Includes active workspace rail, and work area
+            active_workspace_container,    # Work area for pagelets
+        ],
+    ),
+)
 
 
 
