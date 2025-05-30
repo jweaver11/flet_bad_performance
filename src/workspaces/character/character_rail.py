@@ -1,5 +1,5 @@
 import flet as ft
-from pagelets.characters import Character
+from workspaces.character.character_pagelet import Character
 from styles.styles import button_style
 
 characters = []
