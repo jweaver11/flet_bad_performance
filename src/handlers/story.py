@@ -25,10 +25,16 @@ class Story:
     # drawing_board = ?
     Notes = []
     # Other workspaces??
+
+    def create_character(self, name):
+        self.characters.append(Character(name))
+        print(self.characters[2].name)
+
+        
     
 
 # Creating new character object within story object
 char2 = Character("character name 2")
-story = Story("story name")
+story = Story("My story name")
 story.characters[0] = char2
 

@@ -1,10 +1,10 @@
 import flet as ft
 from workspaces.character.character_pagelet import Character
 from styles.styles import button_style
-from handlers.story import Story
+from handlers.story import story
 
 characters = []
-story = Story
+
 
 button_ref = ft.Ref[ft.TextButton]()
 textfield_ref = ft.Ref[ft.TextField]()
@@ -21,7 +21,7 @@ def add_character_click(e):
 def on_textfield_submit(e):
     name = textfield_ref.current.value
     if name:
-        characters.append({"name": name})
+        story.create_character(name)
         print("Added character:", name)
     textfield_ref.current.value = ""
     textfield_ref.current.visible = False
