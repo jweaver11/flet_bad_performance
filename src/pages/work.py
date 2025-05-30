@@ -3,8 +3,8 @@ and to the right of the navigation rail '''
 
 import flet as ft
 from hud.menu_bar import create_menu_bar
-from hud.workspaces_rail import workspaces_rail_container
-from handlers.rail_handler import workspace_rail
+from hud.workspaces_rail import all_workspaces_rail_container
+from handlers.rail_handler import active_workspace_rail
 
 
 # Container for 1 or more pagelets open on main right side of screen (work area)
@@ -21,19 +21,23 @@ pagelets_container = ft.Container(
 )
 
 # Parent container for entire page minus the menubar and workspaces rail
-workspace_container = ft.Container(
+active_workspace_container = ft.Container(
     border = ft.border.all(0, ft.Colors.GREEN_200),
     expand=True,
-    width=160,
     content=ft.Row(
         spacing=0,
         controls=[
-            ft.Column(controls=workspace_rail),  # Adds the rail for whichever workspace selected
+            ft.Column(  # Adds rail fot he activ workspace
+                #padding=10, 
+                width=200, 
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
+                controls=active_workspace_rail
+                ), 
             ft.VerticalDivider(width=0, thickness=2),   # Divider between rail and work area
             ft.Column(controls=[pagelets_container], expand=True)   # Adds container for work area
         ]
     )
-    # [] of active pagelets, save to user so they wont vanish
+    # [] of active pagelets, save to user so they wont vanish when app closed
 )
 
 
@@ -55,8 +59,8 @@ def work_page(page: ft.Page):
                 expand=True,  
 
                 controls=[
-                    workspaces_rail_container,  # Sub-Rail for active workspace
-                    workspace_container,    # Work area for pagelets
+                    all_workspaces_rail_container,  # Sub-Rail for active workspace
+                    active_workspace_container,    # Work area for pagelets
                 ],
             ),
         ],

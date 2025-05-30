@@ -2,7 +2,7 @@
 other than the main navigation rail of all the workspaces'''
 
 import flet as ft
-from workspaces.character.character_rail import char_rail  # Import the characters list
+from workspaces.character.character_rail import characters_rail  
 
 
-workspace_rail = char_rail
+active_workspace_rail = characters_rail

@@ -2,7 +2,7 @@
 import flet as ft
 
 # Design the navigation rail on the left
-workspaces_rail = ft.NavigationRail(
+all_workspaces_rail = ft.NavigationRail(
     selected_index=0,
     expand=True,
     label_type=ft.NavigationRailLabelType.ALL,
@@ -52,13 +52,13 @@ workspaces_rail = ft.NavigationRail(
 )
 
 # Container for active workspace that is open on application
-workspaces_rail_container = ft.Container(
+all_workspaces_rail_container = ft.Container(
     border = ft.border.all(0, ft.Colors.RED_200),
     alignment=ft.alignment.center,  # Aligns content to the 
     width=160,
     content=ft.Row(
         controls=[
-            workspaces_rail,
+            all_workspaces_rail,
             ft.VerticalDivider(width=0, thickness=2),
         ]
     ),
