@@ -35,4 +35,4 @@ class Story:
         self.character_list.append(Character(name))
         # print(self.character_list[self.character_list(len)].name)
 
-story = Story("my title")
+story = Story("Story Title")

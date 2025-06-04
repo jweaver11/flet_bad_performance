@@ -1,5 +1,12 @@
 ''' The master navigation bar for the 'widgets' on the left side of the screen'''
 import flet as ft
+from workspaces.character.character_rail import characters_rail  
+
+# Change which workspace rail we'll use.
+active_workspace_rail = characters_rail
+
+def on_workspace_change(index):
+    print("new workspace selected", index)
 
 # Design the navigation rail on the left
 all_workspaces_rail = ft.NavigationRail(
@@ -7,46 +14,38 @@ all_workspaces_rail = ft.NavigationRail(
     expand=True,
     label_type=ft.NavigationRailLabelType.ALL,
     bgcolor=ft.Colors.TRANSPARENT,
-    min_width=80,
-    min_extended_width=400,
-    group_alignment=-0.9,
-    leading=ft.FloatingActionButton(
-        icon=ft.Icons.CREATE, 
-        text="Project name", 
-        on_click=lambda e: print("FAB clicked!"),
-        scale=.85
-    ),
     destinations=[
         ft.NavigationRailDestination(
-            icon=ft.Icons.FAVORITE_BORDER, selected_icon=ft.Icons.FAVORITE, #icons
+            icon=ft.Icons.LIBRARY_BOOKS_OUTLINED, selected_icon=ft.Icons.LIBRARY_BOOKS_ROUNDED, #icons
             label="Content",
+            padding=10,
         ),
         ft.NavigationRailDestination(
-            icon=ft.Icon(ft.Icons.BOOKMARK_BORDER), selected_icon=ft.Icon(ft.Icons.BOOKMARK),
+            icon=ft.Icons.PEOPLE_OUTLINE_ROUNDED, selected_icon=ft.Icons.PEOPLE_ROUNDED,
             label="Characters",
+            padding=6,
         ),
         ft.NavigationRailDestination(
-            icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS),
+            icon=ft.Icons.TIMELINE_ROUNDED, selected_icon=ft.Icons.TIMELINE_OUTLINED,
             label_content=ft.Text("Plot & Timeline"),
+            padding=6,
         ),
         ft.NavigationRailDestination(
-            icon=ft.Icons.FAVORITE_BORDER, selected_icon=ft.Icons.FAVORITE,
+            icon=ft.Icons.BUILD_OUTLINED, selected_icon=ft.Icons.BUILD_ROUNDED,
             label="World Building",
+            padding=6,
         ),
         ft.NavigationRailDestination(
-            icon=ft.Icons.FAVORITE_BORDER, selected_icon=ft.Icons.FAVORITE,
+            icon=ft.Icons.DRAW_OUTLINED, selected_icon=ft.Icons.DRAW,
             label="Drawing Board",
+            padding=6,
         ),
         ft.NavigationRailDestination(
-            icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS),
+            icon=ft.Icons.STICKY_NOTE_2_OUTLINED, selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2),
             label_content=ft.Text("Notes"),
+            padding=6,
         ),
     ],
-    on_change=lambda e: print("Selected destination:", e.control.selected_index),
-    trailing=ft.FloatingActionButton(
-        icon=ft.Icons.CREATE, 
-        text="Add Workspace (premade)", 
-        on_click=lambda e: print("FAB clicked!"),
-        scale=.85
-    ),
+    # on_change=lambda e: print("Selected destination:", e.control.selected_index),
+    on_change=on_workspace_change,
 )

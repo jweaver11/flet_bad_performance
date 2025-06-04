@@ -2,17 +2,26 @@
 import flet as ft
 from workspaces.story import story
 from hud.menu_bar import create_menu_bar
-from handlers.rail_handler import active_workspace_rail
+from hud.workspaces_rail import active_workspace_rail
 from hud.workspaces_rail import all_workspaces_rail
 
 # Container for all available workspaces. On left most side of page
 all_workspaces_rail_container = ft.Container(
     border = ft.border.all(0, ft.Colors.RED_200),
     alignment=ft.alignment.center,  # Aligns content to the 
-    width=160,
-    content=ft.Row(
+    content=ft.Column(
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
+        alignment=ft.alignment.center,
         controls=[
+            ft.Container(height=10),
+            ft.Text(value=story.title, size=20),
             all_workspaces_rail,
+            ft.TextButton(
+                icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
+                text="Add Workspace", 
+                on_click=lambda e: print("FAB clicked!"),
+                ),
+            ft.Container(height=10),
         ]
     ),
 )
@@ -52,7 +61,7 @@ def main(page: ft.Page):
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"
     page.title = title
-    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
+    #page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
 
     # Create our menu bar for the top of the page
     menubar = create_menu_bar(page)
@@ -69,7 +78,7 @@ def main(page: ft.Page):
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS)),   # Settings button
                 ft.TextButton("Account Name"),  # users account name
-                ft.CircleAvatar(scale=.8),  # users avatar
+                ft.IconButton(ft.Icons.ACCOUNT_CIRCLE_OUTLINED),
             ]
         )
     )
