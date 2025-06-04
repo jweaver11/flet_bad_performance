@@ -1,6 +1,6 @@
 # The main 'story' page. The default page that all others work through
 import flet as ft
-from handlers.story import story
+from workspaces.story import story
 from hud.menu_bar import create_menu_bar
 from handlers.rail_handler import active_workspace_rail
 from hud.workspaces_rail import all_workspaces_rail

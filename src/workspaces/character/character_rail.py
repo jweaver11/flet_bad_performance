@@ -1,6 +1,6 @@
 import flet as ft
 from workspaces.character.character_styles import button_style
-from handlers.story import story
+from workspaces.story import story
 
 # References for button and text field
 button_ref = ft.Ref[ft.TextButton]()
