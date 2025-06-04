@@ -54,10 +54,21 @@ characters_rail = [
 
     # Filter system goes here
     # Checkboxes, or Chip
+    # add character button
+    ft.TextButton(  # 'Create Character button'
+        "Filter characters", 
+        icon=ft.Icons.WAVES_OUTLINED, 
+        style=button_style, 
+        ref=button_ref,
+        on_click=add_character_button_click
+    ),
 
-    # List of characters. Shows img, char name, options button
 
-    # Any spacers if needed
+    # List of characters are inserted here 
+    # Shows image, char name, 3 dot options button
+
+
+    # Adds spacers under last character before 'create character' button
     ft.Container(expand=True),      # Fill space until bottom of column
 
     # add character button

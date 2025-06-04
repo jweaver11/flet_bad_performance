@@ -13,7 +13,6 @@ all_workspaces_rail_container = ft.Container(
     content=ft.Row(
         controls=[
             all_workspaces_rail,
-            ft.VerticalDivider(width=0, thickness=2),
         ]
     ),
 )
@@ -50,23 +49,44 @@ pagelets_container = ft.Container(
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
-    title = "StoryBoard -- " + story.title + " -- Saved status" # Set our title as a string
-    page.title = title  # Set title
-    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)    # Set theme
+    # Adds our page title and theme
+    title = "StoryBoard -- " + story.title + " -- Saved status"
+    page.title = title
+    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
 
     # Create our menu bar for the top of the page
     menubar = create_menu_bar(page)
+    # Create our container for the menu bar
+    menu_bar_container = ft.Container(
+        bgcolor=ft.Colors.GREY_900,     # Set background color
+        border_radius=ft.border_radius.all(20),  # 20px radius on all corners
 
+        content=ft.Row(
+            spacing=None,
+            controls=[
+                menubar,    # Menubar on left
+                ft.Container(expand=True),  # empty space in middle of menubar
+                ft.TextButton("Feedback"),  # Feedback button
+                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS)),   # Settings button
+                ft.TextButton("Account Name"),  # users account name
+                ft.CircleAvatar(scale=.8),  # users avatar
+            ]
+        )
+    )
+
+
+    # RENDER OUR PAGE
     # Add our top menubar to the page
-    page.add(ft.Row([menubar]))
+    page.add(menu_bar_container)
 
     # Add the rest of the page
     page.add(ft.Row(
-        spacing=0, 
-        expand=True,  
+        spacing=0,  # No space between elements
+        expand=True,  # Makes sure it takes up the entire window/screen
 
         controls=[
             all_workspaces_rail_container,  # Main rail of all available workspaces
+            ft.VerticalDivider(width=0, thickness=2),
 
             active_workspace_rail_container,    # Rail for the selected workspace
             ft.VerticalDivider(width=1, thickness=10),   # Divider between rail and work area

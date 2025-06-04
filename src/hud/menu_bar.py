@@ -48,6 +48,7 @@ def create_menu_bar(page: ft.Page):
         expand=True,
         style=ft.MenuStyle(
             alignment=ft.alignment.center,
+            bgcolor=ft.Colors.GREY_900,
             mouse_cursor={
                 ft.ControlState.HOVERED: ft.MouseCursor.WAIT,
                 ft.ControlState.DEFAULT: ft.MouseCursor.ZOOM_OUT,
@@ -157,7 +158,7 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.SubmenuButton(
                 content=ft.Container(
-                    content=ft.Text("Upload"),
+                    content=ft.Text("  Upload  "),
                     alignment=ft.alignment.center
                 ),
                 style=ft.ButtonStyle(
@@ -219,7 +220,7 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.SubmenuButton(
                 content=ft.Container(
-                    content=ft.Text("View"),
+                    content=ft.Text(" View "),
                     alignment=ft.alignment.center
                 ),
                 style=ft.ButtonStyle(
@@ -251,8 +252,8 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.MenuItemButton(
                 content=ft.Container(
-                    content=ft.Text("Settings"),
-                    alignment=ft.alignment.center
+                    content=ft.Text("  Settings  "),
+                    alignment=ft.alignment.center,
                 ),
                 style=ft.ButtonStyle(
                     bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
@@ -261,7 +262,7 @@ def create_menu_bar(page: ft.Page):
             ),
             ft.SubmenuButton(
                 content=ft.Container(
-                    content=ft.Text("Feedback"),
+                    content=ft.Text("  Feedback  "),
                     alignment=ft.alignment.center
                 ),
                 style=ft.ButtonStyle(
