@@ -7,21 +7,18 @@ from hud.workspaces_rail import all_workspaces_rail
 
 # Container for all available workspaces. On left most side of page
 all_workspaces_rail_container = ft.Container(
-    border = ft.border.all(0, ft.Colors.RED_200),
     alignment=ft.alignment.center,  # Aligns content to the 
     content=ft.Column(
         horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
         alignment=ft.alignment.center,
         controls=[
-            ft.Container(height=10),
             ft.Text(value=story.title, size=20),
             all_workspaces_rail,
             ft.TextButton(
                 icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
                 text="Add Workspace", 
                 on_click=lambda e: print("FAB clicked!"),
-                ),
-            ft.Container(height=10),
+            ),
         ]
     ),
 )
@@ -29,24 +26,21 @@ all_workspaces_rail_container = ft.Container(
 
 # Container for the select/active workspace rail.
 active_workspace_rail_container = ft.Container(
-    border = ft.border.all(0, ft.Colors.YELLOW),
-    #expand=True,
-    width=250,
-    padding=ft.padding.all(15),
+    alignment=ft.alignment.center,  # Aligns content to the
     content=ft.Column(  # Adds rail fot he active workspace
-        # horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
         # scroll=ft.ScrollMode.AUTO,
-        controls=active_workspace_rail  # Adds whatever rail is active as a list of items
+        controls=active_workspace_rail,
     ),           
 )
 
 
 # Container for 1 or more pagelets open on main right side of screen (work area)
 pagelets_container = ft.Container(
-    border = ft.border.all(0, ft.Colors.BLUE_200),
     expand=True,
     padding=4,
-    margin=10,
+    border_radius=ft.border_radius.all(20),  # 20px radius on all corners
+    bgcolor=ft.Colors.GREY_900,
     content=ft.Row(
         controls=[
             ft.Column(controls=[ft.Text("Pagelets container")])
@@ -98,7 +92,7 @@ def main(page: ft.Page):
             ft.VerticalDivider(width=0, thickness=2),
 
             active_workspace_rail_container,    # Rail for the selected workspace
-            ft.VerticalDivider(width=1, thickness=10),   # Divider between rail and work area
+            ft.VerticalDivider(thickness=2),   # Divider between rail and work area
             
             pagelets_container,    # Work area for pagelets
         ],

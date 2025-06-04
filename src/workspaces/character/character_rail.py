@@ -1,3 +1,9 @@
+''' 
+Rail for the character workspace. 
+Includes the filter options at the top, a list of characters, and 
+the create 'character button' at the bottom.
+'''
+
 import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
@@ -83,7 +89,7 @@ characters_rail = [
         ref=textfield_ref,
         visible=False,
         hint_text="Enter Character Name",
-        width=200,
+        #width=200,
         on_submit=add_character_textfield_submit,
         on_tap_outside=on_textfield_deselect,
     ),
@@ -94,6 +100,7 @@ for character in story.character_list:
     new_char = ft.Row(alignment=ft.MainAxisAlignment.CENTER, wrap=True, controls=[
         ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
         ft.TextButton(text=character.name, style=button_style),
+        #ft.Container(expand=True),
         ft.PopupMenuButton(icon_color=ft.Colors.GREY_600, tooltip="", items=[
             ft.PopupMenuItem(text="popout", on_click=popout_on_click),
             ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
