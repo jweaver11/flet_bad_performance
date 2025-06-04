@@ -16,19 +16,6 @@ def create_menu_bar(page: ft.Page):
         page.route = "/welcome"
         page.update()
 
-    def handle_bugs_click(e):
-        # Print to console
-        print(f"{e.control.content.content.value}.on_click. Theyre under my skin")
-        page.open(
-            # Pop up on bottom of app and disappear quickly
-            ft.SnackBar(content=ft.Text(f"{e.control.content.content.value} was clicked! claw them out now"))
-        )
-        page.update()
-
-    def handle_settings_click(e):
-        page.route = "/settings"
-        page.update()
-
 
     # Handlers called automatically for submenu events
     def handle_submenu_open(e):
@@ -48,7 +35,8 @@ def create_menu_bar(page: ft.Page):
         expand=True,
         style=ft.MenuStyle(
             alignment=ft.alignment.center,
-            bgcolor=ft.Colors.GREY_900,
+            bgcolor=ft.Colors.TRANSPARENT,
+            shadow_color=ft.Colors.TRANSPARENT,
             mouse_cursor={
                 ft.ControlState.HOVERED: ft.MouseCursor.WAIT,
                 ft.ControlState.DEFAULT: ft.MouseCursor.ZOOM_OUT,
@@ -248,46 +236,6 @@ def create_menu_bar(page: ft.Page):
                         ),
                         on_click=handle_menu_item_click,
                     ),
-                ],
-            ),
-            ft.MenuItemButton(
-                content=ft.Container(
-                    content=ft.Text("  Settings  "),
-                    alignment=ft.alignment.center,
-                ),
-                style=ft.ButtonStyle(
-                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                ),
-                on_click=handle_settings_click,
-            ),
-            ft.SubmenuButton(
-                content=ft.Container(
-                    content=ft.Text("  Feedback  "),
-                    alignment=ft.alignment.center
-                ),
-                style=ft.ButtonStyle(
-                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
-                ),
-                on_open=handle_submenu_open,
-                on_close=handle_submenu_close,
-                on_hover=handle_submenu_hover,
-                controls=[
-                    ft.MenuItemButton(
-                        content=ft.Text("Bugs"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_bugs_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Feature Suggestions"),
-                        leading=ft.Icon(ft.Icons.SAVE),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    )  
                 ],
             ),
         ],
