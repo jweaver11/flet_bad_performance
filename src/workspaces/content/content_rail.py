@@ -18,4 +18,5 @@ content_rail = [
         "More stuff", 
         icon=ft.Icons.WAVES_OUTLINED, 
     ),
+    ft.Text("hi there")
 ]

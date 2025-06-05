@@ -6,54 +6,38 @@ from workspaces.story import story
 
 
 def create_rails(page: ft.Page):
+
+    # Map of all the workspace rails
     workspace_rails = {
         0: content_rail,
         1: characters_rail,
-        2: characters_rail,  # Replace with actual rails as needed
+        2: content_rail,  # Replace with actual rails as needed
         3: characters_rail,
-        4: characters_rail,
+        4: content_rail,
         5: characters_rail,
-    }
+    }  
 
-    # Change which workspace rail we'll use.
-    active_workspace_rail = characters_rail # on startup init
+    # Sets our active rail as a column for page updates
+    active_rail = ft.Column(  # Adds rail for he active workspace
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
+        scroll=ft.ScrollMode.AUTO,
+        controls=workspace_rails[1],    # On startup, set to char rail
+    )       
 
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
         rail_index = e.control.selected_index
-        temp_rail = []
-        aws = active_workspace_rail
+        new_rail = workspace_rails.get(rail_index, content_rail) # Grab our mapped rail, default to cont rail
 
-        match rail_index:
-            case 0:     # on startup??
-                temp_rail = content_rail
-                print("new workspace selected", rail_index)
-                page.update()
-            case 1:
-                temp_rail = characters_rail
-                page.update()
-            case 2:     # on startup??
-                print("new workspace selected", rail_index)
-                temp_rail = characters_rail
-            case 3:     # on startup??
-                print("new workspace selected", rail_index)
-                temp_rail = characters_rail
-            case 4:     # on startup??
-                print("new workspace selected", rail_index)
-                temp_rail = characters_rail
-            case 5:     # on startup??
-                print("new workspace selected", rail_index)
-                temp_rail = characters_rail
-
-            case _:     # Default/fallback
-                print("new workspace selected", rail_index)
-                temp_rail = characters_rail
-
-        
-        active_workspace_rail = temp_rail
-        return active_workspace_rail
+        # Set our new rail to the active rail
+        active_rail.controls = new_rail
+        print("New rail selected", rail_index)
+        page.update()
 
 
+    #;lakdjakfd
+    # Reordable list
+    #____________________________________________________________________________________________
     # Design the navigation rail on the left
     all_workspaces_rail = ft.NavigationRail(
         selected_index=0,
@@ -92,8 +76,8 @@ def create_rails(page: ft.Page):
                 padding=6,
             ),
         ],
-        # on_change=lambda e: print("Selected destination:", e.control.selected_index),
-        on_change=on_workspace_change,
+        # Runs when new destination (workspace) is selected
+        on_change=on_workspace_change
     )
 
     # Container for all available workspaces. On left most side of page
@@ -114,13 +98,10 @@ def create_rails(page: ft.Page):
         ),
     )
 
-    # Container for the select/active workspace rail.
+    # Container for the active workspace rail.
     active_workspace_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the
-        content=ft.Column(  # Adds rail fot he active workspace
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
-            # scroll=ft.ScrollMode.AUTO,
-            controls=active_workspace_rail,
-        ),           
+        width=400,  # Sets the width
+        content=active_rail,    # Sets our active rail column
     )
     return all_workspaces_rail_container, active_workspace_rail_container

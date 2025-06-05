@@ -97,16 +97,15 @@ characters_rail = [
 
 # Runs on app startup - adds all our characters names to the rail so we can see them
 for character in story.character_list:
-    new_char = ft.Row(alignment=ft.MainAxisAlignment.CENTER, wrap=True, controls=[
-        ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
-        ft.TextButton(text=character.name, style=button_style),
-        #ft.Container(expand=True),
-        ft.PopupMenuButton(icon_color=ft.Colors.GREY_600, tooltip="", items=[
+    new_char = ft.ListTile(
+        leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
+        title=ft.TextButton(content=ft.Row(controls=[ft.Text(character.name)], alignment=ft.MainAxisAlignment.START), style=button_style),
+        trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
             ft.PopupMenuItem(text="popout", on_click=popout_on_click),
             ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
             ft.PopupMenuItem(text="delete", on_click=delete_on_click),
             ],
         ),
-    ])
+    )
     # Add our character to the rail
     characters_rail.insert(len(characters_rail) - 3, new_char)
