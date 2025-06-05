@@ -238,7 +238,23 @@ def create_menu_bar(page: ft.Page):
                     ),
                 ],
             ),
-        ],
-        
+        ], 
     )
-    return menubar
+    # Create our container for the menu bar
+    menubar_container = ft.Container(
+        bgcolor=ft.Colors.GREY_900,     # Set background color
+        border_radius=ft.border_radius.all(20),  # 20px radius on all corners
+
+        content=ft.Row(
+            spacing=None,
+            controls=[
+                menubar,    # Menubar on left
+                ft.Container(expand=True),  # empty space in middle of menubar
+                ft.TextButton("Feedback"),  # Feedback button
+                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS)),   # Settings button
+                ft.TextButton("Account Name"),  # users account name
+                ft.IconButton(ft.Icons.ACCOUNT_CIRCLE_OUTLINED),
+            ]
+        )
+    )
+    return menubar_container
