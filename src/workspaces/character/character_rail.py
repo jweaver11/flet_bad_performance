@@ -54,6 +54,8 @@ def on_textfield_deselect(e):
         textfield_ref.current.update()
         button_ref.current.update()
 
+character_list = ft.ListView(spacing=0, padding=0)
+character_list_container = ft.Container(expand=True, content=character_list)
 
 # List of controls for the rail container
 characters_rail = [
@@ -61,29 +63,33 @@ characters_rail = [
     # Filter system goes here
     # Checkboxes, or Chip
     # add character button
-    ft.TextButton(  # 'Create Character button'
-        "Filter characters", 
-        icon=ft.Icons.WAVES_OUTLINED, 
-        style=button_style, 
-        ref=button_ref,
-        on_click=add_character_button_click
+    ft.Container(
+        alignment=ft.alignment.center,  # Aligns content to the
+        padding=10,
+        #expand=True,
+        content=ft.TextButton(  # 'Create Character button'
+            "Filter characters", 
+            icon=ft.Icons.WAVES_OUTLINED, 
+            style=button_style, 
+            ref=button_ref,
+            on_click=add_character_button_click
+        ),
     ),
+    
 
 
     # List of characters are inserted here 
     # Shows image, char name, 3 dot options button
     # Either a column or some sort of list
     # Insert LV here
+    character_list_container,
 
 
-    # Adds spacers under last character before 'create character' button (virtually empty if enough char)
-    #ft.Container(expand=True),      # Fill space until bottom of column
-
-    # add character button
+    # Create Character Button. Button turns into an inputtable
+    # text field when clicked
     ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the
         padding=10,
-        #expand=True,
         content=ft.Row(
             expand=True,
             controls=[
@@ -99,6 +105,7 @@ characters_rail = [
                     ref=textfield_ref,
                     visible=False,
                     hint_text="Enter Character Name",
+                    width=184,
                     on_submit=add_character_textfield_submit,
                     on_tap_outside=on_textfield_deselect,
                 ),
@@ -106,10 +113,6 @@ characters_rail = [
         )
     ),
 ]
-
-
-character_list = ft.ListView(spacing=0, padding=0)
-character_list_container = ft.Container(expand=True, content=character_list)
 
 
 # Runs on app startup - adds a tile to our character list
@@ -128,6 +131,7 @@ for character in story.character_list:
                     ft.Text(
                         character.name,
                         max_lines=1,
+                        width=88,
                         overflow=ft.TextOverflow.CLIP,
                         no_wrap=True,
                     ), 
@@ -143,6 +147,3 @@ for character in story.character_list:
         ),
     )
     character_list.controls.append(new_char)
-
-# Add our character_list container to the rail
-characters_rail.insert(len(characters_rail) - 1, character_list_container)

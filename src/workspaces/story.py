@@ -20,24 +20,9 @@ class Story:
         print(self.character_list[2].name)
         self.character_list.append(Character("Willy")) #temp
         print(self.character_list[2].name)
-        self.character_list.append(Character("Willysdfsdfsdferssrzdsdfasfsdfasfdsaf")) #temp
+        self.character_list.append(Character("Willysdsdfgszxcvbnmlkjhg")) #temp
         print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
+        
 
         #active_workspace = "character" ?
 

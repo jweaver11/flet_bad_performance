@@ -20,6 +20,7 @@ def create_rails(page: ft.Page):
 
     # Sets our active rail as a column for page updates
     active_rail = ft.Column(  # Adds rail for he active workspace
+        spacing=0,
         # horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
         # scroll=ft.ScrollMode.AUTO,
         controls=workspace_rails[1],    # On startup, set to char rail
