@@ -11,6 +11,7 @@ from workspaces.story import story
 # References for button and text field
 button_ref = ft.Ref[ft.TextButton]()
 textfield_ref = ft.Ref[ft.TextField]()
+page_ref = ft.Ref[ft.Page]()
 
 def popout_on_click(e):
     print("popout clicked")

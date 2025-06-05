@@ -41,6 +41,7 @@ def create_rails(page: ft.Page):
     # Reordable list
     #____________________________________________________________________________________________
     # Design the navigation rail on the left
+
     all_workspaces_rail = ft.NavigationRail(
         selected_index=0,
         expand=True,    # Fills rest of page as needed.
@@ -85,19 +86,19 @@ def create_rails(page: ft.Page):
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the 
+        padding=0,
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
-                ft.Text(value=story.title, size=20, weight=ft.FontWeight.BOLD),
+                ft.Text(value="Workspaces", size=20, weight=ft.FontWeight.BOLD),
                 all_workspaces_rail,
-                ft.Container(margin=10, content=
+                ft.Container(margin=10, width=156, padding=0, alignment=ft.alignment.center, content=
                     ft.TextButton(
                         icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
-                        width=100,
                         text="Add Workspace", 
                         on_click=lambda e: print("FAB clicked!"),
-                    )
+                    ),
                 )
             ]
         ),
@@ -109,4 +110,6 @@ def create_rails(page: ft.Page):
         width=200,  # Sets the width
         content=active_rail,    # Sets our active rail column
     )
+
+
     return all_workspaces_rail_container, active_workspace_rail_container

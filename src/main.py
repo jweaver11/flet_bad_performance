@@ -16,7 +16,7 @@ def main(page: ft.Page):
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"
     page.title = title
-    #page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
+    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
 
     # Create our page elements as their own pages so they can update
     menubar = create_menu_bar(page)     # menubar
@@ -36,10 +36,10 @@ def main(page: ft.Page):
 
         controls=[
             all_workspaces_rail,  # Main rail of all available workspaces
-            ft.VerticalDivider(width=0, thickness=2),
+            ft.VerticalDivider(width=2, thickness=2),
 
             active_rail,    # Rail for the selected workspace
-            ft.VerticalDivider(width=0, thickness=2),   # Divider between rail and work area
+            ft.VerticalDivider(width=2, thickness=2),   # Divider between rail and work area
             ft.Column(width=10),
             
             pagelets,    # Work area for pagelets
