@@ -16,11 +16,11 @@ class Story:
         print(self.character_list[2].name)
         self.character_list.append(Character("Willy")) #temp
         print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
+        self.character_list.append(Character("Wi")) #temp
         print(self.character_list[2].name)
         self.character_list.append(Character("Willy")) #temp
         print(self.character_list[2].name)
-        self.character_list.append(Character("Willy")) #temp
+        self.character_list.append(Character("Willysdfsdfsdferssrzdsdfasfsdfasfdsaf")) #temp
         print(self.character_list[2].name)
         self.character_list.append(Character("Willy")) #temp
         print(self.character_list[2].name)

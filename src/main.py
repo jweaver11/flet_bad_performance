@@ -23,6 +23,7 @@ def main(page: ft.Page):
     all_workspaces_rail, active_rail = create_rails(page)   # all workspaces rail and active rail
     pagelets = create_pagelets(page)        # pagelets 
 
+    page.padding = 6
 
     # RENDER OUR PAGE
     # Add our top menubar to the page
@@ -38,7 +39,8 @@ def main(page: ft.Page):
             ft.VerticalDivider(width=0, thickness=2),
 
             active_rail,    # Rail for the selected workspace
-            ft.VerticalDivider(thickness=2),   # Divider between rail and work area
+            ft.VerticalDivider(width=0, thickness=2),   # Divider between rail and work area
+            ft.Column(width=10),
             
             pagelets,    # Work area for pagelets
         ],

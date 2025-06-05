@@ -72,34 +72,69 @@ characters_rail = [
 
     # List of characters are inserted here 
     # Shows image, char name, 3 dot options button
+    # Either a column or some sort of list
+    # Insert LV here
 
 
-    # Adds spacers under last character before 'create character' button
-    ft.Container(expand=True),      # Fill space until bottom of column
+    # Adds spacers under last character before 'create character' button (virtually empty if enough char)
+    #ft.Container(expand=True),      # Fill space until bottom of column
 
     # add character button
-    ft.TextButton(  # 'Create Character button'
-        "Create Character", 
-        icon=ft.Icons.WAVES_OUTLINED, 
-        style=button_style, 
-        ref=button_ref,
-        on_click=add_character_button_click
-    ),
-    ft.TextField(
-        ref=textfield_ref,
-        visible=False,
-        hint_text="Enter Character Name",
-        #width=200,
-        on_submit=add_character_textfield_submit,
-        on_tap_outside=on_textfield_deselect,
+    ft.Container(
+        alignment=ft.alignment.center,  # Aligns content to the
+        padding=10,
+        #expand=True,
+        content=ft.Row(
+            expand=True,
+            controls=[
+                ft.TextButton(  # 'Create Character button'
+                    "Create Character", 
+                    expand=True,
+                    icon=ft.Icons.WAVES_OUTLINED, 
+                    style=button_style, 
+                    ref=button_ref,
+                    on_click=add_character_button_click
+                ),
+                ft.TextField(
+                    ref=textfield_ref,
+                    visible=False,
+                    hint_text="Enter Character Name",
+                    on_submit=add_character_textfield_submit,
+                    on_tap_outside=on_textfield_deselect,
+                ),
+            ]
+        )
     ),
 ]
 
-# Runs on app startup - adds all our characters names to the rail so we can see them
+
+character_list = ft.ListView(spacing=0, padding=0)
+character_list_container = ft.Container(expand=True, content=character_list)
+
+
+# Runs on app startup - adds a tile to our character list
+# Tile has image, character name, popup menu options
 for character in story.character_list:
     new_char = ft.ListTile(
+        horizontal_spacing=0,
         leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
-        title=ft.TextButton(content=ft.Row(controls=[ft.Text(character.name)], alignment=ft.MainAxisAlignment.START), style=button_style),
+        
+        title=ft.TextButton(
+            expand=True, 
+            style=button_style,
+            content=ft.Row(
+                alignment=ft.MainAxisAlignment.START,
+                controls=[
+                    ft.Text(
+                        character.name,
+                        max_lines=1,
+                        overflow=ft.TextOverflow.CLIP,
+                        no_wrap=True,
+                    ), 
+                ], 
+            )
+        ),
+        
         trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
             ft.PopupMenuItem(text="popout", on_click=popout_on_click),
             ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
@@ -107,5 +142,7 @@ for character in story.character_list:
             ],
         ),
     )
-    # Add our character to the rail
-    characters_rail.insert(len(characters_rail) - 3, new_char)
+    character_list.controls.append(new_char)
+
+# Add our character_list container to the rail
+characters_rail.insert(len(characters_rail) - 1, character_list_container)

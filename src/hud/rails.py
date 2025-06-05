@@ -8,6 +8,7 @@ from workspaces.story import story
 def create_rails(page: ft.Page):
 
     # Map of all the workspace rails
+    # Rails must be a list of controls that use containers for spacing
     workspace_rails = {
         0: content_rail,
         1: characters_rail,
@@ -19,8 +20,8 @@ def create_rails(page: ft.Page):
 
     # Sets our active rail as a column for page updates
     active_rail = ft.Column(  # Adds rail for he active workspace
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
-        scroll=ft.ScrollMode.AUTO,
+        # horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
+        # scroll=ft.ScrollMode.AUTO,
         controls=workspace_rails[1],    # On startup, set to char rail
     )       
 
@@ -87,13 +88,16 @@ def create_rails(page: ft.Page):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
-                ft.Text(value=story.title, size=20),
+                ft.Text(value=story.title, size=20, weight=ft.FontWeight.BOLD),
                 all_workspaces_rail,
-                ft.TextButton(
-                    icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
-                    text="Add Workspace", 
-                    on_click=lambda e: print("FAB clicked!"),
-                ),
+                ft.Container(margin=10, content=
+                    ft.TextButton(
+                        icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
+                        width=100,
+                        text="Add Workspace", 
+                        on_click=lambda e: print("FAB clicked!"),
+                    )
+                )
             ]
         ),
     )
@@ -101,7 +105,7 @@ def create_rails(page: ft.Page):
     # Container for the active workspace rail.
     active_workspace_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the
-        width=400,  # Sets the width
+        width=200,  # Sets the width
         content=active_rail,    # Sets our active rail column
     )
     return all_workspaces_rail_container, active_workspace_rail_container
