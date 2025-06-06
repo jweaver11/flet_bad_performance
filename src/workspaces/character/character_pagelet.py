@@ -20,6 +20,9 @@ class Character:
     color : str
     icon : str
 
+    show_character : bool
+    tags : list[str]
+
     '''
     # Add ons that won't show by default
     race: str

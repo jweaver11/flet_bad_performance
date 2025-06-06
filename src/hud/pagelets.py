@@ -11,7 +11,7 @@ def create_pagelets(page: ft.Page):
         expand=True,
         padding=10,
         border_radius=ft.border_radius.all(10),  # 20px radius on all corners
-        #margin=ft.margin.only(top=0, left=2, right=0, bottom=0),
+        #margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
         bgcolor=ft.Colors.GREY_900,
         content=ft.Row(
             controls=[

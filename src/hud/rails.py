@@ -26,62 +26,117 @@ def create_rails(page: ft.Page):
         controls=workspace_rails[1],    # On startup, set to char rail
     )       
 
+
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
-        rail_index = e.control.selected_index
-        new_rail = workspace_rails.get(rail_index, content_rail) # Grab our mapped rail, default to cont rail
+        # controls which of our nav rails r selected and which active workspace rail we use
+        rail_index : int  
+        if e.control == r0:
+            rail_index = 0  # Select our rail
+        elif e.control == r1:
+            rail_index = 1
+        elif e.control == r2:
+            rail_index = 2
+        elif e.control == r3:
+            rail_index = 3
+        elif e.control == r4:
+            rail_index = 4
+        elif e.control == r5:
+            rail_index = 5
 
+        # Turn off all other rails
+        deselect_all_other_rails(rail_index)
+        new_rail = workspace_rails.get(rail_index, content_rail) # Grab our mapped rail, default to cont rail
         # Set our new rail to the active rail
         active_rail.controls = new_rail
         print("New rail selected", rail_index)
         page.update()
 
+    def deselect_all_other_rails(rail_index):
+        rail_index = rail_index
+        if rail_index != 0:
+            r0.selected_index = None
+        if rail_index != 1:
+            r1.selected_index = None
+        if rail_index != 2:
+            r2.selected_index = None
+        if rail_index != 3:
+            r3.selected_index = None
+        if rail_index != 4:
+            r4.selected_index = None
+        if rail_index != 5:
+            r5.selected_index = None
 
-    #;lakdjakfd
-    # Reordable list
-    #____________________________________________________________________________________________
-    # Design the navigation rail on the left
-
-    all_workspaces_rail = ft.NavigationRail(
-        selected_index=0,
-        expand=True,    # Fills rest of page as needed.
-        label_type=ft.NavigationRailLabelType.ALL,
-        bgcolor=ft.Colors.TRANSPARENT,
+    r0 = ft.NavigationRail(
+        height=70,  # Set height of each rail
+        on_change=on_workspace_change,  # When the rail is clicked
+        selected_index=0,   # starts as selected
         destinations=[
             ft.NavigationRailDestination(
                 icon=ft.Icons.LIBRARY_BOOKS_OUTLINED, selected_icon=ft.Icons.LIBRARY_BOOKS_ROUNDED, #icons
-                label="Content",
-                padding=10,
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.PEOPLE_OUTLINE_ROUNDED, selected_icon=ft.Icons.PEOPLE_ROUNDED,
-                label="Characters",
-                padding=6,
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.TIMELINE_ROUNDED, selected_icon=ft.Icons.TIMELINE_OUTLINED,
-                label_content=ft.Text("Plot & Timeline"),
-                padding=6,
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.BUILD_OUTLINED, selected_icon=ft.Icons.BUILD_ROUNDED,
-                label="World Building",
-                padding=6,
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.DRAW_OUTLINED, selected_icon=ft.Icons.DRAW,
-                label="Drawing Board",
-                padding=6,
-            ),
-            ft.NavigationRailDestination(
-                icon=ft.Icons.STICKY_NOTE_2_OUTLINED, selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2),
-                label_content=ft.Text("Notes"),
-                padding=6,
+                label="Content", padding=10,
             ),
         ],
-        # Runs when new destination (workspace) is selected
-        on_change=on_workspace_change
     )
+    r1 = ft.NavigationRail(
+        height=70,
+        on_change=on_workspace_change,
+        destinations=[
+            ft.NavigationRailDestination(
+                icon=ft.Icons.PEOPLE_OUTLINE_ROUNDED, selected_icon=ft.Icons.PEOPLE_ROUNDED,
+                label="Characters", padding=6,
+            ),
+        ],
+    )
+    r2 = ft.NavigationRail(
+        height=70,
+        label_type=ft.NavigationRailLabelType.ALL,
+        bgcolor=ft.Colors.TRANSPARENT,
+        on_change=on_workspace_change,
+        destinations=[
+            ft.NavigationRailDestination(
+                icon=ft.Icons.TIMELINE_ROUNDED, selected_icon=ft.Icons.TIMELINE_OUTLINED,
+                label="Plot & Timeline", padding=6,
+            ),
+        ],
+    )
+    r3 = ft.NavigationRail(
+        height=70,
+        label_type=ft.NavigationRailLabelType.ALL,
+        bgcolor=ft.Colors.TRANSPARENT,
+        on_change=on_workspace_change,
+        destinations=[
+            ft.NavigationRailDestination(
+                icon=ft.Icons.BUILD_OUTLINED, selected_icon=ft.Icons.BUILD_ROUNDED,
+                label="World Building", padding=6,
+            ),
+        ],
+    )
+    r4 = ft.NavigationRail(
+        height=70,
+        label_type=ft.NavigationRailLabelType.ALL,
+        bgcolor=ft.Colors.TRANSPARENT,
+        on_change=on_workspace_change,
+        destinations=[
+            ft.NavigationRailDestination(
+                icon=ft.Icons.DRAW_OUTLINED, selected_icon=ft.Icons.DRAW,
+                label="Drawing Board", padding=6,
+            ),
+        ],
+    )
+    r5 = ft.NavigationRail(
+        height=70,
+        label_type=ft.NavigationRailLabelType.ALL,
+        bgcolor=ft.Colors.TRANSPARENT,
+        on_change=on_workspace_change,
+        destinations=[
+            ft.NavigationRailDestination(
+                icon=ft.Icons.STICKY_NOTE_2_OUTLINED, selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2),
+                label="Notes", padding=6,
+            ),
+        ],
+    )
+    
 
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
@@ -91,8 +146,13 @@ def create_rails(page: ft.Page):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
-                ft.Text(value="Workspaces", size=20, weight=ft.FontWeight.BOLD),
-                all_workspaces_rail,
+                r0, # Add all our rail elements
+                r1,
+                r2,
+                r3,
+                r4,
+                r5,
+                ft.Container(expand=True),
                 ft.Container(margin=10, width=156, padding=0, alignment=ft.alignment.center, content=
                     ft.TextButton(
                         icon=ft.Icons.ADD_CIRCLE_ROUNDED, 

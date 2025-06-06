@@ -55,8 +55,11 @@ def on_textfield_deselect(e):
         textfield_ref.current.update()
         button_ref.current.update()
 
-character_list = ft.ListView(spacing=0, padding=0)
+
+character_list = ft.ReorderableListView(padding=0)
 character_list_container = ft.Container(expand=True, content=character_list)
+
+
 
 # List of controls for the rail container
 characters_rail = [
@@ -73,7 +76,7 @@ characters_rail = [
             icon=ft.Icons.WAVES_OUTLINED, 
             style=button_style, 
             ref=button_ref,
-            on_click=add_character_button_click
+            on_click=add_character_button_click,
         ),
     ),
     
