@@ -47,6 +47,7 @@ def create_rails(page: ft.Page):
         deselect_all_other_rails(rail_index)    # De-select all rails but selected one
         active_rail.controls = new_rail # Set our new rail to the active rail
         print("New rail selected", rail_index)
+
         page.update()   # update our UI
 
     # Function for deselecting all rails except the one passed through
@@ -118,7 +119,7 @@ def create_rails(page: ft.Page):
         ],
     )
     r5 = ft.NavigationRail(
-        height=70,
+        height=100,
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
@@ -127,7 +128,14 @@ def create_rails(page: ft.Page):
             ),
         ],
     )
+
+    def handle_reorder(e: ft.OnReorderEvent):
+        # Pass 
+        print(f"Reordered from {e.old_index} to {e.new_index}")
+        # Need to swtich indexes n stuff for the workspace_rails? 
+
     lv = ft.ReorderableListView(
+        on_reorder=handle_reorder,
         controls=[
             r0,
             r1,
@@ -142,7 +150,7 @@ def create_rails(page: ft.Page):
     all_workspaces_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the 
         padding=0,
-        width = 250,
+        width=150,
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
