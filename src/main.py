@@ -23,7 +23,7 @@ def main(page: ft.Page):
     all_workspaces_rail, active_rail = create_rails(page)   # all workspaces rail and active rail
     pagelets = create_pagelets(page)        # pagelets 
 
-    page.padding = 6
+    page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
 
     # RENDER OUR PAGE
     # Add our top menubar to the page

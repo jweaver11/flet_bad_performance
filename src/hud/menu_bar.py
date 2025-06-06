@@ -6,7 +6,7 @@ def create_menu_bar(page: ft.Page):
     
     # Handler logic for each menu item clicked
     def handle_menu_item_click(e):
-        print(f"{e.control.content.content.value}.on_click")
+        print(f"{e.control.content.value}.on_click")
         page.open(
             ft.SnackBar(content=ft.Text(f"{e.control.content.content.value} was clicked!"))
         )
@@ -243,7 +243,7 @@ def create_menu_bar(page: ft.Page):
     # Create our container for the menu bar
     menubar_container = ft.Container(
         bgcolor=ft.Colors.GREY_900,     # Set background color
-        border_radius=ft.border_radius.all(20),  # 20px radius on all corners
+        border_radius=ft.border_radius.all(4),  # 20px radius on all corners
 
         content=ft.Row(
             spacing=None,
@@ -252,8 +252,7 @@ def create_menu_bar(page: ft.Page):
                 ft.Container(expand=True),  # empty space in middle of menubar
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS)),   # Settings button
-                ft.TextButton("Account Name"),  # users account name
-                ft.IconButton(ft.Icons.ACCOUNT_CIRCLE_OUTLINED),
+                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # users account name
             ]
         )
     )
