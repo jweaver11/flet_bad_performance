@@ -8,21 +8,19 @@ from workspaces.story import story
 def create_rails(page: ft.Page):
 
     # Map of all the workspace rails
-    # Rails must be a list of controls that use containers for spacing
+    # Rails must be a list of controls
     workspace_rails = {
         0: content_rail,
         1: characters_rail,
-        2: content_rail,  # Replace with actual rails as needed
+        2: content_rail, 
         3: characters_rail,
         4: content_rail,
         5: characters_rail,
     }  
 
-    # Sets our active rail as a column for page updates
-    active_rail = ft.Column(  # Adds rail for he active workspace
+    # Requires active rail be a control for page updates - we use a column
+    active_rail = ft.Column(  # Adds rail for the active workspace
         spacing=0,
-        # horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
-        # scroll=ft.ScrollMode.AUTO,
         controls=workspace_rails[1],    # On startup, set to char rail
     )       
 
@@ -44,14 +42,14 @@ def create_rails(page: ft.Page):
         elif e.control == r5:
             rail_index = 5
 
-        # Turn off all other rails
-        deselect_all_other_rails(rail_index)
-        new_rail = workspace_rails.get(rail_index, content_rail) # Grab our mapped rail, default to cont rail
-        # Set our new rail to the active rail
-        active_rail.controls = new_rail
+        new_rail = workspace_rails.get(rail_index, content_rail) # Grab our active rail from map
+        
+        deselect_all_other_rails(rail_index)    # De-select all rails but selected one
+        active_rail.controls = new_rail # Set our new rail to the active rail
         print("New rail selected", rail_index)
-        page.update()
+        page.update()   # update our UI
 
+    # Function for deselecting all rails except the one passed through
     def deselect_all_other_rails(rail_index):
         rail_index = rail_index
         if rail_index != 0:
@@ -67,6 +65,7 @@ def create_rails(page: ft.Page):
         if rail_index != 5:
             r5.selected_index = None
 
+    # Our navigation rails as their own variable for manipulation
     r0 = ft.NavigationRail(
         height=70,  # Set height of each rail
         on_change=on_workspace_change,  # When the rail is clicked
@@ -81,6 +80,12 @@ def create_rails(page: ft.Page):
     r1 = ft.NavigationRail(
         height=70,
         on_change=on_workspace_change,
+        trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
+            ft.PopupMenuItem(text="popout"),
+            ft.PopupMenuItem(text="Pin"),
+            ft.PopupMenuItem(text="delete"),
+            ],
+        ),
         destinations=[
             ft.NavigationRailDestination(
                 icon=ft.Icons.PEOPLE_OUTLINE_ROUNDED, selected_icon=ft.Icons.PEOPLE_ROUNDED,
@@ -90,8 +95,6 @@ def create_rails(page: ft.Page):
     )
     r2 = ft.NavigationRail(
         height=70,
-        label_type=ft.NavigationRailLabelType.ALL,
-        bgcolor=ft.Colors.TRANSPARENT,
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
@@ -102,8 +105,6 @@ def create_rails(page: ft.Page):
     )
     r3 = ft.NavigationRail(
         height=70,
-        label_type=ft.NavigationRailLabelType.ALL,
-        bgcolor=ft.Colors.TRANSPARENT,
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
@@ -114,8 +115,6 @@ def create_rails(page: ft.Page):
     )
     r4 = ft.NavigationRail(
         height=70,
-        label_type=ft.NavigationRailLabelType.ALL,
-        bgcolor=ft.Colors.TRANSPARENT,
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
@@ -126,8 +125,6 @@ def create_rails(page: ft.Page):
     )
     r5 = ft.NavigationRail(
         height=70,
-        label_type=ft.NavigationRailLabelType.ALL,
-        bgcolor=ft.Colors.TRANSPARENT,
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
@@ -137,7 +134,6 @@ def create_rails(page: ft.Page):
         ],
     )
     
-
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the 
