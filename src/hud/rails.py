@@ -80,12 +80,6 @@ def create_rails(page: ft.Page):
     r1 = ft.NavigationRail(
         height=70,
         on_change=on_workspace_change,
-        trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
-            ft.PopupMenuItem(text="popout"),
-            ft.PopupMenuItem(text="Pin"),
-            ft.PopupMenuItem(text="delete"),
-            ],
-        ),
         destinations=[
             ft.NavigationRailDestination(
                 icon=ft.Icons.PEOPLE_OUTLINE_ROUNDED, selected_icon=ft.Icons.PEOPLE_ROUNDED,
@@ -133,21 +127,27 @@ def create_rails(page: ft.Page):
             ),
         ],
     )
+    lv = ft.ReorderableListView(
+        controls=[
+            r0,
+            r1,
+            r2,
+            r3,
+            r4,
+            r5,
+        ]
+    )
     
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the 
         padding=0,
+        width = 250,
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
-                r0, # Add all our rail elements
-                r1,
-                r2,
-                r3,
-                r4,
-                r5,
+                lv,
                 ft.Container(expand=True),
                 ft.Container(margin=10, width=156, padding=0, alignment=ft.alignment.center, content=
                     ft.TextButton(
