@@ -129,7 +129,7 @@ def create_rails(page: ft.Page):
     # we can drag them and re-order them
     all_workspaces_rail = ft.ReorderableListView(
         on_reorder=handle_reorder,
-        controls=rail_controls
+        controls=rail_controls,
     )
 
     # Map of all the workspace rails
@@ -149,6 +149,9 @@ def create_rails(page: ft.Page):
         controls=workspace_rails[1],    # On startup, set to char rail
     )  
 
+    def add_workspace(e):
+        print("Add Workspace Button clicked")
+
     
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
@@ -165,7 +168,7 @@ def create_rails(page: ft.Page):
                     ft.TextButton(
                         icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
                         text="Add Workspace", 
-                        on_click=lambda e: print("FAB clicked!"),
+                        on_click=add_workspace,
                     ),
                 )
             ]

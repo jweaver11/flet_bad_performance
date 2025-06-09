@@ -7,7 +7,7 @@ import flet as ft
 
 def create_pagelets(page: ft.Page):
 
-    aspect_ratio = page.height / page.width     # aspect ratio for child containers
+    aspect_ratio = (page.height-100) / (page.width-500)     # aspect ratio for child containers
 
     def drag_will_accept(e):
         e.control.content.border = ft.border.all(
