@@ -1,4 +1,4 @@
-''' The master navigation bar for the 'widgets' on the left side of the screen'''
+''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
 from workspaces.character.character_rail import characters_rail  
 from workspaces.content.content_rail import content_rail
@@ -6,23 +6,6 @@ from workspaces.story import story
 
 
 def create_rails(page: ft.Page):
-
-    # Map of all the workspace rails
-    # Rails must be a list of controls
-    workspace_rails = {
-        0: content_rail,
-        1: characters_rail,
-        2: content_rail, 
-        3: characters_rail,
-        4: content_rail,
-        5: characters_rail,
-    }  
-
-    # Requires active rail be a control for page updates - we use a column
-    active_rail = ft.Column(  # Adds rail for the active workspace
-        spacing=0,
-        controls=workspace_rails[1],    # On startup, set to char rail
-    )       
 
 
     # Change rail depending on which workspace is selected
@@ -49,7 +32,7 @@ def create_rails(page: ft.Page):
         print("New rail selected", rail_index)
 
         page.update()   # update our UI
-
+    
     # Function for deselecting all rails except the one passed through
     def deselect_all_other_rails(rail_index):
         rail_index = rail_index
@@ -119,7 +102,7 @@ def create_rails(page: ft.Page):
         ],
     )
     r5 = ft.NavigationRail(
-        height=100,
+        height=70,
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
@@ -129,22 +112,43 @@ def create_rails(page: ft.Page):
         ],
     )
 
-    def handle_reorder(e: ft.OnReorderEvent):
-        # Pass 
-        print(f"Reordered from {e.old_index} to {e.new_index}")
-        # Need to swtich indexes n stuff for the workspace_rails? 
+    # List our controls so we can save re-orders
+    rail_controls = [r0, r1, r2, r3, r4, r5]
 
-    lv = ft.ReorderableListView(
+    def handle_reorder(e: ft.OnReorderEvent):
+        print(f"Reordered from {e.old_index} to {e.new_index}")
+
+        item = rail_controls.pop(e.old_index)
+        rail_controls.insert(e.new_index, item)
+        # Update the ReorderableListView's controls
+        all_workspaces_rail.controls = rail_controls
+        page.update()
+ 
+
+    # Sets all wrkspaces rail as a reordable list view so
+    # we can drag them and re-order them
+    all_workspaces_rail = ft.ReorderableListView(
         on_reorder=handle_reorder,
-        controls=[
-            r0,
-            r1,
-            r2,
-            r3,
-            r4,
-            r5,
-        ]
+        controls=rail_controls
     )
+
+    # Map of all the workspace rails
+    # Rails must be a list of controls
+    workspace_rails = {
+        0: content_rail,
+        1: characters_rail,
+        2: content_rail, 
+        3: characters_rail,
+        4: content_rail,
+        5: characters_rail,
+    }  
+
+    # Format our active rail
+    active_rail = ft.Column(  
+        spacing=0,
+        controls=workspace_rails[1],    # On startup, set to char rail
+    )  
+
     
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
@@ -155,7 +159,7 @@ def create_rails(page: ft.Page):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
-                lv,
+                all_workspaces_rail,
                 ft.Container(expand=True),
                 ft.Container(margin=10, width=156, padding=0, alignment=ft.alignment.center, content=
                     ft.TextButton(
