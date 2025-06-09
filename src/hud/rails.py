@@ -2,6 +2,10 @@
 import flet as ft
 from workspaces.character.character_rail import characters_rail  
 from workspaces.content.content_rail import content_rail
+from workspaces.plot_timeline.plot_timeline_rail import plot_timeline_rail
+from workspaces.world_building.world_building_rail import world_building_rail
+from workspaces.drawing_board.drawing_board_rail import drawing_board_rail
+from workspaces.notes.notes_rail import notes_rail
 from workspaces.story import story
 
 
@@ -137,10 +141,10 @@ def create_rails(page: ft.Page):
     workspace_rails = {
         0: content_rail,
         1: characters_rail,
-        2: content_rail, 
-        3: characters_rail,
-        4: content_rail,
-        5: characters_rail,
+        2: plot_timeline_rail, 
+        3: world_building_rail,
+        4: drawing_board_rail,
+        5: notes_rail,
     }  
 
     # Format our active rail

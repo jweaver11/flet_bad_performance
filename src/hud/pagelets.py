@@ -7,7 +7,7 @@ import flet as ft
 
 def create_pagelets(page: ft.Page):
 
-    aspect_ratio = (page.height-100) / (page.width-500)     # aspect ratio for child containers
+    #aspect_ratio = (page.height-100) / (page.width-500)     # aspect ratio for child containers
 
     def drag_will_accept(e):
         e.control.content.border = ft.border.all(
@@ -54,7 +54,7 @@ def create_pagelets(page: ft.Page):
     pagelets_gv = ft.GridView(
         expand=True,
         runs_count=2,
-        child_aspect_ratio=aspect_ratio,
+        #child_aspect_ratio=1,
         controls=[
             d1, 
             d2,
@@ -80,7 +80,14 @@ def create_pagelets(page: ft.Page):
         border_radius=ft.border_radius.all(10),
         # alignment=ft.alignment.center,
         margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
-        content=pagelets_gv
+        content=ft.ResponsiveRow(
+            expand=True,
+            controls=[
+                #pagelets_gv,
+                d1,
+                d2
+            ]
+        )  
     )
     
 
