@@ -7,14 +7,19 @@ for more customization
 
 import flet as ft
 
-def create_pagelets(page: ft.Page):
+def create_widgets(page: ft.Page):
 
     d1 = ft.Draggable(
         content=ft.Container(
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             expand=True,
             bgcolor=ft.Colors.GREY_900,
-            content=ft.Text("container 1")
+            content=ft.Column(
+                expand=True, 
+                controls=[
+                    ft.Row(expand=True, controls=[ft.Text("container 1")])
+                ]
+            )
         ),
     )
     d2 = ft.Draggable(
@@ -26,14 +31,34 @@ def create_pagelets(page: ft.Page):
         ),
     )
     d3 = ft.Draggable(
+        content=ft.Row(
+            expand=True,
+            controls=[
+                ft.Container(
+                    border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+                    expand=True,
+                    bgcolor=ft.Colors.GREY_900,
+                    content=ft.Text("container 3")
+                ),
+            ],
+        ),
+    )
+    d4 = ft.Draggable(
         content=ft.Container(
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             expand=True,
             bgcolor=ft.Colors.GREY_900,
-            content=ft.Text("container 2 is a really fun container that should probably quit being so difficult")
+            content=ft.Text("container 4")
         ),
+        content_feedback=ft.Container(  # Whats shown when dragging
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            width=100,
+            height=100,
+            bgcolor=ft.Colors.GREY_900,
+        )
     )
-    list = [d1, d2, d3]
+
+    list = [d1, d2, d3, d4]
 
     # Main work area stuff in here
     main_work_area_container = ft.Container(
@@ -44,14 +69,14 @@ def create_pagelets(page: ft.Page):
             controls=[
                 ft.Row(
                     expand=True,
-                    wrap=True,
-                    controls=list,
+                    wrap=True,      # elements will move down a line if they dont fit
+                    controls=list,  # List of draggables
                 )
             ]
         )
     )
 
-   
+  
    # Our drag targets to format pagelets different ways
     top_row = ft.DragTarget(
         content=ft.Placeholder(
@@ -77,7 +102,7 @@ def create_pagelets(page: ft.Page):
 
     
     # Container for 1 or more pagelets open on main right side of screen (work area)
-    pagelets_container = ft.Container(
+    widgets_container = ft.Container(
         expand=True,
         margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
@@ -96,4 +121,4 @@ def create_pagelets(page: ft.Page):
     )
     
 
-    return pagelets_container
+    return widgets_container
