@@ -16,33 +16,7 @@ def main(page: ft.Page):
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"
     page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
-    page.window.title_bar_hidden = True
-
-    # Function to maximize/restore window
-    def maximize_restore(e):
-        page.window.maximized = not page.window.maximized
-        page.update()
-
-    # Function to minimize window
-    def minimize(e):
-        page.window.minimized = True
-        page.update()
-
-    title_bar = ft.Row(
-        spacing=0,
-        controls=[
-            ft.WindowDragArea(
-                expand=True,
-                content=ft.Container(
-                    alignment=ft.alignment.center,
-                    content=ft.Text(title),
-                ),
-            ),
-            ft.IconButton(ft.Icons.MINIMIZE, on_click=minimize),
-            ft.IconButton(ft.Icons.SQUARE_OUTLINED, on_click=maximize_restore),
-            ft.IconButton(ft.Icons.CLOSE, on_click=lambda _: page.window.close()),
-        ]
-    )
+    page.title = title
 
     # Create our page elements as their own pages so they can update
     menubar = create_menu_bar(page)     # menubar
@@ -52,8 +26,6 @@ def main(page: ft.Page):
     page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
 
     # RENDER OUR PAGE
-    # Custom title_bar so colors batch better
-    page.add(title_bar)
     # Add our top menubar to the page
     page.add(menubar)
 
