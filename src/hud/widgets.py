@@ -11,36 +11,26 @@ def create_widgets(page: ft.Page):
 
     d1 = ft.Draggable(
         content=ft.Container(
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             expand=True,
             bgcolor=ft.Colors.GREY_900,
-            content=ft.Column(
-                expand=True, 
-                controls=[
-                    ft.Row(expand=True, controls=[ft.Text("container 1")])
-                ]
-            )
-        ),
+            content=ft.Text(value="container 1", expand=True,)
+        )
     )
     d2 = ft.Draggable(
         content=ft.Container(
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            expand=True,
+            #expand=True,
+            width=20,
             bgcolor=ft.Colors.GREY_900,
-            content=ft.Text("container 2 is a really fun container that should probably quit being so difficult")
+            content=ft.ListView([ft.Text(value="container 2 is a really fun container that should probably quit being so difficult")])
         ),
     )
     d3 = ft.Draggable(
-        content=ft.Row(
+        content=ft.Container(
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             expand=True,
-            controls=[
-                ft.Container(
-                    border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-                    expand=True,
-                    bgcolor=ft.Colors.GREY_900,
-                    content=ft.Text("container 3")
-                ),
-            ],
+            bgcolor=ft.Colors.GREY_900,
+            content=ft.Text(value="container 3  so difficult")
         ),
     )
     d4 = ft.Draggable(
@@ -48,7 +38,7 @@ def create_widgets(page: ft.Page):
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             expand=True,
             bgcolor=ft.Colors.GREY_900,
-            content=ft.Text("container 4")
+            content=ft.Text(value="container 4")
         ),
         content_feedback=ft.Container(  # Whats shown when dragging
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
@@ -60,6 +50,12 @@ def create_widgets(page: ft.Page):
 
     list = [d1, d2, d3, d4]
 
+    gv = ft.GridView(
+        #expand=True,
+        controls=list,
+        #runs_count=2,
+        runs_count=len(list) // 2   # Set our runs count for grid formatting
+    )
     # Main work area stuff in here
     main_work_area_container = ft.Container(
         expand=True, 
@@ -70,7 +66,7 @@ def create_widgets(page: ft.Page):
                 ft.Row(
                     expand=True,
                     wrap=True,      # elements will move down a line if they dont fit
-                    controls=list,  # List of draggables
+                    controls=[gv],  # List of draggables
                 )
             ]
         )
@@ -113,6 +109,7 @@ def create_widgets(page: ft.Page):
                 top_row,
                 ft.Row( # Mid row
                     expand=True,
+                    scroll=None,
                     controls=[left_column, main_work_area_container, right_column]
                 ),
                 bottom_row,

@@ -7,7 +7,7 @@ import flet as ft
 from workspaces.story import story
 from hud.menu_bar import create_menu_bar
 from hud.rails import create_rails
-from hud.pagelets import create_widgets
+from hud.widgets import create_widgets
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
@@ -47,7 +47,7 @@ def main(page: ft.Page):
     # Create our page elements as their own pages so they can update
     menubar = create_menu_bar(page)     # menubar
     all_workspaces_rail, active_rail = create_rails(page)   # all workspaces rail and active rail
-    pagelets = create_widgets(page)        # pagelets 
+    widgets = create_widgets(page)        # pagelets 
 
     page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
 
@@ -70,7 +70,7 @@ def main(page: ft.Page):
             ft.VerticalDivider(width=2, thickness=2),   # Divider between rail and work area
             ft.Column(width=10),
             
-            pagelets,    # Work area for pagelets
+            widgets,    # Work area for pagelets
         ],
     ),
 
