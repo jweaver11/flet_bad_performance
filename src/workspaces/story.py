@@ -9,15 +9,13 @@ class Story:
         self.title = title  # Set title whenever new story is created
         print(self.title)
 
-        for char in self.character_list:
-            print(char.name)
+        self.characters_index = int
+        self.characters = {}    # dict of characters name = name of character object
 
 
     # Workspaces within each story object
     # Content
 
-    character_list_index : int
-    character_list = []
 
     # Plot & imeline = ?
     # World Building = ?
@@ -27,6 +25,7 @@ class Story:
 
     # Method to add new character object to story object
     def create_character(self, name):
-        self.character_list.append(Character(name))
+        #self.character_list.append(Character(name))
+        self.characters[name] = Character(name) # Add our character to the dict
 
 story = Story("Story Title") 

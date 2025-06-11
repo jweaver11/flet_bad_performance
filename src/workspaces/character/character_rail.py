@@ -13,7 +13,7 @@ def characters_rail(page: ft.Page):
     # References for button and text field
     button_ref = ft.Ref[ft.TextButton]()
     textfield_ref = ft.Ref[ft.TextField]()
-
+        
     # When popout is clicked
     def popout_on_click(e):
         print("popout clicked")
@@ -24,6 +24,7 @@ def characters_rail(page: ft.Page):
     def pin_on_click(e):
         print("pin clicked")
     # when delete is clicked
+    # When pin is clicked
     def delete_on_click(e):
         print("delete clicked")
 
@@ -39,9 +40,9 @@ def characters_rail(page: ft.Page):
     def add_character_textfield_submit(e):
         name = textfield_ref.current.value  # Passes our character name
         if name:
-            story.create_character(name)    # Add char to char list of story object
-            add_characters_to_list(name)    # add char to our re-orderable list
-            print("Created character:", name, "to story object and rail")
+            story.create_character(name)    # Add char to characters dict in story object
+            add_character_to_rail(name)    # add char to our re-orderable list
+            print(story.characters[name].name)
         
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
@@ -64,7 +65,7 @@ def characters_rail(page: ft.Page):
     # Adds our characters from our story object to our characters_reorderable_list
     # Passes in our character list from our story object
     # ListTile has image, character name, popup menu options
-    def add_characters_to_list(char_name):
+    def add_character_to_rail(char_name):
         char_name = char_name
         new_char = ft.ListTile( # Works as a formatted row
             horizontal_spacing=0,
@@ -72,6 +73,7 @@ def characters_rail(page: ft.Page):
             title=ft.TextButton(
                 expand=True, 
                 style=button_style,
+                on_click=lambda e: print(story.characters[char_name].name, "was clicked"),
                 content=ft.Row(
                     alignment=ft.MainAxisAlignment.START,
                     controls=[
@@ -85,11 +87,14 @@ def characters_rail(page: ft.Page):
                     ], 
                 )
             ),
-            trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
-                ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
-                ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
-                ft.PopupMenuItem(text="Delete", on_click=delete_on_click),
+            trailing=ft.PopupMenuButton(
+                icon_color=ft.Colors.GREY_400, 
+                tooltip="", 
+                items=[
+                    ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
+                    ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
+                    ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
+                    ft.PopupMenuItem(text="Delete", on_click=delete_on_click),
                 ],
             ),
         )
