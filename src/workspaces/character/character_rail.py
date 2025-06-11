@@ -24,9 +24,9 @@ def characters_rail(page: ft.Page):
     def pin_on_click(e):
         print("pin clicked")
     # when delete is clicked
-    # When pin is clicked
     def delete_on_click(e):
         print("delete clicked")
+        update_character_rail()
 
     # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
     def create_character_button_click(e):
@@ -41,7 +41,7 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             story.create_character(name)    # Add char to characters dict in story object
-            add_character_to_rail(name)    # add char to our re-orderable list
+            update_character_rail()    # add char to our re-orderable list
             print(story.characters[name].name)
         
         # Bring back our button, hide textfield, update the page 
@@ -62,43 +62,44 @@ def characters_rail(page: ft.Page):
             button_ref.current.update()
         page.update()
 
-    # Adds our characters from our story object to our characters_reorderable_list
-    # Passes in our character list from our story object
+    # Clears our re-orderable list, then re-adds every character in story.characters
     # ListTile has image, character name, popup menu options
-    def add_character_to_rail(char_name):
-        char_name = char_name
-        new_char = ft.ListTile( # Works as a formatted row
-            horizontal_spacing=0,
-            leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
-            title=ft.TextButton(
-                expand=True, 
-                style=button_style,
-                on_click=lambda e: print(story.characters[char_name].name, "was clicked"),
-                content=ft.Row(
-                    alignment=ft.MainAxisAlignment.START,
-                    controls=[
-                        ft.Text(
-                            char_name,
-                            max_lines=1,
-                            width=88,
-                            overflow=ft.TextOverflow.CLIP,
-                            no_wrap=True,
-                        ), 
-                    ], 
-                )
-            ),
-            trailing=ft.PopupMenuButton(
-                icon_color=ft.Colors.GREY_400, 
-                tooltip="", 
-                items=[
-                    ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
-                    ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                    ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
-                    ft.PopupMenuItem(text="Delete", on_click=delete_on_click),
-                ],
-            ),
-        )
-        characters_reorderable_list.controls.append(new_char)
+    def update_character_rail():
+        characters_reorderable_list.controls.clear()
+        for char in story.characters:
+            new_char = ft.ListTile( # Works as a formatted row
+                horizontal_spacing=0,
+                leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
+                title=ft.TextButton(
+                    expand=True, 
+                    style=button_style,
+                    on_click=lambda e, char=char: print(story.characters[char].name, "was clicked"),
+                    content=ft.Row(
+                        alignment=ft.MainAxisAlignment.START,
+                        controls=[
+                            ft.Text(
+                                char,
+                                max_lines=1,
+                                width=88,
+                                overflow=ft.TextOverflow.CLIP,
+                                no_wrap=True,
+                            ), 
+                        ], 
+                    )
+                ),
+                trailing=ft.PopupMenuButton(
+                    icon_color=ft.Colors.GREY_400, 
+                    tooltip="", 
+                    items=[
+                        ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
+                        ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
+                        ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
+                        ft.PopupMenuItem(text="Delete", on_click=delete_on_click),
+                    ],
+                ),
+            )
+            characters_reorderable_list.controls.append(new_char)
+        return print("character rail updated")
 
     # Our re-orderable list. We add/delete characters to this
     characters_reorderable_list = ft.ReorderableListView(padding=0)
