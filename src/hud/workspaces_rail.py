@@ -32,6 +32,7 @@ def create_rails(page: ft.Page):
         page.update()   # update our UI
     
     # Function for deselecting all rails except the one passed through
+    # Need it to change icons on the workspaces rail
     def deselect_all_other_rails(rail_index):
         rail_index = rail_index
         if rail_index != 0:

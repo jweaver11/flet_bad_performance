@@ -11,8 +11,7 @@ from workspaces.notes.notes_rail import notes_rail
 # Default active workspace rail if none selected/on startup rn
 default_rail = [ft.Text("Select a workspace")]
 
-# Map of all the workspace rails
-# Rails must be a list of controls
+# Map of all the workspace rails - Rails must be a list of flet controls
 workspace_rails = {
     0: default_rail,
 }  
@@ -25,12 +24,13 @@ active_rail = ft.Column(
 )  
 
 def create_active_rail(page: ft.Page):
-
-    char_rail = characters_rail(page)
-
+    
+    # Create our rails
+    chars_rail = characters_rail(page)
+    # Add the rest of our rails
     workspace_rails.update({
         0: content_rail,
-        1: char_rail,
+        1: chars_rail,
         2: plot_timeline_rail, 
         3: world_building_rail,
         4: drawing_board_rail,
