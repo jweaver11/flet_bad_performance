@@ -23,11 +23,11 @@ def create_rails(page: ft.Page):
         elif e.control == r5:
             rail_index = 5
 
-        new_rail = workspace_rails.get(rail_index, default_rail) # Grab our active rail from map
+        new_rail = workspace_rails.get(rail_index, default_rail) # Grab our active rail from dict/map
         
-        deselect_all_other_rails(rail_index)    # De-select all rails but selected one
-        active_rail.controls = new_rail # Set our new rail to the active rail
-        print("New rail selected", rail_index)
+        deselect_all_other_rails(rail_index)    # De-select all rails icons but selected one
+        active_rail.controls = new_rail     # Set our new rail to the active rail
+        print("New workspace selected", rail_index)
 
         page.update()   # update our UI
     

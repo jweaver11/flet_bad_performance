@@ -27,7 +27,8 @@ def create_active_rail(page: ft.Page):
     
     # Create our rails
     chars_rail = characters_rail(page)
-    # Add the rest of our rails
+
+    # Add our rails to the dict/map
     workspace_rails.update({
         0: content_rail,
         1: chars_rail,

@@ -1,6 +1,3 @@
-import flet as ft
-import os
-
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):

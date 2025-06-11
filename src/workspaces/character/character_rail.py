@@ -17,6 +17,9 @@ def characters_rail(page: ft.Page):
     # When popout is clicked
     def popout_on_click(e):
         print("popout clicked")
+    # When rename is clicked
+    def rename_on_click(e):
+        print("pin clicked")
     # When pin is clicked
     def pin_on_click(e):
         print("pin clicked")
@@ -24,23 +27,23 @@ def characters_rail(page: ft.Page):
     def delete_on_click(e):
         print("delete clicked")
 
-    # Control when 'Create Character' button is clicked
-    def add_character_button_click(e):
+    # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
+    def create_character_button_click(e):
         button_ref.current.visible = False
         button_ref.current.update()
         textfield_ref.current.visible = True
         textfield_ref.current.focus()
         textfield_ref.current.update()
 
-    # Control submits in textfield when creating character
+    # When user presses enter after inputting 'create_character' button
     def add_character_textfield_submit(e):
-        name = textfield_ref.current.value
+        name = textfield_ref.current.value  # Passes our character name
         if name:
             story.create_character(name)    # Add char to char list of story object
-            print("added", story.character_list[-1].name, "to story object")
-            #characters_rail.insert(len(characters_rail) - 3, name)  # Add char to char rail
-            #print("Added ", name, "to character_rail")
-        add_characters_to_list(story.character_list)
+            add_characters_to_list(name)    # add char to our re-orderable list
+            print("Created character:", name, "to story object and rail")
+        
+        # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
         textfield_ref.current.visible = False
         textfield_ref.current.update()
@@ -56,6 +59,41 @@ def characters_rail(page: ft.Page):
             button_ref.current.visible = True
             textfield_ref.current.update()
             button_ref.current.update()
+        page.update()
+
+    # Adds our characters from our story object to our characters_reorderable_list
+    # Passes in our character list from our story object
+    # ListTile has image, character name, popup menu options
+    def add_characters_to_list(char_name):
+        char_name = char_name
+        new_char = ft.ListTile( # Works as a formatted row
+            horizontal_spacing=0,
+            leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
+            title=ft.TextButton(
+                expand=True, 
+                style=button_style,
+                content=ft.Row(
+                    alignment=ft.MainAxisAlignment.START,
+                    controls=[
+                        ft.Text(
+                            char_name,
+                            max_lines=1,
+                            width=88,
+                            overflow=ft.TextOverflow.CLIP,
+                            no_wrap=True,
+                        ), 
+                    ], 
+                )
+            ),
+            trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
+                ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
+                ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
+                ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
+                ft.PopupMenuItem(text="Delete", on_click=delete_on_click),
+                ],
+            ),
+        )
+        characters_reorderable_list.controls.append(new_char)
 
     # Our re-orderable list. We add/delete characters to this
     characters_reorderable_list = ft.ReorderableListView(padding=0)
@@ -77,7 +115,6 @@ def characters_rail(page: ft.Page):
                 icon=ft.Icons.WAVES_OUTLINED, 
                 style=button_style, 
                 ref=button_ref,
-                on_click=add_character_button_click,
             ),
         ),
         
@@ -99,7 +136,7 @@ def characters_rail(page: ft.Page):
                         icon=ft.Icons.WAVES_OUTLINED, 
                         style=button_style, 
                         ref=button_ref,
-                        on_click=add_character_button_click
+                        on_click=create_character_button_click
                     ),
                     ft.TextField(
                         ref=textfield_ref,
@@ -114,42 +151,5 @@ def characters_rail(page: ft.Page):
         ),
     ]
 
-
-    # Adds our characters from our story object to our characters_reorderable_list
-    # Passes in our character list from our story object
-    # ListTile has image, character name, popup menu options
-    def add_characters_to_list(char_list):
-        char_list = char_list
-        characters_reorderable_list.controls.clear()
-        for character in story.character_list:
-            new_char = ft.ListTile(
-                horizontal_spacing=0,
-                leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
-                
-                title=ft.TextButton(
-                    expand=True, 
-                    style=button_style,
-                    content=ft.Row(
-                        alignment=ft.MainAxisAlignment.START,
-                        controls=[
-                            ft.Text(
-                                character.name,
-                                max_lines=1,
-                                width=88,
-                                overflow=ft.TextOverflow.CLIP,
-                                no_wrap=True,
-                            ), 
-                        ], 
-                    )
-                ),
-                
-                trailing=ft.PopupMenuButton(icon_color=ft.Colors.GREY_400, tooltip="", items=[
-                    ft.PopupMenuItem(text="popout", on_click=popout_on_click),
-                    ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
-                    ft.PopupMenuItem(text="delete", on_click=delete_on_click),
-                    ],
-                ),
-            )
-            characters_reorderable_list.controls.append(new_char)
 
     return characters_rail
