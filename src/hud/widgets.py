@@ -10,102 +10,109 @@ import flet as ft
 def create_widgets(page: ft.Page):
 
     # Template for widget
-    d1 = ft.Draggable(
-        content=ft.Container(
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            expand=True,
-            bgcolor=ft.Colors.GREY_900,
-            # List view so scrolling enabled
-            content=ft.ListView([ft.Text(value="container 1 is a really fun")]) 
-        ),
-        content_feedback=ft.Container(  # Whats shown when dragging
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            width=100,
-            height=100,
-            bgcolor=ft.Colors.GREY_900,
-        )
+    d1 = ft.Container(
+        expand=True,
+        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+        bgcolor=ft.Colors.GREY_900, 
+        content=ft.Column([
+            ft.Container(
+                border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+                expand=True,
+                alignment=ft.alignment.center,
+                content=ft.Draggable(
+                    content=ft.TextButton("Container 1 Title"), 
+                    content_feedback=ft.TextButton("Container 1 Title")
+                )   
+            ),
+            ft.Container(content=ft.Text("Container 1 body"))
+        ])
     )
-    d2 = ft.Draggable(
-        content=ft.Container(
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            expand=True,
-            bgcolor=ft.Colors.GREY_900,
-            content=ft.ListView([ft.Text(value="container 2 is a really fun")])
-        ),
-        content_feedback=ft.Container(  # Whats shown when dragging
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            width=100,
-            height=100,
-            bgcolor=ft.Colors.GREY_900,
-        )
+    d2 = ft.Container(
+        expand=True,
+        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+        bgcolor=ft.Colors.GREY_900, 
+        content=ft.Column([
+            ft.Container(
+                border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+                expand=True,
+                alignment=ft.alignment.center,
+                content=ft.Draggable(
+                    content=ft.TextButton("Container 2 Title"), 
+                    content_feedback=ft.TextButton("Container 2 Title")
+                )   
+            ),
+            ft.Container(content=ft.Text("Container 2 body"))
+        ])
     )
-    d3 = ft.Draggable(
-        content=ft.Container(
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            expand=True,
-            bgcolor=ft.Colors.GREY_900,
-            content=ft.ListView([ft.Text(value="container 3 is a really fun")])
-        ),
-        content_feedback=ft.Container(  # Whats shown when dragging
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            width=100,
-            height=100,
-            bgcolor=ft.Colors.GREY_900,
-        )
+    d3 = ft.Container(
+        expand=True,
+        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+        bgcolor=ft.Colors.GREY_900, 
+        content=ft.Column([
+            ft.Container(
+                border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+                expand=True,
+                alignment=ft.alignment.center,
+                content=ft.Draggable(
+                    group="target",
+                    content=ft.TextButton("Container 3 Title"), 
+                    content_feedback=ft.TextButton("Container 3 Title")
+                )   
+            ),
+            ft.Container(content=ft.Text("Container 3 body"))
+        ])
     )
-    d4 = ft.Draggable(
-        content=ft.Container(
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            expand=True,
-            bgcolor=ft.Colors.GREY_900,
-            content=ft.ListView([ft.Text(value="container 4 is a really fun")])
-        ),
-        content_feedback=ft.Container(  # Whats shown when dragging
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            width=100,
-            height=100,
-            bgcolor=ft.Colors.GREY_900,
-        )
-    )
+        
 
-    list = [d1, d2, d3, d4]
+    def drag_will_accept(e):
+        e.control.content.border = ft.border.all(
+            2, ft.Colors.BLACK45 if e.data == "true" else ft.Colors.RED
+        )
+        e.control.update()
+
+    def drag_accept(e: ft.DragTargetEvent):
+        #src = page.get_control(f"{e.src_id}")
+        #e.control.content.bgcolor = src.content.bgcolor
+        #e.control.content.border = None
+        print("drag accepted")
+        tr_list.append(d3)
+        e.control.update()
+        page.update()
+
+    def drag_leave(e):
+        e.control.content.border = None
+        e.control.update()
+
+    list = [d1, d2, d3]
     tr_list = []
     lc_list = []
     mr_list = []
     rc_list = []
     br_list = []
 
-
-    # Not filling up cgc correctly, need better login on
-    # child aspect ratio
-    # Need gv to Fill up parent container without having to scroll - cgc
-    # Give correct number of runs
-    gv = ft.GridView(
-        controls=list,
-        child_aspect_ratio=16/9,
-        runs_count=len(list) // 2   # Set our runs count for grid formatting
-    )
-
   
    # Our drag targets to format pagelets different ways
    # Make placeholders containers with rr's?
     top_row = ft.DragTarget(
-        group="top-row",
-        content=ft.Placeholder(
-            expand=True,
-            fallback_height=50,
-        )
+        group="target",
+        on_will_accept=drag_will_accept,
+        on_accept=drag_accept,
+        on_leave=drag_leave,
+        content=ft.Row(height=100, controls=tr_list)
     )
     # Replace placeholder with column??
     left_column = ft.DragTarget(
-        group="left-column",
+        group="target",
         content=ft.Placeholder(
             fallback_width=50,
         )
     )
     middle_row = ft.DragTarget(
-        group="middle-row",
-        content=ft.ResponsiveRow(controls=list)
+        group="target",
+        content=ft.ResponsiveRow(
+            col={"xs": 2, "sm": 2, "md": 2, "lg": 2,}, 
+            controls=list,
+        )
     )
     right_column = ft.DragTarget(
         group="right-column",
