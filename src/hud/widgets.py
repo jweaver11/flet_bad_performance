@@ -63,13 +63,14 @@ def create_widgets(page: ft.Page):
         ])
     )
         
-
+    # When draggable is dragged onto target
     def drag_will_accept(e):
         e.control.content.border = ft.border.all(
             2, ft.Colors.BLACK45 if e.data == "true" else ft.Colors.RED
         )
         e.control.update()
 
+    # When user 'drops' draggable onto target
     def drag_accept(e: ft.DragTargetEvent):
         #src = page.get_control(f"{e.src_id}")
         #e.control.content.bgcolor = src.content.bgcolor
@@ -79,6 +80,11 @@ def create_widgets(page: ft.Page):
         e.control.update()
         page.update()
 
+    # When draggable moves within its target
+    def on_move(e):
+        print("Draggable moved within target")
+
+    # When draggable leaves target
     def drag_leave(e):
         e.control.content.border = None
         e.control.update()
@@ -97,6 +103,7 @@ def create_widgets(page: ft.Page):
         group="target",
         on_will_accept=drag_will_accept,
         on_accept=drag_accept,
+        #on_move=on_move,
         on_leave=drag_leave,
         content=ft.Row(height=100, controls=tr_list)
     )

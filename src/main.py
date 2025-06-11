@@ -6,7 +6,7 @@ so they can update themselves dynamically
 import flet as ft
 from workspaces.story import story
 from hud.menu_bar import create_menu_bar
-from hud.rails import create_rails
+from hud.all_rails import create_rails
 from hud.widgets import create_widgets
 
 

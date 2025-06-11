@@ -136,11 +136,16 @@ def create_rails(page: ft.Page):
         controls=rail_controls,
     )
 
+    def add_workspace(e):
+        print("Add Workspace Button clicked")
+
+    char_rail = characters_rail(page)
+
     # Map of all the workspace rails
     # Rails must be a list of controls
     workspace_rails = {
         0: content_rail,
-        1: characters_rail,
+        1: char_rail,
         2: plot_timeline_rail, 
         3: world_building_rail,
         4: drawing_board_rail,
@@ -152,9 +157,6 @@ def create_rails(page: ft.Page):
         spacing=0,
         controls=workspace_rails[1],    # On startup, set to char rail
     )  
-
-    def add_workspace(e):
-        print("Add Workspace Button clicked")
 
     
     # Container for all available workspaces. On left most side of page

@@ -9,19 +9,15 @@ class Story:
         self.title = title  # Set title whenever new story is created
         print(self.title)
         self.character_list.append(Character("Billy"))  #temp
-        print(self.character_list[0].name)
         self.character_list.append(Character("Johnny")) #temp
-        print(self.character_list[1].name)
         self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
         self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
         self.character_list.append(Character("Wi")) #temp
-        print(self.character_list[2].name)
         self.character_list.append(Character("Willy")) #temp
-        print(self.character_list[2].name)
         self.character_list.append(Character("Willysdsdfgszxcvbnmlkjhg")) #temp
-        print(self.character_list[2].name)
+
+        for char in self.character_list:
+            print(char.name)
         
 
         #active_workspace = "character" ?
@@ -43,4 +39,4 @@ class Story:
         self.character_list.append(Character(name))
         # print(self.character_list[self.character_list(len)].name)
 
-story = Story("Story Title")
+story = Story("Story Title") 
