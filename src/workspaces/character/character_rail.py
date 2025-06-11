@@ -24,9 +24,12 @@ def characters_rail(page: ft.Page):
     def pin_on_click(e):
         print("pin clicked")
     # when delete is clicked
-    def delete_on_click(e):
+    def delete_on_click(e, char):
         print("delete clicked")
+        del story.characters[char]
+
         update_character_rail()
+        page.update()
 
     # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
     def create_character_button_click(e):
@@ -69,11 +72,11 @@ def characters_rail(page: ft.Page):
         for char in story.characters:
             new_char = ft.ListTile( # Works as a formatted row
                 horizontal_spacing=0,
-                leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
+                #leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
                 title=ft.TextButton(
                     expand=True, 
                     style=button_style,
-                    on_click=lambda e, char=char: print(story.characters[char].name, "was clicked"),
+                    on_click=lambda e, char=char: print(story.characters[char].name, "was clicked"),    # on click
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
@@ -94,7 +97,7 @@ def characters_rail(page: ft.Page):
                         ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
                         ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
                         ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
-                        ft.PopupMenuItem(text="Delete", on_click=delete_on_click),
+                        ft.PopupMenuItem(text="Delete", on_click=lambda e, char_name=char: delete_on_click(e, char_name)),
                     ],
                 ),
             )
