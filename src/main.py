@@ -6,7 +6,8 @@ so they can update themselves dynamically
 import flet as ft
 from workspaces.story import story
 from hud.menu_bar import create_menu_bar
-from hud.all_rails import create_rails
+from hud.workspaces_rail import create_rails
+from hud.active_rail import create_active_rail
 from hud.widgets import create_widgets
 
 
@@ -20,7 +21,8 @@ def main(page: ft.Page):
 
     # Create our page elements as their own pages so they can update
     menubar = create_menu_bar(page)     # menubar
-    all_workspaces_rail, active_rail = create_rails(page)   # all workspaces rail and active rail
+    all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
+    active_rail = create_active_rail(page)
     widgets = create_widgets(page)        # pagelets 
 
     page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)

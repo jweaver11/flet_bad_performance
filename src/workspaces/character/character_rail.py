@@ -153,7 +153,5 @@ def characters_rail(page: ft.Page):
             ),
         )
         character_list.controls.append(new_char)
-
-        return
     
     return char_rail

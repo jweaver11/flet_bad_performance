@@ -1,16 +1,10 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
-from workspaces.character.character_rail import characters_rail  
-from workspaces.content.content_rail import content_rail
-from workspaces.plot_timeline.plot_timeline_rail import plot_timeline_rail
-from workspaces.world_building.world_building_rail import world_building_rail
-from workspaces.drawing_board.drawing_board_rail import drawing_board_rail
-from workspaces.notes.notes_rail import notes_rail
+from hud.active_rail import workspace_rails, default_rail, active_rail
 from workspaces.story import story
 
 
 def create_rails(page: ft.Page):
-
 
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
@@ -29,7 +23,7 @@ def create_rails(page: ft.Page):
         elif e.control == r5:
             rail_index = 5
 
-        new_rail = workspace_rails.get(rail_index, content_rail) # Grab our active rail from map
+        new_rail = workspace_rails.get(rail_index, default_rail) # Grab our active rail from map
         
         deselect_all_other_rails(rail_index)    # De-select all rails but selected one
         active_rail.controls = new_rail # Set our new rail to the active rail
@@ -139,25 +133,6 @@ def create_rails(page: ft.Page):
     def add_workspace(e):
         print("Add Workspace Button clicked")
 
-    char_rail = characters_rail(page)
-
-    # Map of all the workspace rails
-    # Rails must be a list of controls
-    workspace_rails = {
-        0: content_rail,
-        1: char_rail,
-        2: plot_timeline_rail, 
-        3: world_building_rail,
-        4: drawing_board_rail,
-        5: notes_rail,
-    }  
-
-    # Format our active rail
-    active_rail = ft.Column(  
-        spacing=0,
-        controls=workspace_rails[1],    # On startup, set to char rail
-    )  
-
     
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
@@ -181,12 +156,5 @@ def create_rails(page: ft.Page):
         ),
     )
 
-    # Container for the active workspace rail.
-    active_workspace_rail_container = ft.Container(
-        alignment=ft.alignment.center,  # Aligns content to the
-        width=200,  # Sets the width
-        content=active_rail,    # Sets our active rail column
-    )
 
-
-    return all_workspaces_rail_container, active_workspace_rail_container
+    return all_workspaces_rail_container
