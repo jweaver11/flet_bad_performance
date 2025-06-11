@@ -9,7 +9,6 @@ class Story:
         self.title = title  # Set title whenever new story is created
         print(self.title)
 
-        self.characters_index = int
         self.characters = {}    # dict of characters name = name of character object
 
 

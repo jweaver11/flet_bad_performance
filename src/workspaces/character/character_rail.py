@@ -20,16 +20,11 @@ def characters_rail(page: ft.Page):
     # When rename is clicked
     def rename_on_click(e):
         print("pin clicked")
-    # When pin is clicked
-    def pin_on_click(e):
-        print("pin clicked")
-    # when delete is clicked
+    # when delete is clicked. Delete our character from story.characters and update the rail
     def delete_on_click(e, char):
         print("delete clicked")
         del story.characters[char]
-
         update_character_rail()
-        page.update()
 
     # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
     def create_character_button_click(e):
@@ -96,12 +91,12 @@ def characters_rail(page: ft.Page):
                     items=[
                         ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
                         ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                        ft.PopupMenuItem(text="Pin", on_click=pin_on_click),
                         ft.PopupMenuItem(text="Delete", on_click=lambda e, char_name=char: delete_on_click(e, char_name)),
                     ],
                 ),
             )
             characters_reorderable_list.controls.append(new_char)
+        page.update()
         return print("character rail updated")
 
     # Our re-orderable list. We add/delete characters to this
