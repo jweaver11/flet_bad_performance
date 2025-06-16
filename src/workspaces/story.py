@@ -11,6 +11,8 @@ class Story:
 
         self.characters = {}    # dict of characters name = name of character object
 
+        self.active_widgets = {}   # Dict of active widgets
+
 
     # Workspaces within each story object
     # Content
@@ -24,7 +26,12 @@ class Story:
 
     # Method to add new character object to story object
     def create_character(self, name):
-        #self.character_list.append(Character(name))
         self.characters[name] = Character(name) # Add our character to the dict
 
 story = Story("Story Title") 
+
+# Class for widget objects in each story 
+class Widget:
+    def __init__(self, title, body):
+        self.title = title
+        self.body = body

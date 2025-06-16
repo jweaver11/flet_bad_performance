@@ -78,7 +78,7 @@ def characters_rail(page: ft.Page):
                             ft.Text(
                                 char,
                                 max_lines=1,
-                                width=88,
+                                width=104,  # for when name longer than button
                                 overflow=ft.TextOverflow.CLIP,
                                 no_wrap=True,
                             ), 

@@ -1,3 +1,5 @@
+import flet as ft
+
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):
@@ -19,6 +21,10 @@ class Character:
 
     show_character : bool
     tags : list[str]
+
+    # Return a list of flet controls
+    def create_character_widget(body):
+        return ft.Text(body)
 
     '''
     # Add ons that won't show by default
@@ -54,5 +60,4 @@ tags = {
 # with open(my_file_path, "w") as f:
     # f.write("My characters will go here")
 
-class character_pagelet:
-    print("do something")
+
