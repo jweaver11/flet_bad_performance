@@ -113,7 +113,6 @@ def characters_rail(page: ft.Page):
         ft.Container(
             alignment=ft.alignment.center,  # Aligns content to the
             padding=10,
-            #expand=True,
             content=ft.TextButton(  # 'Create Character button'
                 "Filter characters", 
                 icon=ft.Icons.WAVES_OUTLINED, 

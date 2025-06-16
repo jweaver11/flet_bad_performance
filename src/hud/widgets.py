@@ -9,157 +9,70 @@ import flet as ft
 
 def create_widgets(page: ft.Page):
 
-    # When draggable is dragged onto target
-    def drag_will_accept(e):
-        e.control.content.border = ft.border.all(
-            2, ft.Colors.BLACK45 if e.data == "true" else ft.Colors.RED
+    # When new widget pops out, format it to fit correctly
+    def create_new_widget(title, body):
+        widget_container = ft.Container(
+            expand=True,
+            padding=6,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            bgcolor=ft.Colors.GREY_900,
+            content=ft.Column([
+                ft.Row(     # Title of the widget
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    controls=[ft.TextButton(title)]
+                ),
+                ft.Container(       # Body of the widget
+                    expand=True,
+                    content=ft.Column([ft.Row(wrap=True, controls=[ft.Text(body)])]) 
+                )
+            ])
         )
-        e.control.update()
-
-    # When user 'drops' draggable onto target
-    def drag_accept(e: ft.DragTargetEvent):
-        #src = page.get_control(f"{e.src_id}")
-        #e.control.content.bgcolor = src.content.bgcolor
-        #e.control.content.border = None
-        print("drag accepted")
-        tr_list.append(d3)
-        e.control.update()
-        page.update()
-
-    # When draggable moves within its target
-    def on_move(e):
-        print("Draggable moved within target")
-
-    # When draggable leaves target
-    def drag_leave(e):
-        e.control.content.border = None
-        e.control.update()
-
-    # Template for widget
-    d1 = ft.Container(
-        expand=True,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        bgcolor=ft.Colors.GREY_900, 
-        content=ft.Column([
-            ft.Container(
-                border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-                expand=True,
-                alignment=ft.alignment.center,
-                content=ft.Draggable(
-                    group="target",
-                    content=ft.TextButton("Container 1 Title"), 
-                    content_feedback=ft.TextButton("Container 1 Title")
-                )   
-            ),
-            ft.Container(content=ft.Text("Container 1 body"))
-        ])
-    )
-    d2 = ft.Container(
-        expand=True,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        bgcolor=ft.Colors.GREY_900, 
-        content=ft.Column([
-            ft.Container(
-                border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-                expand=True,
-                alignment=ft.alignment.center,
-                content=ft.Draggable(
-                    group="target",
-                    content=ft.TextButton("Container 2 Title"), 
-                    content_feedback=ft.TextButton("Container 2 Title")
-                )   
-            ),
-            ft.Container(content=ft.Text("Container 2 body"))
-        ])
-    )
-    d3 = ft.Container(
-        expand=True,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        bgcolor=ft.Colors.GREY_900, 
-        content=ft.Column([
-            ft.Container(
-                border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-                expand=True,
-                alignment=ft.alignment.center,
-                content=ft.Draggable(
-                    group="target",
-                    content=ft.TextButton("Container 3 Title"), 
-                    content_feedback=ft.TextButton("Container 3 Title")
-                )   
-            ),
-            ft.Container(content=ft.Text("Container 3 body"))
-        ])
-    )
+        return widget_container
     
         
     # list for active widgets in the workspace area
-    active_widgets_list = [d1, d2, d3]
-    tr_list = []
-    lc_list = []
-    mr_list = []
-    rc_list = []
-    br_list = []
+    d1 = create_new_widget("widget 1 title", "widget 1 body")
+    d2 = create_new_widget("widget 2 title", "widget 2 body")
+    d3 = create_new_widget("widget 3 title", "widget 3 body")
 
-  
-   # Our drag targets to format pagelets different ways
-   # Make placeholders containers with rr's?
-    top_row = ft.DragTarget(
-        group="target",
-        on_will_accept=drag_will_accept,
-        on_accept=drag_accept,
-        #on_move=on_move,
-        on_leave=drag_leave,
-        content=ft.Row(height=50, controls=tr_list)
-    )
-    # Replace placeholder with column??
-    left_column = ft.DragTarget(
-        group="target",
-        content=ft.Placeholder(
-            fallback_width=50,
-        )
-    )
-    middle_row = ft.DragTarget(
-        group="target",
-        content=ft.ResponsiveRow(
-            expand=True,
-            controls=active_widgets_list
-        )
-    )
-    right_column = ft.DragTarget(
-        group="target",
-        content=ft.Placeholder(
-            fallback_width=50,
-        )
-    )
-    bottom_row =ft.Placeholder(fallback_height=50,)
-    
+    active_widgets_list = [d1, d2, d3, create_new_widget("widget 4 title", "widget 4 body")]
 
-
-    # central grid container
-    middle_row_container = ft.Container(
+    widgets_row = ft.Row(
+        run_spacing = 10,
+        spacing=10,
         expand=True,
-        bgcolor=ft.Colors.GREY_700, 
-        content=ft.Column(expand=True, controls=[middle_row])
+        controls=active_widgets_list
+    )
+
+    tr = ft.Container(
+        height=100,
+        expand=True, 
+        bgcolor=ft.Colors.RED,
+        content=ft.Draggable(
+            group="top_row",
+            content=ft.Container(height=20)
+        )
+    )
+
+    stack = ft.Stack(
+        clip_behavior=True,
+        controls=
+        [
+            d1, 
+            d2,
+            d3, 
+            tr,
+        ],
     )
 
     # Container for 1 or more pagelets open on main right side of screen (work area)
-    widgets_container = ft.Container(
+    active_widgets_container = ft.Container(
         expand=True,
         margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
         bgcolor=ft.Colors.GREY_800,
-        content=ft.Column(
-            expand=True,
-            controls=[
-                top_row,   
-                ft.Row(
-                    expand=True,
-                    controls=[left_column, middle_row_container, right_column]
-                ),
-                ft.DragTarget(group="target", content=bottom_row)   # correct formatting 6/11
-            ]
-        )
+        content=widgets_row
     )
     
 
-    return widgets_container
+    return active_widgets_container
