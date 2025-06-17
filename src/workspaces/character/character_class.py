@@ -5,7 +5,7 @@ import flet as ft
 class Character:
     def __init__(self, name):
         self.name = name    
-        self.visible: bool     # Widget active and visible = True
+        self.visible = True     # Widget active and visible = True
         self.widget = create_character_widget(self.name)
         
     # picture : ft.Image?

@@ -22,8 +22,9 @@ def main(page: ft.Page):
     # Create our page elements as their own pages so they can update
     menubar = create_menu_bar(page)     # menubar
     all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
-    active_rail = create_active_rail(page)
-    widgets = create_widgets(page)        # pagelets 
+    active_rail = create_active_rail(page)  # Render whichever rail is active
+    widgets = create_widgets(page)        # Render the widgets that should be visible/active
+
 
     page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
 

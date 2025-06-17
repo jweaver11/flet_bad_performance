@@ -22,9 +22,11 @@ def characters_rail(page: ft.Page):
         print("pin clicked")
     # when delete is clicked. Delete our character from story.characters and update the rail
     def delete_on_click(e, char):
-        print("delete clicked")
         del story.characters[char]
+        print(char, "was deleted from story characters list")
+
         update_character_rail()
+        story.reload_widgets()
 
     # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
     def create_character_button_click(e):
@@ -40,7 +42,8 @@ def characters_rail(page: ft.Page):
         if name:
             story.create_character(name)    # Add char to characters dict in story object
             update_character_rail()    # add char to our re-orderable list
-            print(story.characters[name].name)
+            story.reload_widgets()
+            # update widget page
         
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
@@ -96,8 +99,7 @@ def characters_rail(page: ft.Page):
                 ),
             )
             characters_reorderable_list.controls.append(new_char)
-        page.update()
-        return print("character rail updated")
+        return page.update()
 
     # Our re-orderable list. We add/delete characters to this
     characters_reorderable_list = ft.ReorderableListView(padding=0)

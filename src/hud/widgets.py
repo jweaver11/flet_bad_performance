@@ -8,12 +8,6 @@ for more customization
 import flet as ft
 from workspaces.story import story
 
-def update_page(page):
-    print("page updated")
-    page.update()
-
-
-
 
 # Function to return our container for our widgets
 def create_widgets(page: ft.Page):      
