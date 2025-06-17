@@ -16,7 +16,7 @@ def create_widgets(page: ft.Page):
     widgets_row = ft.Row(
         spacing=4,
         expand=True,
-        controls=story.widgets    # Make the story.widgets somehow
+        controls=story.active_widgets   # Make the story.widgets somehow
     )
 
     # Container for 1 or more pagelets open on main right side of screen (work area)

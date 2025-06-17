@@ -8,8 +8,8 @@ class Story:
     def __init__(self, title):
         self.title = title  # Set title whenever new story is created
 
-        # list of widgets which are just flet containers
-        self.widgets = []  
+        # list of active widgets shown in main workspace area
+        self.active_widgets = []  
 
         self.characters = {}    # dict of characters name = name of character object
 
@@ -20,16 +20,15 @@ class Story:
 
         # Add our character widget from the new char object above to our widgets list. 
         # Use bool to determine what all goes on the widget list, but default goes on
-        self.widgets.append(self.characters[name].widget)
-        print(f"# of active widgets: ", len(self.widgets))
+        self.active_widgets.append(self.characters[name].widget)
 
 
     def reload_widgets(self):
-        self.widgets.clear()
+        self.active_widgets.clear()
         for char_name in self.characters:
             character_obj = self.characters[char_name]
             if character_obj.visible == True:        # This line is the error
-                self.widgets.append(character_obj.widget)
+                self.active_widgets.append(character_obj.widget)
 
     # Workspaces within each story object
     # Content
