@@ -17,46 +17,62 @@ widgets_row = ft.Row(
     controls=story.active_widgets 
 )
 
+class ResizableWidget(ft.Container):
+    def __init__(self, content):
+        super().__init__(content=content)
+        # Add drag handles as controls around the widget
+        # Handle mouse events to resize
+        print("nothing")
+
+
+# Format my layout for all the widgets
+def layout_widgets(widgets):
+    if len(widgets) == 1:
+        return widgets[0]
+    elif len(widgets) == 2:
+        return ft.Row([widgets[0], widgets[1]], expand=True)
+    elif len(widgets) == 3:
+        return ft.Column([
+            ft.Row([widgets[0], widgets[1]], expand=True),
+            widgets[2]
+        ], expand=True)
+    # ... extend for more widgets
+
+
+
 # Function to return our container for our widgets
-def create_widgets(page: ft.Page):      
+def create_widgets(page: ft.Page):     
 
-    tr = ft.Container(  # top row drag target
-        bgcolor=ft.Colors.GREY_900,
-        content=ft.DragTarget(
-            group="top_row",
-            content=ft.Container(height=20)
-        )
-    )
-    lc = ft.Container(  # left column drag target
-        bgcolor=ft.Colors.GREY_900,
-        content=ft.DragTarget(
-            group="left_column",
-            content=ft.Container(width=20)
-        )
-    )
-    rc = ft.Container(   # right column drag target
-        bgcolor=ft.Colors.GREY_900,
-        content=ft.DragTarget(
-            group="right_column",
-            content=ft.Container(width=20)
+    def drag_accept(e):
+        print("accepted")
+
+    # AI stuff
+    main_area = ft.Column(expand=True)
+    top_pin = ft.DragTarget(group="widgets", content=ft.Container(height=50, bgcolor=ft.Colors.GREY_600))
+    left_pin = ft.DragTarget(group="widgets", content=ft.Container(width=50, bgcolor=ft.Colors.GREY_600))
+    right_pin = ft.DragTarget(group="widgets", content=ft.Container(width=50, bgcolor=ft.Colors.GREY_600))
+    bottom_pin = ft.DragTarget(group="widgets", content=ft.Container(height=50, bgcolor=ft.Colors.GREY_600))
+
+    widget = ft.Draggable(
+        group="widgets",
+        content=ft.Container(
+            content=ft.Text("Widget 1"),
+            bgcolor=ft.Colors.BLUE_200,
+            padding=10,
+            border_radius=10,
         )
     )
 
-    br = ft.Container(   # bottom row drag target
-        bgcolor=ft.Colors.GREY_900,
-        content=ft.DragTarget(
-            group="bottom_row",
-            content=ft.Container(height=20)
-        )
-    )
+    main_area.controls.append(widget)
+
 
     column = ft.Column(
         spacing=4,
         expand=True,
         controls=[
-            tr,
-            ft.Row(expand=True, spacing=0, controls=[lc, widgets_row, rc]),
-            br,
+            top_pin,
+            ft.Row(expand=True, spacing=0, controls=[left_pin, widgets_row, right_pin]),
+            bottom_pin,
         ]
     )
 

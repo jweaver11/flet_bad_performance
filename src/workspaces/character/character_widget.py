@@ -11,6 +11,5 @@ def create_character_widget(name):
         ft.Text("title 1")
     ]
 
-
     # return finished widget
     return new_widget(name, list)
