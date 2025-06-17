@@ -17,7 +17,8 @@ class Story:
 
         self.active_widgets.append(self.characters[name].widget)    # Auto add created characters to the active widgets
 
-    # reload our widget list used to render the workspace widgets
+    # Reload our widget list and how widget_row to hold our widgets
+    # passes in whatever flet control holds our other controls
     def reload_widgets(self, row):
         self.active_widgets.clear()
         row.controls.clear()    # clear widgets-row
