@@ -1,5 +1,6 @@
 ''' Master Story/Project class for projects'''
 from workspaces.character.character_class import Character
+import flet as ft
 
 
 # Class for each seperate story/project
@@ -7,7 +8,6 @@ class Story:
     # Constructor for when new story is created
     def __init__(self, title):
         self.title = title  # Set title whenever new story is created
-        print(self.title)
 
         self.characters = {}    # dict of characters name = name of character object
 
@@ -29,9 +29,3 @@ class Story:
         self.characters[name] = Character(name) # Add our character to the dict
 
 story = Story("Story Title") 
-
-# Class for widget objects in each story 
-class Widget:
-    def __init__(self, title, body):
-        self.title = title
-        self.body = body

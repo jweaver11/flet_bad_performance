@@ -7,6 +7,7 @@ the create 'character button' at the bottom.
 import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
+from hud.widgets import reload_widgets
 
 
 def characters_rail(page: ft.Page):
@@ -71,7 +72,8 @@ def characters_rail(page: ft.Page):
                 title=ft.TextButton(
                     expand=True, 
                     style=button_style,
-                    on_click=lambda e, char=char: print(story.characters[char].name, "was clicked"),    # on click
+                    on_click=lambda e, char=char: reload_widgets(page),
+                    #on_click=lambda e, char=char: print(story.characters[char].name, "was clicked"),    # on click
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
