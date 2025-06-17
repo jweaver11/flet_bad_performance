@@ -9,17 +9,18 @@ import flet as ft
 from workspaces.story import story
 
 
+# Will add our active widgets
+widgets_row = ft.Row(
+    spacing=4,
+    expand=True,
+    controls=story.active_widgets 
+)
+
 # Function to return our container for our widgets
 def create_widgets(page: ft.Page):      
 
-    # Will add our active widgets
-    widgets_row = ft.Row(
-        spacing=4,
-        expand=True,
-        controls=story.active_widgets   # Make the story.widgets somehow
-    )
-
-    # Container for 1 or more pagelets open on main right side of screen (work area)
+    
+    # Container for 1 or more widgets open on the workspace area right side of screen
     active_widgets_container = ft.Container(
         expand=True,
         margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
@@ -27,6 +28,7 @@ def create_widgets(page: ft.Page):
         bgcolor=ft.Colors.GREY_800,
         content=widgets_row
     )
+
 
     '''
     tr = ft.Container(

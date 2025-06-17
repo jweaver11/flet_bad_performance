@@ -7,6 +7,7 @@ the create 'character button' at the bottom.
 import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
+from hud.widgets import widgets_row
 
 
 def characters_rail(page: ft.Page):
@@ -20,13 +21,14 @@ def characters_rail(page: ft.Page):
     # When rename is clicked
     def rename_on_click(e):
         print("pin clicked")
-    # when delete is clicked. Delete our character from story.characters and update the rail
+
+    # when delete is clicked. Delete our char from story obj, reload rail and widget
     def delete_on_click(e, char):
         del story.characters[char]
-        print(char, "was deleted from story characters list")
+        reload_character_rail()
+        story.reload_widgets(widgets_row)
+        page.update()
 
-        update_character_rail()
-        story.reload_widgets()
 
     # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
     def create_character_button_click(e):
@@ -41,9 +43,8 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             story.create_character(name)    # Add char to characters dict in story object
-            update_character_rail()    # add char to our re-orderable list
-            story.reload_widgets()
-            # update widget page
+            reload_character_rail()    # add char to our re-orderable list
+            story.reload_widgets(widgets_row)
         
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
@@ -65,7 +66,7 @@ def characters_rail(page: ft.Page):
 
     # Clears our re-orderable list, then re-adds every character in story.characters
     # ListTile has image, character name, popup menu options
-    def update_character_rail():
+    def reload_character_rail():
         characters_reorderable_list.controls.clear()
         for char in story.characters:
             new_char = ft.ListTile( # Works as a formatted row
@@ -155,6 +156,8 @@ def characters_rail(page: ft.Page):
             )
         ),
     ]
+    reload_character_rail() # called initially so characters loaded on launch
+    story.reload_widgets(widgets_row)
 
 
     return characters_rail
