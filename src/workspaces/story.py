@@ -1,5 +1,6 @@
 ''' Master Story/Project class for projects'''
 from workspaces.character.character_class import Character
+from handlers.layout_widgets import layout_widgets
 
 
 # Class for each seperate story/project
@@ -26,7 +27,13 @@ class Story:
             character_obj = self.characters[char_name]
             if character_obj.visible == True:        # This line is the error
                 self.active_widgets.append(character_obj.widget)
-        row.controls = self.active_widgets
+
+        # Layout our widgets whenever more than two
+        if len(self.active_widgets) > 2:
+            layout_widgets
+            print("layout additional widgets was called")
+        else:
+            row.controls = self.active_widgets
 
     # Workspaces within each story object
     # Content

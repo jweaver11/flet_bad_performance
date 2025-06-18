@@ -1,9 +1,9 @@
 import flet as ft
 
+
 # Other widgets use this function as the 'parent' to return same formatting, with dif bodies
 def new_widget(title, body):
     
-
     cont = ft.Container(
         expand=True,
         padding=6,
@@ -11,10 +11,15 @@ def new_widget(title, body):
         bgcolor=ft.Colors.GREY_900,
         visible=True,
         content=ft.Column([
-            ft.Draggable(group="top_row", content=ft.Row(     # Title of the widget
+            ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,
-                controls=[ft.TextButton(title)]
-            )),
+                controls=[
+                    ft.Draggable(
+                        group="widgets", 
+                        content=ft.TextButton(title)    # Title for the widget
+                    )
+                ]
+            ),
             ft.Container(       # Body of the widget
                 expand=True,
                 content=ft.Column(body) 
