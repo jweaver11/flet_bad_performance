@@ -28,6 +28,9 @@ class Story:
                 self.active_widgets.append(character_obj.widget)    # Make our list current with visible widgets
 
         layout_widgets(self.active_widgets)
+    
+    def reorder_widgets(self):
+        return(print("reorder_widgets was called"))
         
 
     # Workspaces within each story object

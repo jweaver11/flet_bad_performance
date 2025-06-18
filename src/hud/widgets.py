@@ -1,24 +1,11 @@
 '''
-Our 'widgets' page that returns the container for
-all the active widgets.
-Our widgets are draggable, and fit pre-set sized spacers
-for more customization
+Just the formatting for our 'widgets' workspace area.
+Returns our container with our formatting areas inside the workspace area.
+Formatted areas are: top pin, left pin, main work area, right pin, and bottom pin
 '''
 
 import flet as ft
 from handlers.layout_widgets import top_pin, left_pin, main_work_area, right_pin, bottom_pin
-
-
-# Will add our active widgets
-# Needs to be outside so other widgets can call on it to update controls
-
-# Give a default height
-class ResizableWidget(ft.Container):
-    def __init__(self, content):
-        super().__init__(content=content)
-        # Add drag handles as controls around the widget
-        # Handle mouse events to resize
-        print("nothing")
 
 
 # Function to return our container for our widgets

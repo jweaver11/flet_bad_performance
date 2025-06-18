@@ -1,16 +1,15 @@
 import flet as ft
 
-
-# Other widgets use this function as the 'parent' to return same formatting, with dif bodies
-def new_widget(title, body):
-    
-    cont = ft.Container(
-        expand=True,
-        padding=6,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        bgcolor=ft.Colors.GREY_900,
-        visible=True,
-        content=ft.Column([
+# Give a default height
+class ResizableWidget(ft.Container):
+    def __init__(self, title, body):
+        super().__init__(
+            expand=True,
+            padding=6,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            bgcolor=ft.Colors.GREY_900,
+            visible=True,
+            content=ft.Column([
             ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
@@ -24,9 +23,14 @@ def new_widget(title, body):
                 expand=True,
                 content=ft.Column(body) 
             )
-        ]) 
-    )
+            ]) 
+        )
 
+        # Add drag handles as controls around the widget
+        # Handle mouse events to resize
+        #print("nothing")
 
-    # return our formatted container
-    return cont
+# Just calls our resizable widget for readability
+def new_widget(title, body):
+
+    return ResizableWidget(title, body)

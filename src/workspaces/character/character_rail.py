@@ -24,8 +24,8 @@ def characters_rail(page: ft.Page):
     # when delete is clicked. Delete our char from story obj, reload rail and widget
     def delete_on_click(e, char):
         del story.characters[char]
-        reload_character_rail()
-        story.reload_widgets()
+        reload_character_rail()     # Rebuild/reload our character rail
+        story.reload_widgets()      # reload our workspace area
         page.update()
 
 
@@ -42,8 +42,8 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             story.create_character(name)    # Add char to characters dict in story object
-            reload_character_rail()    # add char to our re-orderable list
-            story.reload_widgets()
+            reload_character_rail()    
+            story.reload_widgets()  
         
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
