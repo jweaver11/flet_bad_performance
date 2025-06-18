@@ -20,20 +20,15 @@ class Story:
 
     # Reload our widget list and how widget_row to hold our widgets
     # passes in whatever flet control holds our other controls
-    def reload_widgets(self, row):
+    def reload_widgets(self):
         self.active_widgets.clear()
-        row.controls.clear()    # clear widgets-row
         for char_name in self.characters:
             character_obj = self.characters[char_name]
             if character_obj.visible == True:        # This line is the error
-                self.active_widgets.append(character_obj.widget)
+                self.active_widgets.append(character_obj.widget)    # Make our list current with visible widgets
 
-        # Layout our widgets whenever more than two
-        if len(self.active_widgets) > 2:
-            layout_widgets
-            print("layout additional widgets was called")
-        else:
-            row.controls = self.active_widgets
+        layout_widgets(self.active_widgets)
+        
 
     # Workspaces within each story object
     # Content
@@ -47,3 +42,4 @@ class Story:
 story = Story("Story Title") 
 story.create_character("joe")
 story.create_character("bob")
+story.create_character("steve")

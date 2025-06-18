@@ -7,7 +7,6 @@ the create 'character button' at the bottom.
 import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
-from hud.widgets import widgets_row
 
 
 def characters_rail(page: ft.Page):
@@ -26,7 +25,7 @@ def characters_rail(page: ft.Page):
     def delete_on_click(e, char):
         del story.characters[char]
         reload_character_rail()
-        story.reload_widgets(widgets_row)
+        story.reload_widgets()
         page.update()
 
 
@@ -44,7 +43,7 @@ def characters_rail(page: ft.Page):
         if name:
             story.create_character(name)    # Add char to characters dict in story object
             reload_character_rail()    # add char to our re-orderable list
-            story.reload_widgets(widgets_row)
+            story.reload_widgets()
         
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
@@ -157,7 +156,7 @@ def characters_rail(page: ft.Page):
         ),
     ]
     reload_character_rail() # called initially so characters loaded on launch
-    story.reload_widgets(widgets_row)
+    story.reload_widgets()
 
 
     return characters_rail

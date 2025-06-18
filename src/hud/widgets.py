@@ -6,20 +6,13 @@ for more customization
 '''
 
 import flet as ft
-from workspaces.story import story
-from handlers.layout_widgets import top_pin, left_pin, right_pin, bottom_pin
+from handlers.layout_widgets import top_pin, left_pin, main_work_area, right_pin, bottom_pin
 
 
 # Will add our active widgets
 # Needs to be outside so other widgets can call on it to update controls
-widgets_row = ft.Row(
-    spacing=4,
-    expand=True,
-    controls=story.active_widgets 
-)
 
-
-
+# Give a default height
 class ResizableWidget(ft.Container):
     def __init__(self, content):
         super().__init__(content=content)
@@ -30,17 +23,14 @@ class ResizableWidget(ft.Container):
 
 # Function to return our container for our widgets
 def create_widgets(page: ft.Page):     
-
     
-
-
     # Format our pins and main work area into a column for our container
     column = ft.Column(
         spacing=4,
         expand=True,
         controls=[
             top_pin,
-            ft.Row(expand=True, spacing=0, controls=[left_pin, widgets_row, right_pin]),
+            ft.Row(expand=True, spacing=4, controls=[left_pin, main_work_area, right_pin]),
             bottom_pin,
         ]
     )
