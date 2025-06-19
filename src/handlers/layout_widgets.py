@@ -27,7 +27,7 @@ bottom_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
 # set minimumm fallbacks for our pins
 min_pin_height = 20
 min_pin_width = 20
-# max?
+max_pin_width = 300
 #default?
 
 
@@ -53,6 +53,7 @@ main_work_area = ft.Container(
 
 # Can hold up to 6 widgets
 right_pin = ft.Container(
+    #bgcolor = dark postboard color?
     content=ft.DragTarget(group="widgets", on_accept=right_pin_drag_accept, content=right_pin_widgets
 ))
 
@@ -121,16 +122,16 @@ def layout_widgets(widgets):
             bottom_pin.height=False
             bottom_pin_widgets.controls.append(widgets[i-1])
         if i == 4:
-            right_pin.expand=True
-            right_pin.width=False
+            #right_pin.expand=True
+            right_pin.width=max_pin_width
             right_pin_widgets.controls.append(widgets[i-1])
         if i == 5:
             top_pin.expand=True
             top_pin.height=False
             top_pin_widgets.controls.append(widgets[i-1])
         if i == 6:
-            right_pin.expand=True
-            right_pin.width=False
+            left_pin.expand=True
+            left_pin.width=False
             left_pin_widgets.controls.append(widgets[i-1])
 
     
