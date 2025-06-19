@@ -18,7 +18,7 @@ def bottom_pin_drag_accept(e):
 # Row or column with a list of controls that we can add/subtract from
 top_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
 left_pin_widgets = ft.Column(expand=True, spacing=0, controls=[])
-main_work_area_widgets = ft.Row(expand=True, spacing=4, controls=[])
+main_work_area_widgets = ft.Row(expand=True, spacing=10, controls=[])
 right_pin_widgets = ft.Column(expand=True, spacing=0, controls=[])
 bottom_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
 

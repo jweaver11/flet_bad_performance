@@ -1,5 +1,5 @@
 ''' Master Story/Project class for projects'''
-from workspaces.character.character_class import Character
+from workspaces.character.character import Character
 
 
 # Class for each seperate story/project

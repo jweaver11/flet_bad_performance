@@ -9,7 +9,7 @@ from handlers.layout_widgets import top_pin, left_pin, main_work_area, right_pin
 
 
 # Function to return our container for our widgets
-def create_widgets(page: ft.Page):     
+def create_workspace(page: ft.Page):     
     
     # Format our pins and main work area into a column for our container
     column = ft.Row(
@@ -23,7 +23,7 @@ def create_widgets(page: ft.Page):
     )
 
     # Container for 1 or more widgets open on the workspace area right side of screen
-    active_widgets_container = ft.Container(
+    workspace_container = ft.Container(
         expand=True,
         margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
@@ -32,4 +32,4 @@ def create_widgets(page: ft.Page):
     )
     
 
-    return active_widgets_container
+    return workspace_container

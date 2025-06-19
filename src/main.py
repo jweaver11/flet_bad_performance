@@ -8,7 +8,7 @@ from workspaces.story import story
 from hud.menu_bar import create_menu_bar
 from hud.workspaces_rail import create_rails
 from hud.active_rail import create_active_rail
-from hud.widgets import create_widgets
+from hud.workspace import create_workspace
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
@@ -23,7 +23,7 @@ def main(page: ft.Page):
     menubar = create_menu_bar(page)     # menubar
     all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
     active_rail = create_active_rail(page)  # Render whichever rail is active
-    widgets = create_widgets(page)        # Render the widgets that should be visible/active
+    workspace = create_workspace(page)  # render our workspace containing our widgets
 
 
     page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
@@ -45,7 +45,7 @@ def main(page: ft.Page):
             ft.VerticalDivider(width=2, thickness=2),   # Divider between rail and work area
             ft.Column(width=10),
             
-            widgets,    # Work area for pagelets
+            workspace,    # Work area for pagelets
         ],
     ),
 
