@@ -7,14 +7,13 @@ def top_pin_drag_accept(e):
     print("top pin accepted")
 def left_pin_drag_accept(e):
     print("left pin accepted")
-def main_work_area_top_drag_accept(e):
-    print("top main work area drag accepted")
-def main_work_area_bottom_drag_accept(e):
-    print("bottom main work area drag accepted")
+def main_work_area_drag_accept(e):
+    print("main work area drag accepted")
 def right_pin_drag_accept(e):
     print("right pin accepted")
 def bottom_pin_drag_accept(e):
     print("bottom pin accepted")
+
 
 # Row or column with a list of controls that we can add/subtract from
 top_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
@@ -25,8 +24,8 @@ bottom_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
 
 
 # set minimumm fallbacks for our pins
-min_pin_height = 20
-min_pin_width = 20
+min_pin_height = 30
+min_pin_width = 30
 max_pin_width = 300
 #default?
 
@@ -45,10 +44,10 @@ left_pin = ft.Container(
 main_work_area = ft.Container(
     expand=True,
     content=ft.DragTarget(
-                group="widgets", 
-                on_accept=main_work_area_top_drag_accept,
-                content=main_work_area_widgets, 
-            ))
+        group="widgets", 
+        on_accept=main_work_area_drag_accept,
+        content=main_work_area_widgets, 
+))
 
 
 # Can hold up to 6 widgets
@@ -103,6 +102,8 @@ def clear_all_controls():
 def layout_widgets(widgets):
 
     if len(widgets) <= 0:   # If no widgets active, give it a default later
+        # Otherwise, run our layout
+        clear_all_controls()
         return print("No active widgets")
     if len(widgets) >= 24:  # max num widgets
         return print("Max num widgets reached")
@@ -134,6 +135,4 @@ def layout_widgets(widgets):
             left_pin.width=False
             left_pin_widgets.controls.append(widgets[i-1])
 
-    
-    return print(" layout widgets ran")
    

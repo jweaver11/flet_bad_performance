@@ -1,4 +1,5 @@
 import flet as ft
+from handlers.reload_widgets import reload_widgets
 
 # Give a default height
 class ResizableWidget(ft.Container):
@@ -10,28 +11,37 @@ class ResizableWidget(ft.Container):
             bgcolor=ft.Colors.GREY_900,
             visible=True,
             content=ft.Column(spacing=0, controls=[
-            ft.Row(
-                alignment=ft.MainAxisAlignment.CENTER,
-                controls=[
-                    ft.Draggable(
-                        group="widgets", 
-                        content=ft.TextButton(title)    # Title for the widget
-                    )
-                ]
-            ),
-            ft.Divider(color=ft.Colors.BLUE),
-            ft.Container(       # Body of the widget
-                expand=True,
-                content=ft.Column(body) 
-            )
+                ft.Stack([
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[ft.Draggable(group="widgets", content=ft.TextButton(title))]
+                    ),
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.END,
+                        controls=[
+                            ft.IconButton(
+                                on_click=lambda e, self=self: hide_widget(self),
+                                icon=ft.Icons.CLOSE_ROUNDED
+                    )])
+                ]),
+                ft.Divider(color=ft.Colors.BLUE),
+                ft.Container(       # Body of the widget
+                    expand=True,
+                    content=ft.Column(body) 
+                )
             ]) 
         )
+
+        def hide_widget(self):
+            self.visible = False
+            #reload_widgets()     # need this but is circular import
+            return print("hide clicked")
 
         # Add drag handles as controls around the widget
         # Handle mouse events to resize
         #print("nothing")
 
-# Just calls our resizable widget for readability
-def new_widget(title, body):
 
+# Just calls our resizable widget for readability
+def create_new_widget(title, body):
     return ResizableWidget(title, body)

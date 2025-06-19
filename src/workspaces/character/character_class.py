@@ -1,4 +1,4 @@
-from workspaces.character.character_widget import create_character_widget
+from handlers.create_widgets import create_new_widget
 import flet as ft
 
 # Class for each character. Requires passing in a name
@@ -52,11 +52,20 @@ tags = {
     dead : bool
 }
 '''
-
 # Saving characters locally
 # app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
 # my_file_path = os.path.join(app_data_path, "characters.json")
 # with open(my_file_path, "w") as f:
     # f.write("My characters will go here")
 
+# Creates our widget for each character object
+def create_character_widget(name):
+
+    # list of flet controls, nested within a column
+    list = [
+        ft.Text("title 1")
+    ]
+
+    # return finished widget
+    return create_new_widget(name, list)
 
