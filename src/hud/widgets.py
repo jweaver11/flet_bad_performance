@@ -12,13 +12,13 @@ from handlers.layout_widgets import top_pin, left_pin, main_work_area, right_pin
 def create_widgets(page: ft.Page):     
     
     # Format our pins and main work area into a column for our container
-    column = ft.Column(
-        spacing=4,
+    column = ft.Row(
+        spacing=10,
         expand=True,
         controls=[
-            top_pin,
-            ft.Row(expand=True, spacing=4, controls=[left_pin, main_work_area, right_pin]),
-            bottom_pin,
+            left_pin,
+            ft.Column(expand=True, spacing=10, controls=[top_pin, main_work_area, bottom_pin]),
+            right_pin,
         ]
     )
 
@@ -27,7 +27,7 @@ def create_widgets(page: ft.Page):
         expand=True,
         margin=ft.margin.only(top=0, left=0, right=6, bottom=6),
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        bgcolor=ft.Colors.GREY_800,
+        #bgcolor=ft.Colors.GREY_800,
         content=column
     )
     

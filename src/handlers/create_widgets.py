@@ -9,7 +9,7 @@ class ResizableWidget(ft.Container):
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor=ft.Colors.GREY_900,
             visible=True,
-            content=ft.Column([
+            content=ft.Column(spacing=0, controls=[
             ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
@@ -19,6 +19,7 @@ class ResizableWidget(ft.Container):
                     )
                 ]
             ),
+            ft.Divider(color=ft.Colors.BLUE),
             ft.Container(       # Body of the widget
                 expand=True,
                 content=ft.Column(body) 

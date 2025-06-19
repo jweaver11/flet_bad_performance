@@ -8,7 +8,7 @@ class Story:
     # Constructor for when new story is created
     def __init__(self, title):
         self.title = title  # Set title whenever new story is created
-        self.active_widgets = []  # list of active widgets shown in main workspace area
+        self.active_widgets = [] * 22 # list of active widgets shown in main workspace area
         self.characters = {}    # dict of characters name = name of character object
 
         
@@ -45,5 +45,4 @@ class Story:
 story = Story("Story Title") 
 story.create_character("joe")
 story.create_character("bob")
-story.create_character("steve")
-story.create_character("bill")
+

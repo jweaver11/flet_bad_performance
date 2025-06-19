@@ -19,70 +19,73 @@ def bottom_pin_drag_accept(e):
 # Row or column with a list of controls that we can add/subtract from
 top_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
 left_pin_widgets = ft.Column(expand=True, spacing=0, controls=[])
-
-main_work_area_top_widgets = ft.Row(expand=True, spacing=4, controls=[])
-
-main_work_area_bottom_widgets = ft.Row(expand=True, spacing=4, controls=[])
-
+main_work_area_widgets = ft.Row(expand=True, spacing=4, controls=[])
 right_pin_widgets = ft.Column(expand=True, spacing=0, controls=[])
 bottom_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
 
 
+# set minimumm fallbacks for our pins
+min_pin_height = 20
+min_pin_width = 20
+# max?
+#default?
 
 
 # Pins for when we add more and more controls
 # Can hold up to 4 widgets
-top_pin = ft.DragTarget(group="widgets", on_accept=top_pin_drag_accept, content=ft.Container( 
-    height=100,
-    border=ft.border.all(color=ft.Colors.RED_900),
-    content=top_pin_widgets
+top_pin = ft.Container(
+    content=ft.DragTarget(group="widgets", on_accept=top_pin_drag_accept, content=top_pin_widgets
 ))
 # Can hold up to 6 widgets
-left_pin = ft.DragTarget(group="widgets", on_accept=left_pin_drag_accept, content=ft.Container(
-    width=100,
-    border=ft.border.all(color=ft.Colors.RED_900),
-    content=left_pin_widgets
+left_pin = ft.Container(
+    content=ft.DragTarget(group="widgets", on_accept=left_pin_drag_accept, content=left_pin_widgets
 ))
-# Can hold up to 4 widgets. Puts them in grid
+
+# Can hold up to 2 widgets. Go side by side
 main_work_area = ft.Container(
     expand=True,
-    content=ft.Column(spacing=4, expand=True, controls=[
-        ft.Container(expand=True, content=
-            ft.DragTarget(
+    content=ft.DragTarget(
                 group="widgets", 
                 on_accept=main_work_area_top_drag_accept,
-                content=main_work_area_top_widgets, 
-            )),
-        ft.Container(expand=True, content=
-            ft.DragTarget(
-                group="widgets", 
-                on_accept=main_work_area_bottom_drag_accept,
-                content=main_work_area_bottom_widgets, 
-            )),
-        ]),
-)
+                content=main_work_area_widgets, 
+            ))
+
 
 # Can hold up to 6 widgets
-right_pin = ft.DragTarget(group="widgets", on_accept=right_pin_drag_accept, content=ft.Container(
-    width=100,
-    border=ft.border.all(color=ft.Colors.RED_900),
-    content=right_pin_widgets
+right_pin = ft.Container(
+    content=ft.DragTarget(group="widgets", on_accept=right_pin_drag_accept, content=right_pin_widgets
 ))
-# Can hold up to 4 widgets
-bottom_pin = ft.DragTarget(group="widgets", on_accept=bottom_pin_drag_accept, content=ft.Container(
-    height=100,
-    border=ft.border.all(color=ft.Colors.RED_900),
-    content=bottom_pin_widgets
+
+bottom_pin = ft.Container(
+    content=ft.DragTarget(group="widgets", on_accept=bottom_pin_drag_accept, content=bottom_pin_widgets
 ))
+
+
 
 # clears the controls so we can start fresh
 def clear_all_controls():
+    # Clear our controls
     top_pin_widgets.controls.clear()
     left_pin_widgets.controls.clear()
-    main_work_area_top_widgets.controls.clear()
-    main_work_area_bottom_widgets.controls.clear()
+    main_work_area_widgets.controls.clear()
     right_pin_widgets.controls.clear()
     bottom_pin_widgets.controls.clear()
+
+
+    top_pin.expand=False
+    top_pin.height=min_pin_height
+
+    left_pin.expand=False
+    left_pin.width=min_pin_width
+
+    right_pin.expand=False
+    right_pin.width=min_pin_width
+
+    bottom_pin.expand=False
+    bottom_pin.height=min_pin_height
+
+
+
 
     # placeholder for empty pins, so they can still be dragged into while taking up less space
     #top_bot_placeholder = ft.Container(width=2, height=10)
@@ -109,22 +112,25 @@ def layout_widgets(widgets):
     # Render all widgets in same place, list up to 24 long. 
     # Fill in 'empty' slots with blank entries, but list is always 24 long
     for i in range(len(widgets) + 1):  # run through each widget and figure out where to put it
-        if i==1 or i==2:    # First four go in the main work area
-            main_work_area_top_widgets.controls.append(
-                
-                widgets[i-1]
-                )
+        
+        if i == 1 or i == 2:    # First 2 go in the main work area
+            main_work_area_widgets.controls.append(widgets[i-1])
 
-        if i == 3 or i == 4:
-            main_work_area_bottom_widgets.controls.append(widgets[i-1])
-
-        if i == 5:
+        if i == 3:
+            bottom_pin.expand=True
+            bottom_pin.height=False
             bottom_pin_widgets.controls.append(widgets[i-1])
-        if i == 6:
+        if i == 4:
+            right_pin.expand=True
+            right_pin.width=False
             right_pin_widgets.controls.append(widgets[i-1])
-        if i == 7:
+        if i == 5:
+            top_pin.expand=True
+            top_pin.height=False
             top_pin_widgets.controls.append(widgets[i-1])
-        if i == 8:
+        if i == 6:
+            right_pin.expand=True
+            right_pin.width=False
             left_pin_widgets.controls.append(widgets[i-1])
 
     
