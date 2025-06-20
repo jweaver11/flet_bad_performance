@@ -15,89 +15,51 @@ def bottom_pin_drag_accept(e):
     print("bottom pin accepted")
 
 
+top_drag_target = ft.DragTarget(content=ft.Row())
+left_drag_target = ft.DragTarget(content=ft.Row())
+main_drag_target = ft.DragTarget(content=ft.Row())
+right_drag_target = ft.DragTarget(content=ft.Row())
+bottom_drag_target = ft.DragTarget(content=ft.Row())
+
+
+
 # Row or column with a list of controls that we can add/subtract from
-top_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
-left_pin_widgets = ft.Column(expand=True, spacing=0, controls=[])
-main_work_area_widgets = ft.Row(expand=True, spacing=10, controls=[])
-right_pin_widgets = ft.Column(expand=True, spacing=0, controls=[])
-bottom_pin_widgets = ft.Row(expand=True, spacing=0, controls=[])
+top_pin = ft.Row(spacing=10, controls=[])
+left_pin = ft.Column(spacing=10, controls=[])
+main_work_area = ft.Row(expand=True, spacing=10, controls=[])
+right_pin = ft.Column(spacing=10, controls=[])
+bottom_pin = ft.Row(spacing=10, controls=[])
 
 
 # set minimumm fallbacks for our pins
-min_pin_height = 30
-min_pin_width = 30
-max_pin_width = 300
-#default?
-
-
-# Pins for when we add more and more controls
-# Can hold up to 4 widgets
-top_pin = ft.Container(
-    content=ft.DragTarget(group="widgets", on_accept=top_pin_drag_accept, content=top_pin_widgets
-))
-# Can hold up to 6 widgets
-left_pin = ft.Container(
-    content=ft.DragTarget(group="widgets", on_accept=left_pin_drag_accept, content=left_pin_widgets
-))
-
-# Can hold up to 2 widgets. Go side by side
-main_work_area = ft.Container(
-    expand=True,
-    content=ft.DragTarget(
-        group="widgets", 
-        on_accept=main_work_area_drag_accept,
-        content=main_work_area_widgets, 
-))
-
-
-# Can hold up to 6 widgets
-right_pin = ft.Container(
-    #bgcolor = dark postboard color?
-    content=ft.DragTarget(group="widgets", on_accept=right_pin_drag_accept, content=right_pin_widgets
-))
-
-bottom_pin = ft.Container(
-    content=ft.DragTarget(group="widgets", on_accept=bottom_pin_drag_accept, content=bottom_pin_widgets
-))
-
+#min_pin_height = 30
+#min_pin_width = 30
+default_pin_height = 200
+default_pin_width = 200
 
 
 # clears the controls so we can start fresh
 def clear_all_controls():
     # Clear our controls
-    top_pin_widgets.controls.clear()
-    left_pin_widgets.controls.clear()
-    main_work_area_widgets.controls.clear()
-    right_pin_widgets.controls.clear()
-    bottom_pin_widgets.controls.clear()
+    top_pin.controls.clear()
+    left_pin.controls.clear()
+    main_work_area.controls.clear()
+    right_pin.controls.clear()
+    bottom_pin.controls.clear()
 
-
+    # format so they shrink when empty
     top_pin.expand=False
-    top_pin.height=min_pin_height
-
     left_pin.expand=False
-    left_pin.width=min_pin_width
-
     right_pin.expand=False
-    right_pin.width=min_pin_width
-
     bottom_pin.expand=False
-    bottom_pin.height=min_pin_height
+    top_pin.height=False
+    left_pin.width=False
+    right_pin.width=False
+    bottom_pin.height=False
 
-
-
-
-    # placeholder for empty pins, so they can still be dragged into while taking up less space
-    #top_bot_placeholder = ft.Container(width=2, height=10)
-    #left_right_placeholder = ft.Container(width=10, height=2)
-
-    #top_pin_controls.controls.append(top_bot_placeholder)
-    #left_pin_controls.controls.append(left_right_placeholder)
-    #right_pin_controls.controls.append(left_right_placeholder)
-    #bottom_pin_controls.controls.append(top_bot_placeholder)
+    return print("all controls cleared")
     
-
-
+    
 # autopin widgets when more than 2 are active so they look nicer
 def layout_widgets(widgets):
 
@@ -113,26 +75,57 @@ def layout_widgets(widgets):
     
     # Render all widgets in same place, list up to 24 long. 
     # Fill in 'empty' slots with blank entries, but list is always 24 long
-    for i in range(len(widgets) + 1):  # run through each widget and figure out where to put it
+    # Make this a switch
+    for i in range(len(widgets)):  # run through each widget and figure out where to put it. 
         
-        if i == 1 or i == 2:    # First 2 go in the main work area
-            main_work_area_widgets.controls.append(widgets[i-1])
+        if i == 0:    # First 2 go in the main work area
+            main_work_area.controls.append(widgets[i])
+        if i == 1:
+            main_work_area.controls.append(widgets[i])
 
+        if i == 2:
+            bottom_pin.height=default_pin_height
+            bottom_pin.controls.append(
+                ft.Column(      # Adds column to keep formatting on bottom
+                    expand=True, 
+                    spacing=0, 
+                    controls=[widgets[i], ft.Container(height=10)])
+            )
         if i == 3:
-            bottom_pin.expand=True
-            bottom_pin.height=False
-            bottom_pin_widgets.controls.append(widgets[i-1])
+            right_pin.width=default_pin_width
+            right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
+                expand=True, 
+                spacing=0, 
+                controls=[
+                    ft.Column(expand=True, spacing=0, controls=[
+                        ft.Container(height=10),
+                        widgets[i],
+                        ft.Container(height=10)
+                        ]), 
+                    ft.Container(width=10)]
+            ))
         if i == 4:
-            #right_pin.expand=True
-            right_pin.width=max_pin_width
-            right_pin_widgets.controls.append(widgets[i-1])
+            top_pin.height=default_pin_height
+            top_pin.controls.append(
+                ft.Column(      # Adds column to keep formatting on bottom
+                    expand=True, 
+                    spacing=0, 
+                    controls=[ft.Container(height=10), widgets[i]])
+            )
         if i == 5:
-            top_pin.expand=True
-            top_pin.height=False
-            top_pin_widgets.controls.append(widgets[i-1])
-        if i == 6:
-            left_pin.expand=True
-            left_pin.width=False
-            left_pin_widgets.controls.append(widgets[i-1])
+            left_pin.width=default_pin_width
+            left_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
+                expand=True, 
+                spacing=0, 
+                controls=[
+                    ft.Container(width=10),
+                    ft.Column(expand=True, spacing=0, controls=[
+                        ft.Container(height=10),
+                        widgets[i],
+                        ft.Container(height=10)
+                        ]), 
+                    ]
+            ))
+    print("_________________")
 
    

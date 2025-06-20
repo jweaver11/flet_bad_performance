@@ -7,15 +7,13 @@ class Story:
     # Constructor for when new story is created
     def __init__(self, title):
         self.title = title  # Title of story
-        self.active_widgets = [] # list of active widgets shown in main workspace area
+        self.visible_widgets = [] # list of active widgets shown in main workspace area
         self.characters = {}    # dict of characters name = name of character object
 
         
     # Method to add new character object to story object
     def create_character(self, name):
-        self.characters[name] = Character(name) # Add our character to the dict
-
-        self.active_widgets.append(self.characters[name].widget)    # Auto add created characters to the active widgets
+        self.characters.update({name: Character(name)})
     
     def reorder_widgets(self):
         # mess with position of active_widgets elements

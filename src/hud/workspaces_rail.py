@@ -52,7 +52,6 @@ def create_rails(page: ft.Page):
     r0 = ft.NavigationRail(
         height=70,  # Set height of each rail
         on_change=on_workspace_change,  # When the rail is clicked
-        selected_index=0,   # starts as selected
         destinations=[
             ft.NavigationRailDestination(
                 icon=ft.Icons.LIBRARY_BOOKS_OUTLINED, selected_icon=ft.Icons.LIBRARY_BOOKS_ROUNDED, #icons
@@ -138,21 +137,20 @@ def create_rails(page: ft.Page):
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the 
-        padding=0,
         width=150,
+        padding=ft.padding.only(bottom=10),
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
                 all_workspaces_rail,
                 ft.Container(expand=True),
-                ft.Container(margin=10, width=156, padding=0, alignment=ft.alignment.center, content=
-                    ft.TextButton(
-                        icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
-                        text="Add Workspace", 
-                        on_click=add_workspace,
-                    ),
-                )
+                ft.TextButton(
+                    icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
+                    text="Workspace", 
+                    on_click=add_workspace,
+                ),
+                
             ]
         ),
     )
