@@ -7,7 +7,6 @@ the create 'character button' at the bottom.
 import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
-from handlers.reload_widgets import reload_widgets
 
 
 def characters_rail(page: ft.Page):
@@ -25,8 +24,9 @@ def characters_rail(page: ft.Page):
     # when delete is clicked. Delete our char from story obj, reload rail and widget
     def delete_on_click(e, name):
         del story.characters[name]
+        del story.visible_widgets[name]
         reload_character_rail()     # Rebuild/reload our character rail
-        reload_widgets(story)      # reload our workspace area
+        story.reload_widgets()      # reload our workspace area
         page.update()
 
 
@@ -44,7 +44,7 @@ def characters_rail(page: ft.Page):
         if name:
             story.create_character(name)    # Add char to characters dict in story object
             reload_character_rail()    
-            reload_widgets(story)   
+            story.reload_widgets()   
         
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
@@ -157,7 +157,7 @@ def characters_rail(page: ft.Page):
         ),
     ]
     reload_character_rail() # called initially so characters loaded on launch
-    reload_widgets(story) 
+    story.reload_widgets() 
 
 
     return characters_rail
