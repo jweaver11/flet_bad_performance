@@ -1,12 +1,11 @@
-from handlers.create_widgets import create_new_widget
 import flet as ft
 
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):
         self.name = name    
-        self.visible = True     # Widget active and visible = True
-        self.widget = create_character_widget(self.name)
+        self.widget = ft.Container
+        self.widget_visible = True     # Widget active and visible = True
         
     # picture : ft.Image?
     age : int
@@ -67,5 +66,5 @@ def create_character_widget(name):
     ]
 
     # return finished widget
-    return create_new_widget(name, list)
+    #return create_new_widget(name, list)
 

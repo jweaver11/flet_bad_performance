@@ -1,4 +1,5 @@
 import flet as ft
+from workspaces.story import story
 
 
 # Give a default height
@@ -20,7 +21,7 @@ class ResizableWidget(ft.Container):
                         alignment=ft.MainAxisAlignment.END,
                         controls=[
                             ft.IconButton(
-                                #on_click=lambda e, self=self: hide_widget(self),
+                                on_click=lambda e, self=self: story.hide_widget(),
                                 icon=ft.Icons.CLOSE_ROUNDED
                     )])
                 ]),
@@ -31,7 +32,6 @@ class ResizableWidget(ft.Container):
                 )
             ]) 
         )
-        #return self
 
         # Add drag handles as controls around the widget
         # Handle mouse events to resize

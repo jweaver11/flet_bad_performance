@@ -1,5 +1,6 @@
 ''' Master Story/Project class for projects'''
-from workspaces.character.character import Character
+import flet as ft
+from workspaces.character.character import Character, create_character_widget
 from handlers.layout_widgets import layout_widgets
 
 
@@ -15,6 +16,8 @@ class Story:
     # Method to add new character object to story object
     def create_character(self, name):
         self.characters.update({name: Character(name)})
+        # create character widget inside char dict and add to vis widgets
+        self.characters[name].widget = create_character_widget(name)
         self.visible_widgets[name] = self.characters[name].widget, True   # auto open new widgets on creation
         self.reload_widgets()
 
