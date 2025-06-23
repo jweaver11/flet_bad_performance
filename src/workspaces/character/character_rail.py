@@ -23,8 +23,8 @@ def characters_rail(page: ft.Page):
         print("pin clicked")
 
     # when delete is clicked. Delete our char from story obj, reload rail and widget
-    def delete_on_click(e, char):
-        del story.characters[char]
+    def delete_on_click(e, name):
+        del story.characters[name]
         reload_character_rail()     # Rebuild/reload our character rail
         reload_widgets(story)      # reload our workspace area
         page.update()

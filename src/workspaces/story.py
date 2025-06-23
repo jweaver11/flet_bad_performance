@@ -14,6 +14,7 @@ class Story:
     # Method to add new character object to story object
     def create_character(self, name):
         self.characters.update({name: Character(name)})
+        self.visible_widgets.append(self.characters[name].widget)   # auto open new widgets on creation
     
     def reorder_widgets(self):
         # mess with position of active_widgets elements

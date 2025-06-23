@@ -77,55 +77,52 @@ def layout_widgets(widgets):
     # Fill in 'empty' slots with blank entries, but list is always 24 long
     # Make this a switch
     for i in range(len(widgets)):  # run through each widget and figure out where to put it. 
-        
-        if i == 0:    # First 2 go in the main work area
-            main_work_area.controls.append(widgets[i])
-        if i == 1:
-            main_work_area.controls.append(widgets[i])
-
-        if i == 2:
-            bottom_pin.height=default_pin_height
-            bottom_pin.controls.append(
-                ft.Column(      # Adds column to keep formatting on bottom
+        match i:
+            case 0 | 1:    # First 2 go in the main work area
+                main_work_area.controls.append(widgets[i])
+            
+            case 2:
+                bottom_pin.height=default_pin_height
+                bottom_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[widgets[i], ft.Container(height=10)])
+                )
+            case 3:
+                right_pin.width=default_pin_width
+                right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
                     expand=True, 
                     spacing=0, 
-                    controls=[widgets[i], ft.Container(height=10)])
-            )
-        if i == 3:
-            right_pin.width=default_pin_width
-            right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
-                expand=True, 
-                spacing=0, 
-                controls=[
-                    ft.Column(expand=True, spacing=0, controls=[
-                        ft.Container(height=10),
-                        widgets[i],
-                        ft.Container(height=10)
-                        ]), 
-                    ft.Container(width=10)]
-            ))
-        if i == 4:
-            top_pin.height=default_pin_height
-            top_pin.controls.append(
-                ft.Column(      # Adds column to keep formatting on bottom
+                    controls=[
+                        ft.Column(expand=True, spacing=0, controls=[
+                            ft.Container(height=10),
+                            widgets[i],
+                            ft.Container(height=10)
+                            ]), 
+                        ft.Container(width=10)]
+                ))
+            case 4:
+                top_pin.height=default_pin_height
+                top_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[ft.Container(height=10), widgets[i]])
+                )
+            case 5:
+                left_pin.width=default_pin_width
+                left_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
                     expand=True, 
                     spacing=0, 
-                    controls=[ft.Container(height=10), widgets[i]])
-            )
-        if i == 5:
-            left_pin.width=default_pin_width
-            left_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
-                expand=True, 
-                spacing=0, 
-                controls=[
-                    ft.Container(width=10),
-                    ft.Column(expand=True, spacing=0, controls=[
-                        ft.Container(height=10),
-                        widgets[i],
-                        ft.Container(height=10)
-                        ]), 
-                    ]
-            ))
-    print("_________________")
+                    controls=[
+                        ft.Container(width=10),
+                        ft.Column(expand=True, spacing=0, controls=[
+                            ft.Container(height=10),
+                            widgets[i],
+                            ft.Container(height=10)
+                            ]), 
+                        ]
+                ))
 
    
