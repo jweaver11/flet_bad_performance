@@ -16,8 +16,7 @@ workspace_rails = {
     0: default_rail,
 }  
 
-
-# Format our active rail
+# Format our active rail 
 active_rail = ft.Column(  
     spacing=0,
     controls=workspace_rails[0],    # On startup, set to char rail

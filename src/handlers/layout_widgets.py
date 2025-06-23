@@ -77,19 +77,19 @@ def layout_widgets(widgets):
     # Render all widgets in same place, list up to 24 long. 
     # Fill in 'empty' slots with blank entries, but list is always 24 long
     # Make this a switch
-    for i in range(len(widgets)):  # run through each widget and figure out where to put it. 
+    for i in range(len(widgets)):  # run through each widget and figure out where to put it.
         
         if i < 2:    # First 2 go in the main work area
-            main_work_area.controls.append(widgets[i])
+                main_work_area.controls.append(widgets[i])
 
-        elif i == 2:
-            bottom_pin.height=default_pin_height
-            bottom_pin.controls.append(
-                ft.Column(      # Adds column to keep formatting on bottom
-                    expand=True, 
-                    spacing=0, 
-                    controls=[widgets[i], ft.Container(height=10)])
-            )
+        elif i == 2: 
+                bottom_pin.height=default_pin_height
+                bottom_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[widgets[i], ft.Container(height=10)])
+                )
         elif i == 3:
             right_pin.width=default_pin_width
             right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
@@ -125,5 +125,6 @@ def layout_widgets(widgets):
                         ]), 
                     ]
             ))
+    print("layout widgets done")
 
    

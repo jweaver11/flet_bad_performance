@@ -7,12 +7,20 @@ the create 'character button' at the bottom.
 import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
+from workspaces.character.character import Character
+from workspaces.character.character import create_character_widget
+from handlers.reload_widgets import reload_widgets
+
+
 
 
 def characters_rail(page: ft.Page):
     # References for button and text field
     button_ref = ft.Ref[ft.TextButton]()
     textfield_ref = ft.Ref[ft.TextField]()
+
+    story.characters.update({'bob': Character("bob", story, page)})
+    story.characters.update({'joe': Character("joe", story, page)})
         
     # When popout is clicked
     def popout_on_click(e):
@@ -23,9 +31,10 @@ def characters_rail(page: ft.Page):
 
     # when delete is clicked. Delete our char from story obj, reload rail and widget
     def delete_on_click(e, name):
-        del story.characters[name]
+        del story.characters[name] 
+        # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
-        story.reload_widgets()      # reload our workspace area
+        reload_widgets(story)      # reload our workspace area
         page.update()
 
 
@@ -37,14 +46,23 @@ def characters_rail(page: ft.Page):
         textfield_ref.current.focus()
         textfield_ref.current.update()
 
+
+
+
     # When user presses enter after inputting 'create_character' button
     def add_character_textfield_submit(e):
         name = textfield_ref.current.value  # Passes our character name
         if name:
-            story.create_character(name)    # Add char to characters dict in story object
+            # Add our character to our stories character list, create a widget, and add it to widget list
+            story.characters.update({name: Character(name, story, page)})
             reload_character_rail()    
-            story.reload_widgets()   
+            reload_widgets(story)   
+            page.update()
         
+
+
+
+
         # Bring back our button, hide textfield, update the page 
         textfield_ref.current.value = ""
         textfield_ref.current.visible = False
@@ -156,7 +174,7 @@ def characters_rail(page: ft.Page):
         ),
     ]
     reload_character_rail() # called initially so characters loaded on launch
-    story.reload_widgets() 
+    reload_widgets(story) 
 
 
     return characters_rail

@@ -36,5 +36,7 @@ def create_workspace(page: ft.Page):
         content=stack
     )
     
+    page.update()
+    
 
     return workspace_container

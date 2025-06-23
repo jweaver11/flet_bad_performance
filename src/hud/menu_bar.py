@@ -8,7 +8,7 @@ def create_menu_bar(page: ft.Page):
     def handle_menu_item_click(e):
         print(f"{e.control.content.value}.on_click")
         page.open(
-            ft.SnackBar(content=ft.Text(f"{e.control.content.content.value} was clicked!"))
+            ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
         )
         page.update()
 

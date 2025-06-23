@@ -1,50 +1,60 @@
 import flet as ft
+from handlers.reload_widgets import reload_widgets
 
-# Give a default height
-class ResizableWidget(ft.Container):
-    def __init__(self, title, body, story):
-        super().__init__(
-            expand=True,
-            padding=6,
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor=ft.Colors.GREY_900,
-            visible=True,
-            content=ft.Column(spacing=0, controls=[
-                ft.Stack([
-                    ft.Row(
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        controls=[ft.Draggable(group="widgets", content=ft.TextButton(title))]
-                    ),
-                    ft.Row(
-                        alignment=ft.MainAxisAlignment.END,
-                        controls=[
-                            ft.IconButton(
-                                on_click=lambda e, self=self: hide_widget(self, story),
-                                icon=ft.Icons.CLOSE_ROUNDED
-                    )])
-                ]),
-                ft.Divider(color=ft.Colors.BLUE),
-                ft.Container(       # Body of the widget
-                    expand=True,
-                    content=ft.Column(body) 
-                )
-            ]) 
-        )
+# Take our formatted widget from wherever it was created and make it a resizable widget
+def ResizableWidget(title, body, story, page):
+    rw = ft.Container()
+    return rw
 
-        def hide_widget(widget, story):
-            widget.visible = False
-            # reload widgets
-            story.reload_widgets
 
-            print(" do something")
+# Just calls our resizable widget for readability
+def create_new_widget(title, body, story, page):
+
+    # Hides our widgets when x is clicked in top right
+    def hide_widget(story):
+        
+        story.characters[title].visible = not story.characters[title].visible  # Set the character's visibility to False
+        
+        # reload widgets
+        reload_widgets(story)  # This will update the widgets in the story
+
+        page.update()
+
+
 
         # Add drag handles as controls around the widget
         # Handle mouse events to resize
         #print("nothing")
 
+    widget_container = ft.Container(
+        expand=True,
+        padding=6,
+        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+        bgcolor=ft.Colors.GREY_900,
+        content=ft.Column(spacing=0, controls=[
+            ft.Stack([
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    controls=[ft.Draggable(group="widgets", content=ft.TextButton(title))]
+                ),
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.END,
+                    controls=[
+                        ft.IconButton(
+                            on_click=lambda e, : hide_widget(story),
+                            icon=ft.Icons.CLOSE_ROUNDED
+                )])
+            ]),
+            ft.Divider(color=ft.Colors.BLUE),
+            ft.Container(       # Body of the widget
+                expand=True,
+                content=ft.Column(body) 
+            )
+        ]) 
+    )
 
-# Just calls our resizable widget for readability
-def create_new_widget(title, body, story):
-    return ResizableWidget(title, body, story)
+    return widget_container
+    #story = story
+    #return ResizableWidget(title, body, story, page)
 
 
