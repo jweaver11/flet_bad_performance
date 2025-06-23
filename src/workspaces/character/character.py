@@ -3,10 +3,10 @@ import flet as ft
 
 # Class for each character. Requires passing in a name
 class Character:
-    def __init__(self, name):
+    def __init__(self, name, story):
         self.name = name    
         self.visible = True     # Widget active and visible = True
-        self.widget = create_character_widget(self.name)
+        self.widget = self.create_character_widget(self.name, story)
         
     # picture : ft.Image?
     age : int
@@ -24,6 +24,19 @@ class Character:
 
     show_character : bool
     tags : list[str]
+
+
+    # Creates our widget for each character object
+    def create_character_widget(self, name, story):
+
+        # list of flet controls, nested within a column
+        body = [
+            ft.Text("title 1")
+        ]
+
+
+        # return finished widget
+        return create_new_widget(name, body, story)
 
     '''
     # Add ons that won't show by default
@@ -58,13 +71,3 @@ tags = {
 # with open(my_file_path, "w") as f:
     # f.write("My characters will go here")
 
-# Creates our widget for each character object
-def create_character_widget(name):
-
-    # list of flet controls, nested within a column
-    list = [
-        ft.Text("title 1")
-    ]
-
-    # return finished widget
-    return create_new_widget(name, list)

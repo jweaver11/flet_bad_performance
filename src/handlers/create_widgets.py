@@ -1,16 +1,8 @@
 import flet as ft
-from handlers.reload_widgets import reload_widgets
-
-def hide_widget(widget):
-    widget.visible = False
-    # reload widgets
-    #reload_widgets()
-
-    print(" do something")
 
 # Give a default height
 class ResizableWidget(ft.Container):
-    def __init__(self, title, body):
+    def __init__(self, title, body, story):
         super().__init__(
             expand=True,
             padding=6,
@@ -27,7 +19,7 @@ class ResizableWidget(ft.Container):
                         alignment=ft.MainAxisAlignment.END,
                         controls=[
                             ft.IconButton(
-                                on_click=lambda e, self=self: hide_widget(self),
+                                on_click=lambda e, self=self: hide_widget(self, story),
                                 icon=ft.Icons.CLOSE_ROUNDED
                     )])
                 ]),
@@ -39,13 +31,20 @@ class ResizableWidget(ft.Container):
             ]) 
         )
 
+        def hide_widget(widget, story):
+            widget.visible = False
+            # reload widgets
+            story.reload_widgets
+
+            print(" do something")
+
         # Add drag handles as controls around the widget
         # Handle mouse events to resize
         #print("nothing")
 
 
 # Just calls our resizable widget for readability
-def create_new_widget(title, body):
-    return ResizableWidget(title, body)
+def create_new_widget(title, body, story):
+    return ResizableWidget(title, body, story)
 
 
