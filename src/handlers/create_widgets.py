@@ -1,6 +1,12 @@
 import flet as ft
-from workspaces.story import story
+from handlers.reload_widgets import reload_widgets
 
+def hide_widget(widget):
+    widget.visible = False
+    # reload widgets
+    #reload_widgets()
+
+    print(" do something")
 
 # Give a default height
 class ResizableWidget(ft.Container):
@@ -21,7 +27,7 @@ class ResizableWidget(ft.Container):
                         alignment=ft.MainAxisAlignment.END,
                         controls=[
                             ft.IconButton(
-                                on_click=lambda e, self=self: story.hide_widget(),
+                                on_click=lambda e, self=self: hide_widget(self),
                                 icon=ft.Icons.CLOSE_ROUNDED
                     )])
                 ]),
@@ -41,6 +47,5 @@ class ResizableWidget(ft.Container):
 # Just calls our resizable widget for readability
 def create_new_widget(title, body):
     return ResizableWidget(title, body)
-
 
 
