@@ -5,10 +5,9 @@ from handlers.reload_widgets import reload_widgets
 class ResizableWidget(ft.Container):
     def __init__(self, title, body, story, page):
         super().__init__(
-            
+
         )
     
-
 
 # Just calls our resizable widget for readability
 def create_new_widget(title, body, story, page):
@@ -16,7 +15,7 @@ def create_new_widget(title, body, story, page):
     # Hides our widgets when x is clicked in top right
     def hide_widget(story):
         
-        story.characters[title].visible = not story.characters[title].visible  # Set the character's visibility to False
+        story.characters[title].visible = False  # Set the character's visibility to False
         
         # reload widgets
         reload_widgets(story)  # This will update the widgets in the story
@@ -24,10 +23,8 @@ def create_new_widget(title, body, story, page):
         page.update()
 
 
-
         # Add drag handles as controls around the widget
         # Handle mouse events to resize
-        #print("nothing")
 
     widget_container = ft.Container(
         expand=True,

@@ -5,23 +5,12 @@ Formatted areas are: top pin, left pin, main work area, right pin, and bottom pi
 '''
 
 import flet as ft
-from handlers.layout_widgets import top_pin, left_pin, main_work_area, right_pin, bottom_pin
+from handlers.layout_widgets import row
 
 
 # Function to return our container for our widgets
-def create_workspace(page: ft.Page):     
+def create_workspace(page: ft.Page, story):     
     
-    # Format our content
-    row = ft.Row(
-        spacing=10,
-        expand=True,
-        controls=[
-            left_pin,
-            ft.Column(expand=True, spacing=10, controls=[top_pin, main_work_area, bottom_pin]),
-            right_pin,
-        ]
-    )
-
     stack = ft.Stack(
         expand=True, 
         controls=[row]

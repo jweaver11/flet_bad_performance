@@ -7,6 +7,7 @@ def reload_widgets(story):
     for key, character in story.characters.items():
         print(f"{key}: visible={character.visible}")
         if character.visible == True:        # This line is the error
+            print(f"{key}: added to visible widgets")
             story.visible_widgets.append(character.widget)    # Make our list current with visible widgets
 
 

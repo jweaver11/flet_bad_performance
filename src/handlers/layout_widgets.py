@@ -21,14 +21,13 @@ main_drag_target = ft.DragTarget(content=ft.Row())
 right_drag_target = ft.DragTarget(content=ft.Row())
 bottom_drag_target = ft.DragTarget(content=ft.Row())
 
-
+row = ft.Row(
+    spacing=10,
+    expand=True,
+    controls=[]
+)
 
 # Row or column with a list of controls that we can add/subtract from
-top_pin = ft.Row(spacing=10, controls=[])
-left_pin = ft.Column(spacing=10, controls=[])
-main_work_area = ft.Row(expand=True, spacing=10, controls=[])
-right_pin = ft.Column(spacing=10, controls=[])
-bottom_pin = ft.Row(spacing=10, controls=[])
 
 
 # set minimumm fallbacks for our pins
@@ -39,7 +38,7 @@ default_pin_width = 200
 
 
 # clears the controls so we can start fresh
-def clear_all_controls():
+def clear_all_controls(top_pin, left_pin, main_work_area, right_pin, bottom_pin):
     # Clear our controls
     top_pin.controls.clear()
     left_pin.controls.clear()
@@ -61,7 +60,8 @@ def clear_all_controls():
     
     
 # autopin widgets when more than 2 are active so they look nicer
-def layout_widgets(widgets):
+def layout_widgets(visible_widgets):
+    widgets = visible_widgets
 
     if len(widgets) <= 0:   # If no widgets active, give it a default later
         # Otherwise, run our layout
@@ -70,36 +70,45 @@ def layout_widgets(widgets):
     if len(widgets) >= 24:  # max num widgets
         return print("Max num widgets reached")
     
+    
+    top_pin = ft.Row(spacing=10, controls=[])
+    left_pin = ft.Column(spacing=10, controls=[])
+    main_work_area = ft.Row(expand=True, spacing=10, controls=[])
+    right_pin = ft.Column(spacing=10, controls=[])
+    bottom_pin = ft.Row(spacing=10, controls=[])
+
     # Otherwise, run our layout
-    clear_all_controls()
+    clear_all_controls(top_pin, left_pin, main_work_area, right_pin, bottom_pin)
+
+    print(top_pin.controls)
 
     
     # Render all widgets in same place, list up to 24 long. 
     # Fill in 'empty' slots with blank entries, but list is always 24 long
     # Make this a switch
     for i in range(len(widgets)):  # run through each widget and figure out where to put it.
-        
-        if i < 2:    # First 2 go in the main work area
-                main_work_area.controls.append(widgets[i])
+
+        if i <= 1:    # First 2 go in the main work area
+            main_work_area.controls.append(widgets[i])
 
         elif i == 2: 
-                bottom_pin.height=default_pin_height
-                bottom_pin.controls.append(
-                    ft.Column(      # Adds column to keep formatting on bottom
-                        expand=True, 
-                        spacing=0, 
-                        controls=[widgets[i], ft.Container(height=10)])
-                )
+            bottom_pin.height=default_pin_height
+            bottom_pin.controls.append(
+                ft.Column(      # Adds column to keep formatting on bottom
+                    expand=True, 
+                    spacing=0, 
+                    controls=[widgets[i], ft.Container(height=10)])
+            )
         elif i == 3:
             right_pin.width=default_pin_width
             right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
                 expand=True, 
                 spacing=0, 
                 controls=[
-                    ft.Column(expand=True, spacing=0, controls=[
+                    ft.Column(expand=True, controls=[
                         ft.Container(height=10),
                         widgets[i],
-                        ft.Container(height=10)
+                        
                         ]), 
                     ft.Container(width=10)]
             ))
@@ -125,6 +134,16 @@ def layout_widgets(widgets):
                         ]), 
                     ]
             ))
+
+    # Format our content
+    row.controls.clear()
+    row.controls = [
+        left_pin,
+        ft.Column(expand=True, spacing=10, controls=[top_pin, main_work_area, bottom_pin]),
+        right_pin,
+    ]
+
+
     print("layout widgets done")
 
    
