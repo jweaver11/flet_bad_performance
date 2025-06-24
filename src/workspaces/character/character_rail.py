@@ -8,7 +8,6 @@ import flet as ft
 from workspaces.character.character_styles import button_style
 from workspaces.story import story
 from workspaces.character.character import Character
-from workspaces.character.character import create_character_widget
 from handlers.reload_widgets import reload_widgets
 
 
@@ -84,6 +83,9 @@ def characters_rail(page: ft.Page):
             button_ref.current.update()
         page.update()
 
+    def handle_reorder(e: ft.OnReorderEvent):
+        print(f"Reordered from {e.old_index} to {e.new_index}")
+
     # Clears our re-orderable list, then re-adds every character in story.characters
     # ListTile has image, character name, popup menu options
     def reload_character_rail():
@@ -91,7 +93,6 @@ def characters_rail(page: ft.Page):
         for char in story.characters:
             new_char = ft.ListTile( # Works as a formatted row
                 horizontal_spacing=0,
-                #leading=ft.Image(src=f"src/assets/icon.png", width=20, height=20),  # Add image of the character
                 title=ft.TextButton(
                     expand=True, 
                     style=button_style,
@@ -123,7 +124,7 @@ def characters_rail(page: ft.Page):
         return page.update()
 
     # Our re-orderable list. We add/delete characters to this
-    characters_reorderable_list = ft.ReorderableListView(padding=0)
+    characters_reorderable_list = ft.ReorderableListView(padding=0, on_reorder=handle_reorder)
     # Container for formatting this list better
     character_reorderable_list_container = ft.Container(expand=True, content=characters_reorderable_list)
 

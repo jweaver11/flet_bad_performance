@@ -7,6 +7,7 @@ class Character:
         self.name = name    
         self.visible = True     # Widget active and visible = True
         self.widget = create_character_widget(self.name, story, page)
+        #story.widgets.update({self.name: self.widget, bool: True})  # Add our widget to the story's widgets dict
         
     # picture : ft.Image?
     age : int
