@@ -2,9 +2,12 @@ import flet as ft
 from handlers.reload_widgets import reload_widgets
 
 # Take our formatted widget from wherever it was created and make it a resizable widget
-def ResizableWidget(title, body, story, page):
-    rw = ft.Container()
-    return rw
+class ResizableWidget(ft.Container):
+    def __init__(self, title, body, story, page):
+        super().__init__(
+            
+        )
+    
 
 
 # Just calls our resizable widget for readability

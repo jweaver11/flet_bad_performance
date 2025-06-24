@@ -23,7 +23,10 @@ def characters_rail(page: ft.Page):
     story.characters.update({'joe': Character("joe", story, page)})
         
     # When popout is clicked
-    def popout_on_click(e):
+    def popout_on_click(e, name):
+        story.characters[name].visible = True
+        reload_widgets(story)
+        page.update()
         print("popout clicked")
     # When rename is clicked
     def rename_on_click(e):
@@ -110,7 +113,7 @@ def characters_rail(page: ft.Page):
                     icon_color=ft.Colors.GREY_400, 
                     tooltip="", 
                     items=[
-                        ft.PopupMenuItem(text="Popout", on_click=popout_on_click),
+                        ft.PopupMenuItem(text="Popout", on_click=lambda e, char_name=char: popout_on_click(e, char_name)),
                         ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
                         ft.PopupMenuItem(text="Delete", on_click=lambda e, char_name=char: delete_on_click(e, char_name)),
                     ],
