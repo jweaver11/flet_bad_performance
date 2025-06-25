@@ -12,18 +12,19 @@ from handlers.reload_widgets import reload_widgets
 
 
 
-
 def characters_rail(page: ft.Page):
     # References for button and text field
     button_ref = ft.Ref[ft.TextButton]()
     textfield_ref = ft.Ref[ft.TextField]()
 
-    story.characters.update({'bob': Character("bob", story, page)})
-    story.characters.update({'joe': Character("joe", story, page)})
+    story.characters.append(Character("bob", story, page))
+    story.characters.append(Character("joe", story, page))
         
     # When popout is clicked
     def popout_on_click(e, name):
-        story.characters[name].visible = True
+        for character in story.characters:
+            if character.name == name:
+                character.visible = True
         reload_widgets(story)
         page.update()
         print("popout clicked")
@@ -33,10 +34,15 @@ def characters_rail(page: ft.Page):
 
     # when delete is clicked. Delete our char from story obj, reload rail and widget
     def delete_on_click(e, name):
-        del story.characters[name] 
+        print("delete was run")
+        for character in story.characters:
+            if character.name == name:
+                story.characters.remove(character)
+                print(name, "was deleted")
         # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
         reload_widgets(story)      # reload our workspace area
+        print(story.characters)
         page.update()
 
 
@@ -56,7 +62,7 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             # Add our character to our stories character list, create a widget, and add it to widget list
-            story.characters.update({name: Character(name, story, page)})
+            story.characters.append(Character(name, story, page))
             reload_character_rail()    
             reload_widgets(story)   
             page.update()
@@ -84,24 +90,32 @@ def characters_rail(page: ft.Page):
         page.update()
 
     def handle_reorder(e: ft.OnReorderEvent):
+        print("e.data:", e.data)
         print(f"Reordered from {e.old_index} to {e.new_index}")
+        temp = story.characters[e.old_index]  # Get the character object at the old index
+        story.characters.pop(e.old_index)  # Remove it from the old index
+        story.characters.insert(e.new_index, temp)  # Insert it at the new index
+        reload_character_rail()
+        reload_widgets(story)  # Reload the widgets to reflect the new order
+        page.update()
+
 
     # Clears our re-orderable list, then re-adds every character in story.characters
     # ListTile has image, character name, popup menu options
     def reload_character_rail():
         characters_reorderable_list.controls.clear()
-        for char in story.characters:
+        for character in story.characters:
             new_char = ft.ListTile( # Works as a formatted row
                 horizontal_spacing=0,
                 title=ft.TextButton(
                     expand=True, 
                     style=button_style,
-                    on_click=lambda e, char=char: print(story.characters[char].name, "was clicked"),    # on click
+                    on_click=lambda e, name=character.name: print(name, "was clicked"),    # on click
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
                             ft.Text(
-                                char,
+                                character.name,
                                 max_lines=1,
                                 width=104,  # for when name longer than button
                                 overflow=ft.TextOverflow.CLIP,
@@ -114,9 +128,9 @@ def characters_rail(page: ft.Page):
                     icon_color=ft.Colors.GREY_400, 
                     tooltip="", 
                     items=[
-                        ft.PopupMenuItem(text="Popout", on_click=lambda e, char_name=char: popout_on_click(e, char_name)),
+                        ft.PopupMenuItem(text="Popout", on_click=lambda e, name=character.name: popout_on_click(e, name)),
                         ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                        ft.PopupMenuItem(text="Delete", on_click=lambda e, char_name=char: delete_on_click(e, char_name)),
+                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.name: delete_on_click(e, name)),
                     ],
                 ),
             )

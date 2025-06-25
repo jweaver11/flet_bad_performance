@@ -14,7 +14,9 @@ def create_new_widget(title, body, story, page):
     def hide_widget(story):
         
         # Make our widget false
-        story.characters[title].visible = False  # Set the character's visibility to False
+        for characters in story.characters:
+            if characters.name == title:  # Find the character by name
+                characters.visible = False
         
         # reload widgets
         reload_widgets(story)  # This will update the widgets in the story

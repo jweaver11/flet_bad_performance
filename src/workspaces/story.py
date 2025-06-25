@@ -16,7 +16,7 @@ class Story:
         self.visible_widgets = []  # List of widgets that are currently visible
 
         # Make a list for positional indexing
-        self.characters = {}    # Dict of character object. Used for storing/deleting characters
+        self.characters = []    # Dict of character object. Used for storing/deleting characters
 
         
 
