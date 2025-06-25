@@ -61,50 +61,52 @@ def layout_widgets(visible_widgets):
     # Make this a switch
     for i in range(len(widgets)):  # run through each widget and figure out where to put it.
 
-        if i <= 1:    # First 2 go in the main work area
-            main_work_area.controls.append(widgets[i])
+        if widgets[i] is not None:  # If the widget is not visible, skip it
 
-        elif i == 2: 
-            bottom_pin.height=default_pin_height
-            bottom_pin.controls.append(
-                ft.Column(      # Adds column to keep formatting on bottom
-                    expand=True, 
-                    spacing=0, 
-                    controls=[widgets[i], ft.Container(height=10)])
-            )
-        elif i == 3:
-            right_pin.width=default_pin_width
-            right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
-                expand=True, spacing=0, 
-                controls=[
-                    ft.Column(expand=True, spacing=0, controls=[
-                        ft.Container(height=10),
-                        widgets[i],
-                        ft.Container(height=10)
-                        ]), 
-                    ft.Container(width=10)]
-            ))
-        elif i == 4:
-            top_pin.height=default_pin_height
-            top_pin.controls.append(
-                ft.Column(      # Adds column to keep formatting on bottom
-                    expand=True, 
-                    spacing=0, 
-                    controls=[ft.Container(height=10), widgets[i]])
-            )
-        elif i == 5:
-            left_pin.width=default_pin_width
-            left_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
-                expand=True, spacing=0, 
-                controls=[
-                    ft.Container(width=10),
-                    ft.Column(expand=True, spacing=0, controls=[
-                        ft.Container(height=10),
-                        widgets[i],
-                        ft.Container(height=10)
-                        ]), 
-                    ]
-            ))
+            if i <= 1:    # First 2 go in the main work area
+                main_work_area.controls.append(widgets[i])
+
+            elif i == 2: 
+                bottom_pin.height=default_pin_height
+                bottom_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[widgets[i], ft.Container(height=10)])
+                )
+            elif i == 3:
+                right_pin.width=default_pin_width
+                right_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
+                    expand=True, spacing=0, 
+                    controls=[
+                        ft.Column(expand=True, spacing=0, controls=[
+                            ft.Container(height=10),
+                            widgets[i],
+                            ft.Container(height=10)
+                            ]), 
+                        ft.Container(width=10)]
+                ))
+            elif i == 4:
+                top_pin.height=default_pin_height
+                top_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[ft.Container(height=10), widgets[i]])
+                )
+            elif i == 5:
+                left_pin.width=default_pin_width
+                left_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
+                    expand=True, spacing=0, 
+                    controls=[
+                        ft.Container(width=10),
+                        ft.Column(expand=True, spacing=0, controls=[
+                            ft.Container(height=10),
+                            widgets[i],
+                            ft.Container(height=10)
+                            ]), 
+                        ]
+                ))
 
     # Format our content
     row.controls.clear()
