@@ -38,11 +38,13 @@ def characters_rail(page: ft.Page):
         for character in story.characters:
             if character.name == name:
                 story.characters.remove(character)
+                if character.widget in story.visible_widgets:
+                    idx = story.visible_widgets.index(character.widget)
+                    story.visible_widgets[idx] = None
                 print(name, "was deleted")
         # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
         reload_widgets(story)      # reload our workspace area
-        print(story.characters)
         page.update()
 
 

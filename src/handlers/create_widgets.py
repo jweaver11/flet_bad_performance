@@ -21,20 +21,18 @@ def create_new_widget(title, body, story, page):
     def hide_widget(story):
 
         # Make our widget false
-        for index, character in enumerate(story.characters):
+        for idx, character in enumerate(story.characters):
             if character.name == title:
                 character.visible = False
-                story.visible_widgets[index] = None
+                story.visible_widgets[idx] = None
                 print(title, "widget removed from visible widgets")
+            else:
+                print("how you even get here?")
         
         # reload widgets
         reload_widgets(story)  # This will update the widgets in the story
-
         page.update()
 
-
-        # Add drag handles as controls around the widget
-        # Handle mouse events to resize
 
     widget_container = ft.Container(
         expand=True,

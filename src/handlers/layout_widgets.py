@@ -2,6 +2,7 @@
 Layout our widgets whenever there is more than 2
 '''
 import flet as ft
+from handlers.resizable import splitter_horizontal
 
 def top_pin_drag_accept(e):
     print("top pin accepted")
