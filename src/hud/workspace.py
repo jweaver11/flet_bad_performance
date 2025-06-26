@@ -8,12 +8,28 @@ import flet as ft
 from handlers.layout_widgets import widget_row
 
 
+background_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
+    group="widgets", 
+    content=ft.Row(), 
+    on_accept=lambda e: print("Background drag target accepted"),
+)
+
+background_drag_target_container = ft.Container(
+    expand=True,
+    content=background_drag_target,
+    top=0, left=0, right=0, bottom=0,
+    #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+)
+
+background_stack = ft.Stack(
+    expand=True, 
+    #controls=[]
+)
 
 stack = ft.Stack(
     expand=True, 
     controls=[widget_row]
 )
-
 
 
 
