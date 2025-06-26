@@ -28,6 +28,7 @@ def characters_rail(page: ft.Page):
         reload_widgets(story)
         page.update()
         print("popout clicked")
+        
     # When rename is clicked
     def rename_on_click(e):
         print("pin clicked")

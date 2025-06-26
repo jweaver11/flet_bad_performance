@@ -2,42 +2,19 @@
 Layout our widgets whenever there is more than 2
 '''
 import flet as ft
-from handlers.resizable import splitter_horizontal
 
-def top_pin_drag_accept(e):
-    print("top pin accepted")
-def left_pin_drag_accept(e):
-    print("left pin accepted")
-def main_work_area_drag_accept(e):
-    print("main work area drag accepted")
-def right_pin_drag_accept(e):
-    print("right pin accepted")
-def bottom_pin_drag_accept(e):
-    print("bottom pin accepted")
-
-# These will be the draggable parts
-top_drag_target = ft.DragTarget(content=ft.Row())
-left_drag_target = ft.DragTarget(content=ft.Row())
-main_drag_target = ft.DragTarget(content=ft.Row())
-right_drag_target = ft.DragTarget(content=ft.Row())
-bottom_drag_target = ft.DragTarget(content=ft.Row())
 
 # Master row that holds all our drag targets and pins for our stack inside of workspaces
 # Needs to exist here to be dynamically updated, while the pins need to be created
 # when the layout is run.
-row = ft.Row(
+widget_row = ft.Row(
     spacing=10,
     expand=True,
     controls=[]
 )
 
-
-# set minimumm fallbacks for our pins
-#min_pin_height = 30
-#min_pin_width = 30
 default_pin_height = 200
 default_pin_width = 200
-    
     
 # autopin widgets when more than 2 are active so they look nicer
 def layout_widgets(visible_widgets):
@@ -55,6 +32,8 @@ def layout_widgets(visible_widgets):
     main_work_area = ft.Row(expand=True, spacing=10, controls=[])
     right_pin = ft.Column(spacing=10, controls=[])
     bottom_pin = ft.Row(spacing=10, controls=[])
+
+    # Set lists for pins based off widget list?
 
     
     # Render all widgets in same place, list up to 24 long. 
@@ -110,8 +89,8 @@ def layout_widgets(visible_widgets):
                 ))
 
     # Format our content
-    row.controls.clear()
-    row.controls = [
+    widget_row.controls.clear()
+    widget_row.controls = [
         left_pin,
         ft.Column(expand=True, spacing=10, controls=[top_pin, main_work_area, bottom_pin]),
         right_pin,

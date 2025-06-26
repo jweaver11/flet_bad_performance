@@ -1,20 +1,9 @@
 import flet as ft
 from handlers.reload_widgets import reload_widgets
+from hud.workspace import stack, drag_targets
+from handlers.layout_widgets import widget_row
 
-# Take our formatted widget from wherever it was created and make it a resizable widget
-class ResizableWidget(ft.Container):
-    def __init__(self, title, body, story, page):
-        super().__init__()
-
-        #page.update()
-
-
-        # Add drag handles as controls around the widget
-        # Handle mouse events to resize
-
-    
-
-# Just calls our resizable widget for readability
+# Creates our new widget. All widgets fit into this standard format
 def create_new_widget(title, body, story, page):
 
     # Hides our widgets when x is clicked in top right
@@ -26,12 +15,22 @@ def create_new_widget(title, body, story, page):
                 character.visible = False
                 story.visible_widgets[idx] = None
                 print(title, "widget removed from visible widgets")
-            else:
-                print("how you even get here?")
-        
+
         # reload widgets
         reload_widgets(story)  # This will update the widgets in the story
         page.update()
+
+    def on_drag_start(e):
+        stack.controls.extend(drag_targets)  # Add the drag targets to the stack
+        page.update()
+
+    def on_drag_complete(e):
+        print("drag complete starting")
+        stack.controls.clear()
+        stack.controls.append(widget_row)
+        stack.update()
+        page.update()
+        print("drag complete finished")
 
 
     widget_container = ft.Container(
@@ -43,7 +42,11 @@ def create_new_widget(title, body, story, page):
             ft.Stack([
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[ft.Draggable(group="widgets", content=ft.TextButton(title))]
+                    controls=[ft.Draggable(
+                        group="widgets",
+                        content=ft.TextButton(title),
+                        on_drag_start=on_drag_start,
+                        on_drag_complete=on_drag_complete,)]
                 ),
                 ft.Row(
                     alignment=ft.MainAxisAlignment.END,
@@ -56,9 +59,9 @@ def create_new_widget(title, body, story, page):
             ft.Divider(color=ft.Colors.BLUE),
             ft.Container(       # Body of the widget
                 expand=True,
-                content=ft.Column(body) 
+                content=ft.Column(body)
             )
-        ]) 
+        ])
     )
 
     return widget_container
