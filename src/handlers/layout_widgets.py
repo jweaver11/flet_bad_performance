@@ -3,6 +3,126 @@ Layout our widgets whenever there is more than 2
 '''
 import flet as ft
 
+def top_pin_drag_accept(e):
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("top pin accepted")
+def left_pin_drag_accept(e):
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("left pin accepted")
+def main_pin_drag_accept(e):
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("main pin accepted")
+def right_pin_drag_accept(e):
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("right pin accepted")
+def bottom_pin_drag_accept(e):
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("bottom pin accepted")
+
+def drag_will_accept(e):
+    e.control.content = ft.Container(
+        bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.WHITE), 
+        height=default_pin_height
+    )
+    e.control.update()
+
+def on_leave(e):
+    e.control.content = ft.Row(height=300)
+    e.control.update()
+
+
+# set minimumm fallbacks for our pins
+#min_pin_height = 30
+#min_pin_width = 30
+default_pin_height = 200
+default_pin_width = 200
+
+min_drag_target_height = 200
+
+top_pin_drag_target = ft.DragTarget(
+    group="widgets", 
+    content=ft.Row(height=200), 
+    on_accept=top_pin_drag_accept,
+    on_will_accept=drag_will_accept,
+    on_leave=on_leave,
+)
+left_pin_drag_target = ft.DragTarget(
+    group="widgets", 
+    content=ft.Row(height=200), 
+    on_accept=left_pin_drag_accept,
+    on_will_accept=drag_will_accept,
+    on_leave=on_leave,
+)
+main_pin_drag_target = ft.DragTarget(
+    group="widgets", 
+    content=ft.Row(height=200), 
+    on_accept=main_pin_drag_accept,
+    on_will_accept=drag_will_accept,
+    on_leave=on_leave,
+)
+right_pin_drag_target = ft.DragTarget(
+    group="widgets", 
+    content=ft.Row(height=200), 
+    on_accept=right_pin_drag_accept,
+    on_will_accept=drag_will_accept,
+    on_leave=on_leave,
+)
+bottom_pin_drag_target = ft.DragTarget(
+    group="widgets", 
+    content=ft.Row(height=200), 
+    on_accept=bottom_pin_drag_accept,
+    on_will_accept=drag_will_accept,
+    on_leave=on_leave,
+)
+
+
+drag_targets = [
+    ft.Container(
+            content=top_pin_drag_target,
+            height=200,
+            margin=ft.margin.only(top=10, left=20, right=20),
+            top=0, left=200, right=200,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        ),
+        ft.Container(
+            content=left_pin_drag_target,
+            width=200,
+            margin=ft.margin.only(top=10, left=10, bottom=10,),
+            left=0, top=0, bottom=0,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        ),
+        ft.Container(
+            content=main_pin_drag_target,
+            margin=ft.margin.only(top=20, left=20, right=20, bottom=20,),
+            top=200, left=200, right=200, bottom=200,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        ),
+        ft.Container(
+            content=right_pin_drag_target,
+            width=200,
+            margin=ft.margin.only(top=10, right=10, bottom=10,),
+            right=0, top=0, bottom=0,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        ),
+        ft.Container(
+            content=bottom_pin_drag_target,
+            height=200,
+            bottom=0, left=200, right=200,
+            margin=ft.margin.only(left=20, right=20, bottom=10),
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),
+        )
+]
+
 
 # Master row that holds all our drag targets and pins for our stack inside of workspaces
 # Needs to exist here to be dynamically updated, while the pins need to be created

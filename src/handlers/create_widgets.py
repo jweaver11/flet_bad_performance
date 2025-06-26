@@ -1,7 +1,7 @@
 import flet as ft
 from handlers.reload_widgets import reload_widgets
-from hud.workspace import stack, drag_targets
-from handlers.layout_widgets import widget_row
+from hud.workspace import stack
+from handlers.layout_widgets import widget_row, drag_targets
 
 # Creates our new widget. All widgets fit into this standard format
 def create_new_widget(title, body, story, page):
@@ -22,15 +22,14 @@ def create_new_widget(title, body, story, page):
 
     def on_drag_start(e):
         stack.controls.extend(drag_targets)  # Add the drag targets to the stack
+        stack.update()
         page.update()
 
     def on_drag_complete(e):
-        print("drag complete starting")
         stack.controls.clear()
         stack.controls.append(widget_row)
         stack.update()
         page.update()
-        print("drag complete finished")
 
 
     widget_container = ft.Container(
