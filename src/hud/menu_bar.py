@@ -240,6 +240,7 @@ def create_menu_bar(page: ft.Page):
             ),
         ], 
     )
+
     # Create our container for the menu bar
     menubar_container = ft.Container(
         bgcolor=ft.Colors.GREY_900,     # Set background color

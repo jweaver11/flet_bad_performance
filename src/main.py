@@ -10,6 +10,7 @@ from hud.workspaces_rail import create_rails
 from hud.active_rail import create_active_rail
 from hud.workspace import create_workspace
 
+
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 

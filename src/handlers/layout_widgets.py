@@ -3,6 +3,19 @@ Layout our widgets whenever there is more than 2
 '''
 import flet as ft
 
+
+def bg_drag_will_accept(e):
+    stack.controls.clear()
+    stack.controls.append(widget_row)  # Re-add the widget row to the stack
+    stack.controls.extend(drag_targets)  # Add the drag targets to the stack
+    stack.update()
+
+# Accept functions for each pin location
+def bg_drag_accept(e):
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("BG drag target accepted")
+
 def top_pin_drag_accept(e):
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
@@ -28,20 +41,22 @@ def bottom_pin_drag_accept(e):
     e.control.update()
     print("bottom pin accepted")
 
+# When a draggable is hovering over a target
 def drag_will_accept(e):
-    global over_target
-    over_target = True
+    print("Entered a pin drag target")
     e.control.content = ft.Container(
         bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.WHITE), 
         height=default_pin_height
     )
     e.control.update()
+    stack.update()
 
+# When a draggable leaves a target
 def on_leave(e):
-    global over_target
-    over_target = False
+    print("Left a pin drag target")
     e.control.content = ft.Row(height=300)
     e.control.update()
+    stack.update()
 
 
 # set minimumm fallbacks for our pins
@@ -53,6 +68,14 @@ default_pin_width = 200
 min_drag_target_height = 200
 min_drag_target_width = 200
 
+# Our 5 pin area drag targets
+bg_drag_target = ft.DragTarget(
+    group="widgets", 
+    content=ft.Row(), 
+    on_accept=bg_drag_accept,
+    on_will_accept=drag_will_accept,
+    on_leave=on_leave,
+)
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
@@ -88,19 +111,15 @@ bottom_pin_drag_target = ft.DragTarget(
     on_will_accept=drag_will_accept,
     on_leave=on_leave,
 )
-background_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
-    group="widgets", 
-    content=ft.Row(), 
-    on_accept=lambda e: print("Background drag target accepted"),
-)
+
 
 
 drag_targets = [    # Must be in flet containers in order to position them
     ft.Container(
-        content=background_drag_target,
+        content=bg_drag_target,
         expand=True,
         top=0, left=0, right=0, bottom=0,
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.RED),  # Temporary for visibility
     ),
     ft.Container(
         content=top_pin_drag_target,
@@ -143,20 +162,15 @@ drag_targets = [    # Must be in flet containers in order to position them
     ),
 ]
 
-
-# Master row that holds all our drag targets and pins for our stack inside of workspaces
-# Needs to exist here to be dynamically updated, while the pins need to be created
-# when the layout is run.
 widget_row = ft.Row(
     spacing=10,
     expand=True,
     controls=[]
 )
-
-default_pin_height = 200
-default_pin_width = 200
     
-# autopin widgets when more than 2 are active so they look nicer
+stack = ft.Stack(expand=True, controls=[widget_row])
+
+# Pin our widgets in here for formatting
 def layout_widgets(visible_widgets):
     widgets = visible_widgets
 

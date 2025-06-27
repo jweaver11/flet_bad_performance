@@ -1,11 +1,11 @@
 import flet as ft
 from handlers.reload_widgets import reload_widgets
-from hud.workspace import stack
-from handlers.layout_widgets import drag_targets, widget_row
+from handlers.layout_widgets import widget_row, drag_targets, stack
 
 
 # Creates our new widget. All widgets fit into this standard format
 def create_new_widget(title, body, story, page):
+
 
     # Hides our widgets when x is clicked in top right
     def hide_widget(story):
@@ -22,15 +22,18 @@ def create_new_widget(title, body, story, page):
         page.update()
 
     def on_drag_start(e):
-        stack.controls.extend(drag_targets)  # Add the drag targets to the stack
-        page.update()
+        print("\ndrag start called")
+        stack.controls.extend(drag_targets)  # Add the drag target pins to the stack
+        stack.update()
 
     def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
+        print("Drag complete called")
         stack.controls.clear()
-        stack.controls.append(widget_row)
-        page.update()
+        stack.controls.append(widget_row)  # Re-add the widget row to the stack
+        stack.update()
 
 
+    
     widget_container = ft.Container(
         expand=True,
         padding=6,
@@ -63,7 +66,3 @@ def create_new_widget(title, body, story, page):
     )
 
     return widget_container
-    #story = story
-    #return ResizableWidget(title, body, story, page)
-
-
