@@ -4,17 +4,21 @@ Layout our widgets whenever there is more than 2
 import flet as ft
 
 
-def bg_drag_will_accept(e):
-    stack.controls.clear()
-    stack.controls.append(widget_row)  # Re-add the widget row to the stack
-    stack.controls.extend(drag_targets)  # Add the drag targets to the stack
-    stack.update()
-
 # Accept functions for each pin location
-def bg_drag_accept(e):
+def ib_drag_accept(e):
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
-    print("BG drag target accepted")
+    stack.controls.clear()
+    stack.controls.append(widget_row)  # Re-add the widget row to the stack
+    stack.update()
+    print("ib drag target accepted")
+
+def ib_drag_will_accept(e):
+    print("Entered ib drag target")
+    stack.controls.clear()
+    stack.controls.append(widget_row)  # Re-add the widget row to the stack
+    stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
+    stack.update()
 
 def top_pin_drag_accept(e):
     e.control.content = ft.Row(height=default_pin_height)
@@ -43,12 +47,14 @@ def bottom_pin_drag_accept(e):
 
 # When a draggable is hovering over a target
 def drag_will_accept(e):
-    print("Entered a pin drag target")
     e.control.content = ft.Container(
         bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.WHITE), 
         height=default_pin_height
     )
     e.control.update()
+    stack.controls.clear()
+    stack.controls.append(widget_row)  # Re-add the widget row to the stack
+    stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stac
     stack.update()
 
 # When a draggable leaves a target
@@ -69,13 +75,15 @@ min_drag_target_height = 200
 min_drag_target_width = 200
 
 # Our 5 pin area drag targets
-bg_drag_target = ft.DragTarget(
+in_between_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
-    on_accept=bg_drag_accept,
+    on_accept=ib_drag_accept,
     on_will_accept=drag_will_accept,
     on_leave=on_leave,
 )
+
+# Pin drag targets
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
@@ -112,53 +120,49 @@ bottom_pin_drag_target = ft.DragTarget(
     on_leave=on_leave,
 )
 
-
-
-drag_targets = [    # Must be in flet containers in order to position them
+# containers for our pin drag targets
+pin_drag_targets = [    # Must be in flet containers in order to position them
     ft.Container(
-        content=bg_drag_target,
+        content=in_between_drag_target,
         expand=True,
+        margin=ft.margin.all(10),
+        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
         top=0, left=0, right=0, bottom=0,
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.RED),  # Temporary for visibility
+        #bgcolor=ft.Colors.RED,  # Default color for the in-between container
     ),
     ft.Container(
         content=top_pin_drag_target,
         height=200,
         margin=ft.margin.only(top=10, left=20, right=20),
         top=0, left=200, right=200,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        border_radius=ft.border_radius.all(10),  
     ),
     ft.Container(
         content=left_pin_drag_target,
         width=200,
         margin=ft.margin.only(top=10, left=10, bottom=10,),
         left=0, top=0, bottom=0,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        border_radius=ft.border_radius.all(10), 
     ),
     ft.Container(
         content=main_pin_drag_target,
         margin=ft.margin.only(top=20, left=20, right=20, bottom=20,),
         top=200, left=200, right=200, bottom=200,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        border_radius=ft.border_radius.all(10),  
     ),
     ft.Container(
         content=right_pin_drag_target,
         width=200,
         margin=ft.margin.only(top=10, right=10, bottom=10,),
         right=0, top=0, bottom=0,
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),  # Temporary for visibility
+        border_radius=ft.border_radius.all(10),  
     ),
     ft.Container(
         content=bottom_pin_drag_target,
         height=200,
         bottom=0, left=200, right=200,
         margin=ft.margin.only(left=20, right=20, bottom=10),
-        border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.WHITE),
+        border_radius=ft.border_radius.all(10), 
     ),
 ]
 
@@ -186,8 +190,6 @@ def layout_widgets(visible_widgets):
     main_work_area = ft.Row(expand=True, spacing=10, controls=[])
     right_pin = ft.Column(spacing=10, controls=[])
     bottom_pin = ft.Row(spacing=10, controls=[])
-
-    # Set lists for pins based off widget list?
 
     
     # Render all widgets in same place, list up to 24 long. 
@@ -218,7 +220,7 @@ def layout_widgets(visible_widgets):
                             widgets[i],
                             ft.Container(height=10)
                             ]), 
-                        ft.Container(width=10)]
+                        ft.Column(width=10)]
                 ))
             elif i == 4:
                 top_pin.height=default_pin_height
@@ -241,6 +243,7 @@ def layout_widgets(visible_widgets):
                             ]), 
                         ]
                 ))
+                        
 
     # Format our content
     widget_row.controls.clear()

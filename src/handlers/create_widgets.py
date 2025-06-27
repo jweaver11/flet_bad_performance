@@ -1,6 +1,6 @@
 import flet as ft
 from handlers.reload_widgets import reload_widgets
-from handlers.layout_widgets import widget_row, drag_targets, stack
+from handlers.layout_widgets import widget_row, pin_drag_targets, stack
 
 
 # Creates our new widget. All widgets fit into this standard format
@@ -23,7 +23,7 @@ def create_new_widget(title, body, story, page):
 
     def on_drag_start(e):
         print("\ndrag start called")
-        stack.controls.extend(drag_targets)  # Add the drag target pins to the stack
+        stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
         stack.update()
 
     def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
