@@ -33,6 +33,7 @@ def create_workspace(page: ft.Page, story):
         stack.update()
         page.update()
 
+
     bg_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
         group="widgets", 
         content=ft.Container(expand=True, bgcolor=ft.Colors.BLUE),
@@ -41,9 +42,10 @@ def create_workspace(page: ft.Page, story):
         on_leave=bg_on_leave,
     )
 
+    # Need margin to not be included as part of container
     on_enter_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
         group="widgets", 
-        content=ft.Container(expand=True, margin=ft.margin.all(5), bgcolor=ft.Colors.YELLOW,), 
+        content=ft.Container(expand=True, bgcolor=ft.Colors.YELLOW,), 
         on_will_accept=bg_on_will_accept,
         on_accept=bg_on_accept,
     )
@@ -52,7 +54,7 @@ def create_workspace(page: ft.Page, story):
     # Stack for adding drag target behind container to catch draggable widget errors
     s = ft.Stack(expand=True, controls=[
         bg_drag_target,
-        on_enter_drag_target,  # Add the enter drag target 
+        ft.Container(top=5, left=5, right=5, bottom=5, content=on_enter_drag_target),  # Add the enter drag target 
         stack
     ])
     
