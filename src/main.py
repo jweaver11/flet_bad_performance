@@ -9,6 +9,7 @@ from hud.menu_bar import create_menu_bar
 from hud.workspaces_rail import create_rails
 from hud.active_rail import create_active_rail
 from hud.workspace import create_workspace
+from handlers.layout_widgets import stack, widget_row, pin_drag_targets
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------

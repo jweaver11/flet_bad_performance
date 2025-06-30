@@ -11,7 +11,7 @@ from handlers.layout_widgets import stack, widget_row, pin_drag_targets
 # Function to return our container for our widgets
 def create_workspace(page: ft.Page, story):    
 
-    def bg_on_will_accept(e):
+    def on_will_accept(e):
         print("Entered BG drag target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
@@ -19,14 +19,14 @@ def create_workspace(page: ft.Page, story):
         stack.update()
         page.update()
 
-    def bg_on_accept(e):
+    def on_accept(e):
         print("Accepted into BG drag target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()
         page.update()
 
-    def bg_on_leave(e):
+    def on_leave(e):
         print("Left BG drag target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
@@ -37,24 +37,15 @@ def create_workspace(page: ft.Page, story):
     bg_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
         group="widgets", 
         content=ft.Container(expand=True, bgcolor=ft.Colors.BLUE),
-        on_will_accept=bg_on_will_accept,
-        on_accept=bg_on_accept,
-        on_leave=bg_on_leave,
-    )
-
-    # Need margin to not be included as part of container
-    on_enter_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
-        group="widgets", 
-        content=ft.Container(expand=True, bgcolor=ft.Colors.YELLOW,), 
-        on_will_accept=bg_on_will_accept,
-        on_accept=bg_on_accept,
+        on_will_accept=on_will_accept,
+        on_accept=on_accept,
+        #on_leave=on_leave
     )
 
 
     # Stack for adding drag target behind container to catch draggable widget errors
     s = ft.Stack(expand=True, controls=[
         bg_drag_target,
-        ft.Container(top=5, left=5, right=5, bottom=5, content=on_enter_drag_target),  # Add the enter drag target 
         stack
     ])
     

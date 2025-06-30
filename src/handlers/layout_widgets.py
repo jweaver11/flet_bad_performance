@@ -13,13 +13,6 @@ def ib_drag_accept(e):
     stack.update()
     print("ib drag target accepted")
 
-def ib_drag_will_accept(e):
-    print("Entered ib drag target")
-    stack.controls.clear()
-    stack.controls.append(widget_row)  # Re-add the widget row to the stack
-    stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
-    stack.update()
-
 def top_pin_drag_accept(e):
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
@@ -59,7 +52,7 @@ def drag_will_accept(e):
 
 # When a draggable leaves a target
 def on_leave(e):
-    print("Left a pin drag target")
+    #print("Left a pin drag target")
     e.control.content = ft.Row(height=300)
     e.control.update()
     stack.update()
@@ -79,10 +72,8 @@ in_between_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
     on_accept=ib_drag_accept,
-    on_will_accept=drag_will_accept,
     on_leave=on_leave,
 )
-
 # Pin drag targets
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 

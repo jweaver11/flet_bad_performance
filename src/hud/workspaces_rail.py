@@ -2,6 +2,7 @@
 import flet as ft
 from hud.active_rail import workspace_rails, default_rail, active_rail
 from workspaces.story import story
+from handlers.layout_widgets import stack, widget_row, pin_drag_targets
 
 
 def create_rails(page: ft.Page):
@@ -155,5 +156,42 @@ def create_rails(page: ft.Page):
         ),
     )
 
+    # Accept functions for each pin location
+    def drag_accept(e):
+        e.control.update()
+        stack.controls.clear()
+        stack.controls.append(widget_row)  # Re-add the widget row to the stack
+        stack.update()
+        print("workspaces rail drag target accepted")
 
-    return all_workspaces_rail_container
+    def drag_will_accept(e):
+        print("Entered workspaces rail drag target")
+        stack.controls.clear()
+        stack.controls.append(widget_row)  # Re-add the widget row to the stack
+        stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
+        stack.update()
+        page.update()
+
+    # When a draggable leaves a target
+    def on_leave(e):
+        print("Left workspaces rail target")
+        stack.controls.clear()
+        stack.controls.append(widget_row)  # Re-add the widget row to the stack
+        stack.update()
+        page.update()
+
+
+    dt = ft.DragTarget(
+        group="widgets", 
+        content=ft.Column(expand=True, width=150), 
+        on_accept=drag_accept,
+        on_will_accept=drag_will_accept,
+        on_leave=on_leave,
+    )
+
+    s = ft.Stack(
+        controls=[all_workspaces_rail_container, dt]
+    )
+
+
+    return s
