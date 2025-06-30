@@ -264,10 +264,10 @@ def create_menu_bar(page: ft.Page):
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()
-        print("menubar drag target accepted")
+        #print("menubar drag target accepted")
 
     def drag_will_accept(e):
-        print("Entered menubar drag target")
+        #print("Entered menubar drag target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
@@ -283,7 +283,7 @@ def create_menu_bar(page: ft.Page):
 
     # When a draggable leaves a target
     def on_leave(e):
-        print("Left menubar target")
+        #print("Left menubar target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()

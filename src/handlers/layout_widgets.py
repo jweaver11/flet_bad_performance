@@ -234,6 +234,22 @@ def layout_widgets(visible_widgets):
                             ]), 
                         ]
                 ))
+            elif i == 6:
+                top_pin.height=default_pin_height
+                top_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[ft.Container(height=10), widgets[i]])
+                )
+            elif i == 7:
+                top_pin.height=default_pin_height
+                top_pin.controls.append(
+                    ft.Column(      # Adds column to keep formatting on bottom
+                        expand=True, 
+                        spacing=0, 
+                        controls=[ft.Container(height=10), widgets[i]])
+                )
                         
 
     # Format our content

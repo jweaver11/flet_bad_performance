@@ -44,14 +44,9 @@ def create_workspace(page: ft.Page, story):
 
 
     # Stack for adding drag target behind container to catch draggable widget errors
-    s = ft.Stack(expand=True, controls=[
-        bg_drag_target,
-        stack
-    ])
+    s = ft.Stack(expand=True, controls=[bg_drag_target, stack])
     
     page.update()
-
-
 
     # Container for 1 or more widgets open on the workspace area right side of screen
     workspace_container = ft.Container(

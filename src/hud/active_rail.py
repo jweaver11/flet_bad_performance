@@ -52,10 +52,10 @@ def create_active_rail(page: ft.Page):
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()
-        print("active rail drag target accepted")
+        #print("active rail drag target accepted")
 
     def drag_will_accept(e):
-        print("Entered active rail drag target")
+        #print("Entered active rail drag target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
@@ -71,7 +71,7 @@ def create_active_rail(page: ft.Page):
 
     # When a draggable leaves a target
     def on_leave(e):
-        print("Left active rail target")
+        #print("Left active rail target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()

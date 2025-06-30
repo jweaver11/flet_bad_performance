@@ -162,10 +162,10 @@ def create_rails(page: ft.Page):
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()
-        print("workspaces rail drag target accepted")
+        #print("workspaces rail drag target accepted")
 
     def drag_will_accept(e):
-        print("Entered workspaces rail drag target")
+        #print("Entered workspaces rail drag target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
@@ -174,7 +174,7 @@ def create_rails(page: ft.Page):
 
     # When a draggable leaves a target
     def on_leave(e):
-        print("Left workspaces rail target")
+        #print("Left workspaces rail target")
         stack.controls.clear()
         stack.controls.append(widget_row)  # Re-add the widget row to the stack
         stack.update()
