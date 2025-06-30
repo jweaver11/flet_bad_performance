@@ -6,7 +6,7 @@ the create 'character button' at the bottom.
 
 import flet as ft
 from workspaces.character.character_styles import button_style
-from workspaces.story import story
+from models.story import story
 from workspaces.character.character import Character
 from handlers.reload_widgets import reload_widgets
 

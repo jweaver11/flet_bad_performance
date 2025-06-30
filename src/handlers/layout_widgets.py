@@ -119,7 +119,6 @@ pin_drag_targets = [    # Must be in flet containers in order to position them
         margin=ft.margin.all(10),
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
         top=0, left=0, right=0, bottom=0,
-        #bgcolor=ft.Colors.RED,  # Default color for the in-between container
     ),
     ft.Container(
         content=top_pin_drag_target,
@@ -167,12 +166,16 @@ stack = ft.Stack(expand=True, controls=[widget_row])
 
 # Pin our widgets in here for formatting
 def layout_widgets(visible_widgets):
-    widgets = visible_widgets
+    top_pin_list = []
+    left_pin_list = []
+    main_pin_list = []
+    right_pin_list = []
+    bottom_pin_list = []
 
-    if len(widgets) <= 0:   # If no widgets active, give it a default later
+    if len(visible_widgets) <= 0:   # If no widgets active, give it a default later
         # Otherwise, run our layout
         return print("No active widgets")
-    if len(widgets) >= 24:  # max num widgets
+    if len(visible_widgets) >= 24:  # max num widgets
         return print("Max num widgets reached")
     
     
@@ -186,12 +189,12 @@ def layout_widgets(visible_widgets):
     # Render all widgets in same place, list up to 24 long. 
     # Fill in 'empty' slots with blank entries, but list is always 24 long
     # Make this a switch
-    for i in range(len(widgets)):  # run through each widget and figure out where to put it.
+    for i in range(len(visible_widgets)):  # run through each widget and figure out where to put it.
 
-        if widgets[i] is not None:  # If the widget is not visible, skip it
+        if visible_widgets[i] is not None:  # If the widget is not visible, skip it
 
             if i <= 1:    # First 2 go in the main work area
-                main_work_area.controls.append(widgets[i])
+                main_work_area.controls.append(visible_widgets[i])
 
             elif i == 2: 
                 bottom_pin.height=default_pin_height
@@ -199,7 +202,7 @@ def layout_widgets(visible_widgets):
                     ft.Column(      # Adds column to keep formatting on bottom
                         expand=True, 
                         spacing=0, 
-                        controls=[widgets[i], ft.Container(height=10)])
+                        controls=[visible_widgets[i], ft.Container(height=10)])
                 )
             elif i == 3:
                 right_pin.width=default_pin_width
@@ -208,7 +211,7 @@ def layout_widgets(visible_widgets):
                     controls=[
                         ft.Column(expand=True, spacing=0, controls=[
                             ft.Container(height=10),
-                            widgets[i],
+                            visible_widgets[i],
                             ft.Container(height=10)
                             ]), 
                         ft.Column(width=10)]
@@ -219,7 +222,7 @@ def layout_widgets(visible_widgets):
                     ft.Column(      # Adds column to keep formatting on bottom
                         expand=True, 
                         spacing=0, 
-                        controls=[ft.Container(height=10), widgets[i]])
+                        controls=[ft.Container(height=10), visible_widgets[i]])
                 )
             elif i == 5:
                 left_pin.width=default_pin_width
@@ -229,7 +232,7 @@ def layout_widgets(visible_widgets):
                         ft.Container(width=10),
                         ft.Column(expand=True, spacing=0, controls=[
                             ft.Container(height=10),
-                            widgets[i],
+                            visible_widgets[i],
                             ft.Container(height=10)
                             ]), 
                         ]
@@ -240,7 +243,7 @@ def layout_widgets(visible_widgets):
                     ft.Column(      # Adds column to keep formatting on bottom
                         expand=True, 
                         spacing=0, 
-                        controls=[ft.Container(height=10), widgets[i]])
+                        controls=[ft.Container(height=10), visible_widgets[i]])
                 )
             elif i == 7:
                 top_pin.height=default_pin_height
@@ -248,7 +251,7 @@ def layout_widgets(visible_widgets):
                     ft.Column(      # Adds column to keep formatting on bottom
                         expand=True, 
                         spacing=0, 
-                        controls=[ft.Container(height=10), widgets[i]])
+                        controls=[ft.Container(height=10), visible_widgets[i]])
                 )
                         
 

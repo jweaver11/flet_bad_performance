@@ -4,7 +4,7 @@ Each section of this main page contains another 'page',
 so they can update themselves dynamically
 '''
 import flet as ft
-from workspaces.story import story
+from models.story import story
 from hud.menu_bar import create_menu_bar
 from hud.workspaces_rail import create_rails
 from hud.active_rail import create_active_rail

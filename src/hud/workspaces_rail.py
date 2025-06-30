@@ -1,7 +1,7 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
 from hud.active_rail import workspace_rails, default_rail, active_rail
-from workspaces.story import story
+from models.story import story
 from handlers.layout_widgets import stack, widget_row, pin_drag_targets
 
 

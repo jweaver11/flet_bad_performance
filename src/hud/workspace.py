@@ -36,7 +36,7 @@ def create_workspace(page: ft.Page, story):
 
     bg_drag_target = ft.DragTarget( # Needed to catch drags outside of pins, or program breaks
         group="widgets", 
-        content=ft.Container(expand=True, bgcolor=ft.Colors.BLUE),
+        content=ft.Container(expand=True),
         on_will_accept=on_will_accept,
         on_accept=on_accept,
         #on_leave=on_leave

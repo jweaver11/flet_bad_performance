@@ -9,11 +9,17 @@ class Story:
 
         # Make a list for positional indexing
         # Need this that will tie widgets to parent objects names, but can be reordered independently
-        self.widgets = {    # Dict of all the widgets in the story
-            # 'widget_name': widget_object, bool,
+        self.widgets = {    # Dict of all the widgets in the story 
+            #{'widget_name': {widget_boject, bool}}
         } 
 
         self.visible_widgets = []  # List of widgets that are currently visible
+
+        self.top_pin_widgets = []
+        self.left_pin_widgets = []
+        self.main_pin_widgets = []
+        self.right_pin_widgets = []
+        self.bottom_pin_widgets = []
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
