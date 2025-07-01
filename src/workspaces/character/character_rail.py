@@ -8,7 +8,7 @@ import flet as ft
 from workspaces.character.character_styles import button_style
 from models.story import story
 from workspaces.character.character import Character
-from handlers.reload_widgets import reload_widgets
+from handlers.layout_widgets import layout_widgets
 
 
 def characters_rail(page: ft.Page):
@@ -24,7 +24,7 @@ def characters_rail(page: ft.Page):
         # Show our widget
         if name in story.widgets:
             story.widgets[name].visible = True
-        reload_widgets()
+        layout_widgets()
         page.update()
         print("popout clicked")
         
@@ -37,12 +37,14 @@ def characters_rail(page: ft.Page):
         print("delete was run")
         for character in story.characters:
             if character.name == name:
-                story.characters.remove(character)
-                story.widgets.pop(character.name, None)  # Remove from widgets dict:
+                story.characters.remove(character)  # delete from characters list
+                for widget in story.widgets:
+                    if widget.title == name and widget.tag == "character":
+                        story.widgets.remove(name)  # Remove from widgets dict:
                 print(name, "was deleted")
         # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
-        reload_widgets()      # reload our workspace area
+        layout_widgets()     # reload our workspace area
         page.update()
 
 
@@ -63,7 +65,7 @@ def characters_rail(page: ft.Page):
             # Add our character to our stories character list, create a widget, and add it to widget list
             story.characters.append(Character(name, page))
             reload_character_rail()    
-            reload_widgets()   
+            layout_widgets()  
             page.update()
         
 
@@ -93,7 +95,7 @@ def characters_rail(page: ft.Page):
         story.characters.pop(e.old_index)  # Remove it from the old index
         story.characters.insert(e.new_index, temp)  # Insert it at the new index
         reload_character_rail()
-        reload_widgets()  # Reload the widgets to reflect the new order
+        layout_widgets()  # Reload the widgets to reflect the new order
         page.update()
 
 
@@ -189,7 +191,7 @@ def characters_rail(page: ft.Page):
         ),
     ]
     reload_character_rail() # called initially so characters loaded on launch
-    reload_widgets() 
+    layout_widgets() 
 
 
     return characters_rail

@@ -1,5 +1,5 @@
 import flet as ft
-from handlers.reload_widgets import reload_widgets
+from handlers.layout_widgets import layout_widgets
 from handlers.layout_widgets import widget_row, pin_drag_targets, stack
 from models.story import story 
 
@@ -19,7 +19,7 @@ def create_widget_control(title, body, page):
 
 
         # reload widgets
-        reload_widgets()  # This will update the widgets in the story
+        layout_widgets()  # This will update the widgets in the story
         page.update()
 
     def on_drag_start(e):

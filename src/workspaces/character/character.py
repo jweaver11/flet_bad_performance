@@ -7,10 +7,9 @@ from models.widget import Widget
 class Character:
     def __init__(self, name, page):
         self.name = name    # Name of our character
+        self.tag = "character"
         self.visible = True     # Widget active and visible = True
-        self.tag = "character"  # Give a tag for mapping
-        self.widget = create_character_widget(self.name, self.tag, page)   # Store our widget object
-        story.widgets.update({self.name: self.widget})  # Add our widget to the story's widgets dict
+        story.widgets.append(create_character_widget(self.name, page, self.tag))  # Add our widget to the story's widgets dict  # Add our widget to the bottom pin list
         
     # picture : ft.Image?
     age : int
@@ -64,7 +63,7 @@ tags = {
 
 
 # Creates our widget for each character object
-def create_character_widget(name, tag, page):
+def create_character_widget(name, page, tag):
 
     # Format our body as list of flet controls
     # list of flet controls, nested within a column
@@ -74,6 +73,7 @@ def create_character_widget(name, tag, page):
 
     # Returns our ft container for the widget control
     control = create_widget_control(name, body, page)
+    story.bottom_pin_widgets.append(control)  # Add our widget to the bottom pin list by default for characters
 
     # Create our widget obj --------------- widget ----- name - tag
     widget = Widget(control, name, tag)

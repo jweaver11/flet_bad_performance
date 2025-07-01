@@ -20,6 +20,7 @@ def main(page: ft.Page):
     page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
     page.title = title
     page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
+    page.window.maximized = True
 
     # Create our page elements as their own pages so they can update
     menubar = create_menu_bar(page)     # menubar

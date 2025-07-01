@@ -7,11 +7,10 @@ class Story:
     def __init__(self, title):
         self.title = title  # Title of story
 
-        # Dict of all the widgets in the story. Need this to tie widgets to parent objects names
-        # So we can update the parent object when widget is updated
-        self.widgets = {
-            #{'widget_name': widget_boject}
-        } 
+        # Holds our widgets list.
+        self.widgets = [
+            # widget_object has control:ft.Container, title:str, tag:str, visible:bool
+        ]
 
         # Hold our widgets in each pin area
         self.top_pin_widgets = []
