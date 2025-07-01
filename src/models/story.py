@@ -7,14 +7,13 @@ class Story:
     def __init__(self, title):
         self.title = title  # Title of story
 
-        # Make a list for positional indexing
-        # Need this that will tie widgets to parent objects names, but can be reordered independently
-        self.widgets = {    # Dict of all the widgets in the story 
-            #{'widget_name': {widget_boject, bool}}
+        # Dict of all the widgets in the story. Need this to tie widgets to parent objects names
+        # So we can update the parent object when widget is updated
+        self.widgets = {
+            #{'widget_name': widget_boject}
         } 
 
-        self.visible_widgets = []  # List of widgets that are currently visible
-
+        # Hold our widgets in each pin area
         self.top_pin_widgets = []
         self.left_pin_widgets = []
         self.main_pin_widgets = []

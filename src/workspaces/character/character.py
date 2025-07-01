@@ -1,20 +1,23 @@
-from handlers.create_widgets import create_new_widget
+from handlers.create_widget_control import create_widget_control
 import flet as ft
+from models.story import story
+from models.widget import Widget 
 
 # Class for each character. Requires passing in a name
 class Character:
-    def __init__(self, name, story, page):
-        self.name = name    
+    def __init__(self, name, page):
+        self.name = name    # Name of our character
         self.visible = True     # Widget active and visible = True
-        self.widget = create_character_widget(self.name, story, page)
-        #story.widgets.update({self.name: self.widget, bool: True})  # Add our widget to the story's widgets dict
+        self.tag = "character"  # Give a tag for mapping
+        self.widget = create_character_widget(self.name, self.tag, page)   # Store our widget object
+        story.widgets.update({self.name: self.widget})  # Add our widget to the story's widgets dict
         
     # picture : ft.Image?
     age : int
     parents: list[str]
     backstory : str
     abilities : list[str]
-    occupation: str
+    occupation : str
     # origin = Origin
     notes : str
     shown : bool
@@ -23,7 +26,6 @@ class Character:
     color : str
     icon : str
 
-    show_character : bool
     tags : list[str]
 
 
@@ -52,7 +54,6 @@ tags = {
     man : bool
     woman : bool
     alive : bool
-    dead : bool
 }
 '''
 # Saving characters locally
@@ -63,14 +64,18 @@ tags = {
 
 
 # Creates our widget for each character object
-def create_character_widget(name, story, page,):
+def create_character_widget(name, tag, page):
 
+    # Format our body as list of flet controls
     # list of flet controls, nested within a column
     body = [
         ft.Text("title 1")
     ]
-    
 
+    # Returns our ft container for the widget control
+    control = create_widget_control(name, body, page)
 
-    # return finished widget
-    return create_new_widget(name, body, story, page)
+    # Create our widget obj --------------- widget ----- name - tag
+    widget = Widget(control, name, tag)
+
+    return widget

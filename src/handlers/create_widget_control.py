@@ -1,24 +1,25 @@
 import flet as ft
 from handlers.reload_widgets import reload_widgets
 from handlers.layout_widgets import widget_row, pin_drag_targets, stack
+from models.story import story 
 
 
 # Creates our new widget. All widgets fit into this standard format
-def create_new_widget(title, body, story, page):
-
+def create_widget_control(title, body, page):
 
     # Hides our widgets when x is clicked in top right
-    def hide_widget(story):
+    def hide_widget(e):
 
-        # Make our widget false
-        for idx, character in enumerate(story.characters):
-            if character.name == title:
-                character.visible = False
-                story.visible_widgets[idx] = None
-                print(title, "widget removed from visible widgets")
+        # Grab our widgets dict from story object
+        for widget in story.widgets.values():
+            if widget.title == title:
+                widget.visible = False
+                print(title, " Widget is now hidden")
+                
+
 
         # reload widgets
-        reload_widgets(story)  # This will update the widgets in the story
+        reload_widgets()  # This will update the widgets in the story
         page.update()
 
     def on_drag_start(e):
@@ -53,7 +54,7 @@ def create_new_widget(title, body, story, page):
                     alignment=ft.MainAxisAlignment.END,
                     controls=[
                         ft.IconButton(
-                            on_click=lambda e, : hide_widget(story),
+                            on_click=hide_widget,
                             icon=ft.Icons.CLOSE_ROUNDED
                 )])
             ]),
@@ -64,5 +65,6 @@ def create_new_widget(title, body, story, page):
             )
         ])
     )
+
 
     return widget_container

@@ -2,6 +2,7 @@
 Layout our widgets whenever there is more than 2
 '''
 import flet as ft
+from models.story import story
 
 
 # Accept functions for each pin location
@@ -166,11 +167,7 @@ stack = ft.Stack(expand=True, controls=[widget_row])
 
 # Pin our widgets in here for formatting
 def layout_widgets(visible_widgets):
-    top_pin_list = []
-    left_pin_list = []
-    main_pin_list = []
-    right_pin_list = []
-    bottom_pin_list = []
+    
 
     if len(visible_widgets) <= 0:   # If no widgets active, give it a default later
         # Otherwise, run our layout
@@ -178,8 +175,11 @@ def layout_widgets(visible_widgets):
     if len(visible_widgets) >= 24:  # max num widgets
         return print("Max num widgets reached")
     
-    
+    # Render our pin areas for flet
     top_pin = ft.Row(spacing=10, controls=[])
+    tpf = ft.Column(spacing=0, controls=[])  # Top pin formatting column
+    
+
     left_pin = ft.Column(spacing=10, controls=[])
     main_work_area = ft.Row(expand=True, spacing=10, controls=[])
     right_pin = ft.Column(spacing=10, controls=[])
@@ -217,13 +217,7 @@ def layout_widgets(visible_widgets):
                         ft.Column(width=10)]
                 ))
             elif i == 4:
-                top_pin.height=default_pin_height
-                top_pin.controls.append(
-                    ft.Column(      # Adds column to keep formatting on bottom
-                        expand=True, 
-                        spacing=0, 
-                        controls=[ft.Container(height=10), visible_widgets[i]])
-                )
+                top_pin.controls.append(visible_widgets[i])
             elif i == 5:
                 left_pin.width=default_pin_width
                 left_pin.controls.append(ft.Row(      # Adds column to keep formatting on bottom
@@ -238,28 +232,42 @@ def layout_widgets(visible_widgets):
                         ]
                 ))
             elif i == 6:
-                top_pin.height=default_pin_height
-                top_pin.controls.append(
-                    ft.Column(      # Adds column to keep formatting on bottom
-                        expand=True, 
-                        spacing=0, 
-                        controls=[ft.Container(height=10), visible_widgets[i]])
-                )
+                top_pin.controls.append(visible_widgets[i])
             elif i == 7:
-                top_pin.height=default_pin_height
-                top_pin.controls.append(
-                    ft.Column(      # Adds column to keep formatting on bottom
-                        expand=True, 
-                        spacing=0, 
-                        controls=[ft.Container(height=10), visible_widgets[i]])
-                )
-                        
+                top_pin.controls.append(visible_widgets[i])
+
+
+    if len(top_pin.controls) > 0:
+        top_pin.height=default_pin_height
+        tpf.controls.append(ft.Container(height=10))
+
+        
+        for widget in story.top_pin_widgets:
+            w = widget.control
+            top_pin.controls.append(w)
+
+        tpf.controls.append(top_pin)
+        
+
+    # Add our saved widgets from story object for formatting on page
+    left_pin.controls.extend(story.left_pin_widgets)  # Add any widgets that were in the left pin list
+    main_work_area.controls.extend(story.main_pin_widgets)  # Add any widgets that were in the main pin list
+    right_pin.controls.extend(story.right_pin_widgets)  # Add any widgets that were in the right pin list
+    bottom_pin.controls.extend(story.bottom_pin_widgets)  # Add any widgets that were in
+                                      
 
     # Format our content
     widget_row.controls.clear()
     widget_row.controls = [
+
         left_pin,
-        ft.Column(expand=True, spacing=10, controls=[top_pin, main_work_area, bottom_pin]),
+        ft.Column(
+            expand=True, spacing=10, 
+            controls=[
+                tpf,
+                main_work_area, 
+                bottom_pin
+        ]),
         right_pin,
     ]
 
