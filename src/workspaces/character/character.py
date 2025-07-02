@@ -1,15 +1,10 @@
-from handlers.create_widget_control import create_widget_control
-import flet as ft
-from models.story import story
-from models.widget import Widget 
-
 # Class for each character. Requires passing in a name
 class Character:
-    def __init__(self, name, page):
+    def __init__(self, name):
         self.name = name    # Name of our character
         self.tag = "character"
         self.visible = True     # Widget active and visible = True
-        story.widgets.append(create_character_widget(self.name, page, self.tag))  # Add our widget to the story's widgets dict  # Add our widget to the bottom pin list
+        self.pin_location = "bottom"
         
     # picture : ft.Image?
     age : int
@@ -60,22 +55,3 @@ tags = {
 # my_file_path = os.path.join(app_data_path, "characters.json")
 # with open(my_file_path, "w") as f:
     # f.write("My characters will go here")
-
-
-# Creates our widget for each character object
-def create_character_widget(name, page, tag):
-
-    # Format our body as list of flet controls
-    # list of flet controls, nested within a column
-    body = [
-        ft.Text("title 1")
-    ]
-
-    # Returns our ft container for the widget control
-    control = create_widget_control(name, body, page)
-    story.bottom_pin_widgets.append(control)  # Add our widget to the bottom pin list by default for characters
-
-    # Create our widget obj --------------- widget ----- name - tag
-    widget = Widget(control, name, tag)
-
-    return widget

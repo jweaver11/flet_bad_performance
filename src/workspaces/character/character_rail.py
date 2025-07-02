@@ -8,7 +8,7 @@ import flet as ft
 from workspaces.character.character_styles import button_style
 from models.story import story
 from workspaces.character.character import Character
-from handlers.layout_widgets import layout_widgets
+from handlers.render_widgets import render_widgets
 
 
 def characters_rail(page: ft.Page):
@@ -16,15 +16,17 @@ def characters_rail(page: ft.Page):
     button_ref = ft.Ref[ft.TextButton]()
     textfield_ref = ft.Ref[ft.TextField]()
 
-    story.characters.append(Character("bob", page))
-    story.characters.append(Character("joe", page))
+    story.characters.append(Character("bob"))
+    story.characters.append(Character("joe"))
         
     # When popout is clicked
     def popout_on_click(e, name):
         # Show our widget
-        if name in story.widgets:
-            story.widgets[name].visible = True
-        layout_widgets()
+        for character in story.characters:
+            if character.name == name:
+                character.visible = True  # Set character visible
+
+        render_widgets(page)
         page.update()
         print("popout clicked")
         
@@ -38,13 +40,11 @@ def characters_rail(page: ft.Page):
         for character in story.characters:
             if character.name == name:
                 story.characters.remove(character)  # delete from characters list
-                for widget in story.widgets:
-                    if widget.title == name and widget.tag == "character":
-                        story.widgets.remove(name)  # Remove from widgets dict:
+
                 print(name, "was deleted")
         # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
-        layout_widgets()     # reload our workspace area
+        render_widgets(page)     # reload our workspace area
         page.update()
 
 
@@ -63,9 +63,9 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             # Add our character to our stories character list, create a widget, and add it to widget list
-            story.characters.append(Character(name, page))
+            story.characters.append(Character(name))
             reload_character_rail()    
-            layout_widgets()  
+            render_widgets(page)  
             page.update()
         
 
@@ -95,7 +95,7 @@ def characters_rail(page: ft.Page):
         story.characters.pop(e.old_index)  # Remove it from the old index
         story.characters.insert(e.new_index, temp)  # Insert it at the new index
         reload_character_rail()
-        layout_widgets()  # Reload the widgets to reflect the new order
+        render_widgets(page)  # Reload the widgets to reflect the new order
         page.update()
 
 
@@ -191,7 +191,7 @@ def characters_rail(page: ft.Page):
         ),
     ]
     reload_character_rail() # called initially so characters loaded on launch
-    layout_widgets() 
+    render_widgets(page) 
 
 
     return characters_rail

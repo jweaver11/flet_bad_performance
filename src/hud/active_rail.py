@@ -6,7 +6,7 @@ from workspaces.plot_timeline.plot_timeline_rail import plot_timeline_rail
 from workspaces.world_building.world_building_rail import world_building_rail
 from workspaces.drawing_board.drawing_board_rail import drawing_board_rail
 from workspaces.notes.notes_rail import notes_rail
-from handlers.layout_widgets import stack, widget_row, pin_drag_targets
+from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
 
 # Default active workspace rail if none selected/on startup rn

@@ -7,11 +7,6 @@ class Story:
     def __init__(self, title):
         self.title = title  # Title of story
 
-        # Holds our widgets list.
-        self.widgets = [
-            # widget_object has control:ft.Container, title:str, tag:str, visible:bool
-        ]
-
         # Hold our widgets in each pin area
         self.top_pin_widgets = []
         self.left_pin_widgets = []

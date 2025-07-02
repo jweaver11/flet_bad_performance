@@ -1,29 +1,26 @@
 import flet as ft
-from handlers.layout_widgets import layout_widgets
-from handlers.layout_widgets import widget_row, pin_drag_targets, stack
 from models.story import story 
 
 
 # Creates our new widget. All widgets fit into this standard format
-def create_widget_control(title, body, page):
+def create_widget(title, body, page, widget_row, pin_drag_targets, stack):
+
+    body = [ft.Text("character widget body")]
 
     # Hides our widgets when x is clicked in top right
     def hide_widget(e):
 
         # Grab our widgets dict from story object
-        for widget in story.widgets.values():
+        for widget in story.widgets:
             if widget.title == title:
                 widget.visible = False
                 print(title, " Widget is now hidden")
                 
-
-
-        # reload widgets
-        layout_widgets()  # This will update the widgets in the story
         page.update()
 
     def on_drag_start(e):
         print("\ndrag start called")
+
         stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
         stack.update()
 
@@ -34,7 +31,9 @@ def create_widget_control(title, body, page):
         stack.update()
 
 
-    
+    # Render body seperately, heder the same?
+
+    # Our container that returns the 'control' for the widget
     widget_container = ft.Container(
         expand=True,
         padding=6,
@@ -66,5 +65,7 @@ def create_widget_control(title, body, page):
         ])
     )
 
+    story.bottom_pin_widgets.append(widget_container)
 
     return widget_container
+

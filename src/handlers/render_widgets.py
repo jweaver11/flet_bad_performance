@@ -3,6 +3,7 @@ Layout our widgets whenever there is more than 2
 '''
 import flet as ft
 from models.story import story
+from handlers.create_widget import create_widget
 
 
 # Accept functions for each pin location
@@ -15,7 +16,14 @@ def ib_drag_accept(e):
     print("ib drag target accepted")
 
 def top_pin_drag_accept(e):
-    e.control.content = ft.Row(height=default_pin_height)
+    #e.control.content = ft.Row(height=default_pin_height)
+    print(e.control.content)
+    for widget in story.widgets:
+        if widget.title == e.data:
+            story.top_pin_widgets.append(widget.control)
+
+
+    
     e.control.update()
     print("top pin accepted")
 
@@ -166,7 +174,7 @@ widget_row = ft.Row(
 stack = ft.Stack(expand=True, controls=[widget_row])
 
 # Pin our widgets in here for formatting
-def layout_widgets():
+def render_widgets(page: ft.Page):
     
     # Render our pin areas for flet
     top_pin = ft.Row(spacing=10, controls=[])
@@ -179,23 +187,49 @@ def layout_widgets():
     bottom_pin = ft.Row(spacing=10, controls=[])
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
+    story.top_pin_widgets.clear()  # Clear our pin widgets
+    story.left_pin_widgets.clear()  
+    story.main_pin_widgets.clear()
+    story.right_pin_widgets.clear()
+    story.bottom_pin_widgets.clear()
 
     # Get our num of visible widgets for error formatting
     total_visible_widgets = 0
-    for widget in story.widgets:
-        if widget.visible == True:
+
+    for char in story.characters:
+        if char.visible == True:
             total_visible_widgets += 1
+
+            # Create a widget for our visible characters inside of the correct pin location
+            if char.pin_location == "top":
+                story.top_pin_widgets.append(create_widget(char.name, page, char.tag, widget_row, pin_drag_targets, stack))
+            elif char.pin_location == "left":
+                story.left_pin_widgets.append(create_widget(char.name, page, char.tag, widget_row, pin_drag_targets, stack))
+            elif char.pin_location == "main":
+                story.main_pin_widgets.append(create_widget(char.name, page, char.tag, widget_row, pin_drag_targets, stack))
+            elif char.pin_location == "right":
+                story.right_pin_widgets.append(create_widget(char.name, page, char.tag, widget_row, pin_drag_targets, stack))
+            elif char.pin_location == "bottom":
+                story.bottom_pin_widgets.append(create_widget(char.name, page, char.tag, widget_row, pin_drag_targets, stack))
+
+    if total_visible_widgets == 0:
+        print("No visible widgets found, adding default character widget")
+        
 
 
     # Catch nothing in main_pin but in other pins, so we move them to main pin
     if len(story.main_pin_widgets) == 0 and total_visible_widgets > 0:
         if len(story.top_pin_widgets) > 0: 
+            story.top_pin_widgets[0].pin_location="main"
             story.main_pin_widgets.append(story.top_pin_widgets[0])
         elif len(story.left_pin_widgets) > 0:
+            story.left_pin_widgets[0].pin_location="main"
             story.main_pin_widgets.append(story.left_pin_widgets[0])
         elif len(story.right_pin_widgets) > 0:
+            story.right_pin_widgets[0].pin_location="main"
             story.main_pin_widgets.append(story.right_pin_widgets[0])
         elif len(story.bottom_pin_widgets) > 0:
+            story.bottom_pin_widgets[0].pin_location="main"
             story.main_pin_widgets.append(story.bottom_pin_widgets[0])
             story.bottom_pin_widgets.pop(0)
         else:
@@ -240,7 +274,10 @@ def layout_widgets():
             if len(story.right_pin_widgets) > 0:
                 right_pin.width=default_pin_width
                 right_pin.controls.append(ft.Container(height=0))
-                right_pin.controls.extend(story.right_pin_widgets)
+                for widget in story.right_pin_widgets:
+                    if widget.visible:
+                        right_pin.controls.append(widget)
+                
                 right_pin.controls.append(ft.Container(height=0))
 
                 rpf.controls.append(right_pin)
@@ -249,7 +286,9 @@ def layout_widgets():
             # Format and load our top widgets
             if len(story.bottom_pin_widgets) > 0:
                 bottom_pin.height=default_pin_height
-                bottom_pin.controls.extend(story.bottom_pin_widgets)  # Add any widgets that were in the top pin list
+                for widget in story.bottom_pin_widgets:
+                    if widget.visible:
+                        bottom_pin.controls.append(widget)
 
                 # format and add our top pin
                 bpf.controls.append(bottom_pin)

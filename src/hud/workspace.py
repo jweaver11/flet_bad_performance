@@ -5,7 +5,7 @@ Formatted areas are: top pin, left pin, main work area, right pin, and bottom pi
 '''
 
 import flet as ft
-from handlers.layout_widgets import stack, widget_row, pin_drag_targets
+from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
 
 # Function to return our container for our widgets
