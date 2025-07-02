@@ -23,7 +23,7 @@ def characters_rail(page: ft.Page):
     def popout_on_click(e, name):
         # Show our widget
         for character in story.characters:
-            if character.name == name:
+            if character.title == name:
                 character.visible = True  # Set character visible
 
         render_widgets(page)
@@ -109,12 +109,12 @@ def characters_rail(page: ft.Page):
                 title=ft.TextButton(
                     expand=True, 
                     style=button_style,
-                    on_click=lambda e, name=character.name: print(name, "was clicked"),    # on click
+                    on_click=lambda e, name=character.title: print(name, "was clicked"),    # on click
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
                             ft.Text(
-                                character.name,
+                                character.title,
                                 max_lines=1,
                                 width=104,  # for when name longer than button
                                 overflow=ft.TextOverflow.CLIP,
@@ -127,9 +127,9 @@ def characters_rail(page: ft.Page):
                     icon_color=ft.Colors.GREY_400, 
                     tooltip="", 
                     items=[
-                        ft.PopupMenuItem(text="Popout", on_click=lambda e, name=character.name: popout_on_click(e, name)),
+                        ft.PopupMenuItem(text="Popout", on_click=lambda e, name=character.title: popout_on_click(e, name)),
                         ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.name: delete_on_click(e, name)),
+                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_on_click(e, name)),
                     ],
                 ),
             )

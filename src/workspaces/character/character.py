@@ -1,10 +1,12 @@
+from models.story import story
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):
-        self.name = name    # Name of our character
+        self.title = name    # Name of our character
         self.tag = "character"
         self.visible = True     # Widget active and visible = True
         self.pin_location = "bottom"
+        story.bottom_pin_obj.append(self)  # Add character to the bottom pin area by default
         
     # picture : ft.Image?
     age : int

@@ -65,7 +65,5 @@ def create_widget(title, body, page, widget_row, pin_drag_targets, stack):
         ])
     )
 
-    story.bottom_pin_widgets.append(widget_container)
-
     return widget_container
 

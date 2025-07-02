@@ -7,12 +7,12 @@ class Story:
     def __init__(self, title):
         self.title = title  # Title of story
 
-        # Hold our widgets in each pin area
-        self.top_pin_widgets = []
-        self.left_pin_widgets = []
-        self.main_pin_widgets = []
-        self.right_pin_widgets = []
-        self.bottom_pin_widgets = []
+        # Hold a copy of our story objects for rendering their widgets
+        self.top_pin_obj = []
+        self.left_pin_obj = []
+        self.main_pin_obj = []
+        self.right_pin_obj = []
+        self.bottom_pin_obj = []
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
