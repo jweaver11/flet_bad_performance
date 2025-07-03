@@ -39,7 +39,7 @@ def create_widget(obj, page):
         stack.update()
 
 
-    # Render body seperately, heder the same?
+    # When we render the body, we take from the 'body' attribute of the object, and the 'title'
 
     # Our container that returns the 'control' for the widget
     widget_container = ft.Container(

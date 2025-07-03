@@ -297,7 +297,46 @@ def render_widgets(page: ft.Page):
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
 
-    # Check if objects in pins are visible, add them to render if they are
+    main_vis_widgets = 0
+    # Check if objects in pins are visible, count them
+    for obj in story.main_pin_obj:
+        if obj.visible == True:
+            main_vis_widgets += 1
+
+    if main_vis_widgets == 0:  # If no widgets in main pin, steal from other pins
+        print("No widgets in main pin, stealing from other pins")
+        for obj in story.bottom_pin_obj:
+            if obj.visible == True:
+                # Append our widget from our pointer in the story.pin_location
+                story.main_pin_obj.append(obj)
+                story.bottom_pin_obj.remove(obj)
+                main_vis_widgets += 1
+                break
+    if main_vis_widgets == 0: 
+        for obj in story.top_pin_obj:
+            if obj.visible == True:
+                # Append our widget from our pointer in the story.pin_location
+                story.main_pin_obj.append(obj)
+                story.top_pin_obj.remove(obj)
+                main_vis_widgets += 1
+                break
+    if main_vis_widgets == 0:
+        for obj in story.left_pin_obj:
+            if obj.visible == True:
+                # Append our widget from our pointer in the story.pin_location
+                story.main_pin_obj.append(obj)
+                story.left_pin_obj.remove(obj)
+                main_vis_widgets += 1
+                break
+    if main_vis_widgets == 0:
+        for obj in story.right_pin_obj:
+            if obj.visible == True:
+                # Append our widget from our pointer in the story.pin_location
+                story.main_pin_obj.append(obj)
+                story.right_pin_obj.remove(obj)
+                main_vis_widgets += 1
+                break
+
     for obj in story.main_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
@@ -306,46 +345,31 @@ def render_widgets(page: ft.Page):
     # Bottom pin widgets. Order matters for which pin gets 'stolen' from to fill empty main pin
     for obj in story.bottom_pin_obj:
         if obj.visible == True:
-            # If main pin is empty, add it there, otherwise put it on bottom
-            if len(main_pin.controls) == 0:
-                main_pin.controls.append(obj.widget)
-                obj.pin_location = "main"
-            else:
-                # Append our widget from our pointer in the story.pin_location
-                bottom_pin.controls.append(obj.widget)
+            
+            # Append our widget from our pointer in the story.pin_location
+            bottom_pin.controls.append(obj.widget)
 
     # Top pin widgets
     for obj in story.top_pin_obj:
         if obj.visible == True:
-            # If main pin is empty, add it there, otherwise put it on bottom
-            if len(main_pin.controls) == 0:
-                main_pin.controls.append(obj.widget)
-                obj.pin_location = "main"
-            else:
-                # Append our widget from our pointer in the story.pin_location
-                top_pin.controls.append(obj.widget)
+            
+            # Append our widget from our pointer in the story.pin_location
+            top_pin.controls.append(obj.widget)
+        
 
     # left pin widgets
     for obj in story.left_pin_obj:
         if obj.visible == True:
-            # If main pin is empty, add it there, otherwise put it on bottom
-            if len(main_pin.controls) == 0:
-                main_pin.controls.append(obj.widget)
-                obj.pin_location = "main"
-            else:
-                # Append our widget from our pointer in the story.pin_location
-                left_pin.controls.append(obj.widget)
+            
+            # Append our widget from our pointer in the story.pin_location
+            left_pin.controls.append(obj.widget)
 
     # right pin widgets
     for obj in story.right_pin_obj:
         if obj.visible == True:
-            # If main pin is empty, add it there, otherwise put it on bottom
-            if len(main_pin.controls) == 0:
-                main_pin.controls.append(obj.widget)
-                obj.pin_location = "main"
-            else:
-                # Append our widget from our pointer in the story.pin_location
-                right_pin.controls.append(obj.widget)
+            
+            # Append our widget from our pointer in the story.pin_location
+            right_pin.controls.append(obj.widget)
 
 
     # Arrange our widgets into their pin locations
@@ -360,7 +384,7 @@ def render_widgets(page: ft.Page):
     print(f"story.bottom_pin_obj length:  {len(story.bottom_pin_obj)}")
 
 
-    # Format and load our widgets
+    # Format and render our widgets so they always look fancy on the page
     # If pin is empty, don't expand (hide it)
     if len(top_pin.controls) == 0:
         tpf.expand = False
@@ -380,6 +404,9 @@ def render_widgets(page: ft.Page):
         lpf.controls.append(ft.Container(width=10))
         lpf.controls.append(left_pin)
 
+    if len(main_pin.controls) == 0:
+        main_pin.controls.append(ft.Container(expand=True))
+
     if len(right_pin.controls) == 0:
         rpf.expand = False  
     else:
@@ -388,6 +415,10 @@ def render_widgets(page: ft.Page):
         right_pin.controls.append(ft.Container(width=10))
         rpf.controls.append(right_pin)
         rpf.controls.append(ft.Container(width=10))
+
+    if len(main_pin.controls) == 0:
+        main_pin.expand = False
+    
 
     if len(bottom_pin.controls) == 0:
         bpf.expand = False

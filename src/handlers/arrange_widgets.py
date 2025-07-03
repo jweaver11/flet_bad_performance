@@ -1,5 +1,4 @@
 from models.story import story
-import flet as ft
 
 def arrange_widgets():
     print("arrange widgets called")
