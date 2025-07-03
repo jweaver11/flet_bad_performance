@@ -13,7 +13,7 @@ def create_widget(obj, page):
     body = obj.body
 
     # Hides our widgets when x is clicked in top right
-    def hide_widget(e):
+    def hide_widget(obj):
 
         if pin_location == "bottom":
             for obj in story.bottom_pin_obj:
@@ -27,7 +27,7 @@ def create_widget(obj, page):
         render_widgets(page)
 
     def on_drag_start(e):
-        print("\ndrag start called")
+        print("\ndrag start called\n")
 
         stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
         stack.update()
@@ -54,6 +54,7 @@ def create_widget(obj, page):
                     controls=[ft.Draggable(
                         group="widgets",
                         content=ft.TextButton(title),
+                        data=obj,       # Pass our object as the data so we can access it
                         on_drag_start=on_drag_start,
                         on_drag_complete=on_drag_complete,)]
                 ),
@@ -61,7 +62,7 @@ def create_widget(obj, page):
                     alignment=ft.MainAxisAlignment.END,
                     controls=[
                         ft.IconButton(
-                            on_click=hide_widget,
+                            on_click=lambda e: hide_widget(obj),
                             icon=ft.Icons.CLOSE_ROUNDED
                 )])
             ]),

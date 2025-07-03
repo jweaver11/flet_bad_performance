@@ -1,5 +1,5 @@
-from models.story import story
 import flet as ft
+
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):
@@ -8,7 +8,6 @@ class Character:
         self.visible = True     # Widget active and visible = True
         self.pin_location = "bottom"
         self.widget = ft.Container()
-        story.bottom_pin_obj.append(self)  # Add character to the bottom pin area by default
         self.body = [ft.Text(" Character widget body")]  # ft list of controls to render rest of body
         
     # picture : ft.Image?

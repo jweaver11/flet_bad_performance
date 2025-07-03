@@ -10,6 +10,7 @@ from models.story import story
 from workspaces.character.character import Character
 from handlers.render_widgets import render_widgets
 from handlers.create_widget import create_widget
+from handlers.arrange_widgets import arrange_widgets
 
 
 def characters_rail(page: ft.Page):
@@ -19,6 +20,7 @@ def characters_rail(page: ft.Page):
 
     story.characters.append(Character("bob"))
     story.characters.append(Character("joe"))
+    arrange_widgets()  # Arrange our characters into their pin locations
     for char in story.characters:
         if char.title == "bob":
             char.widget = create_widget(char, page)
@@ -34,7 +36,6 @@ def characters_rail(page: ft.Page):
 
         render_widgets(page)
         page.update()
-        print("popout clicked")
         
     # When rename is clicked
     def rename_on_click(e):
@@ -44,12 +45,15 @@ def characters_rail(page: ft.Page):
     def delete_on_click(e, name):
         print("delete was run")
         for character in story.characters:
-            if character.name == name:
+            if character.title == name:
                 story.characters.remove(character)  # delete from characters list
+                if character in story.bottom_pin_obj:
+                    story.bottom_pin_obj.remove(character)
 
                 print(name, "was deleted")
         # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
+        arrange_widgets()     
         render_widgets(page)     # reload our workspace area
         page.update()
 
@@ -70,7 +74,11 @@ def characters_rail(page: ft.Page):
         if name:
             # Add our character to our stories character list, create a widget, and add it to widget list
             story.characters.append(Character(name))
-            reload_character_rail()    
+            for char in story.characters:
+                if char.title == name:
+                    char.widget = create_widget(char, page)
+            reload_character_rail()   
+            arrange_widgets() 
             render_widgets(page)  
             page.update()
         
@@ -197,6 +205,7 @@ def characters_rail(page: ft.Page):
         ),
     ]
     reload_character_rail() # called initially so characters loaded on launch
+    arrange_widgets()
     render_widgets(page) 
 
 

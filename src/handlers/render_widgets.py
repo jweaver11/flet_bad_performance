@@ -3,6 +3,8 @@ Layout our widgets whenever there is more than 2
 '''
 import flet as ft
 from models.story import story
+import json
+from handlers.arrange_widgets import arrange_widgets
 
 
 # Accept functions for each pin location
@@ -32,13 +34,40 @@ def left_pin_drag_accept(e):
     print("left pin accepted")
 
 def main_pin_drag_accept(e):
-    # We need our parent obj
-    # Change the pin_location string of object
-    # Move the reference obj in old pin location to this pin location
-    # Re-Render the widgets
+    # Change the pin location string of the object
+    # Call 'arrange_widgets'
 
-    e.control.content = ft.Row(height=default_pin_height)
-    e.control.update()
+    print("Raw e.data:", e.data, "\n")
+    # Data doesn't get passed correctly, so we need to parse it
+    # e.data is a JSON string, so parse it
+    event_data = json.loads(e.data)
+    src_id = event_data.get("src_id")
+    print("src_id:", src_id)
+    if src_id:
+        # Get the Draggable control by ID
+        obj = e.page.get_control(src_id)
+        if obj:
+            print("Draggable's data:", obj.data)
+            # Now you can use src_control.data["tag"], etc.
+        else:
+            print("Could not find control with src_id:", src_id)
+    else:
+        print("src_id not found in event data")
+    # Our 'obj' needs the data parameter to access inside of here now
+
+    print("\n", obj.data.title, "\n")
+    print("\n", obj.data.tag, "\n")
+    print("\n", obj.data.pin_location, "\n")
+
+    pl = obj.data.pin_location
+    if pl == "top" or pl == "left" or pl == "right" or pl == "bottom":
+        print("old pin location:", pl)
+        obj.data.pin_location = "main"
+        print("new pin location:", obj.data.pin_location)
+
+    arrange_widgets()
+    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
+
     print("main pin accepted")
 
 def right_pin_drag_accept(e):
@@ -47,6 +76,9 @@ def right_pin_drag_accept(e):
     print("right pin accepted")
 
 def bottom_pin_drag_accept(e):
+    # Change the pin location string of the object
+    # Call 'arrange_widgets'
+
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
     print("bottom pin accepted")
@@ -179,6 +211,7 @@ stack = ft.Stack(expand=True, controls=[widget_row])
 
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):
+    print("render_widgets called")
     
     # Render our pin areas for flet
     top_pin = ft.Row(spacing=10, controls=[])
@@ -192,44 +225,38 @@ def render_widgets(page: ft.Page):
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
 
-    # Store our rendered widgets somewhere so we can move them and reload them from here
-
     # Check if objects in pins are visible, add them to render if they are
     for obj in story.main_pin_obj:
         if obj.visible == True:
-            print("dog")
+            # Append our widget from our pointer in the story.pin_location
             main_pin.controls.append(obj.widget) 
 
     for obj in story.bottom_pin_obj:
         if obj.visible == True:
-            print("y")
-            bottom_pin.controls.append(obj.widget)
+            # If main pin is empty, add it there, otherwise put it on bottom
+            if len(main_pin.controls) == 0:
+                main_pin.controls.append(obj.widget)
+                obj.pin_location = "main"
+            else:
+                # Append our widget from our pointer in the story.pin_location
+                bottom_pin.controls.append(obj.widget)
+
+
+
+
+    arrange_widgets()  # Arrange our widgets into their pin locations
     
+
+
    
-    print(f"top pin widgets length: {len(story.top_pin_obj)}")
-    print(f"tp visible widgets len: {len(top_pin.controls)}")
-
-    print(f"Left pin widgets length: {len(story.left_pin_obj)}")
-    print(f"lp visible widgets len: {len(left_pin.controls)}")
-
-    print(f"main pin widgets length: {len(story.main_pin_obj)}")
-    print(f"mp visible widgets len: {len(main_pin.controls)}")
-
-    print(f"right pin widgets length: {len(story.right_pin_obj)}")
-    print(f"rp visible widgets len: {len(right_pin.controls)}")
-
-    print(f"num of objects instory.bottom_pin_obj {len(story.bottom_pin_obj)}")
-    print(f"bp visible widgets len: {len(bottom_pin.controls)}")
+    print(f"story.top_pin_obj length:  {len(story.top_pin_obj)}")
+    print(f"story.left_pin_obj length:  {len(story.left_pin_obj)}")
+    print(f"story.main_pin_obj length:  {len(story.main_pin_obj)}")
+    print(f"story.right_pin_obj length:  {len(story.right_pin_obj)}")
+    print(f"story.bottom_pin_obj length:  {len(story.bottom_pin_obj)}")
 
 
-    # Catch if no widgets in main pin. Must have at least 1 if there is at least 1 visible widget
-    if len(main_pin.controls) == 0:
-        if len(bottom_pin.controls) > 0:
-            print("main pin is empty replacing with different pin")
-            print("Stole widget from bottom_pin.controls")
-            main_pin.controls.append(bottom_pin.controls[0])
-            bottom_pin.controls.remove(bottom_pin.controls[0])  # Remove the first widget from the bottom pin
-
+    # Format and load our widgets
     # If pin is empty, don't expand (hide it)
     if len(bottom_pin.controls) == 0:
         bpf.expand = False
@@ -257,7 +284,6 @@ def render_widgets(page: ft.Page):
     ]
 
     page.update()
-    print("layout widgets done")
 
    
 '''

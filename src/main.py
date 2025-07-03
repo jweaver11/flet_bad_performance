@@ -9,7 +9,6 @@ from hud.menu_bar import create_menu_bar
 from hud.workspaces_rail import create_rails
 from hud.active_rail import create_active_rail
 from hud.workspace import create_workspace
-from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
@@ -28,7 +27,6 @@ def main(page: ft.Page):
     active_rail = create_active_rail(page)  # Render whichever rail is active
     workspace = create_workspace(page, story)  # render our workspace containing our widgets
 
-    
     # Save our 2 rails, dividers, and our workspace container in a row
     row = ft.Row(
         spacing=0,  # No space between elements
