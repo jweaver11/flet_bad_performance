@@ -17,29 +17,7 @@ def ib_drag_accept(e):
     print("ib drag target accepted")
 
 def top_pin_drag_accept(e):
-    #e.control.content = ft.Row(height=default_pin_height)
-    print(e.control.content)
-    for widget in story.widgets:
-        if widget.title == e.data:
-            story.top_pin_widgets.append(widget.control)
-
-
-    
-    e.control.update()
-    print("top pin accepted")
-
-def left_pin_drag_accept(e):
-    e.control.content = ft.Row(height=default_pin_height)
-    e.control.update()
-    print("left pin accepted")
-
-def main_pin_drag_accept(e):
-    # Change the pin location string of the object
-    # Call 'arrange_widgets'
-
-    print("Raw e.data:", e.data, "\n")
-    # Data doesn't get passed correctly, so we need to parse it
-    # e.data is a JSON string, so parse it
+    # e.data is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     print("src_id:", src_id)
@@ -53,32 +31,126 @@ def main_pin_drag_accept(e):
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
+
     # Our 'obj' needs the data parameter to access inside of here now
-
-    print("\n", obj.data.title, "\n")
-    print("\n", obj.data.tag, "\n")
-    print("\n", obj.data.pin_location, "\n")
-
+    # Check our pin location, and set it to correct pin
     pl = obj.data.pin_location
-    if pl == "top" or pl == "left" or pl == "right" or pl == "bottom":
-        print("old pin location:", pl)
-        obj.data.pin_location = "main"
-        print("new pin location:", obj.data.pin_location)
+    if pl == "left" or pl == "main" or pl == "right" or pl == "bottom":
+        obj.data.pin_location = "top"
 
     arrange_widgets()
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("top pin accepted")
 
+def left_pin_drag_accept(e):
+    # e.data is a JSON string, so we have to parse it
+    event_data = json.loads(e.data)
+    src_id = event_data.get("src_id")
+    print("src_id:", src_id)
+    if src_id:
+        # Get the Draggable control by ID
+        obj = e.page.get_control(src_id)
+        if obj:
+            print("Draggable's data:", obj.data)
+            # Now you can use src_control.data["tag"], etc.
+        else:
+            print("Could not find control with src_id:", src_id)
+    else:
+        print("src_id not found in event data")
+
+    # Our 'obj' needs the data parameter to access inside of here now
+    # Check our pin location, and set it to correct pin
+    pl = obj.data.pin_location
+    if pl == "top" or pl == "main" or pl == "right" or pl == "bottom":
+        obj.data.pin_location = "left"
+
+    arrange_widgets()
+    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
+    print("left pin accepted")
+
+def main_pin_drag_accept(e):
+    # e.data is a JSON string, so we have to parse it
+    event_data = json.loads(e.data)
+    src_id = event_data.get("src_id")
+    print("src_id:", src_id)
+    if src_id:
+        # Get the Draggable control by ID
+        obj = e.page.get_control(src_id)
+        if obj:
+            print("Draggable's data:", obj.data)
+            # Now you can use src_control.data["tag"], etc.
+        else:
+            print("Could not find control with src_id:", src_id)
+    else:
+        print("src_id not found in event data")
+
+    pl = obj.data.pin_location
+    if pl == "top" or pl == "left" or pl == "right" or pl == "bottom":
+        obj.data.pin_location = "main"
+
+    arrange_widgets()
+    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
+    e.control.content = ft.Row(height=default_pin_height)
+    e.control.update()
     print("main pin accepted")
 
+
+
 def right_pin_drag_accept(e):
+    # e.data is a JSON string, so we have to parse it
+    event_data = json.loads(e.data)
+    src_id = event_data.get("src_id")
+    print("src_id:", src_id)
+    if src_id:
+        # Get the Draggable control by ID
+        obj = e.page.get_control(src_id)
+        if obj:
+            print("Draggable's data:", obj.data)
+            # Now you can use src_control.data["tag"], etc.
+        else:
+            print("Could not find control with src_id:", src_id)
+    else:
+        print("src_id not found in event data")
+
+    # Our 'obj' needs the data parameter to access inside of here now
+    # Check our pin location, and set it to correct pin
+    pl = obj.data.pin_location
+    if pl == "top" or pl == "left" or pl == "main" or pl == "bottom":
+        obj.data.pin_location = "right"
+
+    arrange_widgets()
+    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
     print("right pin accepted")
 
 def bottom_pin_drag_accept(e):
-    # Change the pin location string of the object
-    # Call 'arrange_widgets'
+    # e.data is a JSON string, so we have to parse it
+    event_data = json.loads(e.data)
+    src_id = event_data.get("src_id")
+    print("src_id:", src_id)
+    if src_id:
+        # Get the Draggable control by ID
+        obj = e.page.get_control(src_id)
+        if obj:
+            print("Draggable's data:", obj.data)
+            # Now you can use src_control.data["tag"], etc.
+        else:
+            print("Could not find control with src_id:", src_id)
+    else:
+        print("src_id not found in event data")
 
+    # Our 'obj' needs the data parameter to access inside of here now
+    pl = obj.data.pin_location
+    if pl == "top" or pl == "left" or pl == "main" or pl == "right":
+        obj.data.pin_location = "bottom"
+
+    arrange_widgets()
+    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
     print("bottom pin accepted")
@@ -231,6 +303,7 @@ def render_widgets(page: ft.Page):
             # Append our widget from our pointer in the story.pin_location
             main_pin.controls.append(obj.widget) 
 
+    # Bottom pin widgets. Order matters for which pin gets 'stolen' from to fill empty main pin
     for obj in story.bottom_pin_obj:
         if obj.visible == True:
             # If main pin is empty, add it there, otherwise put it on bottom
@@ -241,13 +314,44 @@ def render_widgets(page: ft.Page):
                 # Append our widget from our pointer in the story.pin_location
                 bottom_pin.controls.append(obj.widget)
 
+    # Top pin widgets
+    for obj in story.top_pin_obj:
+        if obj.visible == True:
+            # If main pin is empty, add it there, otherwise put it on bottom
+            if len(main_pin.controls) == 0:
+                main_pin.controls.append(obj.widget)
+                obj.pin_location = "main"
+            else:
+                # Append our widget from our pointer in the story.pin_location
+                top_pin.controls.append(obj.widget)
+
+    # left pin widgets
+    for obj in story.left_pin_obj:
+        if obj.visible == True:
+            # If main pin is empty, add it there, otherwise put it on bottom
+            if len(main_pin.controls) == 0:
+                main_pin.controls.append(obj.widget)
+                obj.pin_location = "main"
+            else:
+                # Append our widget from our pointer in the story.pin_location
+                left_pin.controls.append(obj.widget)
+
+    # right pin widgets
+    for obj in story.right_pin_obj:
+        if obj.visible == True:
+            # If main pin is empty, add it there, otherwise put it on bottom
+            if len(main_pin.controls) == 0:
+                main_pin.controls.append(obj.widget)
+                obj.pin_location = "main"
+            else:
+                # Append our widget from our pointer in the story.pin_location
+                right_pin.controls.append(obj.widget)
 
 
-
-    arrange_widgets()  # Arrange our widgets into their pin locations
+    # Arrange our widgets into their pin locations
+    arrange_widgets() # Only needs to run if main widget was empty catch occurs ^
+    # Otherwise this is uneccessary
     
-
-
    
     print(f"story.top_pin_obj length:  {len(story.top_pin_obj)}")
     print(f"story.left_pin_obj length:  {len(story.left_pin_obj)}")
@@ -258,6 +362,33 @@ def render_widgets(page: ft.Page):
 
     # Format and load our widgets
     # If pin is empty, don't expand (hide it)
+    if len(top_pin.controls) == 0:
+        tpf.expand = False
+    else:
+        # format and add our top pin
+        top_pin.height=default_pin_height
+
+        tpf.controls.append(ft.Container(height=10)) 
+        tpf.controls.append(top_pin)  
+
+    if len(left_pin.controls) == 0:
+        lpf.expand = False
+    else:
+        left_pin.width=default_pin_width
+        left_pin.controls.insert(0, ft.Container(width=10))  # Add spacing to left pin
+        left_pin.controls.append(ft.Container(width=10))  # Add spacing to left pin
+        lpf.controls.append(ft.Container(width=10))
+        lpf.controls.append(left_pin)
+
+    if len(right_pin.controls) == 0:
+        rpf.expand = False  
+    else:
+        right_pin.width=default_pin_width
+        right_pin.controls.insert(0, ft.Container(width=10))
+        right_pin.controls.append(ft.Container(width=10))
+        rpf.controls.append(right_pin)
+        rpf.controls.append(ft.Container(width=10))
+
     if len(bottom_pin.controls) == 0:
         bpf.expand = False
     else:
@@ -287,18 +418,11 @@ def render_widgets(page: ft.Page):
 
    
 '''
-    if len(story.main_pin_widgets) >= 1:
-        for widget in story.main_pin_widgets:
-            main_pin.controls.append(widget)  # Add the control to the main work area
+   
+            
+        
 
-        # Format and load our top widgets
-        if len(story.top_pin_widgets) > 0:
-            top_pin.height=default_pin_height
-            top_pin.controls.extend(story.top_pin_widgets)  # Add any widgets that were in the top pin list
 
-            # format and add our top pin
-            tpf.controls.append(ft.Container(height=10))
-            tpf.controls.append(top_pin)
 
         # Format and load our left pin widgets
         if len(story.left_pin_widgets) > 0:
