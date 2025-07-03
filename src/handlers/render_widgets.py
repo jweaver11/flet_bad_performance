@@ -3,7 +3,6 @@ Layout our widgets whenever there is more than 2
 '''
 import flet as ft
 from models.story import story
-from handlers.create_widget import create_widget
 
 
 # Accept functions for each pin location
@@ -33,6 +32,11 @@ def left_pin_drag_accept(e):
     print("left pin accepted")
 
 def main_pin_drag_accept(e):
+    # We need our parent obj
+    # Change the pin_location string of object
+    # Move the reference obj in old pin location to this pin location
+    # Re-Render the widgets
+
     e.control.content = ft.Row(height=default_pin_height)
     e.control.update()
     print("main pin accepted")
@@ -187,14 +191,19 @@ def render_widgets(page: ft.Page):
     bottom_pin = ft.Row(spacing=10, controls=[])
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
+
+    # Store our rendered widgets somewhere so we can move them and reload them from here
+
     # Check if objects in pins are visible, add them to render if they are
     for obj in story.main_pin_obj:
         if obj.visible == True:
-            main_pin.controls.append(create_widget(obj.title, page, obj.tag, widget_row, pin_drag_targets, stack)) 
+            print("dog")
+            main_pin.controls.append(obj.widget) 
 
     for obj in story.bottom_pin_obj:
         if obj.visible == True:
-            bottom_pin.controls.append(create_widget(obj.title, page, obj.tag, widget_row, pin_drag_targets, stack))
+            print("y")
+            bottom_pin.controls.append(obj.widget)
     
    
     print(f"top pin widgets length: {len(story.top_pin_obj)}")
@@ -211,14 +220,15 @@ def render_widgets(page: ft.Page):
 
     print(f"num of objects instory.bottom_pin_obj {len(story.bottom_pin_obj)}")
     print(f"bp visible widgets len: {len(bottom_pin.controls)}")
-    
+
 
     # Catch if no widgets in main pin. Must have at least 1 if there is at least 1 visible widget
     if len(main_pin.controls) == 0:
-        print("main pin is empty, catching error")
-        print("Stole widget from bottom_pin.controls")
-        main_pin.controls.append(bottom_pin.controls[0])
-        bottom_pin.controls.remove(bottom_pin.controls[0])  # Remove the first widget from the bottom pin
+        if len(bottom_pin.controls) > 0:
+            print("main pin is empty replacing with different pin")
+            print("Stole widget from bottom_pin.controls")
+            main_pin.controls.append(bottom_pin.controls[0])
+            bottom_pin.controls.remove(bottom_pin.controls[0])  # Remove the first widget from the bottom pin
 
     # If pin is empty, don't expand (hide it)
     if len(bottom_pin.controls) == 0:
@@ -246,7 +256,7 @@ def render_widgets(page: ft.Page):
         rpf,    # formatted right pin
     ]
 
-
+    page.update()
     print("layout widgets done")
 
    

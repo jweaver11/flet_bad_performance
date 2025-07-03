@@ -1,22 +1,30 @@
 import flet as ft
-from models.story import story 
+from models.story import story
+from handlers.render_widgets import render_widgets, widget_row, pin_drag_targets, stack
 
 
-# Creates our new widget. All widgets fit into this standard format
-def create_widget(title, body, page, widget_row, pin_drag_targets, stack):
+# Creates our widget from passing in the object, page, and formatting
+def create_widget(obj, page):
 
-    body = [ft.Text("character widget body")]
+    title = obj.title
+    tag = obj.tag
+    pin_location = obj.pin_location
+
+    body = obj.body
 
     # Hides our widgets when x is clicked in top right
     def hide_widget(e):
 
-        # Grab our widgets dict from story object
-        for widget in story.widgets:
-            if widget.title == title:
-                widget.visible = False
-                print(title, " Widget is now hidden")
-                
+        if pin_location == "bottom":
+            for obj in story.bottom_pin_obj:
+                if obj.title == title:
+                    obj.visible = False
+                    print(title, " is visible: ", obj.visible)
+
+        
+        # elif dif pin locatin...
         page.update()
+        render_widgets(page)
 
     def on_drag_start(e):
         print("\ndrag start called")

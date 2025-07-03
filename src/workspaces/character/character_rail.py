@@ -9,6 +9,7 @@ from workspaces.character.character_styles import button_style
 from models.story import story
 from workspaces.character.character import Character
 from handlers.render_widgets import render_widgets
+from handlers.create_widget import create_widget
 
 
 def characters_rail(page: ft.Page):
@@ -18,6 +19,11 @@ def characters_rail(page: ft.Page):
 
     story.characters.append(Character("bob"))
     story.characters.append(Character("joe"))
+    for char in story.characters:
+        if char.title == "bob":
+            char.widget = create_widget(char, page)
+        if char.title == "joe":
+            char.widget = create_widget(char, page)
         
     # When popout is clicked
     def popout_on_click(e, name):
