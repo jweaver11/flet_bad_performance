@@ -7,6 +7,8 @@ from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
 def create_rails(page: ft.Page):
 
+    is_reorderable = False  # Flag to check if we are in reorder mode
+
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
         # controls which of our nav rails r selected and which active workspace rail we use
@@ -122,17 +124,31 @@ def create_rails(page: ft.Page):
         # Update the ReorderableListView's controls
         all_workspaces_rail.controls = rail_controls
         page.update()
- 
 
-    # Sets all wrkspaces rail as a reordable list view so
-    # we can drag them and re-order them
-    all_workspaces_rail = ft.ReorderableListView(
-        on_reorder=handle_reorder,
-        controls=rail_controls,
-    )
+    all_workspaces_rail = ft.Column(spacing = 0, controls=rail_controls)
 
-    def add_workspace(e):
-        print("Add Workspace Button clicked")
+
+    def make_reorderable():
+        
+        nonlocal is_reorderable, all_workspaces_rail
+
+        print("is_reorderable before: ", is_reorderable) 
+        is_reorderable = not is_reorderable
+        print("is_reorderable after: ", is_reorderable)
+
+        if is_reorderable:
+            print("true called")
+            all_workspaces_rail = ft.ReorderableListView(
+                on_reorder=handle_reorder,
+                controls=rail_controls,
+            )
+        else:
+            print("false called")
+            all_workspaces_rail = ft.Column(spacing = 0, controls=rail_controls)
+
+        all_workspaces_rail_container.content.controls[0] = all_workspaces_rail
+        page.update()
+        print("Reorder workspaces clicked")
 
     
     # Container for all available workspaces. On left most side of page
@@ -146,12 +162,10 @@ def create_rails(page: ft.Page):
             controls=[
                 all_workspaces_rail,
                 ft.Container(expand=True),
-                ft.TextButton(
-                    icon=ft.Icons.ADD_CIRCLE_ROUNDED, 
-                    text="Workspace", 
-                    on_click=add_workspace,
+                ft.TextButton( 
+                    text="Reorder", 
+                    on_click=lambda e: make_reorderable(),
                 ),
-                
             ]
         ),
     )

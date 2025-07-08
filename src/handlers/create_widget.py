@@ -7,10 +7,8 @@ from handlers.arrange_widgets import arrange_widgets
 # Creates our widget from passing in the object, page, and formatting
 def create_widget(obj, page):
 
+    # Sets our initial title and body from the object
     title = obj.title
-    tag = obj.tag
-    pin_location = obj.pin_location
-
     body = obj.body
 
     # Hides our widgets when x is clicked in top right
