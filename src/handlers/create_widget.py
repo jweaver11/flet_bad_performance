@@ -1,6 +1,7 @@
 import flet as ft
 from models.story import story
 from handlers.render_widgets import render_widgets, widget_row, pin_drag_targets, stack
+from handlers.arrange_widgets import arrange_widgets
 
 
 # Creates our widget from passing in the object, page, and formatting
@@ -15,7 +16,34 @@ def create_widget(obj, page):
     # Hides our widgets when x is clicked in top right
     def hide_widget(obj):
 
-        if pin_location == "bottom":
+
+        print("pin location: ", obj.pin_location)
+
+        if obj.pin_location == "top":
+            for obj in story.top_pin_obj:
+                if obj.title == title:
+                    obj.visible = False
+                    print(title, " is visible: ", obj.visible)
+
+        if obj.pin_location == "left":
+            for obj in story.left_pin_obj:
+                if obj.title == title:
+                    obj.visible = False
+                    print(title, " is visible: ", obj.visible)
+
+        if obj.pin_location == "main":
+            for obj in story.main_pin_obj:
+                if obj.title == title:
+                    obj.visible = False
+                    print(title, " is visible: ", obj.visible)
+                
+        if obj.pin_location == "right":
+            for obj in story.right_pin_obj:
+                if obj.title == title:
+                    obj.visible = False
+                    print(title, " is visible: ", obj.visible)
+
+        if obj.pin_location == "bottom":
             for obj in story.bottom_pin_obj:
                 if obj.title == title:
                     obj.visible = False
@@ -23,8 +51,9 @@ def create_widget(obj, page):
 
         
         # elif dif pin locatin...
-        page.update()
+        arrange_widgets()  # Re-arrange widgets after hiding one
         render_widgets(page)
+        page.update()
 
     def on_drag_start(e):
         print("\ndrag start called\n")

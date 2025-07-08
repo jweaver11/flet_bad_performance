@@ -99,7 +99,6 @@ def main_pin_drag_accept(e):
     print("main pin accepted")
 
 
-
 def right_pin_drag_accept(e):
     # e.data is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
@@ -297,79 +296,30 @@ def render_widgets(page: ft.Page):
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
 
-    main_vis_widgets = 0
-    # Check if objects in pins are visible, count them
-    for obj in story.main_pin_obj:
+    # Top pin widgets
+    for obj in story.top_pin_obj:
         if obj.visible == True:
-            main_vis_widgets += 1
-
-    if main_vis_widgets == 0:  # If no widgets in main pin, steal from other pins
-        print("No widgets in main pin, stealing from other pins")
-        for obj in story.bottom_pin_obj:
-            if obj.visible == True:
-                # Append our widget from our pointer in the story.pin_location
-                story.main_pin_obj.append(obj)
-                story.bottom_pin_obj.remove(obj)
-                main_vis_widgets += 1
-                break
-    if main_vis_widgets == 0: 
-        for obj in story.top_pin_obj:
-            if obj.visible == True:
-                # Append our widget from our pointer in the story.pin_location
-                story.main_pin_obj.append(obj)
-                story.top_pin_obj.remove(obj)
-                main_vis_widgets += 1
-                break
-    if main_vis_widgets == 0:
-        for obj in story.left_pin_obj:
-            if obj.visible == True:
-                # Append our widget from our pointer in the story.pin_location
-                story.main_pin_obj.append(obj)
-                story.left_pin_obj.remove(obj)
-                main_vis_widgets += 1
-                break
-    if main_vis_widgets == 0:
-        for obj in story.right_pin_obj:
-            if obj.visible == True:
-                # Append our widget from our pointer in the story.pin_location
-                story.main_pin_obj.append(obj)
-                story.right_pin_obj.remove(obj)
-                main_vis_widgets += 1
-                break
-
+            # Append our widget from our pointer in the story.pin_location
+            top_pin.controls.append(obj.widget)
+    # left pin widgets
+    for obj in story.left_pin_obj:
+        if obj.visible == True:
+            # Append our widget from our pointer in the story.pin_location
+            left_pin.controls.append(obj.widget)
     for obj in story.main_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
             main_pin.controls.append(obj.widget) 
-
-    # Bottom pin widgets. Order matters for which pin gets 'stolen' from to fill empty main pin
-    for obj in story.bottom_pin_obj:
-        if obj.visible == True:
-            
-            # Append our widget from our pointer in the story.pin_location
-            bottom_pin.controls.append(obj.widget)
-
-    # Top pin widgets
-    for obj in story.top_pin_obj:
-        if obj.visible == True:
-            
-            # Append our widget from our pointer in the story.pin_location
-            top_pin.controls.append(obj.widget)
-        
-
-    # left pin widgets
-    for obj in story.left_pin_obj:
-        if obj.visible == True:
-            
-            # Append our widget from our pointer in the story.pin_location
-            left_pin.controls.append(obj.widget)
-
     # right pin widgets
     for obj in story.right_pin_obj:
         if obj.visible == True:
-            
             # Append our widget from our pointer in the story.pin_location
             right_pin.controls.append(obj.widget)
+    # Bottom pin widgets. Order matters for which pin gets 'stolen' from to fill empty main pin
+    for obj in story.bottom_pin_obj:
+        if obj.visible == True:
+            # Append our widget from our pointer in the story.pin_location
+            bottom_pin.controls.append(obj.widget)
 
 
     # Arrange our widgets into their pin locations
@@ -378,10 +328,15 @@ def render_widgets(page: ft.Page):
     
    
     print(f"story.top_pin_obj length:  {len(story.top_pin_obj)}")
+    print(f"visible widgets:    {len(top_pin.controls)} \n")
     print(f"story.left_pin_obj length:  {len(story.left_pin_obj)}")
+    print(f"visible widgets:    {len(left_pin.controls)} \n")
     print(f"story.main_pin_obj length:  {len(story.main_pin_obj)}")
+    print(f"visible widgets:    {len(main_pin.controls)} \n")
     print(f"story.right_pin_obj length:  {len(story.right_pin_obj)}")
+    print(f"visible widgets:    {len(right_pin.controls)} \n")
     print(f"story.bottom_pin_obj length:  {len(story.bottom_pin_obj)}")
+    print(f"visible widgets:    {len(bottom_pin.controls)} \n")
 
 
     # Format and render our widgets so they always look fancy on the page
@@ -446,48 +401,3 @@ def render_widgets(page: ft.Page):
     ]
 
     page.update()
-
-   
-'''
-   
-            
-        
-
-
-
-        # Format and load our left pin widgets
-        if len(story.left_pin_widgets) > 0:
-            left_pin.width=default_pin_width
-            left_pin.controls.append(ft.Container(height=0))
-            left_pin.controls.extend(story.left_pin_widgets)
-            left_pin.controls.append(ft.Container(height=0))
-
-            lpf.controls.append(ft.Container(width=10))
-            lpf.controls.append(left_pin)
-
-
-        # Format and load our left pin widgets
-        if len(story.right_pin_widgets) > 0:
-            right_pin.width=default_pin_width
-            right_pin.controls.append(ft.Container(height=0))
-            for widget in story.right_pin_widgets:
-                if widget.visible:
-                    right_pin.controls.append(widget)
-            
-            right_pin.controls.append(ft.Container(height=0))
-
-            rpf.controls.append(right_pin)
-            rpf.controls.append(ft.Container(width=10))
-
-        # Format and load our top widgets
-        if len(story.bottom_pin_widgets) > 0:
-            bottom_pin.height=default_pin_height
-            for widget in story.bottom_pin_widgets:
-                if widget.visible:
-                    bottom_pin.controls.append(widget)
-
-            # format and add our top pin
-            bpf.controls.append(bottom_pin)
-            bpf.controls.append(ft.Container(height=10))
-                         
-        '''

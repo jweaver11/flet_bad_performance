@@ -29,6 +29,3 @@ class Story:
     # Other workspaces??
 
 story = Story("Story Title") 
-
-# We need to check if there are more than 1 visible widgets in main pin,
-# if yes, we can move it out, otherwise don't move it

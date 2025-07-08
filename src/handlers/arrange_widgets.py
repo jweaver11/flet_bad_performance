@@ -3,8 +3,6 @@ from models.story import story
 def arrange_widgets():
     print("arrange widgets called")
 
-    print(len(story.characters), " characters in story")
-
     for char in story.characters:   # Run through our objects in story
         # Add them to their pin location list if not already there
         if char.pin_location == "top" and char not in story.top_pin_obj:   

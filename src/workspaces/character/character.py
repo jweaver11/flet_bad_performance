@@ -6,7 +6,7 @@ class Character:
         self.title = name    # Name of our character
         self.tag = "character"
         self.visible = True     # Widget active and visible = True
-        self.pin_location = "bottom"
+        self.pin_location = "main"
         self.widget = ft.Container()
         self.body = [ft.Text(" Character widget body")]  # ft list of controls to render rest of body
         
