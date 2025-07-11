@@ -73,10 +73,9 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             # Add our character to our stories character list, create a widget, and add it to widget list
-            story.characters.append(Character(name))
-            for char in story.characters:
-                if char.title == name:
-                    char.widget = create_widget(char, page)
+            c = Character(name)  # Create a new character object
+            c.widget = create_widget(c, page)
+            story.characters.append(c)
             reload_character_rail()   
             arrange_widgets() 
             render_widgets(page)  

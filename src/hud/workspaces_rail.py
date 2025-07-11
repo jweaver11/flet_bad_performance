@@ -7,6 +7,7 @@ from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
 def create_rails(page: ft.Page):
 
+    is_reorderable = False  # Flag to check if we are in reorder mode
     is_collapsed = False
 
     # Change rail depending on which workspace is selected
@@ -131,11 +132,41 @@ def create_rails(page: ft.Page):
         controls=rail_controls
     )
 
-    # Collapse the rail to just icons, no labels
-    def collapse(e):
-
-        nonlocal is_collapsed, r0, r1, r2, r3, r4, r5
+    # Toggle is reorderable or not
+    def make_reorderable(e):
         
+        nonlocal is_reorderable, all_workspaces_rail, is_collapsed
+
+        if is_collapsed:
+            return
+        else:
+            print("is_reorderable before: ", is_reorderable) 
+            is_reorderable = not is_reorderable
+            print("is_reorderable after: ", is_reorderable)
+
+            if is_reorderable:
+                print("true called")
+                all_workspaces_rail = ft.ReorderableListView(
+                    on_reorder=handle_reorder,
+                    controls=rail_controls,
+                )
+            else:
+                print("false called")
+                all_workspaces_rail = ft.Column(
+                    spacing=0, 
+                    alignment=ft.alignment.center,
+                    controls=rail_controls
+                )
+
+            all_workspaces_rail_container.content.controls[0] = all_workspaces_rail
+            page.update()
+
+    def collapse(e):
+        print("collapse called")
+        nonlocal is_collapsed, is_reorderable, r0, r1, r2, r3, r4, r5
+
+        if is_reorderable:
+            make_reorderable(e)
 
         is_collapsed = not is_collapsed
 
@@ -148,7 +179,7 @@ def create_rails(page: ft.Page):
             r5.destinations[0].label = None
             all_workspaces_rail_container.width = 50
             dt.content.width = 50
-    
+            print("awrc width: ", all_workspaces_rail_container.width)
             all_workspaces_rail_container.content.controls = [
                 all_workspaces_rail,
                 ft.Container(expand=True, width=50),
@@ -169,6 +200,10 @@ def create_rails(page: ft.Page):
             all_workspaces_rail_container.content.controls = [
                 all_workspaces_rail,
                 ft.Container(expand=True),
+                ft.TextButton( 
+                    text="Reorder", 
+                    on_click=make_reorderable,
+                ),
                 ft.Row(spacing=0, controls=[
                     ft.Container(expand=True),
                     ft.IconButton(
@@ -195,6 +230,10 @@ def create_rails(page: ft.Page):
             controls=[
                 all_workspaces_rail,
                 ft.Container(expand=True),
+                ft.TextButton( 
+                    text="Reorder", 
+                    on_click=make_reorderable,
+                ),
                 ft.Row(spacing=0, controls=[
                     ft.Container(expand=True),
                     ft.IconButton(
