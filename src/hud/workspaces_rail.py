@@ -230,10 +230,6 @@ def create_rails(page: ft.Page):
             controls=[
                 all_workspaces_rail,
                 ft.Container(expand=True),
-                ft.TextButton( 
-                    text="Reorder", 
-                    on_click=make_reorderable,
-                ),
                 ft.Row(spacing=0, controls=[
                     ft.Container(expand=True),
                     ft.IconButton(

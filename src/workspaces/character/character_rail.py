@@ -22,9 +22,9 @@ def characters_rail(page: ft.Page):
     story.characters.append(Character("joe"))
     arrange_widgets()  # Arrange our characters into their pin locations
     for char in story.characters:
-        if char.title == "bob":
+        if char.data['title'] == "bob":
             char.widget = create_widget(char, page)
-        if char.title == "joe":
+        if char.data['title'] == "joe":
             char.widget = create_widget(char, page)
         
     # When popout is clicked
@@ -73,7 +73,7 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             # Add our character to our stories character list, create a widget, and add it to widget list
-            c = Character(name)  # Create a new character object
+            c = Character(name)  # Create a new character object and its widget
             c.widget = create_widget(c, page)
             story.characters.append(c)
             reload_character_rail()   
@@ -90,7 +90,7 @@ def characters_rail(page: ft.Page):
         button_ref.current.visible = True
         button_ref.current.update()
         page.update()
-
+ 
     # When textbox is clicked off and nothing in it, reset to button
     def on_textfield_deselect(e):
         name = textfield_ref.current.value
@@ -122,12 +122,12 @@ def characters_rail(page: ft.Page):
                 title=ft.TextButton(
                     expand=True, 
                     style=button_style,
-                    on_click=lambda e, name=character.title: print(name, "was clicked"),    # on click
+                    on_click=lambda e, name=character.data['title']: print(name, "was clicked"),    # on click
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
                             ft.Text(
-                                character.title,
+                                character.data['title'],
                                 max_lines=1,
                                 width=104,  # for when name longer than button
                                 overflow=ft.TextOverflow.CLIP,
@@ -140,9 +140,9 @@ def characters_rail(page: ft.Page):
                     icon_color=ft.Colors.GREY_400, 
                     tooltip="", 
                     items=[
-                        ft.PopupMenuItem(text="Popout", on_click=lambda e, name=character.title: popout_on_click(e, name)),
+                        ft.PopupMenuItem(text="Popout", on_click=lambda e, name=character.data['title']: popout_on_click(e, name)),
                         ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_on_click(e, name)),
+                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.data['title']: delete_on_click(e, name)),
                     ],
                 ),
             )

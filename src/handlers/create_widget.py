@@ -8,7 +8,7 @@ from handlers.arrange_widgets import arrange_widgets
 def create_widget(obj, page):
 
     # Sets our initial title and body from the object
-    title = obj.title
+    title = obj.data['title']
     body = obj.body
 
     # Hides our widgets when x is clicked in top right
