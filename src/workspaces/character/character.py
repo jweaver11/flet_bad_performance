@@ -3,135 +3,96 @@ import flet as ft
 # Class for each character. Requires passing in a name
 class Character:
     def __init__(self, name):
+        self.title = name  # Title of the character, used for identifier so all data objects have a title
         self.tag = "character"  # Tag for logic
-        self.data = {
-            'title': name,
-            'age': "",
-        }
-
-        # How elements of our classes are stored in order to be rendered.
-        # - Data variable itself
-        # - An update method so controls can update the data directly
-        # - Controls to render the data in the widget list
-        self.age = ""
-        def update_age(e):
-            self.age = e.control.value
-            print("Age updated to: ", self.age)
-        self.age_controls = [
-            ft.TextField(
-                label="Age",
-                hint_text="Age",
-                value=self.age,
-                width=200,
-                multiline=True,
-                on_change=update_age,
-            ),
-        ]
-
-        self.family = {'Father': "", 'Mother': ""}
-                       #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []}
-        def update_parents(e):
-            self.parents[e.control.label] = e.control.value
-            print("Parents updated to: ", self.parents)
-        def create_parents_control():
-            control = ft.TextField(
-                    label="Father", # key
-                    hint_text="Father", # key
-                    value=self.age, # data
-                    width=200,
-                    multiline=True,
-                    on_change=update_parents,
-                ),
-            return control 
-        self.family_controls = [
-            ft.Row([
-                ft.Text("Family"),
-                ft.TextField(
-                    label="Father",
-                    hint_text="Father",
-                    value=self.age,
-                    width=200,
-                    multiline=True,
-                    on_change=update_parents,
-                ),
-                ft.TextField(
-                    label="Mother",
-                    hint_text="Mother",
-                    value=self.age,
-                    width=200,
-                    multiline=True,
-                    on_change=update_parents,
-                )
-            ]),
-        ]
-        
-
-        self.occupation = ""
-
-        self.goals = ""
-
-        self.physical_description = [
-            # hair color, eye color, height, weight, etc.
-        ]
-
-        self.personality = ""
-
-        self.backstory = ""
-
-        self.abilities = {}
-
-        self.notes = ""
-        def update_notes(e):
-            self.notes = e.control.value
-            print("Notes updated to: ", self.notes)
-        self.notes_controls = [
-            ft.TextField(
-                label="Notes",
-                hint_text="Notes",
-                value=self.notes,
-                width=200,
-                multiline=True,
-                on_change=update_notes,
-            ),
-        ]
-
-    
-        def add_data(e):
-            self.data["data_key"] = "data_value"
-            print("Data added: ", self.data)
-
 
         self.visible = True     # Widget active and visible = True
         self.pin_location = "main"  # Start in main pin location
         self.widget = ft.Container()    # Set our widget as a flet container to hold the body
-        # Body is a list of controls that use the object's data
+        
         self.body = []  # flet list of controls to render rest of body
+
+        # These 3 outside of data so they can render differently
+        self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
+        self.age = ""
+        self.sex = ""    # Add selecteble male, female, other - custom write in
+
+        self.data = {
+            'Family': {'Father': "", 'Mother': ""}, #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
+            'Occupation': "",
+            'Goals': "",
+            'Origin': {
+                'Birthplace': "",
+                'Birth Date': "",
+                'Hometown': "",
+                'Education': "",
+            },
+            'Physical Description': {
+                'Hair Color': "",
+                'Eye Color': "",
+                'Height': "",
+                'Weight': "",
+                'Build': "",
+                'Distinguishing Features': "",
+            },
+            'Personality': "",
+            'Backstory': "",
+            'Abilities': "",
+            'Notes' : "",
+        }
+
+        # Pass in our control and type of data
+        def update_data(e, type):
+            print(type)
+            print("Type printed ^^^^^^^^^^^^^^^^^^^^^^^^^")
+            self.data[e.control.key] = e.control.text
+            print("Data updated: ", self.data)
+
+
         # Update our widget so we can alter the char object class and re-render
         # Those updates into our widget, otherwise it would be static
         def update_widget():
             self.body.clear()  # Clear the body before updating
 
-            for control in self.age_controls:
-                self.body.append(control)
+            #self.body.append(ft.Image(src=self.image, width=100, height=100))
+            self.body.append(ft.Container(ft.Icon(ft.Icons.PERSON, size=100), padding=10))
 
-            for key, value in self.family.items():
-                self.body.append(
-                    ft.TextField(
-                        label=key,
-                        hint_text=key,
-                        value=value,
-                        width=200,
-                        multiline=True,
-                        on_change=update_parents,
+            # Render our built in data in a fixed formatted way, then format all other data
+            # Differently afterwards
+
+            # Run through all our data to render it
+            for key, value in self.data.items():
+                if not isinstance(value, dict):
+                    self.body.append(
+                        ft.Row(controls=[
+                            ft.TextField(
+                                label=key,
+                                hint_text=key,
+                                value=value,
+                                width=200,
+                                multiline=True,
+                                on_change=lambda e: update_data(e, type(value)),
+                            )
+                        ])
                     )
-                )
-            
-            for control in self.notes_controls:
-                self.body.append(control)
+                elif isinstance(value, dict):
+                    row = ft.Row()
+                    for sub_key, sub_value in value.items():
+                        row.controls.append(
+                            ft.TextField(
+                                label=sub_key,
+                                hint_text=sub_key,
+                                value=sub_value,
+                                width=200,
+                                multiline=True,
+                                on_change=lambda e: update_data(e, type(value)),
+                            )
+                        )
+                    self.body.append(row)
 
             self.body.append(
                 ft.TextButton(
-                    on_click=add_data,
+                    on_click=lambda e: update_data(e, str),
                     text="Add Data",
                 )
             )
@@ -153,12 +114,6 @@ class Character:
     species : str
     parents = []
 
-
-class Origin:
-    birthplace: str
-    birth_date: str
-    hometown : str
-    education : str
 
 '''
 tags = {
