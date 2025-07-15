@@ -1,8 +1,9 @@
 import flet as ft
-from models.story import story
+from models.user import user
 from handlers.render_widgets import render_widgets, widget_row, pin_drag_targets, stack
 from handlers.arrange_widgets import arrange_widgets
 
+story = user.stories['empty_story']  # Get our story object from the user
 
 # Creates our widget from passing in the object, page, and formatting
 def create_widget(obj, page):

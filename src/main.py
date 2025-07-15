@@ -4,7 +4,7 @@ Each section of this main page contains another 'page',
 so they can update themselves dynamically
 '''
 import flet as ft
-from models.story import story
+from models.user import user
 from hud.menu_bar import create_menu_bar
 from hud.workspaces_rail import create_rails
 from hud.active_rail import create_active_rail
@@ -13,6 +13,9 @@ from hud.workspace import create_workspace
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
+
+    story = user.stories['empty_story']  # Get our story object from the user
+
 
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"

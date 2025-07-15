@@ -27,5 +27,3 @@ class Story:
     # Drawing Board = ?
     # Notes = []
     # Other workspaces??
-
-story = Story("Story Title") 

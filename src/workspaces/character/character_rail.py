@@ -6,12 +6,13 @@ the create 'character button' at the bottom.
 
 import flet as ft
 from workspaces.character.character_styles import button_style
-from models.story import story
+from models.user import user
 from workspaces.character.character import Character
 from handlers.render_widgets import render_widgets
 from handlers.create_widget import create_widget
 from handlers.arrange_widgets import arrange_widgets
 
+story = user.stories['empty_story']  # Get our story object from the user
 
 def characters_rail(page: ft.Page):
     # References for button and text field

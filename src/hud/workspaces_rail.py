@@ -1,9 +1,10 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
 from hud.active_rail import workspace_rails, default_rail, active_rail
-from models.story import story
+from models.user import user
 from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
+story = user.stories['empty_story']  # Get our story object from the user
 
 def create_rails(page: ft.Page):
 

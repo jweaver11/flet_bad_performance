@@ -2,10 +2,11 @@
 Layout our widgets whenever there is more than 2
 '''
 import flet as ft
-from models.story import story
+from models.user import user
 import json
 from handlers.arrange_widgets import arrange_widgets
 
+story = user.stories['empty_story']  # Get our story object from the user
 
 # Accept functions for each pin location
 def ib_drag_accept(e):

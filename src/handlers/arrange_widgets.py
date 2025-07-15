@@ -1,4 +1,6 @@
-from models.story import story
+from models.user import user
+
+story = user.stories['empty_story']  # Get our story object from the user
 
 def arrange_widgets():
     print("arrange widgets called")
