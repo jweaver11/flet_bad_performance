@@ -141,9 +141,7 @@ def create_rails(page: ft.Page):
         if is_collapsed:
             return
         else:
-            print("is_reorderable before: ", is_reorderable) 
             is_reorderable = not is_reorderable
-            print("is_reorderable after: ", is_reorderable)
 
             if is_reorderable:
                 print("true called")
@@ -196,16 +194,16 @@ def create_rails(page: ft.Page):
             r3.destinations[0].label = "World Building"
             r4.destinations[0].label = "Drawing Board"
             r5.destinations[0].label = "Notes"
-            all_workspaces_rail_container.width = 150
-            dt.content.width =150
+            all_workspaces_rail_container.width = 130
+            dt.content.width =130
             all_workspaces_rail_container.content.controls = [
                 all_workspaces_rail,
                 ft.Container(expand=True),
-                ft.TextButton( 
-                    text="Reorder", 
-                    on_click=make_reorderable,
-                ),
                 ft.Row(spacing=0, controls=[
+                    ft.IconButton( 
+                        icon=ft.Icons.REORDER_ROUNDED, 
+                        on_click=make_reorderable,
+                    ),
                     ft.Container(expand=True),
                     ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
@@ -223,15 +221,18 @@ def create_rails(page: ft.Page):
     # Container for all available workspaces. On left most side of page
     all_workspaces_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the 
-        width=150,
+        width=130,
         padding=ft.padding.only(bottom=10),
         content=ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER, # Centers items in column
             alignment=ft.alignment.center,
             controls=[
                 all_workspaces_rail,
                 ft.Container(expand=True),
                 ft.Row(spacing=0, controls=[
+                    ft.IconButton( 
+                        icon=ft.Icons.REORDER_ROUNDED,
+                        on_click=make_reorderable,
+                    ),
                     ft.Container(expand=True),
                     ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
@@ -270,7 +271,7 @@ def create_rails(page: ft.Page):
 
     dt = ft.DragTarget(
         group="widgets", 
-        content=ft.Column(expand=True, width=150), 
+        content=ft.Column(expand=True, width=130), 
         on_accept=drag_accept,
         on_will_accept=drag_will_accept,
         on_leave=on_leave,

@@ -1,6 +1,7 @@
 import flet as ft
 from handlers.render_widgets import render_widgets, widget_row, pin_drag_targets, stack
 
+
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
@@ -9,7 +10,7 @@ class Character(ft.Container):
 
         self.pin_location = "main"  # Start in main pin location
         
-        self.body = []  # flet list of controls to render rest of body
+        self.controls = []  # flet list of controls to render rest of body
 
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
@@ -51,10 +52,10 @@ class Character(ft.Container):
         # Update our widget so we can alter the char object class and re-render
         # Those updates into our widget, otherwise it would be static
         def update_widget():
-            self.body.clear()  # Clear the body before updating
+            self.controls.clear()  # Clear the body before updating
 
             #self.body.append(ft.Image(src=self.image, width=100, height=100))
-            self.body.append(ft.Container(ft.Icon(ft.Icons.PERSON, size=100), padding=10))
+            self.controls.append(ft.Container(ft.Icon(ft.Icons.PERSON, size=100), padding=10))
 
             # Render our built in data in a fixed formatted way, then format all other data
             # Differently afterwards
@@ -62,7 +63,7 @@ class Character(ft.Container):
             # Run through all our data to render it
             for key, value in self.char_data.items():
                 if not isinstance(value, dict):
-                    self.body.append(
+                    self.controls.append(
                         ft.Row(controls=[
                             ft.TextField(
                                 label=key,
@@ -87,9 +88,9 @@ class Character(ft.Container):
                                 on_change=lambda e: update_data(e, type(value)),
                             )
                         )
-                    self.body.append(row)
+                    self.controls.append(row)
 
-            self.body.append(
+            self.controls.append(
                 ft.TextButton(
                     on_click=lambda e: update_data(e, str),
                     text="Add Data",
@@ -144,7 +145,7 @@ class Character(ft.Container):
                 ft.Divider(color=ft.Colors.BLUE),
                 ft.Container(       # Body of the widget
                     expand=True,
-                    content=ft.Column(self.body)
+                    content=ft.Column(self.controls)
                 )
             ])
         )
