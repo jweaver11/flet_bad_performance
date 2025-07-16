@@ -12,6 +12,7 @@ class Character(ft.Container):
         
         self.controls = []  # flet list of controls to render rest of body
 
+
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.age = ""
@@ -169,9 +170,9 @@ class Character(ft.Container):
 
 '''
 tags = {
-    main_character : bool
-    side_character : bool
-    background_character : bool
+    main_character : bool       # Add star
+    side_character : bool       # add something
+    background_character : bool     # make faded gray
     good : bool
     evil : bool
     neutral : bool

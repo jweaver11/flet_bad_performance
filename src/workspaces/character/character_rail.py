@@ -121,6 +121,7 @@ def characters_rail(page: ft.Page):
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
+                            ft.Icon(ft.Icons.STAR_ROUNDED, color=ft.Colors.BLUE),
                             ft.Text(
                                 character.title,
                                 max_lines=1,
