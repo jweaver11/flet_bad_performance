@@ -301,26 +301,26 @@ def render_widgets(page: ft.Page):
     for obj in story.top_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
-            top_pin.controls.append(obj.widget)
+            top_pin.controls.append(obj)
     # left pin widgets
     for obj in story.left_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
-            left_pin.controls.append(obj.widget)
+            left_pin.controls.append(obj)
     for obj in story.main_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
-            main_pin.controls.append(obj.widget) 
+            main_pin.controls.append(obj) 
     # right pin widgets
     for obj in story.right_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
-            right_pin.controls.append(obj.widget)
+            right_pin.controls.append(obj)
     # Bottom pin widgets. Order matters for which pin gets 'stolen' from to fill empty main pin
     for obj in story.bottom_pin_obj:
         if obj.visible == True:
             # Append our widget from our pointer in the story.pin_location
-            bottom_pin.controls.append(obj.widget)
+            bottom_pin.controls.append(obj)
 
 
     # Arrange our widgets into their pin locations

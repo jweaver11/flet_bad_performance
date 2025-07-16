@@ -9,7 +9,6 @@ from workspaces.character.character_styles import button_style
 from models.user import user
 from workspaces.character.character import Character
 from handlers.render_widgets import render_widgets
-from handlers.create_widget import create_widget
 from handlers.arrange_widgets import arrange_widgets
 
 story = user.stories['empty_story']  # Get our story object from the user
@@ -19,14 +18,9 @@ def characters_rail(page: ft.Page):
     button_ref = ft.Ref[ft.TextButton]()
     textfield_ref = ft.Ref[ft.TextField]()
 
-    story.characters.append(Character("bob"))
-    story.characters.append(Character("joe"))
+    story.characters.append(Character("bob", page))
+    story.characters.append(Character("joe", page))
     arrange_widgets()  # Arrange our characters into their pin locations
-    for char in story.characters:
-        if char.title == "bob":
-            char.widget = create_widget(char, page)
-        if char.title == "joe":
-            char.widget = create_widget(char, page)
         
     # When popout is clicked
     def popout_on_click(e, name):
@@ -74,8 +68,8 @@ def characters_rail(page: ft.Page):
         name = textfield_ref.current.value  # Passes our character name
         if name:
             # Add our character to our stories character list, create a widget, and add it to widget list
-            c = Character(name)  # Create a new character object and its widget
-            c.widget = create_widget(c, page)
+            c = Character(name, page)  # Create a new character object and its widget
+            #c.widget = create_widget(c, page)
             story.characters.append(c)
             reload_character_rail()   
             arrange_widgets() 
