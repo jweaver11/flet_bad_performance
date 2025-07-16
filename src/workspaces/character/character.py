@@ -12,6 +12,17 @@ class Character(ft.Container):
         
         self.controls = []  # flet list of controls to render rest of body
 
+        self.tags = {
+            'main_character': True,       # Add star
+            'side_character' : True,     # add something
+            'background_character': True,     # make faded gray
+            #good : bool
+            #evil : bool
+            #neutral : bool
+            #man : bool
+            #woman : bool
+            #alive : bool
+        }
 
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
@@ -19,6 +30,9 @@ class Character(ft.Container):
         self.sex = ""    # Add selecteble male, female, other - custom write in
 
         self.char_data = {
+            'Good': True,
+            'Evil': False,
+            'Neutral': False,
             'Family': {'Father': "", 'Mother': ""}, #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
             'Occupation': "",
             'Goals': "",
@@ -47,7 +61,7 @@ class Character(ft.Container):
             print(type)
             print("Type printed ^^^^^^^^^^^^^^^^^^^^^^^^^")
             self.data[e.control.key] = e.control.text
-            print("Data updated: ", self.data)
+            print("Data updated: ", self.char_data)
 
 
         # Update our widget so we can alter the char object class and re-render
@@ -118,6 +132,7 @@ class Character(ft.Container):
             render_widgets(page)
             page.update()
 
+        # Make a markdown as content of container
         super().__init__(
             expand=True,
             padding=6,
@@ -159,8 +174,6 @@ class Character(ft.Container):
     color : str
     icon : str
 
-    tags : list[str]
-
     # Add ons that won't show by default
     race: str
     species : str
@@ -168,19 +181,6 @@ class Character(ft.Container):
     # init comi
 
 
-'''
-tags = {
-    main_character : bool       # Add star
-    side_character : bool       # add something
-    background_character : bool     # make faded gray
-    good : bool
-    evil : bool
-    neutral : bool
-    man : bool
-    woman : bool
-    alive : bool
-}
-'''
 # Saving characters locally
 # app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
 # my_file_path = os.path.join(app_data_path, "characters.json")

@@ -14,16 +14,13 @@ from handlers.arrange_widgets import arrange_widgets
 story = user.stories['empty_story']  # Get our story object from the user
 
 def characters_rail(page: ft.Page):
-    # References for button and text field
-    button_ref = ft.Ref[ft.TextButton]()
-    textfield_ref = ft.Ref[ft.TextField]()
 
-    story.characters.append(Character("bob", page))
-    story.characters.append(Character("joe", page))
+    story.characters.append(Character("Bob", page))
+    story.characters.append(Character("Joe", page))
     arrange_widgets()  # Arrange our characters into their pin locations
         
-    # When popout is clicked
-    def popout_on_click(e, name):
+    # Show the widget of character. Runs when character is clicked in the rail
+    def popout(e, name):
         # Show our widget
         for character in story.characters:
             if character.title == name:
@@ -32,12 +29,12 @@ def characters_rail(page: ft.Page):
         render_widgets(page)
         page.update()
         
-    # When rename is clicked
-    def rename_on_click(e):
+    # Rename our character
+    def rename(e):
         print("pin clicked")
 
-    # when delete is clicked. Delete our char from story obj, reload rail and widget
-    def delete_on_click(e, name):
+    # Delete our character object from the story, and its reference in its pin
+    def delete(e, name):
         print("delete was run")
         for character in story.characters:
             if character.title == name:
@@ -52,156 +49,181 @@ def characters_rail(page: ft.Page):
         render_widgets(page)     # reload our workspace area
         page.update()
 
+    # Create a new character 
+    def create_character(e, tag):
+        print("create character clicked")
 
-    # Control when 'Create Character' button is clicked. Button disappears, textfield appears focused
-    def create_character_button_click(e):
-        button_ref.current.visible = False
-        button_ref.current.update()
-        textfield_ref.current.visible = True
-        textfield_ref.current.focus()
-        textfield_ref.current.update()
-
-
-
-    # When user presses enter after inputting 'create_character' button
-    def add_character_textfield_submit(e):
-        name = textfield_ref.current.value  # Passes our character name
-        if name:
-            # Add our character to our stories character list, create a widget, and add it to widget list
-            c = Character(name, page)  # Create a new character object and its widget
-            #c.widget = create_widget(c, page)
-            story.characters.append(c)
-            reload_character_rail()   
-            arrange_widgets() 
-            render_widgets(page)  
-            page.update()
+        # Create a reference for the dialog text field
+        dialog_textfield_ref = ft.Ref[ft.TextField]()
         
+        def add_character_from_dialog(e):
+            name = dialog_textfield_ref.current.value  # Get name from dialog text field
+            if name and name.strip():    
+                # Create new character with appropriate tag
+                new_character = Character(name.strip(), page)
+                
+                # Set the appropriate tag based on the category
+                if tag == "main":
+                    new_character.tags['main_character'] = True
+                    new_character.tags['side_character'] = False
+                    new_character.tags['background_character'] = False
+                elif tag == "side":
+                    new_character.tags['main_character'] = False
+                    new_character.tags['side_character'] = True
+                    new_character.tags['background_character'] = False
+                elif tag == "background":
+                    new_character.tags['main_character'] = False
+                    new_character.tags['side_character'] = False
+                    new_character.tags['background_character'] = True
+                
+                story.characters.append(new_character)
+                reload_character_rail()   
+                arrange_widgets() 
+                render_widgets(page)  
 
+        
+                
+                # Close the dialog
+                dlg.open = False
+                page.update()
+        
+        dlg = ft.AlertDialog(
+            title=ft.Text("Enter Character Name"), 
+            content=ft.TextField(
+                ref=dialog_textfield_ref,
+                label="Character Name",
+                hint_text="Enter character name",
+                on_submit=add_character_from_dialog,  # When enter is pressed
+                autofocus=True,  # Focus on this text field when dialog opens
+            ),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
+                ft.TextButton("Create", on_click=add_character_from_dialog),
+            ],
+            on_dismiss=lambda e: print("Dialog dismissed!")
+        )
 
-        # Bring back our button, hide textfield, update the page 
-        textfield_ref.current.value = ""
-        textfield_ref.current.visible = False
-        textfield_ref.current.update()
-        button_ref.current.visible = True
-        button_ref.current.update()
-        page.update()
- 
-    # When textbox is clicked off and nothing in it, reset to button
-    def on_textfield_deselect(e):
-        name = textfield_ref.current.value
-        if name == "":
-            textfield_ref.current.visible = False
-            button_ref.current.visible = True
-            textfield_ref.current.update()
-            button_ref.current.update()
+        page.overlay.append(dlg)
+        dlg.open = True
         page.update()
 
-    def handle_reorder(e: ft.OnReorderEvent):
-        print("e.data:", e.data)
-        print(f"Reordered from {e.old_index} to {e.new_index}")
-        temp = story.characters[e.old_index]  # Get the character object at the old index
-        story.characters.pop(e.old_index)  # Remove it from the old index
-        story.characters.insert(e.new_index, temp)  # Insert it at the new index
-        reload_character_rail()
-        render_widgets(page)  # Reload the widgets to reflect the new order
-        page.update()
+    main_characters = ft.ExpansionTile(
+        title=ft.Text("Main"),
+        collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
+        tile_padding=ft.padding.symmetric(horizontal=6),  # Reduce tile padding
+        controls_padding=None,
+    )
+    side_characters = ft.ExpansionTile(
+        title=ft.Text("Side"),
+        collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
+        tile_padding=ft.padding.symmetric(horizontal=6),  # Reduce tile padding
+    )
+    background_characters = ft.ExpansionTile(
+        title=ft.Text("Background"),
+        collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
+        tile_padding=ft.padding.symmetric(horizontal=6),  # Reduce tile padding
+        controls_padding=None,
+    )
 
 
     # Clears our re-orderable list, then re-adds every character in story.characters
     # ListTile has image, character name, popup menu options
+    # Our actual list of characters, within our container
+    # Each char has an image, name, and 3 dot options button
+    #character_reorderable_list_container,
     def reload_character_rail():
-        characters_reorderable_list.controls.clear()
+        main_characters.controls.clear()
+        side_characters.controls.clear()
+        background_characters.controls.clear()
         for character in story.characters:
             new_char = ft.ListTile( # Works as a formatted row
                 horizontal_spacing=0,
-                title=ft.TextButton(
-                    expand=True, 
-                    style=button_style,
-                    on_click=lambda e, name=character.title: print(name, "was clicked"),    # on click
-                    content=ft.Row(
-                        alignment=ft.MainAxisAlignment.START,
-                        controls=[
-                            ft.Icon(ft.Icons.STAR_ROUNDED, color=ft.Colors.BLUE),
-                            ft.Text(
-                                character.title,
-                                max_lines=1,
-                                width=104,  # for when name longer than button
-                                overflow=ft.TextOverflow.CLIP,
-                                no_wrap=True,
-                            ), 
-                        ], 
-                    )
-                ),
+                expand=True,
+                content_padding=None,
+                title=ft.GestureDetector(
+                    on_secondary_tap=lambda e: print("right clicked"),
+                    content=ft.TextButton(
+                        expand=True, 
+                        style=button_style,
+                        on_click=lambda e, name=character.title: popout(e, name),    # on click
+                        content=ft.Container(expand=True, content=ft.Row(
+                            alignment=ft.MainAxisAlignment.START,
+                            controls=[
+                                ft.Text(
+                                    value=character.title,
+                                    color=ft.Colors.PRIMARY,
+                                    max_lines=1,
+                                    overflow=ft.TextOverflow.CLIP,
+                                    no_wrap=True,
+                                ), 
+                            ], 
+                        )
+                ))),
                 trailing=ft.PopupMenuButton(
                     icon_color=ft.Colors.GREY_400, 
                     tooltip="", 
                     items=[
-                        ft.PopupMenuItem(text="Popout", on_click=lambda e, name=character.title: popout_on_click(e, name)),
-                        ft.PopupMenuItem(text="Rename", on_click=rename_on_click),
-                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_on_click(e, name)),
+                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout(e, name)),
+                        ft.PopupMenuItem(text="Rename", on_click=rename),
+                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete(e, name)),
                     ],
                 ),
             )
-            characters_reorderable_list.controls.append(new_char)
-        return page.update()
 
-    # Our re-orderable list. We add/delete characters to this
-    characters_reorderable_list = ft.ReorderableListView(padding=0, on_reorder=handle_reorder)
-    # Container for formatting this list better
-    character_reorderable_list_container = ft.Container(expand=True, content=characters_reorderable_list)
+            # Format our character based on its tag
+            if character.tags['main_character'] == True:
+                main_characters.controls.append(new_char)
+            elif character.tags['side_character'] == True:
+                side_characters.controls.append(new_char)
+            elif character.tags['background_character'] == True:
+                background_characters.controls.append(new_char)
+
+        # Add our 'create character' button in each category
+        main_characters.controls.append(
+            ft.IconButton(
+                ft.Icons.ADD_ROUNDED, 
+                on_click=lambda e: create_character(e, "main"),
+                icon_color=ft.Colors.PRIMARY,  # Match expanded color
+            )
+        )
+        side_characters.controls.append(
+            ft.IconButton(
+                ft.Icons.ADD_ROUNDED, 
+                on_click=lambda e: create_character(e, "side"),
+                icon_color=ft.Colors.PRIMARY,  # Match expanded color
+            )
+        )
+        background_characters.controls.append(
+            ft.IconButton(
+                ft.Icons.ADD_ROUNDED, 
+                on_click=lambda e: create_character(e, "background"),
+                icon_color=ft.Colors.PRIMARY,  # Match expanded color
+            )
+        )
+        return page.update()
 
     # List of controls that we return from our page. 
     # This is static and should not change
     characters_rail = [
 
-        # Filter system goes here
-        # Checkboxes, or Chip
-        ft.Container(
-            alignment=ft.alignment.center,  # Aligns content to the
-            padding=10,
-            content=ft.TextButton(  # 'Create Character button'
-                "Filter characters", 
-                icon=ft.Icons.WAVES_OUTLINED, 
-                style=button_style, 
-                ref=button_ref,
-            ),
-        ),
-        
-        # Our actual list of characters, within our container
-        # Each char has an image, name, and 3 dot options button
-        character_reorderable_list_container,
 
-        # Create Character Button. Button turns into an inputtable
-        # text field when clicked
-        ft.Container(
-            alignment=ft.alignment.center,  # Aligns content to the
-            padding=10,
-            content=ft.Row(
-                expand=True,
-                controls=[
-                    ft.TextButton(  # 'Create Character button'
-                        "Create Character", 
-                        expand=True,
-                        icon=ft.Icons.WAVES_OUTLINED, 
-                        style=button_style, 
-                        ref=button_ref,
-                        on_click=create_character_button_click
-                    ),
-                    ft.TextField(
-                        ref=textfield_ref,
-                        visible=False,
-                        hint_text="Enter Character Name",
-                        width=184,
-                        on_submit=add_character_textfield_submit,
-                        on_tap_outside=on_textfield_deselect,
-                    ),
-                ]
-            )
-        ),
+        main_characters,
+        side_characters,
+        background_characters,
+
+        ft.Container(expand=True),
     ]
+
+
     reload_character_rail() # called initially so characters loaded on launch
     arrange_widgets()
     render_widgets(page) 
 
 
+
     return characters_rail
+
+
+
+# Make right clicking character pop open menu options
+# Auto capitalize names of characters, check if name already exists before adding anoter

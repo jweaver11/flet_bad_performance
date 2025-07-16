@@ -89,7 +89,7 @@ def create_rails(page: ft.Page):
         on_change=on_workspace_change,
         destinations=[
             ft.NavigationRailDestination(
-                icon=ft.Icons.BUILD_OUTLINED, selected_icon=ft.Icons.BUILD_ROUNDED,
+                icon=ft.Icons.PUBLIC_OUTLINED, selected_icon=ft.Icons.PUBLIC,
                 label="World Building", padding=6,
             ),
         ],
