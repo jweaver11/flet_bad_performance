@@ -113,6 +113,7 @@ class Character:
     race: str
     species : str
     parents = []
+    # init comi
 
 
 '''
