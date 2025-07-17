@@ -4,9 +4,11 @@ class User:
     def __init__(self, username: str, email: str):
         self.username = username
         self.email = email
+        
         self.stories = {
             'empty_story': Story("Story Title") 
         }
+        self.active_story = self.stories['empty_story']  # Default to empty story. Make this fetch a story from function in future
 
     def __repr__(self):
         return f"User(username={self.username}, email={self.email})"

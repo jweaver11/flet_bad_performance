@@ -15,7 +15,6 @@ story = user.stories['empty_story']  # Get our story object from the user
 
 
 def characters_rail(page: ft.Page):
-
     story.characters.append(Character("Bob", page))
     story.characters.append(Character("Joe", page))
     arrange_widgets()  # Arrange our characters into their pin locations
@@ -86,7 +85,6 @@ def characters_rail(page: ft.Page):
                 render_widgets(page)  
 
         
-                
                 # Close the dialog
                 dlg.open = False
                 page.update()

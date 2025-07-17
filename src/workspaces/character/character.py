@@ -1,14 +1,16 @@
 import flet as ft
+from models.user import user
 from handlers.render_widgets import render_widgets, widget_row, pin_drag_targets, stack
 
-
+story = user.active_story  # Get our story object from the user
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
         self.title = name  # Title of the character, used for identifier so all data objects have a title
         self.tag = "character"  # Tag for logic
 
-        self.pin_location = "main"  # Start in main pin location
+        self.pin_location = "left"  # Start in main pin location
+        story.left_pin_obj.append(self)  # Add to left pin location
         
         self.controls = []  # flet list of controls to render rest of body
 
@@ -142,6 +144,41 @@ class Character(ft.Container):
                 ft.Stack([
                     ft.Row(
                         alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[
+                            ft.Draggable(
+                                group="widgets",
+                                content=ft.TextButton(self.title),
+                                data=self,       # Pass our object as the data so we can access it
+                                on_drag_start=on_drag_start,
+                                on_drag_complete=on_drag_complete,
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.END,
+                        controls=[
+                            ft.IconButton(
+                                on_click=hide,
+                                icon=ft.Icons.CLOSE_ROUNDED
+                    )])
+                ]),
+                ft.Divider(color=ft.Colors.PRIMARY),
+                ft.Container(       # Body of the widget
+                    expand=True,
+                    content=ft.Column(self.controls)
+                )
+            ])
+        )
+        '''
+        super().__init__(
+            expand=True,
+            padding=6,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            bgcolor=ft.Colors.GREY_900,
+            content=ft.Column(spacing=0, controls=[
+                ft.Stack([
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.CENTER,
                         controls=[ft.Draggable(
                             group="widgets",
                             content=ft.TextButton(self.title),
@@ -165,8 +202,7 @@ class Character(ft.Container):
                 )
             ])
         )
-    
-
+        '''
 
     # origin = Origin
 

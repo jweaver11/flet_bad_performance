@@ -51,13 +51,13 @@ def create_workspace(page: ft.Page, story):
     # Container for 1 or more widgets open on the workspace area right side of screen
     workspace_container = ft.Container(
         expand=True,
-        margin=ft.margin.all(10),
+        #=ft.margin.all(10),
         #bgcolor=ft.Colors.RED,
         padding=None,
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
         #bgcolor=ft.Colors.GREY_800,
-        content=stack
+        content=s
     )
     
 
-    return s
+    return workspace_container

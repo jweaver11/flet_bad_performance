@@ -25,7 +25,9 @@ class Story:
 
     # Pass in our character object
     def create_character(self, character):
-        self.characters.append(character)
+        self.characters.append(character)   # Add our character object to our story list
+
+        # Write our character to a file
         with open(my_file_path, "w") as f:
             f.write(character.title)  # Need to write object to json
             print("Character created: " + character.title)
@@ -39,3 +41,11 @@ class Story:
     # Drawing Board = ?
     # Notes = []
     # Other workspaces??
+
+
+
+# Add all this to user file??
+# Save stories locally - folder structure:
+# user/stories/story_name/
+# - characters/character
+# - workspace_name/...

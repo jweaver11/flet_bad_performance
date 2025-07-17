@@ -52,6 +52,7 @@ def main(page: ft.Page):
         expand=True, 
         controls=[
             menubar, 
+            ft.Divider(color=ft.Colors.PRIMARY, height=2, thickness=2, opacity=0.2),
             row
         ]
     )
@@ -60,3 +61,6 @@ def main(page: ft.Page):
 
 
 ft.app(main)
+
+
+# Add custom title bar 
