@@ -158,7 +158,7 @@ class Character(ft.Container):
                                 icon=ft.Icons.CLOSE_ROUNDED
                     )])
                 ]),
-                ft.Divider(color=ft.Colors.BLUE),
+                ft.Divider(color=ft.Colors.PRIMARY),
                 ft.Container(       # Body of the widget
                     expand=True,
                     content=ft.Column(self.controls)
@@ -181,8 +181,3 @@ class Character(ft.Container):
     # init comi
 
 
-# Saving characters locally
-# app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
-# my_file_path = os.path.join(app_data_path, "characters.json")
-# with open(my_file_path, "w") as f:
-    # f.write("My characters will go here")

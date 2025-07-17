@@ -13,6 +13,7 @@ from handlers.arrange_widgets import arrange_widgets
 
 story = user.stories['empty_story']  # Get our story object from the user
 
+
 def characters_rail(page: ft.Page):
 
     story.characters.append(Character("Bob", page))
@@ -59,11 +60,11 @@ def characters_rail(page: ft.Page):
         def add_character_from_dialog(e):
             name = dialog_textfield_ref.current.value  # Get name from dialog text field
             if name and name.strip() and check_character(name):   
-                name_strip = name.strip()
-                name_strip = name_strip.capitalize()  # Auto capitalize names
+                name = name.strip()
+                name = name.capitalize()  # Auto capitalize names
                 
                 # Create new character with appropriate tag
-                new_character = Character(name_strip, page)
+                new_character = Character(name, page)
                 # Set the appropriate tag based on the category
                 if tag == "main":
                     new_character.tags['main_character'] = True
@@ -78,7 +79,8 @@ def characters_rail(page: ft.Page):
                     new_character.tags['side_character'] = False
                     new_character.tags['background_character'] = True
                 
-                story.characters.append(new_character)
+                #story.characters.append(new_character)
+                story.create_character(new_character)
                 reload_character_rail()   
                 arrange_widgets() 
                 render_widgets(page)  
@@ -89,7 +91,9 @@ def characters_rail(page: ft.Page):
                 dlg.open = False
                 page.update()
             else:       # When character name is empty or already exists
-                print("Character name is empty or already exists")
+                dlg.open = False
+                page.update()
+                print("Character name is empty")
         
         dlg = ft.AlertDialog(
             title=ft.Text("Enter Character Name"), 
@@ -111,7 +115,18 @@ def characters_rail(page: ft.Page):
         def check_character(name):
             for character in story.characters:
                 if character.title.lower() == name.lower():
-                    dlg.actions.insert(0, ft.Text("Character name must be unique", color=ft.Colors.RED_300))
+                    page.open(
+                        ft.SnackBar(
+                            bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
+                            content=ft.Container(
+                                border_radius=ft.border_radius.all(6),  # Rounded corners on container
+                                border=ft.border.all(2, ft.Colors.PRIMARY),  # Red border on container
+                                bgcolor=ft.Colors.GREY_900,  # Background color on container
+                                padding=ft.padding.all(10),  # Add padding for better appearance
+                                content=ft.Text("Character name must be unique", color=ft.Colors.PRIMARY)
+                            ),   
+                        )
+                    )
                     page.update()
                     return False
         
@@ -121,20 +136,21 @@ def characters_rail(page: ft.Page):
         dlg.open = True
         page.update()
 
+    # Shows our popupmenubutton when hovering over a character, allowing for edit, rename, and delete
     def show_options(e):
-        
         popup_button = e.control.content.content.content.controls[2]
         print(popup_button)
         popup_button.visible = True     # Show our options button
         page.update()
         print("show options called")
-
+    # Gets rid of our popupmenubutton when mouse exits character
     def hide_options(e):
         popup_button = e.control.content.content.content.controls[2]
         popup_button.visible = False    # Hide our options button
         page.update()
         print("hide options called")
 
+    # Set our three main categories of characters to be rendered on the screen
     main_characters = ft.ExpansionTile(
         title=ft.Text("Main"),
         collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
@@ -156,16 +172,16 @@ def characters_rail(page: ft.Page):
         shape=ft.RoundedRectangleBorder()
     )
 
-
-    # Clears our re-orderable list, then re-adds every character in story.characters
-    # ListTile has image, character name, popup menu options
-    # Our actual list of characters, within our container
-    # Each char has an image, name, and 3 dot options button
-    #character_reorderable_list_container,
+    # Reloads our rail when changes happen in the character data
+    # Characters are organized based on their tag of main, side, or background
+    # Have their colors change based on good, evil, neutral. Widget will reflect that
     def reload_character_rail():
+        # Clear our controls so they start fresh, doesnt effect our stored characters
         main_characters.controls.clear()
         side_characters.controls.clear()
         background_characters.controls.clear()
+
+        # Run through each character in our story, and create a ListTile for them
         for character in story.characters:
             new_char = ft.ListTile( # Works as a formatted row
                 horizontal_spacing=0,
@@ -193,6 +209,7 @@ def characters_rail(page: ft.Page):
                                     icon_color=ft.Colors.GREY_400, 
                                     tooltip="", 
                                     visible=False,
+                                    scale=.9,
                                     items=[
                                         ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout_character_widget(e, name)),
                                         ft.PopupMenuItem(text="Rename", on_click=rename_character),
@@ -200,13 +217,11 @@ def characters_rail(page: ft.Page):
                                     ],
                                 ),
                             ], 
-                            
                         )
                 ))),
-        
             )
 
-            # Format our character based on its tag
+            # Add our character to category based on its tag
             if character.tags['main_character'] == True:
                 main_characters.controls.append(new_char)
             elif character.tags['side_character'] == True:
@@ -214,7 +229,7 @@ def characters_rail(page: ft.Page):
             elif character.tags['background_character'] == True:
                 background_characters.controls.append(new_char)
 
-        # Add our 'create character' button in each category
+        # Add our 'create character' button at bottom of each category
         main_characters.controls.append(
             ft.IconButton(
                 ft.Icons.ADD_ROUNDED, 
@@ -242,7 +257,6 @@ def characters_rail(page: ft.Page):
     # This is static and should not change
     characters_rail = [
 
-
         main_characters,
         side_characters,
         background_characters,
@@ -256,8 +270,4 @@ def characters_rail(page: ft.Page):
     render_widgets(page) 
 
 
-
     return characters_rail
-
-
-# Auto capitalize names of characters, check if name already exists before adding another
