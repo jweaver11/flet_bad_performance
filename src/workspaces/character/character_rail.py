@@ -107,22 +107,39 @@ def characters_rail(page: ft.Page):
         dlg.open = True
         page.update()
 
+    def show_options(e):
+        
+        popup_button = e.control.content.content.content.controls[2]
+        print(popup_button)
+        popup_button.visible = True     # Show our options button
+        page.update()
+        print("show options called")
+
+    def hide_options(e):
+        popup_button = e.control.content.content.content.controls[2]
+        popup_button.visible = False    # Hide our options button
+        page.update()
+        print("hide options called")
+
     main_characters = ft.ExpansionTile(
         title=ft.Text("Main"),
         collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
-        tile_padding=ft.padding.symmetric(horizontal=6),  # Reduce tile padding
+        tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
         controls_padding=None,
+        shape=ft.RoundedRectangleBorder()
     )
     side_characters = ft.ExpansionTile(
         title=ft.Text("Side"),
         collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
-        tile_padding=ft.padding.symmetric(horizontal=6),  # Reduce tile padding
+        tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
+        shape=ft.RoundedRectangleBorder()
     )
     background_characters = ft.ExpansionTile(
         title=ft.Text("Background"),
         collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
-        tile_padding=ft.padding.symmetric(horizontal=6),  # Reduce tile padding
+        tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
         controls_padding=None,
+        shape=ft.RoundedRectangleBorder()
     )
 
 
@@ -141,7 +158,8 @@ def characters_rail(page: ft.Page):
                 expand=True,
                 content_padding=None,
                 title=ft.GestureDetector(
-                    on_secondary_tap=lambda e: print("right clicked"),
+                    on_hover=show_options,  # Show our options button when hovering over character
+                    on_exit=hide_options,
                     content=ft.TextButton(
                         expand=True, 
                         style=button_style,
@@ -156,18 +174,22 @@ def characters_rail(page: ft.Page):
                                     overflow=ft.TextOverflow.CLIP,
                                     no_wrap=True,
                                 ), 
+                                ft.Container(expand=True,),
+                                ft.PopupMenuButton(
+                                    icon_color=ft.Colors.GREY_400, 
+                                    tooltip="", 
+                                    visible=False,
+                                    items=[
+                                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout(e, name)),
+                                        ft.PopupMenuItem(text="Rename", on_click=rename),
+                                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete(e, name)),
+                                    ],
+                                ),
                             ], 
+                            
                         )
                 ))),
-                trailing=ft.PopupMenuButton(
-                    icon_color=ft.Colors.GREY_400, 
-                    tooltip="", 
-                    items=[
-                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout(e, name)),
-                        ft.PopupMenuItem(text="Rename", on_click=rename),
-                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete(e, name)),
-                    ],
-                ),
+        
             )
 
             # Format our character based on its tag
@@ -226,4 +248,4 @@ def characters_rail(page: ft.Page):
 
 
 # Make right clicking character pop open menu options
-# Auto capitalize names of characters, check if name already exists before adding anoter
+# Auto capitalize names of characters, check if name already exists before adding another
