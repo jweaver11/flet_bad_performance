@@ -6,7 +6,7 @@ from models.user import user
 import json
 from handlers.arrange_widgets import arrange_widgets
 
-story = user.stories['empty_story']  # Get our story object from the user
+story = user.active_story # Get our story object from the user
 
 # Accepting drags for our five pin locations
 def top_pin_drag_accept(e):
@@ -26,7 +26,7 @@ def top_pin_drag_accept(e):
     else:
         print("src_id not found in event data")
 
-    # Set our pin location inside the object to the correct new location
+    # Set our objects pin location to the correct new location
     object.pin_location = "top"
 
     arrange_widgets()       # Re-arrange our widgets held in the story object
@@ -36,118 +36,101 @@ def top_pin_drag_accept(e):
     print("top pin accepted")
 
 def left_pin_drag_accept(e):
-    # e.data is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
-    print("src_id:", src_id)
+    
     if src_id:
-        # Get the Draggable control by ID
-        obj = e.page.get_control(src_id)
-        if obj:
-            print("Draggable's data:", obj.data)
-            # Now you can use src_control.data["tag"], etc.
+        draggable = e.page.get_control(src_id)
+        if draggable:
+            object = draggable.data
+            print("object:\n", object) 
         else:
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Our 'obj' needs the data parameter to access inside of here now
-    # Check our pin location, and set it to correct pin
-    pl = obj.data.pin_location
-    if pl == "top" or pl == "main" or pl == "right" or pl == "bottom":
-        obj.data.pin_location = "left"
+    # Set our objects pin location to the correct new location
+    object.pin_location = "left"
 
-    arrange_widgets()
+    arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row(height=default_pin_height)
+    e.control.content = ft.Row()
     e.control.update()
     print("left pin accepted")
 
 def main_pin_drag_accept(e):
-    # e.data is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
-    print("src_id:", src_id)
+    
     if src_id:
-        # Get the Draggable control by ID
-        obj = e.page.get_control(src_id)
-        if obj:
-            print("Draggable's data:", obj.data)
-            # Now you can use src_control.data["tag"], etc.
+        draggable = e.page.get_control(src_id)
+        if draggable:
+            object = draggable.data
+            print("object:\n", object) 
         else:
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    pl = obj.data.pin_location
-    if pl == "top" or pl == "left" or pl == "right" or pl == "bottom":
-        obj.data.pin_location = "main"
+    # Set our objects pin location to the correct new location
+    object.pin_location = "main"
 
-    arrange_widgets()
+    arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row(height=default_pin_height)
+    e.control.content = ft.Row()
     e.control.update()
     print("main pin accepted")
 
 
 def right_pin_drag_accept(e):
-    # e.data is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
-    print("src_id:", src_id)
+    
     if src_id:
-        # Get the Draggable control by ID
-        obj = e.page.get_control(src_id)
-        if obj:
-            print("Draggable's data:", obj.data)
-            # Now you can use src_control.data["tag"], etc.
+        draggable = e.page.get_control(src_id)
+        if draggable:
+            object = draggable.data
+            print("object:\n", object) 
         else:
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Our 'obj' needs the data parameter to access inside of here now
-    # Check our pin location, and set it to correct pin
-    pl = obj.data.pin_location
-    if pl == "top" or pl == "left" or pl == "main" or pl == "bottom":
-        obj.data.pin_location = "right"
+    # Set our objects pin location to the correct new location
+    object.pin_location = "right"
 
-    arrange_widgets()
+    arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row(height=default_pin_height)
+    e.control.content = ft.Row()
     e.control.update()
     print("right pin accepted")
 
 def bottom_pin_drag_accept(e):
-    # e.data is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
-    print("src_id:", src_id)
+    
     if src_id:
-        # Get the Draggable control by ID
-        obj = e.page.get_control(src_id)
-        if obj:
-            print("Draggable's data:", obj.data)
-            # Now you can use src_control.data["tag"], etc.
+        draggable = e.page.get_control(src_id)
+        if draggable:
+            object = draggable.data
+            print("object:\n", object) 
         else:
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Our 'obj' needs the data parameter to access inside of here now
-    pl = obj.data.pin_location
-    if pl == "top" or pl == "left" or pl == "main" or pl == "right":
-        obj.data.pin_location = "bottom"
+    # Set our objects pin location to the correct new location
+    object.pin_location = "bottom"
 
-    arrange_widgets()
+    arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row(height=default_pin_height)
+    e.control.content = ft.Row()
     e.control.update()
     print("bottom pin accepted")
 
 # Drag target to catch draggable drops between the drag targets
 def ib_drag_accept(e):
-    e.control.content = ft.Row(height=default_pin_height)
+    e.control.content = ft.Row(height=minimum_pin_height)
     e.control.update()
     stack.controls.clear()
     stack.controls.append(widget_row)  # Re-add the widget row to the stack
@@ -158,7 +141,7 @@ def ib_drag_accept(e):
 def drag_will_accept(e):
     e.control.content = ft.Container(
         bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.WHITE), 
-        height=default_pin_height
+        height=minimum_pin_height
     )
     e.control.update()
     stack.controls.clear()
@@ -177,11 +160,8 @@ def on_leave(e):
 # set minimumm fallbacks for our pins
 #min_pin_height = 30
 #min_pin_width = 30
-default_pin_height = 200
-default_pin_width = 200
-
-#min_drag_target_height = 200
-min_drag_target_width = 200
+minimum_pin_height = 200
+minimum_pin_width = 200
 
 # Our 5 pin area drag targets
 in_between_drag_target = ft.DragTarget(
@@ -286,45 +266,47 @@ def render_widgets(page: ft.Page):
     
     # We have our 5 pin locations that hold the containers, and the formatted controls that hold the pin locations
     # and formatting so it all looks nice. They also hold the draggable gesture detector dividers for resizing
-    top_pin = ft.Row(spacing=10, controls=[], height=0)
-    tpf = ft.Column(spacing=0, controls=[], height=0)  # Top pin formatting column
-    left_pin = ft.Column(spacing=10, controls=[])
+    tpf = ft.Column(spacing=0, controls=[])  # Top pin formatting column
     lpf = ft.Row(spacing=0, controls=[])  # Left pin formatting row
-    main_pin = ft.Row(expand=True, spacing=10, controls=[])   # no formatting needed
-    right_pin = ft.Column(spacing=10, controls=[])
     rpf = ft.Row(spacing=0, controls=[])  # Right pin formatting row
-    bottom_pin = ft.Row(spacing=10, controls=[])
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
-
-    def move_horizontal_divider(e: ft.DragUpdateEvent):
-        print("e.delta_y: ", e.delta_y)
-        
-        # Initialize height if it's None
-        if tpf.height is None:
-            tpf.height = default_pin_height  # or some default value
-        
-        print("tpc.height: ", tpf.height)
-
-        if (e.delta_y > 0 and top_pin.height < 300) or (e.delta_y < 0 and top_pin.height > 100):
-            top_pin.height += e.delta_y
-        top_pin.update()
+    # Method called when our divider (inside a gesture detector) is dragged
+    # Updates the size of our pin in the story object
+    def move_top_pin_divider(e: ft.DragUpdateEvent):
+        if (e.delta_y > 0 and story.top_pin.height < page.height/2) or (e.delta_y < 0 and story.top_pin.height > 200):
+            story.top_pin.height += e.delta_y
         tpf.update()
-        main_pin.update()
+    def move_left_pin_divider(e: ft.DragUpdateEvent):
+        if (e.delta_x > 0 and story.left_pin.width < page.width/2) or (e.delta_x < 0 and story.left_pin.width > 200):
+            story.left_pin.width += e.delta_x
+        lpf.update()
 
-    def show_draggable_cursor(e: ft.HoverEvent):
+    # Change our cursor when we hover over a divider 
+    def show_vertical_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
         e.control.update()
+    def show_horizontal_cursor(e: ft.HoverEvent):
+        e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+        e.control.update()
 
-    hgd = ft.GestureDetector(
-        content=ft.Divider(color=ft.Colors.PRIMARY, height=2),
-        on_pan_update=move_horizontal_divider,
-        on_hover=show_draggable_cursor,
+    # Holds the divider that is draggable to resize the top pin
+    top_pin_gesture_detector = ft.GestureDetector(
+        content=ft.Divider(color=ft.Colors.PRIMARY, height=10),
+        on_pan_update=move_top_pin_divider,
+        on_hover=show_vertical_cursor,
+    )
+    # Holds the divider that is draggable to resize the top pin
+    left_pin_gesture_detector = ft.GestureDetector(
+        content=ft.VerticalDivider(color=ft.Colors.PRIMARY, width=10),
+        on_pan_update=move_left_pin_divider,
+        on_hover=show_horizontal_cursor,
     )
 
-    vgd = ft.GestureDetector()
 
+    arrange_widgets() # Only needs to run if main widget was empty catch occurs ^
 
+    '''
     # Each obj is an extended flet container, meaning we just add it to our pin controls
     for obj in story.top_pin_obj:
         if obj.visible == True:
@@ -340,6 +322,7 @@ def render_widgets(page: ft.Page):
     for obj in story.bottom_pin_obj:
         if obj.visible == True:
             bottom_pin.controls.append(obj)
+    '''
 
 
     # Arrange our widgets into their pin locations
@@ -362,49 +345,47 @@ def render_widgets(page: ft.Page):
 
     # Format and render our widgets so they always look fancy on the page
     # If pin is empty, don't expand (hide it)
-    if len(top_pin.controls) == 0:
+    if len(story.top_pin.controls) == 0:
         tpf.expand = False
     else:
         # format and add our top pin
-        top_pin.height=default_pin_height
-        tpf.height = default_pin_height + 50
+        if story.top_pin.height < minimum_pin_height:
+            story.top_pin.height = minimum_pin_height
 
         tpf.controls.append(ft.Container(height=10)) 
-        tpf.controls.append(top_pin)  
-        tpf.controls.append(hgd)
+        tpf.controls.append(story.top_pin)  
+        tpf.controls.append(top_pin_gesture_detector)
 
-    if len(left_pin.controls) == 0:
+    if len(story.left_pin.controls) == 0:
         lpf.expand = False
     else:
-        left_pin.width=default_pin_width
-        left_pin.controls.insert(0, ft.Container(width=10))  # Add spacing to left pin
-        left_pin.controls.append(ft.Container(width=10))  # Add spacing to left pin
+        story.left_pin.width=minimum_pin_width
+
         lpf.controls.append(ft.Container(width=10))
-        lpf.controls.append(left_pin)
+        lpf.controls.append(story.left_pin)
+        lpf.controls.append(left_pin_gesture_detector)
 
-    if len(main_pin.controls) == 0:
-        main_pin.controls.append(ft.Container(expand=True))
-
-    if len(right_pin.controls) == 0:
+    
+    if len(story.right_pin.controls) == 0:
         rpf.expand = False  
     else:
-        right_pin.width=default_pin_width
-        right_pin.controls.insert(0, ft.Container(width=10))
-        right_pin.controls.append(ft.Container(width=10))
-        rpf.controls.append(right_pin)
+        story.right_pin.width=minimum_pin_width
+        story.right_pin.controls.insert(0, ft.Container(width=10))
+        story.right_pin.controls.append(ft.Container(width=10))
+        rpf.controls.append(story.right_pin)
         rpf.controls.append(ft.Container(width=10))
 
-    if len(main_pin.controls) == 0:
-        main_pin.expand = False
+    if len(story.main_pin.controls) == 0:
+        story.main_pin.expand = False
     
 
-    if len(bottom_pin.controls) == 0:
+    if len(story.bottom_pin.controls) == 0:
         bpf.expand = False
     else:
         # format and add our top pin
-        bottom_pin.height=default_pin_height
+        story.bottom_pin.height=minimum_pin_height
 
-        bpf.controls.append(bottom_pin)
+        bpf.controls.append(story.bottom_pin)
         bpf.controls.append(ft.Container(height=10))    
 
 
@@ -417,10 +398,13 @@ def render_widgets(page: ft.Page):
             expand=True, spacing=10, 
             controls=[
                 tpf,    # formatted top pin
-                main_pin,     # main work area with widgets
+                story.main_pin,     # main work area with widgets
                 bpf     # formatted bottom pin
         ]),
         rpf,    # formatted right pin
     ]
 
     page.update()
+
+
+# Holding flet controls as our pins inside of story now, 

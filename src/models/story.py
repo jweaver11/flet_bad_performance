@@ -1,6 +1,7 @@
 ''' Master Story/Project class for projects'''
 
 import os
+import flet as ft
 
 # Saving characters locally
 app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
@@ -14,11 +15,11 @@ class Story:
         self.title = title  # Title of story
 
         # Hold a copy of our story objects for rendering their widgets
-        self.top_pin_obj = []
-        self.left_pin_obj = []
-        self.main_pin_obj = []
-        self.right_pin_obj = []
-        self.bottom_pin_obj = []
+        self.top_pin = ft.Row(spacing=10, controls=[], height=0)
+        self.left_pin = ft.Column(spacing=10, controls=[])
+        self.main_pin = ft.Row(expand=True, spacing=10, controls=[])   # no formatting needed
+        self.right_pin = ft.Column(spacing=10, controls=[])
+        self.bottom_pin = ft.Row(spacing=10, controls=[])
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
