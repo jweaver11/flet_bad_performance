@@ -20,7 +20,7 @@ def characters_rail(page: ft.Page):
     arrange_widgets()  # Arrange our characters into their pin locations
         
     # Show the widget of character. Runs when character is clicked in the rail
-    def popout(e, name):
+    def popout_character_widget(e, name):
         # Show our widget
         for character in story.characters:
             if character.title == name:
@@ -30,11 +30,11 @@ def characters_rail(page: ft.Page):
         page.update()
         
     # Rename our character
-    def rename(e):
+    def rename_character(e):
         print("pin clicked")
 
     # Delete our character object from the story, and its reference in its pin
-    def delete(e, name):
+    def delete_character(e, name):
         print("delete was run")
         for character in story.characters:
             if character.title == name:
@@ -58,10 +58,12 @@ def characters_rail(page: ft.Page):
         
         def add_character_from_dialog(e):
             name = dialog_textfield_ref.current.value  # Get name from dialog text field
-            if name and name.strip():    
-                # Create new character with appropriate tag
-                new_character = Character(name.strip(), page)
+            if name and name.strip() and check_character(name):   
+                name_strip = name.strip()
+                name_strip = name_strip.capitalize()  # Auto capitalize names
                 
+                # Create new character with appropriate tag
+                new_character = Character(name_strip, page)
                 # Set the appropriate tag based on the category
                 if tag == "main":
                     new_character.tags['main_character'] = True
@@ -86,6 +88,8 @@ def characters_rail(page: ft.Page):
                 # Close the dialog
                 dlg.open = False
                 page.update()
+            else:       # When character name is empty or already exists
+                print("Character name is empty or already exists")
         
         dlg = ft.AlertDialog(
             title=ft.Text("Enter Character Name"), 
@@ -102,6 +106,16 @@ def characters_rail(page: ft.Page):
             ],
             on_dismiss=lambda e: print("Dialog dismissed!")
         )
+
+        # checks if our character name is unique
+        def check_character(name):
+            for character in story.characters:
+                if character.title.lower() == name.lower():
+                    dlg.actions.insert(0, ft.Text("Character name must be unique", color=ft.Colors.RED_300))
+                    page.update()
+                    return False
+        
+            return True
 
         page.overlay.append(dlg)
         dlg.open = True
@@ -163,7 +177,7 @@ def characters_rail(page: ft.Page):
                     content=ft.TextButton(
                         expand=True, 
                         style=button_style,
-                        on_click=lambda e, name=character.title: popout(e, name),    # on click
+                        on_click=lambda e, name=character.title: popout_character_widget(e, name),    # on click
                         content=ft.Container(expand=True, content=ft.Row(
                             alignment=ft.MainAxisAlignment.START,
                             controls=[
@@ -180,9 +194,9 @@ def characters_rail(page: ft.Page):
                                     tooltip="", 
                                     visible=False,
                                     items=[
-                                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout(e, name)),
-                                        ft.PopupMenuItem(text="Rename", on_click=rename),
-                                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete(e, name)),
+                                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout_character_widget(e, name)),
+                                        ft.PopupMenuItem(text="Rename", on_click=rename_character),
+                                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_character(e, name)),
                                     ],
                                 ),
                             ], 
@@ -246,6 +260,4 @@ def characters_rail(page: ft.Page):
     return characters_rail
 
 
-
-# Make right clicking character pop open menu options
 # Auto capitalize names of characters, check if name already exists before adding another
