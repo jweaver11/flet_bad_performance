@@ -263,11 +263,13 @@ stack = ft.Stack(expand=True, controls=[widget_row])
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):
     print("render_widgets called")
+
     
     # We have our 5 pin locations that hold the containers, and the formatted controls that hold the pin locations
     # and formatting so it all looks nice. They also hold the draggable gesture detector dividers for resizing
     tpf = ft.Column(spacing=0, controls=[])  # Top pin formatting column
     lpf = ft.Row(spacing=0, controls=[])  # Left pin formatting row
+
     rpf = ft.Row(spacing=0, controls=[])  # Right pin formatting row
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
 
@@ -303,31 +305,10 @@ def render_widgets(page: ft.Page):
         on_hover=show_horizontal_cursor,
     )
 
-
-    arrange_widgets() # Only needs to run if main widget was empty catch occurs ^
-
-    '''
-    # Each obj is an extended flet container, meaning we just add it to our pin controls
-    for obj in story.top_pin_obj:
-        if obj.visible == True:
-            top_pin.controls.append(obj)
-    for obj in story.left_pin_obj:
-        if obj.visible == True:
-            left_pin.controls.append(obj)
-    for obj in story.main_pin_obj:
-            main_pin.controls.append(obj) 
-    for obj in story.right_pin_obj:
-        if obj.visible == True:
-            right_pin.controls.append(obj)
-    for obj in story.bottom_pin_obj:
-        if obj.visible == True:
-            bottom_pin.controls.append(obj)
-    '''
-
-
     # Arrange our widgets into their pin locations
     arrange_widgets() # Only needs to run if main widget was empty catch occurs ^
     # Otherwise this is uneccessary
+
     
     '''
     print(f"story.top_pin_obj length:  {len(story.top_pin_obj)}")
@@ -378,7 +359,6 @@ def render_widgets(page: ft.Page):
     if len(story.main_pin.controls) == 0:
         story.main_pin.expand = False
     
-
     if len(story.bottom_pin.controls) == 0:
         bpf.expand = False
     else:
@@ -407,4 +387,5 @@ def render_widgets(page: ft.Page):
     page.update()
 
 
-# Holding flet controls as our pins inside of story now, 
+# Fix formatting, get rest of drag targets working
+# Add stack so drag targets are same size as pin??

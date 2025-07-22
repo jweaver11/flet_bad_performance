@@ -169,6 +169,7 @@ def characters_rail(page: ft.Page):
         controls_padding=None,
         shape=ft.RoundedRectangleBorder()
     )
+        
 
     # Reloads our rail when changes happen in the character data
     # Characters are organized based on their tag of main, side, or background
@@ -188,10 +189,12 @@ def characters_rail(page: ft.Page):
                 title=ft.GestureDetector(
                     on_hover=show_options,  # Show our options button when hovering over character
                     on_exit=hide_options,
-                    content=ft.TextButton(
-                        expand=True, 
-                        style=button_style,
-                        on_click=lambda e, name=character.title: popout_character_widget(e, name),    # on click
+                    on_tap=lambda e, name=character.title: popout_character_widget(e, name),  # on click
+                    content=ft.Draggable(
+                        content_feedback=ft.TextButton(
+                            text=character.title,
+                        ), 
+                        group="widgets",
                         content=ft.Container(expand=True, content=ft.Row(
                             alignment=ft.MainAxisAlignment.START,
                             controls=[

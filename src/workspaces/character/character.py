@@ -15,9 +15,9 @@ class Character(ft.Container):
         self.controls = []  # flet list of controls to render rest of body
 
         self.tags = {
-            'main_character': True,       # Add star
-            'side_character' : True,     # add something
-            'background_character': True,     # make faded gray
+            'main_character': True,      
+            'side_character' : True,     
+            'background_character': True,     
             #good : bool
             #evil : bool
             #neutral : bool

@@ -16,7 +16,7 @@ class Story:
 
         # Hold a copy of our story objects for rendering their widgets
         self.top_pin = ft.Row(spacing=10, controls=[], height=0)
-        self.left_pin = ft.Column(spacing=10, controls=[])
+        self.left_pin = ft.Column(spacing=10, width=0, controls=[])
         self.main_pin = ft.Row(expand=True, spacing=10, controls=[])   # no formatting needed
         self.right_pin = ft.Column(spacing=10, controls=[])
         self.bottom_pin = ft.Row(spacing=10, controls=[])
