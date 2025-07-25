@@ -120,12 +120,21 @@ class Character(ft.Container):
 
             master_stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
             master_stack.update()
+            page.update()
 
         def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
             print("Drag complete called")
-            master_stack.controls.clear()
-            master_stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
+            # Instead of clearing and re-adding, just remove the pin drag targets
+            for target in pin_drag_targets:
+                if target in master_stack.controls:
+                    master_stack.controls.remove(target)
+            
+            # Ensure master_widget_row is in the stack
+            if master_widget_row not in master_stack.controls:
+                master_stack.controls.append(master_widget_row)
+            
             master_stack.update()
+            page.update()
 
         def hide(e):
             self.visible = False

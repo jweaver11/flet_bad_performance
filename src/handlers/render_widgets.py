@@ -20,9 +20,9 @@ def top_pin_drag_accept(e):
         if draggable:
             # Set object variable to our object
             object = draggable.data
-            print("object:\n", object) 
-        else:
-            print("Could not find control with src_id:", src_id)
+            #print("object:\n", object) 
+        #else:
+            #print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
@@ -33,6 +33,11 @@ def top_pin_drag_accept(e):
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     e.control.content = ft.Row()
     e.control.update()
+
+    # Properly reset the stack
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)
+    master_stack.update()
     print("top pin accepted")
 
 def left_pin_drag_accept(e):
@@ -43,11 +48,11 @@ def left_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            print("object:\n", object) 
-        else:
-            print("Could not find control with src_id:", src_id)
+            #print("object:\n", object) 
+        #else:
+            #print("Could not find control with src_id:", src_id)
     else:
-        print("src_id not found in event data")
+       print("src_id not found in event data")
 
     # Set our objects pin location to the correct new location
     object.pin_location = "left"
@@ -56,6 +61,11 @@ def left_pin_drag_accept(e):
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     e.control.content = ft.Row()
     e.control.update()
+
+    # Properly reset the stack
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)
+    master_stack.update()
     print("left pin accepted")
 
 def main_pin_drag_accept(e):
@@ -66,9 +76,9 @@ def main_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            print("object:\n", object) 
-        else:
-            print("Could not find control with src_id:", src_id)
+            #print("object:\n", object) 
+        #else:
+            #print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
@@ -77,8 +87,16 @@ def main_pin_drag_accept(e):
 
     arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row()
+    
+    # Reset the drag target appearance but don't clear it completely
+    e.control.content = ft.Row(height=minimum_pin_height)
     e.control.update()
+    
+    # Properly reset the stack
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)
+    master_stack.update()
+    
     print("main pin accepted")
 
 
@@ -90,9 +108,9 @@ def right_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            print("object:\n", object) 
-        else:
-            print("Could not find control with src_id:", src_id)
+            #print("object:\n", object) 
+        #else:
+            #print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
@@ -103,6 +121,11 @@ def right_pin_drag_accept(e):
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     e.control.content = ft.Row()
     e.control.update()
+
+    # Properly reset the stack
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)
+    master_stack.update()
     print("right pin accepted")
 
 def bottom_pin_drag_accept(e):
@@ -113,9 +136,9 @@ def bottom_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            print("object:\n", object) 
-        else:
-            print("Could not find control with src_id:", src_id)
+            #print("object:\n", object) 
+        #else:
+            #print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
@@ -126,6 +149,11 @@ def bottom_pin_drag_accept(e):
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     e.control.content = ft.Row()
     e.control.update()
+
+    # Properly reset the stack
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)
+    master_stack.update()
     print("bottom pin accepted")
 
 # Drag target to catch draggable drops between the drag targets
@@ -144,9 +172,16 @@ def drag_will_accept(e):
         height=minimum_pin_height
     )
     e.control.update()
+    
+    # Clear the stack and rebuild it properly
     master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
-    master_stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stac
+    master_stack.controls.append(master_widget_row)
+    
+    # Only add drag targets if they're not already in the stack
+    for target in pin_drag_targets:
+        if target not in master_stack.controls:
+            master_stack.controls.append(target)
+    
     master_stack.update()
 
 # When a draggable leaves a target
@@ -204,6 +239,11 @@ bottom_pin_drag_target = ft.DragTarget(
     content=ft.Row(), 
     on_accept=bottom_pin_drag_accept, on_will_accept=drag_will_accept, on_leave=on_leave,
 )
+
+def hide_pin_drag_targets():
+    for target in pin_drag_targets:
+        target.visible = False
+        target.update()
 
 # containers for our pin drag targets
 pin_drag_targets = [    # Must be in flet containers in order to position them

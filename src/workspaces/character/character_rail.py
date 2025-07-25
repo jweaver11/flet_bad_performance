@@ -88,6 +88,7 @@ def characters_rail(page: ft.Page):
                 
                 #story.characters.append(new_character)
                 story.create_character(new_character)
+                story.left_pin.controls.append(new_character)  # Add to left pin
                 reload_character_rail()   
                 arrange_widgets() 
                 render_widgets(page)  
@@ -218,7 +219,7 @@ def characters_rail(page: ft.Page):
                                     icon_color=ft.Colors.GREY_400, 
                                     tooltip="", 
                                     visible=False,
-                                    scale=.9,
+                                    scale=.8,
                                     items=[
                                         ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout_character_widget(e, name)),
                                         ft.PopupMenuItem(text="Rename", on_click=rename_character),
