@@ -1,6 +1,5 @@
 ''' Menu bar at the top of the page '''
 import flet as ft
-from handlers.render_widgets import stack, widget_row, pin_drag_targets
 
 
 def create_menu_bar(page: ft.Page):

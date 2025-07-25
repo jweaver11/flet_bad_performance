@@ -1,6 +1,6 @@
 import flet as ft
 from models.user import user
-from handlers.render_widgets import render_widgets, widget_row, pin_drag_targets, stack
+from handlers.render_widgets import render_widgets, master_widget_row, pin_drag_targets, stack
 
 story = user.active_story  # Get our story object from the user
 # Class for each character. Requires passing in a name
@@ -126,7 +126,7 @@ class Character(ft.Container):
         def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
             print("Drag complete called")
             stack.controls.clear()
-            stack.controls.append(widget_row)  # Re-add the widget row to the stack
+            stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
             stack.update()
 
         def hide(e):

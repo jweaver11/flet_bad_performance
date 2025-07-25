@@ -133,7 +133,7 @@ def ib_drag_accept(e):
     e.control.content = ft.Row(height=minimum_pin_height)
     e.control.update()
     stack.controls.clear()
-    stack.controls.append(widget_row)  # Re-add the widget row to the stack
+    stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
     stack.update()
     print("ib drag target accepted")
 
@@ -145,7 +145,7 @@ def drag_will_accept(e):
     )
     e.control.update()
     stack.controls.clear()
-    stack.controls.append(widget_row)  # Re-add the widget row to the stack
+    stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
     stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stac
     stack.update()
 
@@ -217,14 +217,13 @@ pin_drag_targets = [    # Must be in flet containers in order to position them
     ft.Container(
         content=top_pin_drag_target,
         height=200,
-        margin=ft.margin.only(top=10, left=20, right=20),
+        margin=ft.margin.only(left=20, right=20),
         top=0, left=200, right=200,
         border_radius=ft.border_radius.all(10),  
     ),
     ft.Container(
         content=left_pin_drag_target,
         width=200,
-        margin=ft.margin.only(top=10, left=10, bottom=10,),
         left=0, top=0, bottom=0,
         border_radius=ft.border_radius.all(10), 
     ),
@@ -237,7 +236,6 @@ pin_drag_targets = [    # Must be in flet containers in order to position them
     ft.Container(
         content=right_pin_drag_target,
         width=200,
-        margin=ft.margin.only(top=10, right=10, bottom=10,),
         right=0, top=0, bottom=0,
         border_radius=ft.border_radius.all(10),  
     ),
@@ -245,20 +243,20 @@ pin_drag_targets = [    # Must be in flet containers in order to position them
         content=bottom_pin_drag_target,
         height=200,
         bottom=0, left=200, right=200,
-        margin=ft.margin.only(left=20, right=20, bottom=10),
+        margin=ft.margin.only(left=20, right=20),
         border_radius=ft.border_radius.all(10), 
     ),
 ]
 
 # Master row that holds all our widgets
-widget_row = ft.Row(
+master_widget_row = ft.Row(
     spacing=0,
     expand=True,
     controls=[]
 )
 
 # Stack that holds our widget row, and the drag targets overtop them when it needs to
-stack = ft.Stack(expand=True, controls=[widget_row])
+stack = ft.Stack(expand=True, controls=[master_widget_row])
 
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):
@@ -277,7 +275,7 @@ def render_widgets(page: ft.Page):
         tpf.update()
 
     # Holds the divider that is draggable to resize the top pin
-    top_pin_gesture_detector = ft.GestureDetector(
+    top_pin_resizer = ft.GestureDetector(
         content=ft.Divider(color=ft.Colors.PRIMARY, height=10, thickness=10),
         on_pan_update=move_top_pin_divider,
         on_hover=show_vertical_cursor,
@@ -292,19 +290,18 @@ def render_widgets(page: ft.Page):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
         e.control.update()
 
-    left_pin_gesture_detector = ft.GestureDetector(
+    left_pin_resizer = ft.GestureDetector(
         content=ft.VerticalDivider(thickness=10, width=10, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
         on_pan_update=move_left_pin_divider,
         on_hover=show_horizontal_cursor,
     )
 
     
-    # We have our 5 pin locations that hold the containers, and the formatted controls that hold the pin locations
-    # and formatting so it all looks nice. They also hold the draggable gesture detector dividers for resizing
-    tpf = ft.Column(spacing=0, controls=[story.top_pin, top_pin_gesture_detector])  # Top pin formatting column
+    # Formatted pin locations that hold our draggable dividers
+    tpf = ft.Column(spacing=0, controls=[story.top_pin, top_pin_resizer])  # Top pin formatting column
 
     # Adds padding to left of left pin widgets
-    lpfr = ft.Row(spacing=0, controls=[story.left_pin, left_pin_gesture_detector]) 
+    lpfr = ft.Row(spacing=0, controls=[story.left_pin, left_pin_resizer]) 
 
     rpf = ft.Row(spacing=0, controls=[])  # Right pin formatting row
     bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
@@ -346,8 +343,8 @@ def render_widgets(page: ft.Page):
 
 
     # Format our pins on the page
-    widget_row.controls.clear()
-    widget_row.controls = [
+    master_widget_row.controls.clear()
+    master_widget_row.controls = [
         lpfr,    # formatted left pin
         ft.Column(
             expand=True, spacing=10, 
