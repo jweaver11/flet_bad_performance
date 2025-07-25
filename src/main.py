@@ -5,10 +5,10 @@ so they can update themselves dynamically
 '''
 import flet as ft
 from models.user import user
-from hud.menu_bar import create_menu_bar
-from hud.workspaces_rail import create_rails
-from hud.active_rail import create_active_rail
-from hud.workspace import create_workspace
+from ui.menu_bar import create_menu_bar
+from ui.workspaces_rail import create_rails
+from ui.active_rail import create_active_rail
+from ui.workspace import create_workspace
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------

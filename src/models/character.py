@@ -1,8 +1,6 @@
 import flet as ft
-from models.user import user
 from handlers.render_widgets import render_widgets, master_widget_row, pin_drag_targets, stack
 
-story = user.active_story  # Get our story object from the user
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
@@ -10,7 +8,7 @@ class Character(ft.Container):
         self.tag = "character"  # Tag for logic
 
         self.pin_location = "left"  # Start in main pin location
-        story.left_pin.controls.append(self)  # Add to left pin location
+        #story.left_pin.controls.append(self)  # Add to left pin location
         
         self.controls = []  # flet list of controls to render rest of body
 

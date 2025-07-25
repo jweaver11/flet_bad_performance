@@ -7,7 +7,7 @@ the create 'character button' at the bottom.
 import flet as ft
 from workspaces.character.character_styles import button_style
 from models.user import user
-from workspaces.character.character import Character
+from models.character import Character
 from handlers.render_widgets import render_widgets
 from handlers.arrange_widgets import arrange_widgets
 
@@ -15,8 +15,16 @@ story = user.stories['empty_story']  # Get our story object from the user
 
 
 def characters_rail(page: ft.Page):
-    story.characters.append(Character("Bob", page))
-    story.characters.append(Character("Joe", page))
+    char1 = Character("Bob", page)
+    char2 = Character("Alice", page)
+    char3 = Character("Joe", page)
+
+    story.characters.append(char1)
+    story.characters.append(char2)
+    story.characters.append(char3)
+    story.left_pin.controls.append(char1)
+    story.left_pin.controls.append(char2)
+    story.left_pin.controls.append(char3)
     arrange_widgets()  # Arrange our characters into their pin locations
         
     # Show the widget of character. Runs when character is clicked in the rail

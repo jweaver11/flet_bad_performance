@@ -1,6 +1,6 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
-from hud.active_rail import workspace_rails, default_rail, active_rail
+from ui.active_rail import workspace_rails, default_rail, active_rail
 from models.user import user
 
 story = user.stories['empty_story']  # Get our story object from the user
