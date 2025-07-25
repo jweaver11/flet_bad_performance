@@ -14,7 +14,7 @@ from ui.workspace import create_workspace
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
-    story = user.stories['empty_story']  # Get our story object from the user
+    story = user.active_story  # Get our story object from the user
 
 
     # Adds our page title and theme

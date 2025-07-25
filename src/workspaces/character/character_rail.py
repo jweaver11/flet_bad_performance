@@ -15,16 +15,12 @@ story = user.stories['empty_story']  # Get our story object from the user
 
 
 def characters_rail(page: ft.Page):
-    char1 = Character("Bob", page)
-    char2 = Character("Alice", page)
-    char3 = Character("Joe", page)
 
-    story.characters.append(char1)
-    story.characters.append(char2)
-    story.characters.append(char3)
-    story.left_pin.controls.append(char1)
-    story.left_pin.controls.append(char2)
-    story.left_pin.controls.append(char3)
+    # Initially create some characters to test with
+    story.add_object_to_story(Character("Bob", page))
+    story.add_object_to_story(Character("Alice", page))
+    story.add_object_to_story(Character("Joe", page))
+
     arrange_widgets()  # Arrange our characters into their pin locations
         
     # Show the widget of character. Runs when character is clicked in the rail

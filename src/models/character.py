@@ -188,6 +188,10 @@ class Character(ft.Container):
     species : str
     parents = []
 
+    # Adds our character object to the storyies list of characters and gives it a pin location
+    def create_character(self, story):
+        story.create_character(self)
+
 
 
 # Make widget container contain markdown for rendering, and scrollable
