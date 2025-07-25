@@ -5,6 +5,15 @@ story = user.active_story  # Get our story object from the user
 def arrange_widgets():
     print("arrange widgets called")
 
+    '''     Steal from other pins if main pin is empty
+    if len(story.main_pin.controls) <= 0:
+        if len(story.top_pin.controls) > 0:
+            print("Steal from top pin")
+        elif len(story.left_pin.controls) > 0:
+            story.main_pin.controls.append(story.left_pin.controls[0])
+            #...
+    '''
+
     # Append a reference obj to the pin location based on its pin location tag
     def update_pin_location(obj):
         pin_location = obj.pin_location

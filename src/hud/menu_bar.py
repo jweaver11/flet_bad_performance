@@ -258,50 +258,5 @@ def create_menu_bar(page: ft.Page):
             ]))
 
 
-    # Accept functions for each pin location
-    def drag_accept(e):
-        e.control.update()
-        stack.controls.clear()
-        stack.controls.append(widget_row)  # Re-add the widget row to the stack
-        stack.update()
-        #print("menubar drag target accepted")
 
-    def drag_will_accept(e):
-        #print("Entered menubar drag target")
-        stack.controls.clear()
-        stack.controls.append(widget_row)  # Re-add the widget row to the stack
-        stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stack
-        stack.update()
-        page.open(
-            ft.SnackBar(
-                bgcolor=ft.Colors.GREY_900,
-                duration=ft.Duration(seconds=3),
-                content=ft.Text(color=ft.Colors.BLUE_200, value="Please don't drag widgets outside workspace area. You might break the program!")
-            )
-        )
-        page.update()
-
-    # When a draggable leaves a target
-    def on_leave(e):
-        #print("Left menubar target")
-        stack.controls.clear()
-        stack.controls.append(widget_row)  # Re-add the widget row to the stack
-        stack.update()
-        page.update()
-
-
-    dt = ft.DragTarget(
-        group="widgets", 
-        content=ft.Row(expand=True, height=40), 
-        on_accept=drag_accept,
-        on_will_accept=drag_will_accept,
-        on_leave=on_leave,
-    )
-
-    s = ft.Stack(
-        controls=[menubar_container, dt]
-    )
-
-
-
-    return s
+    return menubar_container

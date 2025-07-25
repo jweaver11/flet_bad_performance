@@ -252,7 +252,7 @@ pin_drag_targets = [    # Must be in flet containers in order to position them
 
 # Master row that holds all our widgets
 widget_row = ft.Row(
-    spacing=10,
+    spacing=0,
     expand=True,
     controls=[]
 )
@@ -264,50 +264,51 @@ stack = ft.Stack(expand=True, controls=[widget_row])
 def render_widgets(page: ft.Page):
     print("render_widgets called")
 
-    
-    # We have our 5 pin locations that hold the containers, and the formatted controls that hold the pin locations
-    # and formatting so it all looks nice. They also hold the draggable gesture detector dividers for resizing
-    tpf = ft.Column(spacing=0, controls=[])  # Top pin formatting column
-    lpf = ft.Row(spacing=0, controls=[])  # Left pin formatting row
+    # Change our cursor when we hover over a divider 
+    def show_vertical_cursor(e: ft.HoverEvent):
+        e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
+        e.control.update()
 
-    rpf = ft.Row(spacing=0, controls=[])  # Right pin formatting row
-    bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
-
-    # Method called when our divider (inside a gesture detector) is dragged
+        # Method called when our divider (inside a gesture detector) is dragged
     # Updates the size of our pin in the story object
     def move_top_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_y > 0 and story.top_pin.height < page.height/2) or (e.delta_y < 0 and story.top_pin.height > 200):
             story.top_pin.height += e.delta_y
         tpf.update()
+
+    # Holds the divider that is draggable to resize the top pin
+    top_pin_gesture_detector = ft.GestureDetector(
+        content=ft.Divider(color=ft.Colors.PRIMARY, height=10, thickness=10),
+        on_pan_update=move_top_pin_divider,
+        on_hover=show_vertical_cursor,
+    )
+
     def move_left_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_x > 0 and story.left_pin.width < page.width/2) or (e.delta_x < 0 and story.left_pin.width > 200):
             story.left_pin.width += e.delta_x
-        lpf.update()
+        lpfr.update()
 
-    # Change our cursor when we hover over a divider 
-    def show_vertical_cursor(e: ft.HoverEvent):
-        e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
-        e.control.update()
     def show_horizontal_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
         e.control.update()
 
-    # Holds the divider that is draggable to resize the top pin
-    top_pin_gesture_detector = ft.GestureDetector(
-        content=ft.Divider(color=ft.Colors.PRIMARY, height=10),
-        on_pan_update=move_top_pin_divider,
-        on_hover=show_vertical_cursor,
-    )
-    # Holds the divider that is draggable to resize the top pin
     left_pin_gesture_detector = ft.GestureDetector(
-        content=ft.VerticalDivider(color=ft.Colors.PRIMARY, width=10),
+        content=ft.VerticalDivider(thickness=10, width=10, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
         on_pan_update=move_left_pin_divider,
         on_hover=show_horizontal_cursor,
     )
 
-    # Arrange our widgets into their pin locations
-    arrange_widgets() # Only needs to run if main widget was empty catch occurs ^
-    # Otherwise this is uneccessary
+    
+    # We have our 5 pin locations that hold the containers, and the formatted controls that hold the pin locations
+    # and formatting so it all looks nice. They also hold the draggable gesture detector dividers for resizing
+    tpf = ft.Column(spacing=0, controls=[story.top_pin, top_pin_gesture_detector])  # Top pin formatting column
+
+    # Adds padding to left of left pin widgets
+    lpfr = ft.Row(spacing=0, controls=[story.left_pin, left_pin_gesture_detector]) 
+
+    rpf = ft.Row(spacing=0, controls=[])  # Right pin formatting row
+    bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
+
 
     
     '''
@@ -327,53 +328,27 @@ def render_widgets(page: ft.Page):
     # Format and render our widgets so they always look fancy on the page
     # If pin is empty, don't expand (hide it)
     if len(story.top_pin.controls) == 0:
-        tpf.expand = False
+        tpf.visible = False
     else:
+        tpf.visible = True
         # format and add our top pin
         if story.top_pin.height < minimum_pin_height:
             story.top_pin.height = minimum_pin_height
 
-        tpf.controls.append(ft.Container(height=10)) 
-        tpf.controls.append(story.top_pin)  
-        tpf.controls.append(top_pin_gesture_detector)
-
+    # If no widgets in left pin, hide it
     if len(story.left_pin.controls) == 0:
-        lpf.expand = False
+        lpfr.visible = False
+        
     else:
         story.left_pin.width=minimum_pin_width
-
-        lpf.controls.append(ft.Container(width=10))
-        lpf.controls.append(story.left_pin)
-        lpf.controls.append(left_pin_gesture_detector)
-
-    
-    if len(story.right_pin.controls) == 0:
-        rpf.expand = False  
-    else:
-        story.right_pin.width=minimum_pin_width
-        story.right_pin.controls.insert(0, ft.Container(width=10))
-        story.right_pin.controls.append(ft.Container(width=10))
-        rpf.controls.append(story.right_pin)
-        rpf.controls.append(ft.Container(width=10))
-
-    if len(story.main_pin.controls) == 0:
-        story.main_pin.expand = False
-    
-    if len(story.bottom_pin.controls) == 0:
-        bpf.expand = False
-    else:
-        # format and add our top pin
-        story.bottom_pin.height=minimum_pin_height
-
-        bpf.controls.append(story.bottom_pin)
-        bpf.controls.append(ft.Container(height=10))    
+        lpfr.visible = True
 
 
 
     # Format our pins on the page
     widget_row.controls.clear()
     widget_row.controls = [
-        lpf,    # formatted left pin
+        lpfr,    # formatted left pin
         ft.Column(
             expand=True, spacing=10, 
             controls=[
