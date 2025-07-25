@@ -1,5 +1,5 @@
 import flet as ft
-from handlers.render_widgets import render_widgets, master_widget_row, pin_drag_targets, stack
+from handlers.render_widgets import render_widgets, master_widget_row, pin_drag_targets, master_stack
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
@@ -118,14 +118,14 @@ class Character(ft.Container):
         def on_drag_start(e):
             print("\ndrag start called\n")
 
-            stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
-            stack.update()
+            master_stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
+            master_stack.update()
 
         def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
             print("Drag complete called")
-            stack.controls.clear()
-            stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
-            stack.update()
+            master_stack.controls.clear()
+            master_stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
+            master_stack.update()
 
         def hide(e):
             self.visible = False

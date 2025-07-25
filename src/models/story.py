@@ -15,11 +15,11 @@ class Story:
         self.title = title  # Title of story
 
         # Hold a copy of our story objects for rendering their widgets
-        self.top_pin = ft.Row(spacing=10, controls=[], height=0)
+        self.top_pin = ft.Row(spacing=10, height=0, controls=[],)
         self.left_pin = ft.Column(spacing=10, width=0, controls=[])
-        self.main_pin = ft.Row(expand=True, spacing=10, controls=[])   # no formatting needed
-        self.right_pin = ft.Column(spacing=10, controls=[])
-        self.bottom_pin = ft.Row(spacing=10, controls=[])
+        self.main_pin = ft.Row(spacing=10, expand=True, controls=[])   # no formatting needed
+        self.right_pin = ft.Column(spacing=10, width=0, controls=[])
+        self.bottom_pin = ft.Row(spacing=10, height=0, controls=[])
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters

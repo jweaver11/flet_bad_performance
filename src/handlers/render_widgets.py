@@ -132,9 +132,9 @@ def bottom_pin_drag_accept(e):
 def ib_drag_accept(e):
     e.control.content = ft.Row(height=minimum_pin_height)
     e.control.update()
-    stack.controls.clear()
-    stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
-    stack.update()
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
+    master_stack.update()
     print("ib drag target accepted")
 
 # When a draggable is hovering over a target
@@ -144,17 +144,17 @@ def drag_will_accept(e):
         height=minimum_pin_height
     )
     e.control.update()
-    stack.controls.clear()
-    stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
-    stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stac
-    stack.update()
+    master_stack.controls.clear()
+    master_stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
+    master_stack.controls.extend(pin_drag_targets)  # Add the drag targets to the stac
+    master_stack.update()
 
 # When a draggable leaves a target
 def on_leave(e):
     #print("Left a pin drag target")
     e.control.content = ft.Row(height=300)
     e.control.update()
-    stack.update()
+    master_stack.update()
 
 
 # set minimumm fallbacks for our pins
@@ -256,23 +256,28 @@ master_widget_row = ft.Row(
 )
 
 # Stack that holds our widget row, and the drag targets overtop them when it needs to
-stack = ft.Stack(expand=True, controls=[master_widget_row])
+master_stack = ft.Stack(expand=True, controls=[master_widget_row])
 
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):
     print("render_widgets called")
 
-    # Change our cursor when we hover over a divider 
+    # Change our cursor when we hover over a divider. Either vertical or horizontal
     def show_vertical_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
         e.control.update()
+    def show_horizontal_cursor(e: ft.HoverEvent):
+        e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+        e.control.update()
 
-        # Method called when our divider (inside a gesture detector) is dragged
+    # Method called when our divider (inside a gesture detector) is dragged
     # Updates the size of our pin in the story object
     def move_top_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_y > 0 and story.top_pin.height < page.height/2) or (e.delta_y < 0 and story.top_pin.height > 200):
             story.top_pin.height += e.delta_y
-        tpf.update()
+        formatted_top_pin.update()
+        master_widget_row.update() # Update the main pin, as it is affected by all pins resizing
+        master_stack.update()
 
     # Holds the divider that is draggable to resize the top pin
     top_pin_resizer = ft.GestureDetector(
@@ -281,30 +286,51 @@ def render_widgets(page: ft.Page):
         on_hover=show_vertical_cursor,
     )
 
+    # Left pin reisizer
     def move_left_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_x > 0 and story.left_pin.width < page.width/2) or (e.delta_x < 0 and story.left_pin.width > 200):
             story.left_pin.width += e.delta_x
-        lpfr.update()
-
-    def show_horizontal_cursor(e: ft.HoverEvent):
-        e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-        e.control.update()
-
+        formatted_left_pin.update()
+        master_widget_row.update()
+        master_stack.update()
     left_pin_resizer = ft.GestureDetector(
         content=ft.VerticalDivider(thickness=10, width=10, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
         on_pan_update=move_left_pin_divider,
         on_hover=show_horizontal_cursor,
     )
 
+    # Right pin resizer
+    def move_right_pin_divider(e: ft.DragUpdateEvent):
+        if (e.delta_x < 0 and story.right_pin.width < page.width/2) or (e.delta_x > 0 and story.right_pin.width > 200):
+            story.right_pin.width -= e.delta_x
+        formatted_right_pin.update()
+        master_widget_row.update()
+        master_stack.update()
+    right_pin_resizer = ft.GestureDetector(
+        content=ft.VerticalDivider(thickness=10, width=10, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
+        on_pan_update=move_right_pin_divider,
+        on_hover=show_horizontal_cursor,
+    )
+    # Bottom pin resizer
+    def move_bottom_pin_divider(e: ft.DragUpdateEvent):
+        if (e.delta_y < 0 and story.bottom_pin.height < page.height/2) or (e.delta_y > 0 and story.bottom_pin.height > 200):
+            story.bottom_pin.height -= e.delta_y
+        formatted_bottom_pin.update()
+        master_widget_row.update()
+        master_stack.update()
+    bottom_pin_resizer = ft.GestureDetector(
+        content=ft.Divider(color=ft.Colors.PRIMARY, height=10, thickness=10),
+        on_pan_update=move_bottom_pin_divider,
+        on_hover=show_vertical_cursor,
+    )
+
     
-    # Formatted pin locations that hold our draggable dividers
-    tpf = ft.Column(spacing=0, controls=[story.top_pin, top_pin_resizer])  # Top pin formatting column
-
-    # Adds padding to left of left pin widgets
-    lpfr = ft.Row(spacing=0, controls=[story.left_pin, left_pin_resizer]) 
-
-    rpf = ft.Row(spacing=0, controls=[])  # Right pin formatting row
-    bpf = ft.Column(spacing=0, controls=[])  # Bottom pin formatting column
+    # Formatted pin locations that also hold our resizer gesture detecctors
+    # Main pin is always expanded and has no resizer, so it doesnt need to be formatted
+    formatted_top_pin = ft.Column(spacing=0, controls=[story.top_pin, top_pin_resizer])
+    formatted_left_pin = ft.Row(spacing=0, controls=[story.left_pin, left_pin_resizer]) 
+    formatted_right_pin = ft.Row(spacing=0, controls=[right_pin_resizer, story.right_pin])  # Right pin formatting row
+    formatted_bottom_pin = ft.Column(spacing=0, controls=[bottom_pin_resizer, story.bottom_pin])  # Bottom pin formatting column
 
 
     
@@ -321,42 +347,67 @@ def render_widgets(page: ft.Page):
     print(f"visible widgets:    {len(bottom_pin.controls)} \n")
     '''
 
-
-    # Format and render our widgets so they always look fancy on the page
-    # If pin is empty, don't expand (hide it)
+    # Check if we have any widgets in top pin. If not, we hide the formatted top pin
+    # If there are widgets, check if any are visible. If yes, show the formatted pin and break the loop
     if len(story.top_pin.controls) == 0:
-        tpf.visible = False
+        formatted_top_pin.visible = False
     else:
-        tpf.visible = True
+        for obj in story.top_pin.controls:
+            if obj.visible == True:
+                formatted_top_pin.visible = True
+                break
         # format and add our top pin
         if story.top_pin.height < minimum_pin_height:
             story.top_pin.height = minimum_pin_height
 
-    # If no widgets in left pin, hide it
     if len(story.left_pin.controls) == 0:
-        lpfr.visible = False
-        
+        formatted_left_pin.visible = False
     else:
-        story.left_pin.width=minimum_pin_width
-        lpfr.visible = True
+        for obj in story.left_pin.controls:
+            if obj.visible == True:
+                formatted_left_pin.visible = True
+                break
+        if story.left_pin.width < minimum_pin_width:
+            story.left_pin.width = minimum_pin_width
+
+    if len(story.right_pin.controls) == 0:
+        formatted_right_pin.visible = False
+    else:
+        for obj in story.right_pin.controls:
+            if obj.visible == True:
+                formatted_right_pin.visible = True
+                break
+        if story.right_pin.width < minimum_pin_width:
+            story.right_pin.width = minimum_pin_width
+
+    if len(story.bottom_pin.controls) == 0:
+        formatted_bottom_pin.visible = False
+    else:
+        for obj in story.bottom_pin.controls:
+            if obj.visible == True:
+                formatted_bottom_pin.visible = True
+                break
+        if story.bottom_pin.height < minimum_pin_height:
+            story.bottom_pin.height = minimum_pin_height
 
 
 
     # Format our pins on the page
     master_widget_row.controls.clear()
     master_widget_row.controls = [
-        lpfr,    # formatted left pin
+        formatted_left_pin,    # formatted left pin
         ft.Column(
-            expand=True, spacing=10, 
+            expand=True, spacing=0, 
             controls=[
-                tpf,    # formatted top pin
+                formatted_top_pin,    # formatted top pin
                 story.main_pin,     # main work area with widgets
-                bpf     # formatted bottom pin
+                formatted_bottom_pin     # formatted bottom pin
         ]),
-        rpf,    # formatted right pin
+        formatted_right_pin,    # formatted right pin
     ]
 
     page.update()
+    arrange_widgets()
 
 
 # Fix formatting, get rest of drag targets working
