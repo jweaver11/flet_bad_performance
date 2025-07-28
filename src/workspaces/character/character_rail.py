@@ -150,19 +150,12 @@ def characters_rail(page: ft.Page):
 
     # Shows our popupmenubutton when hovering over a character, allowing for edit, rename, and delete
     def show_options(e):
-        popup_button = e.control.content.content.content.controls[2]
-        print(popup_button)
-        popup_button.opacity = 1    # Show our options button
-
-        e.control.mouse_cursor = ft.MouseCursor.CLICK  # Change cursor to pointer (hand)
-        e.control.update()
-
+        e.control.content.content.content.content.controls[2].opacity = 1
         page.update()
         print("show options called")
     # Gets rid of our popupmenubutton when mouse exits character
     def hide_options(e):
-        popup_button = e.control.content.content.content.controls[2]
-        popup_button.opacity = 0    # Hide our options button
+        e.control.content.content.content.content.controls[2].opacity = 0
         page.update()
         print("hide options called")
 
@@ -206,7 +199,7 @@ def characters_rail(page: ft.Page):
             draggable = e.page.get_control(src_id)
             if draggable:
                 object = draggable.data
-                print("object:\n", object) 
+                #print("object:\n", object) 
             else:
                 print("Could not find control with src_id:", src_id)
         else:
@@ -230,7 +223,7 @@ def characters_rail(page: ft.Page):
             draggable = e.page.get_control(src_id)
             if draggable:
                 object = draggable.data
-                print("object:\n", object) 
+                #print("object:\n", object) 
             else:
                 print("Could not find control with src_id:", src_id)
         else:
@@ -240,7 +233,7 @@ def characters_rail(page: ft.Page):
             object.tags['main_character'] = False
             object.tags['side_character'] = False
             object.tags['background_character'] = True
-            print(object.tags)
+            #print(object.tags)
         else:
             print("Object does not have tags attribute, cannot change character type")
         reload_character_rail() 
@@ -252,7 +245,8 @@ def characters_rail(page: ft.Page):
         title=ft.Text("Main"),
         collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
         tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
-        shape=ft.RoundedRectangleBorder()
+        shape=ft.RoundedRectangleBorder(),
+        controls_padding=None,
     )
     side_characters = ft.ExpansionTile(
         title=ft.Text("Side"),
@@ -312,36 +306,43 @@ def characters_rail(page: ft.Page):
                     data=character,  # Data to pass when dragging
                     group="widgets",
                     content=ft.Container(
-                        expand=True, 
-                        content=ft.Row(
-                            alignment=ft.MainAxisAlignment.START,
-                            controls=[
-                                ft.Container(
-                                    padding=ft.padding.only(left=8),
-                                    content=ft.Text(
-                                        value=character.title,
-                                        color=ft.Colors.PRIMARY,
-                                        max_lines=1,    # Handle too long of names
-                                        overflow=ft.TextOverflow.CLIP,  # Handle too long of names
-                                        weight=ft.FontWeight.BOLD,  # Make text bold
-                                        no_wrap=True,
-                                    )
-                                ),
-                                ft.Container(expand=True,),
-                                ft.PopupMenuButton(
-                                    icon_color=ft.Colors.GREY_400, 
-                                    tooltip="", 
-                                    opacity=0,
-                                    scale=.8,
-                                    items=[
-                                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: show_character_widget(e, name)),
-                                        ft.PopupMenuItem(text="Rename", on_click=lambda e, name=character.title: rename_character(e, name)),
-                                        ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_character(e, name)),
-                                    ],
-                                ),
-                            ], 
+                        expand=True,
+                        content=ft.GestureDetector(
+                            on_double_tap=lambda e: print("double clicked):"),
+                            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+                            content=ft.Row(
+                                alignment=ft.MainAxisAlignment.START,
+                                controls=[
+                                    ft.Container(
+                                        padding=ft.padding.only(left=8),
+                                        on_double_tap=lambda e: print("double clicked):"),
+                                        content=ft.GestureDetector(
+                                            mouse_cursor=ft.MouseCursor.TEXT,
+                                            content=ft.Text(
+                                                value=character.title,
+                                                color=ft.Colors.PRIMARY,
+                                                max_lines=1,    # Handle too long of names
+                                                overflow=ft.TextOverflow.CLIP,  # Handle too long of names
+                                                weight=ft.FontWeight.BOLD,  # Make text bold
+                                                no_wrap=True,
+                                            ),
+                                        )
+                                    ),
+                                    ft.Container(expand=True),
+                                    ft.PopupMenuButton(
+                                        icon_color=ft.Colors.GREY_400, 
+                                        tooltip="", 
+                                        opacity=0,
+                                        scale=.8,
+                                        items=[
+                                            ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: show_character_widget(e, name)),
+                                            ft.PopupMenuItem(text="Rename", on_click=lambda e, name=character.title: rename_character(e, name)),
+                                            ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_character(e, name)),
+                                        ],
+                                    ),
+                                ], 
+                            ))
                         )
-                    )
                 )
             )
             
