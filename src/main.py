@@ -3,6 +3,7 @@ The main 'story' page. The default page that all others work through.
 Each section of this main page contains another 'page',
 so they can update themselves dynamically
 '''
+
 import flet as ft
 from models.user import user
 from ui.menu_bar import create_menu_bar

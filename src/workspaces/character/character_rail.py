@@ -10,8 +10,9 @@ from models.user import user
 from models.character import Character
 from handlers.render_widgets import render_widgets
 from handlers.arrange_widgets import arrange_widgets
+import json
 
-story = user.stories['empty_story']  # Get our story object from the user
+story = user.active_story  # Get our story object from the user
 
 
 def characters_rail(page: ft.Page):
@@ -83,7 +84,7 @@ def characters_rail(page: ft.Page):
                     new_character.tags['background_character'] = True
                 
                 #story.characters.append(new_character)
-                story.create_character(new_character)
+                story.add_object_to_story(new_character)
                 story.left_pin.controls.append(new_character)  # Add to left pin
                 reload_character_rail()   
                 arrange_widgets() 
@@ -144,6 +145,10 @@ def characters_rail(page: ft.Page):
         popup_button = e.control.content.content.content.controls[2]
         print(popup_button)
         popup_button.visible = True     # Show our options button
+
+        e.control.mouse_cursor = ft.MouseCursor.CLICK  # Change cursor to pointer (hand)
+        e.control.update()
+
         page.update()
         print("show options called")
     # Gets rid of our popupmenubutton when mouse exits character
@@ -153,12 +158,92 @@ def characters_rail(page: ft.Page):
         page.update()
         print("hide options called")
 
-    # Set our three main categories of characters to be rendered on the screen
+    # Quality of life feature to change a character to main, side, or background by dragging them on the rail.
+    def make_main_character(e):
+        # Load our object
+        event_data = json.loads(e.data)
+        src_id = event_data.get("src_id")
+        
+        # Check if we loaded our data correctly
+        if src_id:
+            # Get the Draggable control by ID. our object is stored in its data
+            draggable = e.page.get_control(src_id)
+            if draggable:
+                # Set object variable to our object
+                object = draggable.data
+                print("object:\n", object) 
+            else:
+                print("Could not find control with src_id:", src_id)
+        else:
+            print("src_id not found in event data")
+            
+        # Change our character tags to reflect its new category    
+        if hasattr(object, 'tags'):
+            object.tags['main_character'] = True
+            object.tags['side_character'] = False
+            object.tags['background_character'] = False
+            print(object.tags)
+        else:
+            print("Object does not have tags attribute, cannot change character type")
+
+        reload_character_rail()  # Reload our character rail to show new character
+        object.update()     # Reflect our changes in the widget on the right
+        print("Character added to main characters")
+
+    def make_side_character(e):
+        event_data = json.loads(e.data)
+        src_id = event_data.get("src_id")
+        
+        if src_id:
+            draggable = e.page.get_control(src_id)
+            if draggable:
+                object = draggable.data
+                print("object:\n", object) 
+            else:
+                print("Could not find control with src_id:", src_id)
+        else:
+            print("src_id not found in event data")
+            
+        if hasattr(object, 'tags'):
+            object.tags['main_character'] = False
+            object.tags['side_character'] = True
+            object.tags['background_character'] = False
+            print(object.tags)
+        else:
+            print("Object does not have tags attribute, cannot change character type")
+        reload_character_rail()
+        object.update()
+
+    def make_background_character(e):
+        event_data = json.loads(e.data)
+        src_id = event_data.get("src_id")
+        
+        if src_id:
+            draggable = e.page.get_control(src_id)
+            if draggable:
+                object = draggable.data
+                print("object:\n", object) 
+            else:
+                print("Could not find control with src_id:", src_id)
+        else:
+            print("src_id not found in event data")
+            
+        if hasattr(object, 'tags'):
+            object.tags['main_character'] = False
+            object.tags['side_character'] = False
+            object.tags['background_character'] = True
+            print(object.tags)
+        else:
+            print("Object does not have tags attribute, cannot change character type")
+        reload_character_rail() 
+        object.update()
+
+    # The 3 main categories of characters and how they will be rendered on the screen
+    # There list of controls are populated from our character list in the story
     main_characters = ft.ExpansionTile(
         title=ft.Text("Main"),
         collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
         tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
-        controls_padding=None,
         shape=ft.RoundedRectangleBorder()
     )
     side_characters = ft.ExpansionTile(
@@ -174,6 +259,25 @@ def characters_rail(page: ft.Page):
         controls_padding=None,
         shape=ft.RoundedRectangleBorder()
     )
+
+    # Our drag targets so we can easily drag and drop characters into their categories
+    # These hold the expansion tiles lists from above, and are directly rendered in the rail
+    main_characters_drag_target = ft.DragTarget(
+        group="widgets",
+        on_accept=make_main_character,
+        content=main_characters
+    )
+    side_characters_drag_target = ft.DragTarget(
+        group="widgets",
+        on_accept=make_side_character,
+        content=side_characters
+    )
+    background_characters_drag_target = ft.DragTarget(
+        group="widgets",
+        on_accept=make_background_character,
+        content=background_characters
+    )
+
         
 
     # Reloads our rail when changes happen in the character data
@@ -185,22 +289,23 @@ def characters_rail(page: ft.Page):
         side_characters.controls.clear()
         background_characters.controls.clear()
 
-        # Run through each character in our story, and create a ListTile for them
+        # Run through each character in our story
         for character in story.characters:
-            new_char = ft.ListTile( # Works as a formatted row
-                horizontal_spacing=0,
+            new_char = ft.GestureDetector(
+                on_hover=show_options,  # Show our options button when hovering over character
+                on_exit=hide_options,
+                mouse_cursor=ft.MouseCursor.CLICK,
                 expand=True,
-                content_padding=None,
-                title=ft.GestureDetector(
-                    on_hover=show_options,  # Show our options button when hovering over character
-                    on_exit=hide_options,
-                    on_tap=lambda e, name=character.title: popout_character_widget(e, name),  # on click
-                    content=ft.Draggable(
-                        content_feedback=ft.TextButton(
-                            text=character.title,
-                        ), 
-                        group="widgets",
-                        content=ft.Container(expand=True, content=ft.Row(
+                on_tap=lambda e, name=character.title: popout_character_widget(e, name),  # on click
+                content=ft.Draggable(
+                    content_feedback=ft.TextButton(
+                        text=character.title,
+                    ), 
+                    data=character,  # Data to pass when dragging
+                    group="widgets",
+                    content=ft.Container(
+                        expand=True, 
+                        content=ft.Row(
                             alignment=ft.MainAxisAlignment.START,
                             controls=[
                                 ft.Text(
@@ -224,8 +329,10 @@ def characters_rail(page: ft.Page):
                                 ),
                             ], 
                         )
-                ))),
+                    )
+                )
             )
+            
 
             # Add our character to category based on its tag
             if character.tags['main_character'] == True:
@@ -263,15 +370,15 @@ def characters_rail(page: ft.Page):
     # This is static and should not change
     characters_rail = [
 
-        main_characters,
-        side_characters,
-        background_characters,
+        # Our drag targets that hold each character list for each category
+        main_characters_drag_target,
+        side_characters_drag_target,
+        background_characters_drag_target,
 
-        ft.Container(expand=True),
     ]
 
-
-    reload_character_rail() # called initially so characters loaded on launch
+    # Initially load our rail
+    reload_character_rail()
     arrange_widgets()
     render_widgets(page) 
 
