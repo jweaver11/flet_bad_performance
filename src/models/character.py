@@ -4,8 +4,8 @@ from handlers.render_widgets import render_widgets, master_widget_row, pin_drag_
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
-        self.title = name  # Title of the character, used for identifier so all data objects have a title
-        self.tag = "character"  # Tag for logic
+        self.title = name  # Name of character, but all objects have a title for identification
+        self.tag = "character"  # Tag for logic, mostly for routing it through our story object
 
         self.pin_location = "left"  # Start in main pin location
         #story.left_pin.controls.append(self)  # Add to left pin location
@@ -69,7 +69,7 @@ class Character(ft.Container):
         def update_widget():
             self.controls.clear()  # Clear the body before updating
 
-            #self.body.append(ft.Image(src=self.image, width=100, height=100))
+            #self.controls.append(ft.Image(src=self.image, width=100, height=100))
             self.controls.append(ft.Container(ft.Icon(ft.Icons.PERSON, size=100), padding=10))
 
             # Render our built in data in a fixed formatted way, then format all other data

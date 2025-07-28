@@ -25,22 +25,29 @@ def characters_rail(page: ft.Page):
     arrange_widgets()  # Arrange our characters into their pin locations
         
     # Show the widget of character. Runs when character is clicked in the rail
-    def popout_character_widget(e, name):
+    def show_character_widget(e, name):
         # Show our widget
         for character in story.characters:
             if character.title == name:
                 character.visible = True  # Set character visible
+                break
 
         render_widgets(page)
         page.update()
         
     # Rename our character
-    def rename_character(e):
-        print("pin clicked")
+    def rename_character(e, name):
+        for character in story.characters:
+            if character.title == name:
+                
+                print("rename clicked")
+                break
 
     # Delete our character object from the story, and its reference in its pin
     def delete_character(e, name):
         print("delete was run")
+
+        story.delete_object_from_story(e.data)  # Delete our character object from the story, and its reference in its pin
         for character in story.characters:
             if character.title == name:
                 story.characters.remove(character)  # delete from characters list
@@ -61,14 +68,16 @@ def characters_rail(page: ft.Page):
         # Create a reference for the dialog text field
         dialog_textfield_ref = ft.Ref[ft.TextField]()
         
-        def add_character_from_dialog(e):
+        # Create a new character object when one of the three 'plus' buttons is clicked
+        def create_new_character(e):
             name = dialog_textfield_ref.current.value  # Get name from dialog text field
             if name and name.strip() and check_character(name):   
                 name = name.strip()
                 name = name.capitalize()  # Auto capitalize names
                 
-                # Create new character with appropriate tag
+                # temporary character object so we can check tags
                 new_character = Character(name, page)
+
                 # Set the appropriate tag based on the category
                 if tag == "main":
                     new_character.tags['main_character'] = True
@@ -83,14 +92,13 @@ def characters_rail(page: ft.Page):
                     new_character.tags['side_character'] = False
                     new_character.tags['background_character'] = True
                 
-                #story.characters.append(new_character)
+                # Add our object (in this case character) to the story.
+                # This story function handles pinning it and adding it to any lists
                 story.add_object_to_story(new_character)
-                story.left_pin.controls.append(new_character)  # Add to left pin
                 reload_character_rail()   
                 arrange_widgets() 
                 render_widgets(page)  
 
-        
                 # Close the dialog
                 dlg.open = False
                 page.update()
@@ -105,12 +113,12 @@ def characters_rail(page: ft.Page):
                 ref=dialog_textfield_ref,
                 label="Character Name",
                 hint_text="Enter character name",
-                on_submit=add_character_from_dialog,  # When enter is pressed
+                on_submit=create_new_character,  # When enter is pressed
                 autofocus=True,  # Focus on this text field when dialog opens
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
-                ft.TextButton("Create", on_click=add_character_from_dialog),
+                ft.TextButton("Create", on_click=create_new_character),
             ],
             on_dismiss=lambda e: print("Dialog dismissed!")
         )
@@ -144,7 +152,7 @@ def characters_rail(page: ft.Page):
     def show_options(e):
         popup_button = e.control.content.content.content.controls[2]
         print(popup_button)
-        popup_button.visible = True     # Show our options button
+        popup_button.opacity = 1    # Show our options button
 
         e.control.mouse_cursor = ft.MouseCursor.CLICK  # Change cursor to pointer (hand)
         e.control.update()
@@ -154,11 +162,11 @@ def characters_rail(page: ft.Page):
     # Gets rid of our popupmenubutton when mouse exits character
     def hide_options(e):
         popup_button = e.control.content.content.content.controls[2]
-        popup_button.visible = False    # Hide our options button
+        popup_button.opacity = 0    # Hide our options button
         page.update()
         print("hide options called")
 
-    # Quality of life feature to change a character to main, side, or background by dragging them on the rail.
+    # Feature to change a character to main, side, or background by dragging them on the rail.
     def make_main_character(e):
         # Load our object
         event_data = json.loads(e.data)
@@ -189,7 +197,7 @@ def characters_rail(page: ft.Page):
         reload_character_rail()  # Reload our character rail to show new character
         object.update()     # Reflect our changes in the widget on the right
         print("Character added to main characters")
-
+    # Side character
     def make_side_character(e):
         event_data = json.loads(e.data)
         src_id = event_data.get("src_id")
@@ -213,7 +221,7 @@ def characters_rail(page: ft.Page):
             print("Object does not have tags attribute, cannot change character type")
         reload_character_rail()
         object.update()
-
+    # Background character
     def make_background_character(e):
         event_data = json.loads(e.data)
         src_id = event_data.get("src_id")
@@ -279,8 +287,7 @@ def characters_rail(page: ft.Page):
     )
 
         
-
-    # Reloads our rail when changes happen in the character data
+    # Rebuilds our character rail from scratch whenever changes are made in data to the rail (add or del character, etc.)
     # Characters are organized based on their tag of main, side, or background
     # Have their colors change based on good, evil, neutral. Widget will reflect that
     def reload_character_rail():
@@ -291,12 +298,13 @@ def characters_rail(page: ft.Page):
 
         # Run through each character in our story
         for character in story.characters:
+            # Create a new character widget for the rail
             new_char = ft.GestureDetector(
-                on_hover=show_options,  # Show our options button when hovering over character
+                on_hover=show_options,  # Show our options button when hovering over character, hide it when not
                 on_exit=hide_options,
-                mouse_cursor=ft.MouseCursor.CLICK,
+                mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
                 expand=True,
-                on_tap=lambda e, name=character.title: popout_character_widget(e, name),  # on click
+                on_tap=lambda e, name=character.title: show_character_widget(e, name),  # Show our widget if hidden when character clicked
                 content=ft.Draggable(
                     content_feedback=ft.TextButton(
                         text=character.title,
@@ -308,22 +316,26 @@ def characters_rail(page: ft.Page):
                         content=ft.Row(
                             alignment=ft.MainAxisAlignment.START,
                             controls=[
-                                ft.Text(
-                                    value=character.title,
-                                    color=ft.Colors.PRIMARY,
-                                    max_lines=1,
-                                    overflow=ft.TextOverflow.CLIP,
-                                    no_wrap=True,
-                                ), 
+                                ft.Container(
+                                    padding=ft.padding.only(left=8),
+                                    content=ft.Text(
+                                        value=character.title,
+                                        color=ft.Colors.PRIMARY,
+                                        max_lines=1,    # Handle too long of names
+                                        overflow=ft.TextOverflow.CLIP,  # Handle too long of names
+                                        weight=ft.FontWeight.BOLD,  # Make text bold
+                                        no_wrap=True,
+                                    )
+                                ),
                                 ft.Container(expand=True,),
                                 ft.PopupMenuButton(
                                     icon_color=ft.Colors.GREY_400, 
                                     tooltip="", 
-                                    visible=False,
+                                    opacity=0,
                                     scale=.8,
                                     items=[
-                                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: popout_character_widget(e, name)),
-                                        ft.PopupMenuItem(text="Rename", on_click=rename_character),
+                                        ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: show_character_widget(e, name)),
+                                        ft.PopupMenuItem(text="Rename", on_click=lambda e, name=character.title: rename_character(e, name)),
                                         ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_character(e, name)),
                                     ],
                                 ),

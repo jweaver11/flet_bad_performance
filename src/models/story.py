@@ -24,7 +24,7 @@ class Story:
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
-    # Add our created object to story. This will add it to its pin location, any lists it should be, ...
+    # Add our created object to story. This will add it to any lists it should be in, pin location, etc.
     # All our story objects are extended flet containers, and require a title, pin location, tag,...
     def add_object_to_story(self, obj):
         print("Adding object in story: " + obj.title)
@@ -35,7 +35,6 @@ class Story:
         else:
             print("Object does not have a pin location, did not pin to story")
 
-        
         # Checks our objects tag, then figures out what to do with it
         if obj.tag == "character":
             self.characters.append(obj)
@@ -50,15 +49,16 @@ class Story:
 
     # Handles where to pin newly added objects to our story
     def add_object_to_pin(self, obj):
-        if obj.pin_location == "top":
+        # check objects pin and that its not already in that pin
+        if obj.pin_location == "top" and obj not in self.top_pin.controls:
             self.top_pin.controls.append(obj)
-        elif obj.pin_location == "left":
+        elif obj.pin_location == "left" and obj not in self.left_pin.controls:
             self.left_pin.controls.append(obj)
-        elif obj.pin_location == "main":
+        elif obj.pin_location == "main" and obj not in self.main_pin.controls:
             self.main_pin.controls.append(obj)
-        elif obj.pin_location == "right":
+        elif obj.pin_location == "right" and obj not in self.right_pin.controls:
             self.right_pin.controls.append(obj)
-        elif obj.pin_location == "bottom":
+        elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:
             self.bottom_pin.controls.append(obj)
 
     # Delete an object from the story. Only works for certain objects
@@ -72,6 +72,7 @@ class Story:
 
         # delete_from_pin()
         # delete_from_file()
+
 
     # Workspaces within each story object
     # Description
