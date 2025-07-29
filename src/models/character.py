@@ -139,6 +139,7 @@ class Character(ft.Container):
         def hide(e):
             self.visible = False
             render_widgets(page)
+            self.update()
             page.update()
 
         # Make a markdown as content of container

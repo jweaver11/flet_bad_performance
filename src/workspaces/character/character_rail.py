@@ -25,13 +25,9 @@ def characters_rail(page: ft.Page):
     arrange_widgets()  # Arrange our characters into their pin locations
         
     # Show the widget of character. Runs when character is clicked in the rail
-    def show_character_widget(e, name):
+    def show_character_widget(e, character):
         # Show our widget
-        for character in story.characters:
-            if character.title == name:
-                character.visible = True  # Set character visible
-                break
-
+        character.visible = True
         render_widgets(page)
         page.update()
         
@@ -44,17 +40,12 @@ def characters_rail(page: ft.Page):
                 break
 
     # Delete our character object from the story, and its reference in its pin
-    def delete_character(e, name):
-        print("delete was run")
+    def delete_character(e, character):
+        print("delete character was run")
+        
+        
+        story.delete_object_from_story(character)  # delete from characters list
 
-        story.delete_object_from_story(e.data)  # Delete our character object from the story, and its reference in its pin
-        for character in story.characters:
-            if character.title == name:
-                story.characters.remove(character)  # delete from characters list
-                if character in story.bottom_pin_obj:
-                    story.bottom_pin_obj.remove(character)
-
-                print(name, "was deleted")
         # del our widget
         reload_character_rail()     # Rebuild/reload our character rail
         arrange_widgets()     
@@ -148,16 +139,6 @@ def characters_rail(page: ft.Page):
         dlg.open = True
         page.update()
 
-    # Shows our popupmenubutton when hovering over a character, allowing for edit, rename, and delete
-    def show_options(e):
-        e.control.content.content.content.content.controls[2].opacity = 1
-        page.update()
-        print("show options called")
-    # Gets rid of our popupmenubutton when mouse exits character
-    def hide_options(e):
-        e.control.content.content.content.content.controls[2].opacity = 0
-        page.update()
-        print("hide options called")
 
     # Feature to change a character to main, side, or background by dragging them on the rail.
     def make_main_character(e):
@@ -293,29 +274,21 @@ def characters_rail(page: ft.Page):
         # Run through each character in our story
         for character in story.characters:
             # Create a new character widget for the rail
-            new_char = ft.GestureDetector(
-                on_hover=show_options,  # Show our options button when hovering over character, hide it when not
-                on_exit=hide_options,
-                mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
-                expand=True,
-                on_tap=lambda e, name=character.title: show_character_widget(e, name),  # Show our widget if hidden when character clicked
-                content=ft.Draggable(
-                    content_feedback=ft.TextButton(
-                        text=character.title,
-                    ), 
-                    data=character,  # Data to pass when dragging
-                    group="widgets",
-                    content=ft.Container(
-                        expand=True,
-                        content=ft.GestureDetector(
-                            on_double_tap=lambda e: print("double clicked):"),
-                            mouse_cursor=ft.MouseCursor.CLICK, 
+            new_char = ft.Draggable(
+                content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
+                data=character,     # Pass in our character object when dragging
+                group="widgets",
+                content=ft.Row(
+                    alignment=ft.MainAxisAlignment.START,
+                    expand=True,
+                    controls=[
+                        ft.GestureDetector(
                             content=ft.Row(
-                                alignment=ft.MainAxisAlignment.START,
+                                spacing=0,
                                 controls=[
-                                ft.Container(
-                                    padding=ft.padding.only(left=8),
-                                    content=ft.Text(
+                                    ft.Container(
+                                        padding=ft.padding.only(left=8),
+                                        content=ft.Text(
                                             value=character.title,
                                             color=ft.Colors.PRIMARY,
                                             max_lines=1,    # Handle too long of names
@@ -325,25 +298,31 @@ def characters_rail(page: ft.Page):
                                         ),
                                     ),
                                     ft.Container(expand=True),
-                                    ft.PopupMenuButton(
-                                        icon_color=ft.Colors.GREY_400, 
-                                        tooltip="", 
-                                        opacity=0,
-                                        scale=.8,
-                                        items=[
-                                            ft.PopupMenuItem(text="Edit", on_click=lambda e, name=character.title: show_character_widget(e, name)),
-                                            ft.PopupMenuItem(text="Rename", on_click=lambda e, name=character.title: rename_character(e, name)),
-                                            ft.PopupMenuItem(text="Delete", on_click=lambda e, name=character.title: delete_character(e, name)),
-                                        ],
-                                    ),
-                                ], 
-                            ))
-                        )
+                                ],
+                            ),
+                            on_double_tap=lambda e: print("double clicked, lets rename"),
+                            on_secondary_tap_down=lambda e: print("right clicked, lets show options"),
+                            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+                            expand=True,
+                            on_tap=lambda e: show_character_widget(e, character),  # Show our widget if hidden when character clicked
+                        ),
+                        ft.IconButton(     # Temporary options buttons to the right of each character, phase out later
+                            icon_color=ft.Colors.GREY_400, 
+                            icon=ft.Icons.DELETE,
+                            on_click=lambda e, char=character: delete_character(e, char),
+                            # Needs to save a character ^^ reference because of pythons late binding, or this wont work
+                            opacity=1,  
+                            scale=.8,
+                        ),
+                    ], 
                 )
             )
             
+                
+            
+            
 
-            # Add our character to category based on its tag
+            # Still in for loop, add our character to category based on its tag
             if character.tags['main_character'] == True:
                 main_characters.controls.append(new_char)
             elif character.tags['side_character'] == True:

@@ -65,12 +65,27 @@ class Story:
     def delete_object_from_story(self, obj):
         print("Removing object from story: " + obj.title)
 
+        
+
         # Remove from characters list if it is a character
         if hasattr(obj, 'tag') and obj.tag == "character":
+            # Chck our characters pin location, and remove its reference from there
+            if hasattr(obj, 'pin_location'):
+                if obj.pin_location == "top":
+                    self.top_pin.controls.remove(obj)
+                elif obj.pin_location == "left":
+                    self.left_pin.controls.remove(obj)
+                elif obj.pin_location == "main":
+                    self.main_pin.controls.remove(obj)
+                elif obj.pin_location == "right":
+                    self.right_pin.controls.remove(obj)
+                elif obj.pin_location == "bottom":
+                    self.bottom_pin.controls.remove(obj)
+            # Remove object from the characters list
             if obj in self.characters:
                 self.characters.remove(obj)
+            
 
-        # delete_from_pin()
         # delete_from_file()
 
 
