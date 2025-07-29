@@ -1,5 +1,8 @@
 import flet as ft
-from handlers.render_widgets import render_widgets, master_widget_row, pin_drag_targets, master_stack
+from models.user import user
+from handlers.render_widgets import render_widgets
+
+story = user.active_story  # Get our story object from the user
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
@@ -8,7 +11,6 @@ class Character(ft.Container):
         self.tag = "character"  # Tag for logic, mostly for routing it through our story object
 
         self.pin_location = "left"  # Start in main pin location
-        #story.left_pin.controls.append(self)  # Add to left pin location
         
         self.controls = []  # flet list of controls to render rest of body
 
@@ -115,28 +117,22 @@ class Character(ft.Container):
 
         update_widget()  # Initialize the widget on startup
 
-        def on_drag_start(e):
-            print("\ndrag start called\n")
-
-            master_stack.controls.extend(pin_drag_targets)  # Add the drag target pins to the stack
-            master_stack.update()
-            page.update()
 
         def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
             print("Drag complete called")
             # Instead of clearing and re-adding, just remove the pin drag targets
-            for target in pin_drag_targets:
-                if target in master_stack.controls:
-                    master_stack.controls.remove(target)
+            #for target in pin_drag_targets:
+                #if target in master_stack.controls:
+                    #.controls.remove(target)
             
             # Ensure master_widget_row is in the stack
-            if master_widget_row not in master_stack.controls:
-                master_stack.controls.append(master_widget_row)
+            if story.widgets not in story.master_stack.controls:
+                story.master_stack.controls.append(story.widgets)
             
-            master_stack.update()
+            story.master_stack.update()
             page.update()
 
-        def hide(e):
+        def hide_widget(e):
             self.visible = False
             render_widgets(page)
             self.update()
@@ -157,7 +153,6 @@ class Character(ft.Container):
                                 group="widgets",
                                 content=ft.TextButton(self.title),
                                 data=self,       # Pass our object as the data so we can access it
-                                on_drag_start=on_drag_start,
                                 on_drag_complete=on_drag_complete,
                             )
                         ]
@@ -166,7 +161,7 @@ class Character(ft.Container):
                         alignment=ft.MainAxisAlignment.END,
                         controls=[
                             ft.IconButton(
-                                on_click=hide,
+                                on_click=hide_widget,
                                 icon=ft.Icons.CLOSE_ROUNDED
                     )])
                 ]),

@@ -12,7 +12,9 @@ my_file_path = os.path.join(app_data_path, "characters.json")
 class Story:
     # Constructor for when new story is created
     def __init__(self, title):
-        self.title = title  # Title of story
+       
+       # Gives our story a title when its created
+        self.title=title
 
         # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
         self.top_pin = ft.Row(spacing=10, height=0, controls=[],)
@@ -20,6 +22,10 @@ class Story:
         self.main_pin = ft.Row(spacing=10, expand=True, controls=[])   # no formatting needed
         self.right_pin = ft.Column(spacing=10, width=0, controls=[])
         self.bottom_pin = ft.Row(spacing=10, height=0, controls=[])
+
+        # Our row that holds all our widgets
+        self.widgets = ft.Row(spacing=0, expand=True, controls=[])
+        self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters

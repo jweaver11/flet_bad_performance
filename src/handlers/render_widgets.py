@@ -35,9 +35,17 @@ def top_pin_drag_accept(e):
     e.control.update()
 
     # Properly reset the stack
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)
-    master_stack.update()
+    story.master_stack.controls.clear()
+    story.master_stack.controls.append(story.widgets)
+    story.master_stack.update()
+
+    # Update our pins to help with errors
+    story.top_pin.update()
+    story.left_pin.update()
+    story.main_pin.update()
+    story.right_pin.update()
+    story.bottom_pin.update()
+    
     print("top pin accepted")
 
 def left_pin_drag_accept(e):
@@ -63,9 +71,17 @@ def left_pin_drag_accept(e):
     e.control.update()
 
     # Properly reset the stack
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)
-    master_stack.update()
+    story.master_stack.controls.clear()
+    story.master_stack.controls.append(story.widgets)
+    story.master_stack.update()
+
+    # Update our pins to help with errors
+    story.top_pin.update()
+    story.left_pin.update()
+    story.main_pin.update()
+    story.right_pin.update()
+    story.bottom_pin.update()
+
     print("left pin accepted")
 
 def main_pin_drag_accept(e):
@@ -93,9 +109,16 @@ def main_pin_drag_accept(e):
     e.control.update()
     
     # Properly reset the stack
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)
-    master_stack.update()
+    story.master_stack.controls.clear()
+    story.master_stack.controls.append(story.widgets)
+    story.master_stack.update()
+
+    # Update our pins to help with errors
+    story.top_pin.update()
+    story.left_pin.update()
+    story.main_pin.update()
+    story.right_pin.update()
+    story.bottom_pin.update()
     
     print("main pin accepted")
 
@@ -123,9 +146,17 @@ def right_pin_drag_accept(e):
     e.control.update()
 
     # Properly reset the stack
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)
-    master_stack.update()
+    story.master_stack.controls.clear()
+    story.master_stack.controls.append(story.widgets)
+    story.master_stack.update()
+
+    # Update our pins to help with errors
+    story.top_pin.update()
+    story.left_pin.update()
+    story.main_pin.update()
+    story.right_pin.update()
+    story.bottom_pin.update()
+
     print("right pin accepted")
 
 def bottom_pin_drag_accept(e):
@@ -151,14 +182,22 @@ def bottom_pin_drag_accept(e):
     e.control.update()
 
     # Properly reset the stack
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)
-    master_stack.update()
+    story.master_stack.controls.clear()
+    story.master_stack.controls.append(story.widgets)
+    story.master_stack.update()
+
+    # Update our pins to help with errors
+    story.top_pin.update()
+    story.left_pin.update()
+    story.main_pin.update()
+    story.right_pin.update()
+    story.bottom_pin.update()
+
     print("bottom pin accepted")
 
 
 # When a draggable is hovering over a target
-def drag_will_accept(e):
+def show_pin_drag_targets(e):
     e.control.content = ft.Container(
         bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.WHITE), 
         height=minimum_pin_height
@@ -166,22 +205,23 @@ def drag_will_accept(e):
     e.control.update()
     
     # Clear the stack and rebuild it properly
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)
+    story.master_stack.controls.clear()
+    story.master_stack.controls.append(story.widgets)
     
     # Only add drag targets if they're not already in the stack
-    for target in pin_drag_targets:
-        if target not in master_stack.controls:
-            master_stack.controls.append(target)
+    # 
+    #for target in pin_drag_targets:
+        #if target not in master_stack.controls:
+            #master_stack.controls.append(target)
     
-    master_stack.update()
+    story.master_stack.update()
 
 # When a draggable leaves a target
 def on_leave(e):
     #print("Left a pin drag target")
     e.control.content = ft.Row(height=300)
     e.control.update()
-    master_stack.update()
+    story.master_stack.update()
 
 
 # set minimumm fallbacks for our pins
@@ -193,44 +233,37 @@ minimum_pin_width = 200
 # Pin drag targets
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=ft.Row(), 
+    content=story.top_pin, 
     on_accept=top_pin_drag_accept,
-    on_will_accept=drag_will_accept,
+    on_will_accept=show_pin_drag_targets,
     on_leave=on_leave,
 )
-left_pin_drag_target = ft.DragTarget(
-    group="widgets", 
-    content=ft.Row(), 
-    on_accept=left_pin_drag_accept,
-    on_will_accept=drag_will_accept,
-    on_leave=on_leave,
-)
+
 main_pin_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
     on_accept=main_pin_drag_accept,
-    on_will_accept=drag_will_accept,
+    on_will_accept=show_pin_drag_targets,
     on_leave=on_leave,
 )
 right_pin_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
     on_accept=right_pin_drag_accept,
-    on_will_accept=drag_will_accept,
+    on_will_accept=show_pin_drag_targets,
     on_leave=on_leave,
 )
 bottom_pin_drag_target = ft.DragTarget(
     group="widgets", 
     content=ft.Row(), 
-    on_accept=bottom_pin_drag_accept, on_will_accept=drag_will_accept, on_leave=on_leave,
+    on_accept=bottom_pin_drag_accept, on_will_accept=show_pin_drag_targets, on_leave=on_leave,
 )
 
 def hide_pin_drag_targets():
-    for target in pin_drag_targets:
-        target.visible = False
-        target.update()
+    print("hide targets called")
 
 # In containers in order to position them inside the stack
+'''
 pin_drag_targets = [
     ft.Container(
         content=top_pin_drag_target,
@@ -265,16 +298,8 @@ pin_drag_targets = [
         border_radius=ft.border_radius.all(10), 
     ),
 ]
+'''
 
-# Master row that holds all our widgets
-master_widget_row = ft.Row(
-    spacing=0,
-    expand=True,
-    controls=[]
-)
-
-# Stack that holds our widget row, and the drag targets overtop them when it needs to
-master_stack = ft.Stack(expand=True, controls=[master_widget_row])
 
 
 # Pin our widgets in here for formatting
@@ -295,8 +320,8 @@ def render_widgets(page: ft.Page):
         if (e.delta_y > 0 and story.top_pin.height < page.height/2) or (e.delta_y < 0 and story.top_pin.height > 200):
             story.top_pin.height += e.delta_y
         formatted_top_pin.update()
-        master_widget_row.update() # Update the main pin, as it is affected by all pins resizing
-        master_stack.update()
+        story.widgets.update() # Update the main pin, as it is affected by all pins resizing
+        story.master_stack.update()
 
     # Holds the divider that is draggable to resize the top pin
     top_pin_resizer = ft.GestureDetector(
@@ -310,8 +335,8 @@ def render_widgets(page: ft.Page):
         if (e.delta_x > 0 and story.left_pin.width < page.width/2) or (e.delta_x < 0 and story.left_pin.width > 200):
             story.left_pin.width += e.delta_x
         formatted_left_pin.update()
-        master_widget_row.update()
-        master_stack.update()
+        story.widgets.update()
+        story.master_stack.update()
     left_pin_resizer = ft.GestureDetector(
         content=ft.VerticalDivider(thickness=10, width=10, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
         on_pan_update=move_left_pin_divider,
@@ -323,8 +348,8 @@ def render_widgets(page: ft.Page):
         if (e.delta_x < 0 and story.right_pin.width < page.width/2) or (e.delta_x > 0 and story.right_pin.width > 200):
             story.right_pin.width -= e.delta_x
         formatted_right_pin.update()
-        master_widget_row.update()
-        master_stack.update()
+        story.widgets.update()
+        story.master_stack.update()
     right_pin_resizer = ft.GestureDetector(
         content=ft.VerticalDivider(thickness=10, width=10, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
         on_pan_update=move_right_pin_divider,
@@ -335,8 +360,8 @@ def render_widgets(page: ft.Page):
         if (e.delta_y < 0 and story.bottom_pin.height < page.height/2) or (e.delta_y > 0 and story.bottom_pin.height > 200):
             story.bottom_pin.height -= e.delta_y
         formatted_bottom_pin.update()
-        master_widget_row.update()
-        master_stack.update()
+        story.widgets.update()
+        story.master_stack.update()
     bottom_pin_resizer = ft.GestureDetector(
         content=ft.Divider(color=ft.Colors.PRIMARY, height=10, thickness=10),
         on_pan_update=move_bottom_pin_divider,
@@ -352,6 +377,17 @@ def render_widgets(page: ft.Page):
     formatted_bottom_pin = ft.Column(spacing=0, controls=[bottom_pin_resizer, story.bottom_pin])  # Bottom pin formatting column
 
 
+    left_pin_drag_target = ft.DragTarget(
+        group="widgets", 
+        content=formatted_left_pin, 
+        on_accept=left_pin_drag_accept,
+        #on_will_accept=show_pin_drag_targets,
+        on_leave=on_leave,
+    )
+
+    
+
+
     
     '''
     print(f"story.top_pin_obj length:  {len(story.top_pin_obj)}")
@@ -365,6 +401,7 @@ def render_widgets(page: ft.Page):
     print(f"story.bottom_pin_obj length:  {len(story.bottom_pin_obj)}")
     print(f"visible widgets:    {len(bottom_pin.controls)} \n")
     '''
+
 
     # Check if we have any widgets in top pin. If not, we hide the formatted top pin
     # If there are widgets, check if any are visible. If yes, show the formatted pin and break the loop
@@ -409,12 +446,16 @@ def render_widgets(page: ft.Page):
         if story.bottom_pin.height < minimum_pin_height:
             story.bottom_pin.height = minimum_pin_height
 
+    
+
+    
+
 
 
     # Format our pins on the page
-    master_widget_row.controls.clear()
-    master_widget_row.controls = [
-        formatted_left_pin,    # formatted left pin
+    story.widgets.controls.clear()
+    story.widgets.controls = [
+        left_pin_drag_target,    # formatted left pin
         ft.Column(
             expand=True, spacing=0, 
             controls=[

@@ -32,12 +32,8 @@ def characters_rail(page: ft.Page):
         page.update()
         
     # Rename our character
-    def rename_character(e, name):
-        for character in story.characters:
-            if character.title == name:
-                
-                print("rename clicked")
-                break
+    def rename_character(e, character):
+        print("rename character was run")
 
     # Delete our character object from the story, and its reference in its pin
     def delete_character(e, character):
@@ -300,11 +296,11 @@ def characters_rail(page: ft.Page):
                                     ft.Container(expand=True),
                                 ],
                             ),
-                            on_double_tap=lambda e: print("double clicked, lets rename"),
+                            on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click
                             on_secondary_tap_down=lambda e: print("right clicked, lets show options"),
+                            on_tap=lambda e, char=character: show_character_widget(e, char),  # Show our widget if hidden when character clicked
                             mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
                             expand=True,
-                            on_tap=lambda e: show_character_widget(e, character),  # Show our widget if hidden when character clicked
                         ),
                         ft.IconButton(     # Temporary options buttons to the right of each character, phase out later
                             icon_color=ft.Colors.GREY_400, 

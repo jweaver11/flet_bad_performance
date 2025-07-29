@@ -5,8 +5,9 @@ Formatted areas are: top pin, left pin, main work area, right pin, and bottom pi
 '''
 
 import flet as ft
-from handlers.render_widgets import master_stack
+from models.user import user
 
+story = user.active_story  # Get our story object from the user
 
 # Function to return our container for our widgets
 def create_workspace(page: ft.Page, story):    
@@ -18,7 +19,7 @@ def create_workspace(page: ft.Page, story):
         expand=True,
         padding=ft.padding.all(10),
         border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        content=master_stack
+        content=story.master_stack
     )
     
 
