@@ -156,14 +156,6 @@ def bottom_pin_drag_accept(e):
     master_stack.update()
     print("bottom pin accepted")
 
-# Drag target to catch draggable drops between the drag targets
-def ib_drag_accept(e):
-    e.control.content = ft.Row(height=minimum_pin_height)
-    e.control.update()
-    master_stack.controls.clear()
-    master_stack.controls.append(master_widget_row)  # Re-add the widget row to the stack
-    master_stack.update()
-    print("ib drag target accepted")
 
 # When a draggable is hovering over a target
 def drag_will_accept(e):
@@ -198,13 +190,6 @@ def on_leave(e):
 minimum_pin_height = 200
 minimum_pin_width = 200
 
-# Our 5 pin area drag targets
-in_between_drag_target = ft.DragTarget(
-    group="widgets", 
-    content=ft.Row(), 
-    on_accept=ib_drag_accept,
-    on_leave=on_leave,
-)
 # Pin drag targets
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 
@@ -245,15 +230,8 @@ def hide_pin_drag_targets():
         target.visible = False
         target.update()
 
-# containers for our pin drag targets
-pin_drag_targets = [    # Must be in flet containers in order to position them
-    ft.Container(
-        content=in_between_drag_target,
-        expand=True,
-        margin=ft.margin.all(10),
-        border_radius=ft.border_radius.all(10),
-        top=0, left=0, right=0, bottom=0,       # Position them in their container
-    ),
+# In containers in order to position them inside the stack
+pin_drag_targets = [
     ft.Container(
         content=top_pin_drag_target,
         height=200,
@@ -297,6 +275,7 @@ master_widget_row = ft.Row(
 
 # Stack that holds our widget row, and the drag targets overtop them when it needs to
 master_stack = ft.Stack(expand=True, controls=[master_widget_row])
+
 
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):

@@ -309,24 +309,20 @@ def characters_rail(page: ft.Page):
                         expand=True,
                         content=ft.GestureDetector(
                             on_double_tap=lambda e: print("double clicked):"),
-                            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+                            mouse_cursor=ft.MouseCursor.CLICK, 
                             content=ft.Row(
                                 alignment=ft.MainAxisAlignment.START,
                                 controls=[
-                                    ft.Container(
-                                        padding=ft.padding.only(left=8),
-                                        on_double_tap=lambda e: print("double clicked):"),
-                                        content=ft.GestureDetector(
-                                            mouse_cursor=ft.MouseCursor.TEXT,
-                                            content=ft.Text(
-                                                value=character.title,
-                                                color=ft.Colors.PRIMARY,
-                                                max_lines=1,    # Handle too long of names
-                                                overflow=ft.TextOverflow.CLIP,  # Handle too long of names
-                                                weight=ft.FontWeight.BOLD,  # Make text bold
-                                                no_wrap=True,
-                                            ),
-                                        )
+                                ft.Container(
+                                    padding=ft.padding.only(left=8),
+                                    content=ft.Text(
+                                            value=character.title,
+                                            color=ft.Colors.PRIMARY,
+                                            max_lines=1,    # Handle too long of names
+                                            overflow=ft.TextOverflow.CLIP,  # Handle too long of names
+                                            weight=ft.FontWeight.BOLD,  # Make text bold
+                                            no_wrap=True,
+                                        ),
                                     ),
                                     ft.Container(expand=True),
                                     ft.PopupMenuButton(
