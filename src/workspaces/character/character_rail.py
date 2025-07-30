@@ -22,7 +22,7 @@ def characters_rail(page: ft.Page):
     story.add_object_to_story(Character("Alice", page))
     story.add_object_to_story(Character("Joe", page))
         
-    # Show the widget of character. Runs when character is clicked in the rail
+    # Called when user clicks a character on the rail, and it shows its widget
     def show_character_widget(e, character):
         # Show our widget
         character.visible = True
@@ -45,13 +45,71 @@ def characters_rail(page: ft.Page):
         e.control.content.controls[3].opacity = 0
         e.control.content.controls[3].update()
         
-    # Rename our character
-    def rename_character(e, character):
-        print("rename character was run")
+    # Called when user clicks rename button on the character on the rail
+    # Opens an alert dialog to change the characters name
+    def rename_character(character):
+        print("rename character called")
 
+        def rename_char(e=None):
+            #if name
+                #character.title = 
+            if e is not None:
+                new_name = e.control.value
+            else:
+                new_name = dialog_textfield_ref.current.value
+            dlg.open = False
+            page.update()
+
+            # Set our character objects new name to the textfield submissions value
+            character.title = new_name
+            
+            reload_character_rail()
+            render_widgets(page)
+            page.open(
+                ft.SnackBar(
+                    bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
+                    content=ft.Container(
+                        border_radius=ft.border_radius.all(6),  # Rounded corners on container
+                        border=ft.border.all(2, ft.Colors.PRIMARY),  # Red border on container
+                        bgcolor=ft.Colors.GREY_900,  # Background color on container
+                        padding=ft.padding.all(10),  # Add padding for better appearance
+                        content=ft.Text(f"{character.title} was renamed to {new_name}", color=ft.Colors.PRIMARY)
+                    ),   
+                )
+            )
+            page.update()
+
+            for char in story.characters:
+                print (char.title)
+
+        dialog_textfield_ref = ft.Ref[ft.TextField]()
+
+        dlg = ft.AlertDialog(
+            #title=ft.Text(character.title), 
+            content=ft.TextField(
+                ref=dialog_textfield_ref,
+                label=f"{character.title}'s New Name",
+                value=character.title,
+                hint_text=character.title,
+                on_submit=rename_char,  # When enter is pressed
+                autofocus=True,  # Focus on this text field when dialog opens
+            ),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
+                ft.TextButton("Rename", on_click=lambda e: rename_char()),
+            ],
+            on_dismiss=lambda e: print("Dialog dismissed!")
+        )
+
+        page.overlay.append(dlg)
+        dlg.open = True
+        page.update()
+        
+
+    # Called when user clicks the delete button on the character on the rail
     # Delete our character object from the story, and its reference in its pin
-    def delete_character(e, character):
-        print("delete character was run")
+    def delete_character(character):
+        print("delete character called")
 
         # Mini function to handle closing our confirmation dialog, UI updates, and deleting the character
         def del_char(character):
@@ -60,6 +118,19 @@ def characters_rail(page: ft.Page):
             story.delete_object_from_story(character)
             reload_character_rail()
             render_widgets(page)
+            page.open(
+                ft.SnackBar(
+                    bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
+                    content=ft.Container(
+                        border_radius=ft.border_radius.all(6),  # Rounded corners on container
+                        border=ft.border.all(2, ft.Colors.PRIMARY),  # Red border on container
+                        bgcolor=ft.Colors.GREY_900,  # Background color on container
+                        padding=ft.padding.all(10),  # Add padding for better appearance
+                        content=ft.Text(f"{character.title} was deleted", color=ft.Colors.PRIMARY)
+                    ),   
+                )
+            )
+            page.update()
 
         # Sets our title for our alert dialog
         title=f"Are you sure you want to delete {character.title} forever?"
@@ -72,9 +143,11 @@ def characters_rail(page: ft.Page):
             ],
             on_dismiss=lambda e: print("Dialog dismissed!")
         )
+
+
         # Runs to open the dialog
         page.overlay.append(dlg)
-        dlg.open=True
+        dlg.open = True
         page.update()
 
 
@@ -328,7 +401,7 @@ def characters_rail(page: ft.Page):
                                     ft.IconButton(
                                         icon_color=ft.Colors.PRIMARY, 
                                         icon=ft.Icons.EDIT_ROUNDED,
-                                        on_click=lambda e, char=character: delete_character(e, char),
+                                        on_click=lambda e, char=character: rename_character(char),
                                         # Needs to save a character ^^ reference because of pythons late binding, or this wont work
                                         opacity=0,  
                                         scale=.8,
@@ -336,7 +409,7 @@ def characters_rail(page: ft.Page):
                                     ft.IconButton(     # Temporary options buttons to the right of each character, phase out later
                                         icon_color=ft.Colors.PRIMARY, 
                                         icon=ft.Icons.DELETE,
-                                        on_click=lambda e, char=character: delete_character(e, char),
+                                        on_click=lambda e, char=character: delete_character(char),
                                         # Needs to save a character ^^ reference because of pythons late binding, or this wont work
                                         opacity=0,  
                                         scale=.8,
@@ -344,11 +417,10 @@ def characters_rail(page: ft.Page):
                                 ],
                             ),
                             #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click
-                            #on_secondary_tap_down=lambda e: print("right clicked, lets show options"),
                             on_hover=show_options,
                             on_exit=hide_options,
                             on_tap_down=lambda e, char=character: show_character_widget(e, char),  # Show our widget if hidden when character clicked
-                            #mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+                            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
                             expand=True,
                         ),
                         
