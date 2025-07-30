@@ -251,6 +251,9 @@ print("render_widgets called")
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):
 
+    # Runs our arrange widgets function to make sure all widgets are in correct locations
+    arrange_widgets()
+
     # Change our cursor when we hover over a resizer (divieder). Either vertical or horizontal
     def show_vertical_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
@@ -328,6 +331,9 @@ def render_widgets(page: ft.Page):
     # Check if top pin is empty. If yes, hide the formatted pin
     if len(story.top_pin.controls) == 0:
         formatted_top_pin.visible = False
+    # If top pin not empty, make sure there is at least one visible widget
+    elif all(obj.visible == False for obj in story.top_pin.controls[:]):
+        formatted_top_pin.visible = False
     else:   # If not empty, check if any of the widgets are visible
         for obj in story.top_pin.controls:
             if obj.visible == True:     # If any widgets are visible, show our formatted pin
@@ -340,6 +346,8 @@ def render_widgets(page: ft.Page):
     # Left pin
     if len(story.left_pin.controls) == 0:
         formatted_left_pin.visible = False
+    elif all(obj.visible == False for obj in story.left_pin.controls[:]):
+        formatted_left_pin.visible = False
     else:
         for obj in story.left_pin.controls:
             if obj.visible == True:
@@ -351,6 +359,8 @@ def render_widgets(page: ft.Page):
     # Right pin
     if len(story.right_pin.controls) == 0:
         formatted_right_pin.visible = False
+    elif all(obj.visible == False for obj in story.right_pin.controls[:]):
+        formatted_right_pin.visible = False
     else:
         for obj in story.right_pin.controls:
             if obj.visible == True:
@@ -361,6 +371,8 @@ def render_widgets(page: ft.Page):
 
     # Bottom pin
     if len(story.bottom_pin.controls) == 0:
+        formatted_bottom_pin.visible = False
+    elif all(obj.visible == False for obj in story.bottom_pin.controls[:]):
         formatted_bottom_pin.visible = False
     else:
         for obj in story.bottom_pin.controls:

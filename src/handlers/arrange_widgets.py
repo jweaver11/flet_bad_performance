@@ -2,11 +2,12 @@ from models.user import user
 
 story = user.active_story  # Get our story object from the user
 
-#
+# Called by other functions after a completed drag. This check the widgets in each pins 'pin_location' tag...
+# And if they don't match their actual pin location, it moves them to the correct one BASED of the tag
+# Also handles making sure there is always a widget in the main_pin, so long as there is at least 1 visible widget
 def arrange_widgets():
     print("arrange widgets called")
     
-
     # Append a reference obj (pointer) to the pin location based on its pin location tag
     def update_pin_location(obj):
         pin_location = obj.pin_location
@@ -55,9 +56,9 @@ def arrange_widgets():
                 if obj.visible == True:     # If there is at least one visible widget
                     obj.pin_location = "main"  # Update pin location
                     story.main_pin.controls.append(obj)  # Add object to main pin
-                    story.main_pin.update()
+                    #story.main_pin.update()
                     story.top_pin.controls.remove(obj)  # Remove it from top pin
-                    story.top_pin.update()
+                    #story.top_pin.update()
                     print("Stole from top pin")
                     break   # Exit our for loop
         # Check left pin
@@ -66,9 +67,9 @@ def arrange_widgets():
                 if obj.visible == True:
                     obj.pin_location = "main"
                     story.main_pin.controls.append(obj)
-                    story.main_pin.update()
+                   #story.main_pin.update()
                     story.left_pin.controls.remove(obj)
-                    story.left_pin.update()
+                    #story.left_pin.update()
                     print("Stole from left pin")
                     break
         # Check right pin
@@ -77,9 +78,9 @@ def arrange_widgets():
                 if obj.visible == True:
                     obj.pin_location = "main"
                     story.main_pin.controls.append(obj)
-                    story.main_pin.update()
+                    #story.main_pin.update()
                     story.right_pin.controls.remove(obj)
-                    story.right_pin.update()
+                    #story.right_pin.update()
                     print("Stole from right pin")
                     break
         # Check bottom pin
@@ -88,9 +89,9 @@ def arrange_widgets():
                 if obj.visible == True:
                     obj.pin_location = "main"
                     story.main_pin.controls.append(obj)
-                    story.main_pin.update()
+                    #story.main_pin.update()
                     story.bottom_pin.controls.remove(obj)
-                    story.bottom_pin.update()
+                    #story.bottom_pin.update()
                     print("Stole from bottom pin")
                     break
 

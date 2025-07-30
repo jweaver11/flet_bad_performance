@@ -123,13 +123,13 @@ class Character(ft.Container):
 
         def hide_widget(e):
             self.visible = False
+            #self.update()
             render_widgets(page)
-            self.update()
             page.update()
 
         # Make a markdown as content of container
         super().__init__(
-            expand=True,
+            expand=True, 
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor=ft.Colors.GREY_900,

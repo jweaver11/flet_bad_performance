@@ -314,9 +314,6 @@ def characters_rail(page: ft.Page):
                 )
             )
             
-                
-            
-            
 
             # Still in for loop, add our character to category based on its tag
             if character.tags['main_character'] == True:
