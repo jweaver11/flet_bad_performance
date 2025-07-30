@@ -21,8 +21,6 @@ def characters_rail(page: ft.Page):
     story.add_object_to_story(Character("Bob", page))
     story.add_object_to_story(Character("Alice", page))
     story.add_object_to_story(Character("Joe", page))
-
-    arrange_widgets()  # Arrange our characters into their pin locations
         
     # Show the widget of character. Runs when character is clicked in the rail
     def show_character_widget(e, character):
@@ -30,6 +28,22 @@ def characters_rail(page: ft.Page):
         character.visible = True
         render_widgets(page)
         page.update()
+
+    # Called when hovered over a character on the rail
+    # Shows our two buttons rename and delete
+    def show_options(e):
+        e.control.content.controls[2].opacity = 1
+        e.control.content.controls[2].update()
+        e.control.content.controls[3].opacity = 1
+        e.control.content.controls[3].update()
+
+    # Called when mouse leaves a character on the rail
+    # Hides our two buttons rename and delete
+    def hide_options(e):
+        e.control.content.controls[2].opacity = 0
+        e.control.content.controls[2].update()
+        e.control.content.controls[3].opacity = 0
+        e.control.content.controls[3].update()
         
     # Rename our character
     def rename_character(e, character):
@@ -38,15 +52,31 @@ def characters_rail(page: ft.Page):
     # Delete our character object from the story, and its reference in its pin
     def delete_character(e, character):
         print("delete character was run")
-        
-        
-        story.delete_object_from_story(character)  # delete from characters list
 
-        # del our widget
-        reload_character_rail()     # Rebuild/reload our character rail
-        arrange_widgets()     
-        render_widgets(page)     # reload our workspace area
+        # Mini function to handle closing our confirmation dialog, UI updates, and deleting the character
+        def del_char(character):
+            dlg.open = False
+            page.update()
+            story.delete_object_from_story(character)
+            reload_character_rail()
+            render_widgets(page)
+
+        # Sets our title for our alert dialog
+        title=f"Are you sure you want to delete {character.title} forever?"
+        # Our alert dialog that pops up on screen to confirm the delete or cancel
+        dlg=ft.AlertDialog(
+            title=ft.Text(title), 
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
+                ft.TextButton("Delete", on_click=lambda e: del_char(character)),
+            ],
+            on_dismiss=lambda e: print("Dialog dismissed!")
+        )
+        # Runs to open the dialog
+        page.overlay.append(dlg)
+        dlg.open=True
         page.update()
+
 
     # Create a new character 
     def create_character(e, tag):
@@ -163,8 +193,10 @@ def characters_rail(page: ft.Page):
         else:
             print("Object does not have tags attribute, cannot change character type")
 
-        reload_character_rail()  # Reload our character rail to show new character
         object.update()     # Reflect our changes in the widget on the right
+
+        reload_character_rail()  # Reload our character rail to show new character
+        
         print("Character added to main characters")
     # Side character
     def make_side_character(e):
@@ -282,7 +314,7 @@ def characters_rail(page: ft.Page):
                                 spacing=0,
                                 controls=[
                                     ft.Container(
-                                        padding=ft.padding.only(left=8),
+                                        on_click=lambda e, char=character: show_character_widget(e, char),
                                         content=ft.Text(
                                             value=character.title,
                                             color=ft.Colors.PRIMARY,
@@ -293,22 +325,33 @@ def characters_rail(page: ft.Page):
                                         ),
                                     ),
                                     ft.Container(expand=True),
+                                    ft.IconButton(
+                                        icon_color=ft.Colors.PRIMARY, 
+                                        icon=ft.Icons.EDIT_ROUNDED,
+                                        on_click=lambda e, char=character: delete_character(e, char),
+                                        # Needs to save a character ^^ reference because of pythons late binding, or this wont work
+                                        opacity=0,  
+                                        scale=.8,
+                                    ),
+                                    ft.IconButton(     # Temporary options buttons to the right of each character, phase out later
+                                        icon_color=ft.Colors.PRIMARY, 
+                                        icon=ft.Icons.DELETE,
+                                        on_click=lambda e, char=character: delete_character(e, char),
+                                        # Needs to save a character ^^ reference because of pythons late binding, or this wont work
+                                        opacity=0,  
+                                        scale=.8,
+                                    ),
                                 ],
                             ),
-                            on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click
-                            on_secondary_tap_down=lambda e: print("right clicked, lets show options"),
-                            on_tap=lambda e, char=character: show_character_widget(e, char),  # Show our widget if hidden when character clicked
-                            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+                            #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click
+                            #on_secondary_tap_down=lambda e: print("right clicked, lets show options"),
+                            on_hover=show_options,
+                            on_exit=hide_options,
+                            on_tap_down=lambda e, char=character: show_character_widget(e, char),  # Show our widget if hidden when character clicked
+                            #mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
                             expand=True,
                         ),
-                        ft.IconButton(     # Temporary options buttons to the right of each character, phase out later
-                            icon_color=ft.Colors.GREY_400, 
-                            icon=ft.Icons.DELETE,
-                            on_click=lambda e, char=character: delete_character(e, char),
-                            # Needs to save a character ^^ reference because of pythons late binding, or this wont work
-                            opacity=1,  
-                            scale=.8,
-                        ),
+                        
                     ], 
                 )
             )

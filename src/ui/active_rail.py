@@ -40,7 +40,7 @@ def create_active_rail(page: ft.Page):
     # Container for the active workspace rail.
     active_workspace_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the
-        padding=ft.padding.only(top=10, bottom=10),
+        padding=ft.padding.only(top=10, bottom=10, left=8, right=8),
         width=200,  # Sets the width
         content=active_rail,    # Sets our active rail column
     )

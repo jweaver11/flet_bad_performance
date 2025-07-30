@@ -120,12 +120,10 @@ class Character(ft.Container):
 
         
             
-
+        # Makes our widget invisible
         def hide_widget(e):
             self.visible = False
-            #self.update()
             render_widgets(page)
-            page.update()
 
         # Make a markdown as content of container
         super().__init__(

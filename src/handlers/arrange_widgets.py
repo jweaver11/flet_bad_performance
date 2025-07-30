@@ -110,11 +110,3 @@ def arrange_widgets():
         # If all objects are invisible, steal. Otherwise do nothing
         if all(obj.visible == False for obj in story.main_pin.controls[:]):
           steal_from_other_pins()
-
-    print("main pin")
-    print(story.main_pin)
-    print(len(story.main_pin.controls))
-    print("\n\n")
-    print("left pin")
-    print(story.left_pin)
-    print(len(story.left_pin.controls))
