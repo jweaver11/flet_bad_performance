@@ -49,6 +49,7 @@ def arrange_widgets():
     # Called when main pin is empty or has no visible widgets
     # Function to steal from our other pins so UI looks prettier and consistent
     def steal_from_other_pins():
+        print("steal from other pins called")
 
         # If pin is NOT empty. Pin's can hold widgets that are not visible, so we check that as well
         if len(story.top_pin.controls) > 0: 
@@ -108,4 +109,12 @@ def arrange_widgets():
     else:
         # If all objects are invisible, steal. Otherwise do nothing
         if all(obj.visible == False for obj in story.main_pin.controls[:]):
-          steal_from_other_pins
+          steal_from_other_pins()
+
+    print("main pin")
+    print(story.main_pin)
+    print(len(story.main_pin.controls))
+    print("\n\n")
+    print("left pin")
+    print(story.left_pin)
+    print(len(story.left_pin.controls))

@@ -83,7 +83,6 @@ def characters_rail(page: ft.Page):
                 # This story function handles pinning it and adding it to any lists
                 story.add_object_to_story(new_character)
                 reload_character_rail()   
-                arrange_widgets() 
                 render_widgets(page)  
 
                 # Close the dialog
