@@ -60,8 +60,12 @@ def characters_rail(page: ft.Page):
             dlg.open = False
             page.update()
 
-            # Set our character objects new name to the textfield submissions value
+            # Old name for snackbar alert
+            old_name = character.title
+
+            # Set our new name and update its widget to reflect the change
             character.title = new_name
+            character.update_widget()
             
             reload_character_rail()
             render_widgets(page)
@@ -73,7 +77,7 @@ def characters_rail(page: ft.Page):
                         border=ft.border.all(2, ft.Colors.PRIMARY),  # Red border on container
                         bgcolor=ft.Colors.GREY_900,  # Background color on container
                         padding=ft.padding.all(10),  # Add padding for better appearance
-                        content=ft.Text(f"{character.title} was renamed to {new_name}", color=ft.Colors.PRIMARY)
+                        content=ft.Text(f"{old_name} was renamed to {new_name}", color=ft.Colors.PRIMARY)
                     ),   
                 )
             )

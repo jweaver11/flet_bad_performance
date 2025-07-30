@@ -12,7 +12,8 @@ class Character(ft.Container):
 
         self.pin_location = "left"  # Start in main pin location
         
-        self.controls = []  # flet list of controls to render rest of body
+        self.controls = []
+        self.body_column = ft.Column()
 
         self.tags = {
             'main_character': True,      
@@ -57,75 +58,10 @@ class Character(ft.Container):
             'Abilities': "",
             'Notes' : "",
         }
-
-        # Pass in our control and type of data
-        def update_data(e, type):
-            print(type)
-            print("Type printed ^^^^^^^^^^^^^^^^^^^^^^^^^")
-            self.data[e.control.key] = e.control.text
-            print("Data updated: ", self.char_data)
-
-
-        # Update our widget so we can alter the char object class and re-render
-        # Those updates into our widget, otherwise it would be static
-        def update_widget():
-            self.controls.clear()  # Clear the body before updating
-
-            #self.controls.append(ft.Image(src=self.image, width=100, height=100))
-            self.controls.append(ft.Container(ft.Icon(ft.Icons.PERSON, size=100), padding=10))
-
-            # Render our built in data in a fixed formatted way, then format all other data
-            # Differently afterwards
-
-            # Run through all our data to render it
-            for key, value in self.char_data.items():
-                if not isinstance(value, dict):
-                    self.controls.append(
-                        ft.Row(controls=[
-                            ft.TextField(
-                                label=key,
-                                hint_text=key,
-                                value=value,
-                                width=200,
-                                multiline=True,
-                                on_change=lambda e: update_data(e, type(value)),
-                            )
-                        ])
-                    )
-                elif isinstance(value, dict):
-                    row = ft.Row()
-                    for sub_key, sub_value in value.items():
-                        row.controls.append(
-                            ft.TextField(
-                                label=sub_key,
-                                hint_text=sub_key,
-                                value=sub_value,
-                                width=200,
-                                multiline=True,
-                                on_change=lambda e: update_data(e, type(value)),
-                            )
-                        )
-                    self.controls.append(row)
-
-            self.controls.append(
-                ft.TextButton(
-                    on_click=lambda e: update_data(e, str),
-                    text="Add Data",
-                )
-            )
-
-
-        update_widget()  # Initialize the widget on startup
-
-
-        
-            
-        # Makes our widget invisible
-        def hide_widget(e):
-            self.visible = False
-            render_widgets(page)
+        self.update_widget()
 
         # Make a markdown as content of container
+        # Gives us our initial widget as a container
         super().__init__(
             expand=True, 
             padding=6,
@@ -133,6 +69,7 @@ class Character(ft.Container):
             bgcolor=ft.Colors.GREY_900,
             content=ft.Column(spacing=0, controls=[
                 ft.Stack([
+                    # Draggable title of character at top center of widget
                     ft.Row(
                         alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
@@ -145,21 +82,60 @@ class Character(ft.Container):
                             )
                         ]
                     ),
+                    # Hide widget 'x' button at top right of widget
                     ft.Row(
                         alignment=ft.MainAxisAlignment.END,
                         controls=[
                             ft.IconButton(
-                                on_click=hide_widget,
+                                on_click=self.hide_widget,
                                 icon=ft.Icons.CLOSE_ROUNDED
                     )])
                 ]),
+                # Divider between title and body of widget
                 ft.Divider(color=ft.Colors.PRIMARY),
+
+                # Body of our widget
                 ft.Container(       # Body of the widget
                     expand=True,
                     content=ft.Column(self.controls)
                 )
             ])
         )
+
+    # Pass in our control and type of data
+    def update_data(self, e, type_):
+        print(type_)
+        print("Type printed ^^^^^^^^^^^^^^^^^^^^^^^^^")
+        self.data[e.control.key] = e.control.text
+        print("Data updated: ", self.char_data)
+        self.update()
+
+
+    # Update our widget so we can alter the char object class and re-render
+    # Those updates into our widget, otherwise it would be static
+    def update_widget(self):
+        #self.controls.clear()  # Clear the body before updating
+
+        self.body_column.controls.clear()
+
+        #self.controls.append(ft.Image(src=self.image, width=100, height=100))
+        
+
+        # Render our built in data in a fixed formatted way, then format all other data
+        # Differently afterward
+           
+
+
+
+
+        
+            
+    # Makes our widget invisible
+    def hide_widget(self, e):
+        self.visible = False
+        render_widgets(self.page)
+
+        
 
     # origin = Origin
 
