@@ -251,6 +251,7 @@ def create_menu_bar(page: ft.Page):
             controls=[
                 menubar,    # Menubar on left
                 ft.Container(expand=True),  # empty space in middle of menubar
+                # Fix broken widgets button
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS)),   # Settings button
