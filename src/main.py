@@ -29,7 +29,7 @@ def main(page: ft.Page):
     menubar = create_menu_bar(page)     # menubar
     all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
     active_rail = create_active_rail(page)  # Render whichever rail is active
-    workspace = create_workspace(page, story)  # render our workspace containing our widgets
+    workspace = create_workspace(page)  # render our workspace containing our widgets
 
     # Save our 2 rails, dividers, and our workspace container in a row
     row = ft.Row(

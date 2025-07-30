@@ -2,6 +2,7 @@ from models.user import user
 
 story = user.active_story  # Get our story object from the user
 
+#
 def arrange_widgets():
     print("arrange widgets called")
     
@@ -46,14 +47,16 @@ def arrange_widgets():
 
 
 
-    # Steal from other pins if main pin is empty. Makes UI look prettier
+    # Steal from other pins if main pin is empty. Makes UI look prettier and consistent
     if len(story.main_pin.controls) == 0:   # Check if main pin is empty
+
         
-        if len(story.top_pin.controls) > 0: # If it is, check all other pins to steal from
-            for obj in story.top_pin.controls[:]:  # Run through our objects to find the first visible one
-                if obj.visible == True:
-                    story.top_pin.controls.remove(obj)  # Remove from top pin
+        # If pin is NOT empty. Pin's can hold widgets that are not visible, so we check that as well
+        if len(story.top_pin.controls) > 0: 
+            for obj in story.top_pin.controls[:]:  
+                if obj.visible == True:     # If there is at least one visible widget
                     story.main_pin.controls.append(obj)  # Add to main pin
+                    story.top_pin.controls.remove(obj)  # Remove it from top pin
                     obj.pin_location = "main"  # Update pin location
                     print("Stole from top pin")
                     break   # Exit our for loop
@@ -85,3 +88,5 @@ def arrange_widgets():
             print("No visible widgets, so we did not steal from other pins")
 
 
+# check if main pin empty, and if its not empty but all invisible
+# make steal_widgets from above

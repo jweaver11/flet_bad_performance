@@ -1,4 +1,7 @@
-''' Master Story class that contains data and methods for the entire story '''
+''' 
+Master Story class that contains data and methods for the entire story 
+This is a dead-end model. Imports nothing else from project, or things will ciruclar import
+'''
 
 import os
 import flet as ft
@@ -23,9 +26,14 @@ class Story:
         self.right_pin = ft.Column(spacing=10, width=0, controls=[])
         self.bottom_pin = ft.Row(spacing=10, height=0, controls=[])
 
-        # Our row that holds all our widgets
+        # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
+
+        # Master stack that holds our widgets
+        # And our drag targets when we start dragging widgets.
+        # We do this so there is a receiver (drag target) for the widget even if a pin is empty and hidden
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
+
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters

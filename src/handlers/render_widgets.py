@@ -1,5 +1,6 @@
 '''
-Layout our widgets whenever there is more than 2
+Render our widgets on the screen based on their pins.
+This also handles logic for dragging widgets into different pins and relocating them.
 '''
 import flet as ft
 from models.user import user
@@ -8,9 +9,51 @@ from handlers.arrange_widgets import arrange_widgets
 
 story = user.active_story # Get our story object from the user
 
+# When a draggable starts dragging, we add our drag targets to the master stack
+def show_pin_drag_targets(e):
+    
+    # Only add drag targets if they're not already in the stack
+    if pin_drag_targets not in story.master_stack.controls:
+        story.master_stack.controls.extend(pin_drag_targets)
+        story.master_stack.update()
+    else:
+        print("drag targets already in master stack. This is an error")
+
+# Called whenever a drag target accepts a draggable
+# Removes our drag targets from the stack, otherwise they sit overtop our widgets and break the program
+def remove_drag_targets():
+    print("remove drag_targets called")
+    # Remove all our drag targets when a drag is complete
+    for target in pin_drag_targets:
+        if target in story.master_stack.controls:
+            story.master_stack.controls.remove(target)
+    story.master_stack.update()
+
+# Called when a draggable hovers over a drag target before dropping
+# Makes the drag target visible to notify users they can drop here
+def on_hover_pin_drag_target(e):
+    # e.control = whichever drag target is calling this method
+    e.control.content.opacity = .5
+    e.control.content.update()
+    print("Hovered over a drag target")
+    
+# Called when a draggable leaves a drag target
+# Makes the drag target invisible again
+def on_leave_pin(e):
+    e.control.content.opacity = 0
+    e.control.content.update()
+    print("Left a drag target")
+
+
 # Accepting drags for our five pin locations
 def top_pin_drag_accept(e):
-    # e.data is a JSON string, so we have to parse it
+    # Reset our container to be invisible again
+    e.control.content.opacity = 0
+    e.control.content.update()
+
+    remove_drag_targets()  # Remove our drag targets from the stack, since we have completed our drag
+
+    # Grab our object from e.data, which is is a JSON string, so we have to parse it
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -21,34 +64,25 @@ def top_pin_drag_accept(e):
             # Set object variable to our object
             object = draggable.data
             #print("object:\n", object) 
-        #else:
-            #print("Could not find control with src_id:", src_id)
+        else:
+            print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Set our objects pin location to the correct new location
+    # Set our objects pin location to the correct new location, and then call our arrange_widgets function
     object.pin_location = "top"
-
     arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row()
-    e.control.update()
-
-    # Properly reset the stack
-    story.master_stack.controls.clear()
-    story.master_stack.controls.append(story.widgets)
-    story.master_stack.update()
-
-    # Update our pins to help with errors
-    story.top_pin.update()
-    story.left_pin.update()
-    story.main_pin.update()
-    story.right_pin.update()
-    story.bottom_pin.update()
     
     print("top pin accepted")
 
+# Left drag accept
 def left_pin_drag_accept(e):
+    e.control.content.opacity = 0
+    e.control.content.update()
+
+    remove_drag_targets() 
+
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -56,74 +90,49 @@ def left_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            #print("object:\n", object) 
-        #else:
-            #print("Could not find control with src_id:", src_id)
-    else:
-       print("src_id not found in event data")
-
-    # Set our objects pin location to the correct new location
-    object.pin_location = "left"
-
-    arrange_widgets()       # Re-arrange our widgets held in the story object
-    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row()
-    e.control.update()
-
-    # Properly reset the stack
-    story.master_stack.controls.clear()
-    story.master_stack.controls.append(story.widgets)
-    story.master_stack.update()
-
-    # Update our pins to help with errors
-    story.top_pin.update()
-    story.left_pin.update()
-    story.main_pin.update()
-    story.right_pin.update()
-    story.bottom_pin.update()
-
-    print("left pin accepted")
-
-def main_pin_drag_accept(e):
-    event_data = json.loads(e.data)
-    src_id = event_data.get("src_id")
-    
-    if src_id:
-        draggable = e.page.get_control(src_id)
-        if draggable:
-            object = draggable.data
-            #print("object:\n", object) 
-        #else:
-            #print("Could not find control with src_id:", src_id)
+        else:
+            print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Set our objects pin location to the correct new location
+    object.pin_location = "left"
+    arrange_widgets()       
+    render_widgets(e.page)  
+    
+    print("left pin accepted")
+
+# Main drag accept
+def main_pin_drag_accept(e):
+    e.control.content.opacity = 0
+    e.control.content.update()
+    
+    remove_drag_targets() 
+
+    event_data = json.loads(e.data)
+    src_id = event_data.get("src_id")
+    
+    if src_id:
+        draggable = e.page.get_control(src_id)
+        if draggable:
+            object = draggable.data
+        else:
+            print("Could not find control with src_id:", src_id)
+    else:
+        print("src_id not found in event data")
+
     object.pin_location = "main"
-
-    arrange_widgets()       # Re-arrange our widgets held in the story object
-    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    
-    # Reset the drag target appearance but don't clear it completely
-    e.control.content = ft.Row(height=minimum_pin_height)
-    e.control.update()
-    
-    # Properly reset the stack
-    story.master_stack.controls.clear()
-    story.master_stack.controls.append(story.widgets)
-    story.master_stack.update()
-
-    # Update our pins to help with errors
-    story.top_pin.update()
-    story.left_pin.update()
-    story.main_pin.update()
-    story.right_pin.update()
-    story.bottom_pin.update()
+    arrange_widgets()       
+    render_widgets(e.page)  
     
     print("main pin accepted")
 
-
+# Right drag accept
 def right_pin_drag_accept(e):
+    e.control.content.opacity = 0
+    e.control.content.update()
+    
+    remove_drag_targets() 
+
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -131,35 +140,23 @@ def right_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            #print("object:\n", object) 
-        #else:
-            #print("Could not find control with src_id:", src_id)
+        else:
+            print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Set our objects pin location to the correct new location
     object.pin_location = "right"
-
-    arrange_widgets()       # Re-arrange our widgets held in the story object
-    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row()
-    e.control.update()
-
-    # Properly reset the stack
-    story.master_stack.controls.clear()
-    story.master_stack.controls.append(story.widgets)
-    story.master_stack.update()
-
-    # Update our pins to help with errors
-    story.top_pin.update()
-    story.left_pin.update()
-    story.main_pin.update()
-    story.right_pin.update()
-    story.bottom_pin.update()
-
+    arrange_widgets()       
+    render_widgets(e.page)  
+    
     print("right pin accepted")
 
 def bottom_pin_drag_accept(e):
+    e.control.content.opacity = 0
+    e.control.content.update()
+    
+    remove_drag_targets() 
+
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -167,103 +164,53 @@ def bottom_pin_drag_accept(e):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            #print("object:\n", object) 
-        #else:
-            #print("Could not find control with src_id:", src_id)
+        else:
+            print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
 
-    # Set our objects pin location to the correct new location
     object.pin_location = "bottom"
-
-    arrange_widgets()       # Re-arrange our widgets held in the story object
-    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
-    e.control.content = ft.Row()
-    e.control.update()
-
-    # Properly reset the stack
-    story.master_stack.controls.clear()
-    story.master_stack.controls.append(story.widgets)
-    story.master_stack.update()
-
-    # Update our pins to help with errors
-    story.top_pin.update()
-    story.left_pin.update()
-    story.main_pin.update()
-    story.right_pin.update()
-    story.bottom_pin.update()
-
+    arrange_widgets()       
+    render_widgets(e.page)  
+    
     print("bottom pin accepted")
 
 
-# When a draggable is hovering over a target
-def show_pin_drag_targets(e):
-    e.control.content = ft.Container(
-        bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.WHITE), 
-        height=minimum_pin_height
-    )
-    e.control.update()
-    
-    # Clear the stack and rebuild it properly
-    story.master_stack.controls.clear()
-    story.master_stack.controls.append(story.widgets)
-    
-    # Only add drag targets if they're not already in the stack
-    # 
-    #for target in pin_drag_targets:
-        #if target not in master_stack.controls:
-            #master_stack.controls.append(target)
-    
-    story.master_stack.update()
 
-# When a draggable leaves a target
-def on_leave(e):
-    #print("Left a pin drag target")
-    e.control.content = ft.Row(height=300)
-    e.control.update()
-    story.master_stack.update()
-
-
-# set minimumm fallbacks for our pins
-#min_pin_height = 30
-#min_pin_width = 30
+# set minimumm fallbacks for our pins, and our drag targets
 minimum_pin_height = 200
 minimum_pin_width = 200
 
 # Pin drag targets
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=story.top_pin, 
-    on_accept=top_pin_drag_accept,
-    on_will_accept=show_pin_drag_targets,
-    on_leave=on_leave,
+    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    on_accept=top_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
-
+left_pin_drag_target = ft.DragTarget(
+    group="widgets",
+    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    on_accept=left_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
+)
 main_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=ft.Row(), 
-    on_accept=main_pin_drag_accept,
-    on_will_accept=show_pin_drag_targets,
-    on_leave=on_leave,
+    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    on_accept=main_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
 right_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=ft.Row(), 
-    on_accept=right_pin_drag_accept,
-    on_will_accept=show_pin_drag_targets,
-    on_leave=on_leave,
+    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    on_accept=right_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
 bottom_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=ft.Row(), 
-    on_accept=bottom_pin_drag_accept, on_will_accept=show_pin_drag_targets, on_leave=on_leave,
+    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0),
+    on_accept=bottom_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
 
-def hide_pin_drag_targets():
-    print("hide targets called")
-
-# In containers in order to position them inside the stack
-'''
+# List of Controls (Containers) that hold our drag targets we just created
+# Must be in containers in order to position them inside the stack
+# Surrounding drag target is on the bottom
 pin_drag_targets = [
     ft.Container(
         content=top_pin_drag_target,
@@ -298,15 +245,13 @@ pin_drag_targets = [
         border_radius=ft.border_radius.all(10), 
     ),
 ]
-'''
-
+print("render_widgets called")
 
 
 # Pin our widgets in here for formatting
 def render_widgets(page: ft.Page):
-    print("render_widgets called")
 
-    # Change our cursor when we hover over a divider. Either vertical or horizontal
+    # Change our cursor when we hover over a resizer (divieder). Either vertical or horizontal
     def show_vertical_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
         e.control.update()
@@ -323,14 +268,14 @@ def render_widgets(page: ft.Page):
         story.widgets.update() # Update the main pin, as it is affected by all pins resizing
         story.master_stack.update()
 
-    # Holds the divider that is draggable to resize the top pin
+    # The control that holds our divider, which we drag to resize the top pin
     top_pin_resizer = ft.GestureDetector(
         content=ft.Divider(color=ft.Colors.PRIMARY, height=10, thickness=10),
         on_pan_update=move_top_pin_divider,
         on_hover=show_vertical_cursor,
     )
 
-    # Left pin reisizer
+    # Left pin reisizer method and variable
     def move_left_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_x > 0 and story.left_pin.width < page.width/2) or (e.delta_x < 0 and story.left_pin.width > 200):
             story.left_pin.width += e.delta_x
@@ -342,8 +287,10 @@ def render_widgets(page: ft.Page):
         on_pan_update=move_left_pin_divider,
         on_hover=show_horizontal_cursor,
     )
+    
+    # No resizer for main pin, as it is always expanded and takes up the rest of the space
 
-    # Right pin resizer
+    # Right pin resizer method and variable
     def move_right_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_x < 0 and story.right_pin.width < page.width/2) or (e.delta_x > 0 and story.right_pin.width > 200):
             story.right_pin.width -= e.delta_x
@@ -355,7 +302,8 @@ def render_widgets(page: ft.Page):
         on_pan_update=move_right_pin_divider,
         on_hover=show_horizontal_cursor,
     )
-    # Bottom pin resizer
+
+    # Bottom pin resizer method and variable
     def move_bottom_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_y < 0 and story.bottom_pin.height < page.height/2) or (e.delta_y > 0 and story.bottom_pin.height > 200):
             story.bottom_pin.height -= e.delta_y
@@ -369,53 +317,27 @@ def render_widgets(page: ft.Page):
     )
 
     
-    # Formatted pin locations that also hold our resizer gesture detecctors
+    # Formatted pin locations that hold our drag targets, and our resizer gesture detectors.
     # Main pin is always expanded and has no resizer, so it doesnt need to be formatted
     formatted_top_pin = ft.Column(spacing=0, controls=[story.top_pin, top_pin_resizer])
     formatted_left_pin = ft.Row(spacing=0, controls=[story.left_pin, left_pin_resizer]) 
     formatted_right_pin = ft.Row(spacing=0, controls=[right_pin_resizer, story.right_pin])  # Right pin formatting row
     formatted_bottom_pin = ft.Column(spacing=0, controls=[bottom_pin_resizer, story.bottom_pin])  # Bottom pin formatting column
 
-
-    left_pin_drag_target = ft.DragTarget(
-        group="widgets", 
-        content=formatted_left_pin, 
-        on_accept=left_pin_drag_accept,
-        #on_will_accept=show_pin_drag_targets,
-        on_leave=on_leave,
-    )
-
-    
-
-
-    
-    '''
-    print(f"story.top_pin_obj length:  {len(story.top_pin_obj)}")
-    print(f"visible widgets:    {len(top_pin.controls)} \n")
-    print(f"story.left_pin_obj length:  {len(story.left_pin_obj)}")
-    print(f"visible widgets:    {len(left_pin.controls)} \n")
-    print(f"story.main_pin_obj length:  {len(story.main_pin_obj)}")
-    print(f"visible widgets:    {len(main_pin.controls)} \n")
-    print(f"story.right_pin_obj length:  {len(story.right_pin_obj)}")
-    print(f"visible widgets:    {len(right_pin.controls)} \n")
-    print(f"story.bottom_pin_obj length:  {len(story.bottom_pin_obj)}")
-    print(f"visible widgets:    {len(bottom_pin.controls)} \n")
-    '''
-
-
-    # Check if we have any widgets in top pin. If not, we hide the formatted top pin
-    # If there are widgets, check if any are visible. If yes, show the formatted pin and break the loop
+    # Check if our pins have any visible widgets or not, so if they should show up on screen
+    # Check if top pin is empty. If yes, hide the formatted pin
     if len(story.top_pin.controls) == 0:
         formatted_top_pin.visible = False
-    else:
+    else:   # If not empty, check if any of the widgets are visible
         for obj in story.top_pin.controls:
-            if obj.visible == True:
+            if obj.visible == True:     # If any widgets are visible, show our formatted pin
                 formatted_top_pin.visible = True
-                break
-        # format and add our top pin
+                break   # No need to keep checking if at least one is visible
+        # Makes sure our height is set correctly
         if story.top_pin.height < minimum_pin_height:
             story.top_pin.height = minimum_pin_height
 
+    # Left pin
     if len(story.left_pin.controls) == 0:
         formatted_left_pin.visible = False
     else:
@@ -426,6 +348,7 @@ def render_widgets(page: ft.Page):
         if story.left_pin.width < minimum_pin_width:
             story.left_pin.width = minimum_pin_width
 
+    # Right pin
     if len(story.right_pin.controls) == 0:
         formatted_right_pin.visible = False
     else:
@@ -436,6 +359,7 @@ def render_widgets(page: ft.Page):
         if story.right_pin.width < minimum_pin_width:
             story.right_pin.width = minimum_pin_width
 
+    # Bottom pin
     if len(story.bottom_pin.controls) == 0:
         formatted_bottom_pin.visible = False
     else:
@@ -446,16 +370,10 @@ def render_widgets(page: ft.Page):
         if story.bottom_pin.height < minimum_pin_height:
             story.bottom_pin.height = minimum_pin_height
 
-    
-
-    
-
-
-
     # Format our pins on the page
     story.widgets.controls.clear()
     story.widgets.controls = [
-        left_pin_drag_target,    # formatted left pin
+        formatted_left_pin,    # formatted left pin
         ft.Column(
             expand=True, spacing=0, 
             controls=[
@@ -465,10 +383,8 @@ def render_widgets(page: ft.Page):
         ]),
         formatted_right_pin,    # formatted right pin
     ]
-
+    #story.widgets.update()
     page.update()
-    arrange_widgets()
 
 
-# Fix formatting, get rest of drag targets working
 # Add stack so drag targets are same size as pin??

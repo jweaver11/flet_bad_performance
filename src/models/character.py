@@ -1,6 +1,6 @@
 import flet as ft
 from models.user import user
-from handlers.render_widgets import render_widgets
+from handlers.render_widgets import render_widgets, show_pin_drag_targets
 
 story = user.active_story  # Get our story object from the user
 
@@ -118,19 +118,8 @@ class Character(ft.Container):
         update_widget()  # Initialize the widget on startup
 
 
-        def on_drag_complete(e):    # Has no cancellation method, meaning errors if not dropped in workspace
-            print("Drag complete called")
-            # Instead of clearing and re-adding, just remove the pin drag targets
-            #for target in pin_drag_targets:
-                #if target in master_stack.controls:
-                    #.controls.remove(target)
+        
             
-            # Ensure master_widget_row is in the stack
-            if story.widgets not in story.master_stack.controls:
-                story.master_stack.controls.append(story.widgets)
-            
-            story.master_stack.update()
-            page.update()
 
         def hide_widget(e):
             self.visible = False
@@ -153,7 +142,8 @@ class Character(ft.Container):
                                 group="widgets",
                                 content=ft.TextButton(self.title),
                                 data=self,       # Pass our object as the data so we can access it
-                                on_drag_complete=on_drag_complete,
+                                on_drag_start=show_pin_drag_targets,    # Called from render_widgets handler
+                                # No on_complete method since the drag target will handle that
                             )
                         ]
                     ),
@@ -184,9 +174,6 @@ class Character(ft.Container):
     species : str
     parents = []
 
-    # Adds our character object to the storyies list of characters and gives it a pin location
-    def create_character(self, story):
-        story.create_character(self)
 
 
 
