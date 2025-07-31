@@ -120,6 +120,34 @@ def characters_rail(page: ft.Page):
             
             
             character.color = color
+            if character.color == "red":
+                character.rendered_color = ft.Colors.RED_900
+            elif character.color == "pink":
+                character.rendered_color = ft.Colors.PINK_900
+            elif character.color == "purple":
+                character.rendered_color = ft.Colors.PURPLE_900
+            elif character.color == "blue":
+                character.rendered_color = ft.Colors.BLUE_900
+            elif character.color == "cyan":
+                character.rendered_color = ft.Colors.CYAN_900
+            elif character.color == "teal":
+                character.rendered_color = ft.Colors.TEAL_900
+            elif character.color == "green":
+                character.rendered_color = ft.Colors.GREEN_900
+            elif character.color == "lime":
+                character.rendered_color = ft.Colors.LIME_900
+            elif character.color == "yellow":
+                character.rendered_color = ft.Colors.YELLOW_900
+            elif character.color == "orange":
+                character.rendered_color = ft.Colors.ORANGE_900
+            elif character.color == "brown":
+                character.rendered_color = ft.Colors.BROWN_900
+            elif character.color == "light_grey":
+                character.rendered_color = ft.Colors.GREY_500
+            elif character.color == "grey":
+                character.rendered_color = ft.Colors.GREY_900
+            else:
+                character.rendered_color = ft.Colors.TRANSPARENT
             print(character.color)
             
             

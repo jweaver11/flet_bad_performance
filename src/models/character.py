@@ -31,7 +31,7 @@ class Character(ft.Container):
         self.sex = ""    # Add selecteble male, female, other - custom write in
 
         self.color = "none"     # Changable border color of widget and character on rail
-        self.render_color = ft.Colors.TRANSPARENT   # Flet colors formatting based on our above color
+        self.rendered_color = ft.Colors.TRANSPARENT   # Flet colors formatting based on our above color
 
         self.char_data = {
             'Good': True,
@@ -80,34 +80,6 @@ class Character(ft.Container):
     def build_widget(self):
         # Sets our color when we build widget, or it would have to set on every UI element
         
-        if self.color == "red":
-            self.rendered_color = ft.Colors.RED_900
-        elif self.color == "pink":
-            self.rendered_color = ft.Colors.PINK_900
-        elif self.color == "purple":
-            self.rendered_color = ft.Colors.PURPLE_900
-        elif self.color == "blue":
-            self.rendered_color = ft.Colors.BLUE_900
-        elif self.color == "cyan":
-            self.rendered_color = ft.Colors.CYAN_900
-        elif self.color == "teal":
-            self.rendered_color = ft.Colors.TEAL_900
-        elif self.color == "green":
-            self.rendered_color = ft.Colors.GREEN_900
-        elif self.color == "lime":
-            self.rendered_color = ft.Colors.LIME_900
-        elif self.color == "yellow":
-            self.rendered_color = ft.Colors.YELLOW_900
-        elif self.color == "orange":
-            self.rendered_color = ft.Colors.ORANGE_900
-        elif self.color == "brown":
-            self.rendered_color = ft.Colors.BROWN_900
-        elif self.color == "light_grey":
-            self.rendered_color = ft.Colors.GREY_500
-        elif self.color == "grey":
-            self.rendered_color = ft.Colors.GREY_900
-        else:
-            self.rendered_color = ft.Colors.TRANSPARENT
 
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
