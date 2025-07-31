@@ -59,7 +59,6 @@ class Character(ft.Container):
             'Abilities': "",
             'Notes' : "",
         }
-        self.update_widget()
 
         # Make a markdown as content of container
         # Gives us our initial widget as a container
@@ -68,40 +67,9 @@ class Character(ft.Container):
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor=ft.Colors.GREY_900,
-            content=ft.Column(spacing=0, controls=[
-                ft.Stack([
-                    # Draggable title of character at top center of widget
-                    ft.Row(
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        controls=[
-                            ft.Draggable(
-                                group="widgets",
-                                content=ft.TextButton(self.title),
-                                data=self,       # Pass our object as the data so we can access it
-                                on_drag_start=show_pin_drag_targets,    # Called from render_widgets handler
-                                # No on_complete method since the drag target will handle that
-                            )
-                        ]
-                    ),
-                    # Hide widget 'x' button at top right of widget
-                    ft.Row(
-                        alignment=ft.MainAxisAlignment.END,
-                        controls=[
-                            ft.IconButton(
-                                on_click=lambda e: self.hide_widget(),
-                                icon=ft.Icons.CLOSE_ROUNDED
-                    )])
-                ]),
-                # Divider between title and body of widget
-                ft.Divider(color=ft.Colors.PRIMARY),
-
-                # Body of our widget
-                ft.Container(       # Body of the widget
-                    expand=True,
-                    content=ft.Column(self.controls)
-                )
-            ])
+            content=None
         )
+        self.build_widget()
 
     # Pass in our control and type of data
     def update_data(self, e, type_):
@@ -111,27 +79,53 @@ class Character(ft.Container):
         self.data[e.control.key] = e.control.text
         print("Data updated: ", self.char_data)
         self.update()
-
-
-    # Update our widget so we can alter the char object class and re-render
-    # Those updates into our widget, otherwise it would be static
-    def update_widget(self):
-        #self.controls.clear()  # Clear the body before updating
-
-        self.body_column.controls.clear()
-
-        #self.controls.append(ft.Image(src=self.image, width=100, height=100))
-        
-
-        # Render our built in data in a fixed formatted way, then format all other data
-        # Differently afterward
            
  
-            
     # Makes our widget invisible
     def hide_widget(self):
         self.visible = False
         story.master_stack.update()
+
+    def build_widget(self):
+
+        self.body_column.controls.clear()
+        #self.controls.append(ft.Image(src=self.image, width=100, height=100))
+       
+        self.content=ft.Column(spacing=0, controls=[
+            ft.Stack([
+                # Draggable title of character at top center of widget
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    controls=[
+                        ft.Draggable(
+                            group="widgets",
+                            content=ft.TextButton(self.title),
+                            data=self,       # Pass our object as the data so we can access it
+                            on_drag_start=show_pin_drag_targets,    # Called from render_widgets handler
+                            # No on_complete method since the drag target will handle that
+                        )
+                    ]
+                ),
+                # Hide widget 'x' button at top right of widget
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.END,
+                    controls=[
+                        ft.IconButton(
+                            on_click=lambda e: self.hide_widget(),
+                            icon=ft.Icons.CLOSE_ROUNDED
+                )])
+            ]),
+            # Divider between title and body of widget
+            ft.Divider(color=ft.Colors.PRIMARY),
+
+            # Body of our widget
+            ft.Container(       # Body of the widget
+                expand=True,
+                content=ft.Column(self.controls)
+            )
+        ])
+    
+
 
         
 

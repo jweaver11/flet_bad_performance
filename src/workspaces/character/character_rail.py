@@ -65,7 +65,7 @@ def characters_rail(page: ft.Page):
 
             # Set our new name and update its widget to reflect the change
             character.title = new_name
-            character.update_widget()
+            character.build_widget()
             
             reload_character_rail()
             render_widgets(page)
