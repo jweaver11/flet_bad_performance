@@ -29,7 +29,9 @@ class Character(ft.Container):
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.age = ""
         self.sex = ""    # Add selecteble male, female, other - custom write in
-        self.color = "grey"     # Changable bg color of widget and bg of character on rail
+
+        self.color = "none"     # Changable border color of widget and character on rail
+        self.render_color = ft.Colors.TRANSPARENT   # Flet colors formatting based on our above color
 
         self.char_data = {
             'Good': True,
@@ -64,8 +66,8 @@ class Character(ft.Container):
             expand=True, 
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor=self.color, # Uniformed bg color of the widget
-            content=None
+            bgcolor = ft.Colors.GREY_900,
+            content=None,
         )
         self.build_widget() # Builds our widgets content when object is created
            
@@ -79,36 +81,40 @@ class Character(ft.Container):
         # Sets our color when we build widget, or it would have to set on every UI element
         
         if self.color == "red":
-            render_color = ft.Colors.RED_900
+            self.rendered_color = ft.Colors.RED_900
         elif self.color == "pink":
-            render_color = ft.Colors.PINK_900
+            self.rendered_color = ft.Colors.PINK_900
         elif self.color == "purple":
-            render_color = ft.Colors.PURPLE_900
+            self.rendered_color = ft.Colors.PURPLE_900
         elif self.color == "blue":
-            render_color = ft.Colors.BLUE_900
+            self.rendered_color = ft.Colors.BLUE_900
         elif self.color == "cyan":
-            render_color = ft.Colors.CYAN_900
+            self.rendered_color = ft.Colors.CYAN_900
         elif self.color == "teal":
-            render_color = ft.Colors.TEAL_900
+            self.rendered_color = ft.Colors.TEAL_900
         elif self.color == "green":
-            render_color = ft.Colors.GREEN_900
+            self.rendered_color = ft.Colors.GREEN_900
         elif self.color == "lime":
-            render_color = ft.Colors.LIME_900
+            self.rendered_color = ft.Colors.LIME_900
         elif self.color == "yellow":
-            render_color = ft.Colors.YELLOW_900
+            self.rendered_color = ft.Colors.YELLOW_900
         elif self.color == "orange":
-            render_color = ft.Colors.ORANGE_900
+            self.rendered_color = ft.Colors.ORANGE_900
         elif self.color == "brown":
-            render_color = ft.Colors.BROWN_900
+            self.rendered_color = ft.Colors.BROWN_900
         elif self.color == "light_grey":
-            render_color = ft.Colors.GREY_500
+            self.rendered_color = ft.Colors.GREY_500
         elif self.color == "grey":
-            render_color = ft.Colors.GREY_900
+            self.rendered_color = ft.Colors.GREY_900
         else:
-            render_color = ft.Colors.GREY_900
+            self.rendered_color = ft.Colors.TRANSPARENT
+
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
-        self.bgcolor=render_color
+
+        # Gives our container a border and adjusts the user selected color to it
+        self.border = ft.border.all(2, self.rendered_color)
+
        
         self.content=ft.Column(spacing=0, controls=[
             ft.Stack([
@@ -120,7 +126,7 @@ class Character(ft.Container):
                             group="widgets",
                             content=ft.TextButton(self.title),
                             data=self,       # Pass our object as the data so we can access it
-                            on_drag_start=show_pin_drag_targets,    # Called from render_widgets handler
+                            on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
                             # No on_complete method since the drag target will handle that
                         )
                     ]
@@ -159,5 +165,5 @@ class Character(ft.Container):
 
 
 
-# Make widget container contain markdown for rendering, and scrollable
+# Make widget container contain markdown for rendereding, and scrollable
 

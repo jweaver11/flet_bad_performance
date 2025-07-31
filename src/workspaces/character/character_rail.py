@@ -5,11 +5,9 @@ the create 'character button' at the bottom.
 '''
 
 import flet as ft
-from workspaces.character.character_styles import button_style
 from models.user import user
 from models.character import Character
 from handlers.render_widgets import render_widgets
-from handlers.arrange_widgets import arrange_widgets
 import json
 
 story = user.active_story  # Get our story object from the user
@@ -26,7 +24,7 @@ def characters_rail(page: ft.Page):
     def show_character_widget(character):
         # Show our widget and update it
         character.visible = True
-        character.update()
+        page.update()
 
     # Called when hovered over a character on the rail
     # Shows our two buttons rename and delete
@@ -129,6 +127,7 @@ def characters_rail(page: ft.Page):
             # Update the widget to reflect the changes
             character.build_widget()
             character.update()
+            reload_character_rail()
 
         # Reference for our radio selection of colors
         radio_group_ref = ft.Ref[ft.RadioGroup]()
@@ -151,6 +150,7 @@ def characters_rail(page: ft.Page):
                     ft.Radio(value="brown", label="Brown", adaptive=True),
                     ft.Radio(value="light_grey", label="Light Grey", adaptive=True),
                     ft.Radio(value="grey", label="Grey", adaptive=True),
+                    ft.Radio(value="none", label="None", adaptive=True),
                 ]),
             ),
             actions=[
@@ -167,7 +167,6 @@ def characters_rail(page: ft.Page):
         dlg.open = True
         page.update()
 
-        
 
     # Called when user clicks the delete button on the character on the rail
     # Delete our character object from the story, and its reference in its pin
@@ -434,7 +433,12 @@ def characters_rail(page: ft.Page):
         # Run through each character in our story
         for character in story.characters:
             # Create a new character widget for the rail
-            new_char = ft.Draggable(
+            new_char = ft.Container(
+                border=ft.border.all(2, character.rendered_color),  # Gives a border to match the widgets border
+                padding=ft.padding.only(left=4, right=4),   # padding
+                margin=ft.margin.only(bottom=2),    # Margin between characters on rail
+                border_radius=ft.border_radius.all(10),
+                content=ft.Draggable(
                 content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
                 data=character,     # Pass in our character object when dragging
                 group="widgets",
@@ -502,6 +506,7 @@ def characters_rail(page: ft.Page):
                         
                     ], 
                 )
+            )
             )
             
 
