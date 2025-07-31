@@ -270,8 +270,6 @@ def characters_rail(page: ft.Page):
         else:
             print("Object does not have tags attribute, cannot change character type")
 
-        object.update()     # Reflect our changes in the widget on the right
-
         reload_character_rail()  # Reload our character rail to show new character
         
         print("Character added to main characters")
@@ -298,7 +296,7 @@ def characters_rail(page: ft.Page):
         else:
             print("Object does not have tags attribute, cannot change character type")
         reload_character_rail()
-        object.update()
+
     # Background character
     def make_background_character(e):
         event_data = json.loads(e.data)
@@ -318,11 +316,10 @@ def characters_rail(page: ft.Page):
             object.tags['main_character'] = False
             object.tags['side_character'] = False
             object.tags['background_character'] = True
-            #print(object.tags)
+            print(object.tags)
         else:
             print("Object does not have tags attribute, cannot change character type")
         reload_character_rail() 
-        object.update()
 
     # The 3 main categories of characters and how they will be rendered on the screen
     # There list of controls are populated from our character list in the story

@@ -105,6 +105,7 @@ class Character(ft.Container):
 
     # Pass in our control and type of data
     def update_data(self, e, type_):
+        print("Update data called")
         print(type_)
         print("Type printed ^^^^^^^^^^^^^^^^^^^^^^^^^")
         self.data[e.control.key] = e.control.text
