@@ -18,9 +18,9 @@ story = user.active_story  # Get our story object from the user
 def characters_rail(page: ft.Page):
 
     # Initially create some characters to test with
-    story.add_object_to_story(Character("Bob", page))
-    story.add_object_to_story(Character("Alice", page))
-    story.add_object_to_story(Character("Joe", page))
+    story.add_object_to_story(Character("Bob"))
+    story.add_object_to_story(Character("Alice"))
+    story.add_object_to_story(Character("Joe"))
         
     # Called when user clicks a character on the rail, and it shows its widget
     def show_character_widget(e, character):
@@ -170,7 +170,7 @@ def characters_rail(page: ft.Page):
                 name = name.capitalize()  # Auto capitalize names
                 
                 # temporary character object so we can check tags
-                new_character = Character(name, page)
+                new_character = Character(name)
 
                 # Set the appropriate tag based on the category
                 if tag == "main":
