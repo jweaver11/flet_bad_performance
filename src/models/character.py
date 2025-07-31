@@ -6,7 +6,7 @@ story = user.active_story  # Get our story object from the user
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
-    def __init__(self, name):
+    def __init__(self, name, ):
         self.title = name  # Name of character, but all objects have a title for identification
         self.tag = "character"  # Tag for logic, mostly for routing it through our story object
 
@@ -32,7 +32,11 @@ class Character(ft.Container):
 
         self.color = "none"     # Changable border color of widget and character on rail
         self.rendered_color = ft.Colors.TRANSPARENT   # Flet colors formatting based on our above color
+        self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
+
+        # Data about the character that the user will manipulate
+        # Can't call this 'data' since containers already have that property
         self.char_data = {
             'Good': True,
             'Evil': False,
@@ -69,7 +73,7 @@ class Character(ft.Container):
             bgcolor = ft.Colors.GREY_900,
             content=None,
         )
-        self.build_widget() # Builds our widgets content when object is created
+        self.reload_widget() # Builds our widgets content when object is created
            
  
     # Makes our widget invisible
@@ -77,10 +81,56 @@ class Character(ft.Container):
         self.visible = False
         story.master_stack.update()
 
-    def build_widget(self):
-        # Sets our color when we build widget, or it would have to set on every UI element
-        
+    # Called when the 'good' character option is clicked in the widget body
+    def make_character_good(self):
+        # Make sure our other 2 options are false, and good is true
+        self.char_data['Good'] = True
+        self.char_data['Evil'] = False
+        self.char_data['Neutral'] = False
+        self.check_morality()   # Changes the name_color variable based on our updated tags
+        self.reload_widget()
+        self.update()
 
+    # Called when the 'evil' character option is clicked in the widget body
+    def make_character_evil(self):
+        self.char_data['Good'] = False
+        self.char_data['Evil'] = True
+        self.char_data['Neutral'] = False
+        self.check_morality()
+        self.reload_widget()
+        self.update()
+
+    # Called when the neutral character option is clicked in the widget body
+    def make_character_neutral(self):
+        self.char_data['Good'] = False
+        self.char_data['Evil'] = False
+        self.char_data['Neutral'] = True
+        self.check_morality()
+        self.reload_widget()
+        self.update()
+
+    # Called when the n/a character option is clicked in the widget body
+    def make_character_na(self):
+        self.char_data['Good'] = False
+        self.char_data['Evil'] = False
+        self.char_data['Neutral'] = False
+        self.check_morality()
+        self.reload_widget()
+        self.update()
+    
+    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
+    def check_morality(self):
+        if self.char_data['Good'] == True:
+            self.name_color = ft.Colors.GREEN
+        elif self.char_data['Evil'] == True:
+            self.name_color = ft.Colors.RED
+        elif self.char_data['Neutral'] == True:
+            self.name_color = ft.Colors.GREY
+        else:
+            self.name_color = ft.Colors.PRIMARY
+
+    # Reloads/builds our widget. Called after any changes happen to the data in it
+    def reload_widget(self):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
@@ -96,14 +146,15 @@ class Character(ft.Container):
                     controls=[
                         ft.Draggable(
                             group="widgets",
-                            content=ft.TextButton(self.title),
+                            content=ft.TextButton(content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title)),
                             data=self,       # Pass our object as the data so we can access it
                             on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
                             # No on_complete method since the drag target will handle that
+                            # If an on_cancel method gets added to flet, we add it here to remove the drag targets
                         )
                     ]
                 ),
-                # Hide widget 'x' button at top right of widget
+                # Hide widget eyeball button at top right of widget
                 ft.Row(
                     alignment=ft.MainAxisAlignment.END,
                     controls=[
@@ -118,7 +169,12 @@ class Character(ft.Container):
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
-                content=ft.Column()
+                content=ft.Column([
+                    ft.TextButton(text="good", on_click=lambda e: self.make_character_good()),
+                    ft.TextButton(text="bad", on_click=lambda e: self.make_character_evil()),
+                    ft.TextButton(text="neutral", on_click=lambda e: self.make_character_neutral()),
+                    ft.TextButton(text="N/A", on_click=lambda e: self.make_character_na()),
+                ])
             )
         ])
     

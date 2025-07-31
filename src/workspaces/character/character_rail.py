@@ -58,7 +58,7 @@ def characters_rail(page: ft.Page):
 
             # Set our new name and update its widget to reflect the change
             character.title = new_name
-            character.build_widget()
+            character.reload_widget()
             
             reload_character_rail()
             render_widgets(page)
@@ -107,45 +107,44 @@ def characters_rail(page: ft.Page):
         print("Change character color called")
 
         # Does the heavy lifting to change the characters color
-        def change_color(e=None):
+        def change_color():
             print("Change color called")
 
-            if e is not None:
-                color = e.control.value
-            else:
-                color = radio_group_ref.current.value
+            color = radio_group_ref.current.value
 
             dlg.open = False
             page.update()
             
-            
             character.color = color
-            if character.color == "red":
+
+            # Check our color and change our 'rendered_color' to match
+            # rendered_color is what can be directly used by controls from the object
+            if color == "red":
                 character.rendered_color = ft.Colors.RED_900
-            elif character.color == "pink":
+            elif color == "pink":
                 character.rendered_color = ft.Colors.PINK_900
-            elif character.color == "purple":
+            elif color == "purple":
                 character.rendered_color = ft.Colors.PURPLE_900
-            elif character.color == "blue":
+            elif color == "blue":
                 character.rendered_color = ft.Colors.BLUE_900
-            elif character.color == "cyan":
+            elif color == "cyan":
                 character.rendered_color = ft.Colors.CYAN_900
-            elif character.color == "teal":
+            elif color == "teal":
                 character.rendered_color = ft.Colors.TEAL_900
-            elif character.color == "green":
+            elif color == "green":
                 character.rendered_color = ft.Colors.GREEN_900
             elif character.color == "lime":
                 character.rendered_color = ft.Colors.LIME_900
-            elif character.color == "yellow":
+            elif color == "yellow":
                 character.rendered_color = ft.Colors.YELLOW_900
-            elif character.color == "orange":
+            elif color == "orange":
                 character.rendered_color = ft.Colors.ORANGE_900
-            elif character.color == "brown":
+            elif color == "brown":
                 character.rendered_color = ft.Colors.BROWN_900
-            elif character.color == "light_grey":
+            elif color == "light_grey":
                 character.rendered_color = ft.Colors.GREY_500
-            elif character.color == "grey":
-                character.rendered_color = ft.Colors.GREY_900
+            elif color == "grey":
+                character.rendered_color = ft.Colors.GREY_800
             else:
                 character.rendered_color = ft.Colors.TRANSPARENT
             print(character.color)
@@ -153,7 +152,7 @@ def characters_rail(page: ft.Page):
             
             print(f"Character color changed to: {character.color}")
             # Update the widget to reflect the changes
-            character.build_widget()
+            character.reload_widget()
             character.update()
             reload_character_rail()
 
@@ -482,7 +481,7 @@ def characters_rail(page: ft.Page):
                                         #on_click=lambda e, char=character: show_character_widget(e, char),
                                         content=ft.Text(
                                             value=character.title,
-                                            color=ft.Colors.PRIMARY,
+                                            color=character.name_color,
                                             max_lines=1,    # Handle too long of names
                                             overflow=ft.TextOverflow.CLIP,  # Handle too long of names
                                             weight=ft.FontWeight.BOLD,  # Make text bold
