@@ -19,7 +19,7 @@ class User:
         return self.username == other.username and self.email == other.email
     
 
-    
+    # Settings the user can change
     settings = {
 
     }

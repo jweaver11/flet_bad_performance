@@ -22,7 +22,7 @@ class Story:
         # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
         self.top_pin = ft.Row(spacing=10, height=0, controls=[],)
         self.left_pin = ft.Column(spacing=10, width=0, controls=[])
-        self.main_pin = ft.Row(spacing=10, expand=True, controls=[])   # no formatting needed
+        self.main_pin = ft.Row(spacing=10, expand=True, controls=[])
         self.right_pin = ft.Column(spacing=10, width=0, controls=[])
         self.bottom_pin = ft.Row(spacing=10, height=0, controls=[])
 

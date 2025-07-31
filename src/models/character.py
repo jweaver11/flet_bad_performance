@@ -1,6 +1,6 @@
 import flet as ft
 from models.user import user
-from handlers.render_widgets import render_widgets, show_pin_drag_targets
+from handlers.render_widgets import show_pin_drag_targets
 
 story = user.active_story  # Get our story object from the user
 
@@ -12,26 +12,24 @@ class Character(ft.Container):
 
         self.pin_location = "left"  # Start in main pin location
 
-        
-        self.controls = []
-        self.body_column = ft.Column()
-
-        self.tags = {
+        self.tags = {   # adjectives about the character for easier identification
             'main_character': True,      
             'side_character' : True,     
             'background_character': True,     
-            #good : bool
-            #evil : bool
-            #neutral : bool
+            'good' : True,
+            'evil' : False,
+            'neutral' : False,
             #man : bool
             #woman : bool
-            #alive : bool
+            #alive : 
+            'color': True,
         }
 
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.age = ""
         self.sex = ""    # Add selecteble male, female, other - custom write in
+        self.color = "grey"     # Changable bg color of widget and bg of character on rail
 
         self.char_data = {
             'Good': True,
@@ -66,19 +64,10 @@ class Character(ft.Container):
             expand=True, 
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor=ft.Colors.GREY_900,
+            bgcolor=self.color, # Uniformed bg color of the widget
             content=None
         )
-        self.build_widget()
-
-    # Pass in our control and type of data
-    def update_data(self, e, type_):
-        print("Update data called")
-        print(type_)
-        print("Type printed ^^^^^^^^^^^^^^^^^^^^^^^^^")
-        self.data[e.control.key] = e.control.text
-        print("Data updated: ", self.char_data)
-        self.update()
+        self.build_widget() # Builds our widgets content when object is created
            
  
     # Makes our widget invisible
@@ -87,9 +76,39 @@ class Character(ft.Container):
         story.master_stack.update()
 
     def build_widget(self):
+        # Sets our color when we build widget, or it would have to set on every UI element
+        
+        if self.color == "red":
+            render_color = ft.Colors.RED_900
+        elif self.color == "pink":
+            render_color = ft.Colors.PINK_900
+        elif self.color == "purple":
+            render_color = ft.Colors.PURPLE_900
+        elif self.color == "blue":
+            render_color = ft.Colors.BLUE_900
+        elif self.color == "cyan":
+            render_color = ft.Colors.CYAN_900
+        elif self.color == "teal":
+            render_color = ft.Colors.TEAL_900
+        elif self.color == "green":
+            render_color = ft.Colors.GREEN_900
+        elif self.color == "lime":
+            render_color = ft.Colors.LIME_900
+        elif self.color == "yellow":
+            render_color = ft.Colors.YELLOW_900
+        elif self.color == "orange":
+            render_color = ft.Colors.ORANGE_900
+        elif self.color == "brown":
+            render_color = ft.Colors.BROWN_900
+        elif self.color == "light_grey":
+            render_color = ft.Colors.GREY_500
+        elif self.color == "grey":
+            render_color = ft.Colors.GREY_900
+        else:
+            render_color = ft.Colors.GREY_900
 
-        self.body_column.controls.clear()
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
+        self.bgcolor=render_color
        
         self.content=ft.Column(spacing=0, controls=[
             ft.Stack([
@@ -112,7 +131,7 @@ class Character(ft.Container):
                     controls=[
                         ft.IconButton(
                             on_click=lambda e: self.hide_widget(),
-                            icon=ft.Icons.CLOSE_ROUNDED
+                            icon=ft.Icons.VISIBILITY_OFF_ROUNDED
                 )])
             ]),
             # Divider between title and body of widget
@@ -121,18 +140,15 @@ class Character(ft.Container):
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
-                content=ft.Column(self.controls)
+                content=ft.Column()
             )
         ])
     
 
-
-        
-
     # origin = Origin
 
     # unique data types, (not str)
-    color : str
+    #color : str
     icon : str
 
     # Add ons that won't show by default

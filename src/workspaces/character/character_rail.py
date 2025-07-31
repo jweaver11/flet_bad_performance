@@ -23,27 +23,23 @@ def characters_rail(page: ft.Page):
     story.add_object_to_story(Character("Joe"))
         
     # Called when user clicks a character on the rail, and it shows its widget
-    def show_character_widget(e, character):
-        # Show our widget
+    def show_character_widget(character):
+        # Show our widget and update it
         character.visible = True
-        render_widgets(page)
-        page.update()
+        character.update()
 
     # Called when hovered over a character on the rail
     # Shows our two buttons rename and delete
     def show_options(e):
         e.control.content.controls[2].opacity = 1
         e.control.content.controls[2].update()
-        e.control.content.controls[3].opacity = 1
-        e.control.content.controls[3].update()
+        
 
     # Called when mouse leaves a character on the rail
     # Hides our two buttons rename and delete
     def hide_options(e):
         e.control.content.controls[2].opacity = 0
         e.control.content.controls[2].update()
-        e.control.content.controls[3].opacity = 0
-        e.control.content.controls[3].update()
         
     # Called when user clicks rename button on the character on the rail
     # Opens an alert dialog to change the characters name
@@ -51,8 +47,7 @@ def characters_rail(page: ft.Page):
         print("rename character called")
 
         def rename_char(e=None):
-            #if name
-                #character.title = 
+            
             if e is not None:
                 new_name = e.control.value
             else:
@@ -89,7 +84,6 @@ def characters_rail(page: ft.Page):
         dialog_textfield_ref = ft.Ref[ft.TextField]()
 
         dlg = ft.AlertDialog(
-            #title=ft.Text(character.title), 
             content=ft.TextField(
                 ref=dialog_textfield_ref,
                 label=f"{character.title}'s New Name",
@@ -108,6 +102,71 @@ def characters_rail(page: ft.Page):
         page.overlay.append(dlg)
         dlg.open = True
         page.update()
+
+    # Called when the 'color' button next to character on the rail is clicked
+    # Changed the charactesr 'color' of the background of widget and bg of rail tile
+    def change_character_color(character):
+        print("Change character color called")
+
+        # Does the heavy lifting to change the characters color
+        def change_color(e=None):
+            print("Change color called")
+
+            if e is not None:
+                color = e.control.value
+            else:
+                color = radio_group_ref.current.value
+
+            dlg.open = False
+            page.update()
+            
+            
+            character.color = color
+            print(character.color)
+            
+            
+            print(f"Character color changed to: {character.color}")
+            # Update the widget to reflect the changes
+            character.build_widget()
+            character.update()
+
+        # Reference for our radio selection of colors
+        radio_group_ref = ft.Ref[ft.RadioGroup]()
+
+        dlg = ft.AlertDialog(
+            title=character.title,
+            content=ft.RadioGroup(
+                ref=radio_group_ref,
+                content=ft.Row([
+                    ft.Radio(value="red", label="Red", adaptive=True),
+                    ft.Radio(value="pink", label="Pink", adaptive=True),
+                    ft.Radio(value="purple", label="Purple", adaptive=True),
+                    ft.Radio(value="blue", label="Blue", adaptive=True),
+                    ft.Radio(value="cyan", label="Cyan", adaptive=True),
+                    ft.Radio(value="teal", label="Teal", adaptive=True),
+                    ft.Radio(value="green", label="Green", adaptive=True),
+                    ft.Radio(value="lime", label="Lime", adaptive=True),
+                    ft.Radio(value="yellow", label="Yellow", adaptive=True),
+                    ft.Radio(value="orange", label="Orange", adaptive=True),
+                    ft.Radio(value="brown", label="Brown", adaptive=True),
+                    ft.Radio(value="light_grey", label="Light Grey", adaptive=True),
+                    ft.Radio(value="grey", label="Grey", adaptive=True),
+                ]),
+            ),
+            actions=[
+                # Both buttons at bottom just dismiss the popup, which runs the change_color command
+                ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
+                ft.TextButton("Submit", on_click=lambda e: change_color()),    
+            ],
+            # Whenever this is dismissed, run the change color command.
+            # Since the radio will start selected with active color, this will function as a cancel button if no change to color is made
+            on_dismiss=lambda e: print("dialog dismissed")
+        )
+
+        page.overlay.append(dlg)
+        dlg.open = True
+        page.update()
+
         
 
     # Called when user clicks the delete button on the character on the rail
@@ -156,7 +215,7 @@ def characters_rail(page: ft.Page):
 
 
     # Create a new character 
-    def create_character(e, tag):
+    def create_character(tag):
         print("create character clicked")
 
         # Create a reference for the dialog text field
@@ -388,7 +447,7 @@ def characters_rail(page: ft.Page):
                                 spacing=0,
                                 controls=[
                                     ft.Container(
-                                        on_click=lambda e, char=character: show_character_widget(e, char),
+                                        #on_click=lambda e, char=character: show_character_widget(e, char),
                                         content=ft.Text(
                                             value=character.title,
                                             color=ft.Colors.PRIMARY,
@@ -398,29 +457,45 @@ def characters_rail(page: ft.Page):
                                             no_wrap=True,
                                         ),
                                     ),
+                                    # Space between name of character in the rail and menu button on right
                                     ft.Container(expand=True),
-                                    ft.IconButton(
+                                    # Menu button for options to edit character in the rail
+                                    ft.PopupMenuButton(
+                                        opacity=0,
+                                        scale=.9,
+                                        tooltip="",
                                         icon_color=ft.Colors.PRIMARY, 
-                                        icon=ft.Icons.EDIT_ROUNDED,
-                                        on_click=lambda e, char=character: rename_character(char),
-                                        # Needs to save a character ^^ reference because of pythons late binding, or this wont work
-                                        opacity=0,  
-                                        scale=.8,
+                                        items=[
+                                            # Button to rename a character
+                                            ft.PopupMenuItem(
+                                                icon=ft.Icons.EDIT_ROUNDED,
+                                                text="Rename",
+                                                # Needs to save a character reference because of pythons late binding, or this wont work
+                                                on_click=lambda e, char=character: rename_character(char),
+                                                
+                                            ),
+                                            # Button for changing a characters color (background of widget and rail)
+                                            ft.PopupMenuItem(
+                                                icon=ft.Icons.COLOR_LENS,
+                                                text="Color",
+                                                on_click=lambda e, char=character: change_character_color(char),
+                                            ),
+                                            # Button to delete a character
+                                            ft.PopupMenuItem(  
+                                                icon=ft.Icons.DELETE,
+                                                text="Delete",
+                                                on_click=lambda e, char=character: delete_character(char),
+                                            ),
+                                        ]
                                     ),
-                                    ft.IconButton(     # Temporary options buttons to the right of each character, phase out later
-                                        icon_color=ft.Colors.PRIMARY, 
-                                        icon=ft.Icons.DELETE,
-                                        on_click=lambda e, char=character: delete_character(char),
-                                        # Needs to save a character ^^ reference because of pythons late binding, or this wont work
-                                        opacity=0,  
-                                        scale=.8,
-                                    ),
+                                    
+                                    
                                 ],
                             ),
                             #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click
                             on_hover=show_options,
                             on_exit=hide_options,
-                            on_tap_down=lambda e, char=character: show_character_widget(e, char),  # Show our widget if hidden when character clicked
+                            on_tap_down=lambda e, char=character: show_character_widget(char),  # Show our widget if hidden when character clicked
                             mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
                             expand=True,
                         ),
@@ -442,21 +517,21 @@ def characters_rail(page: ft.Page):
         main_characters.controls.append(
             ft.IconButton(
                 ft.Icons.ADD_ROUNDED, 
-                on_click=lambda e: create_character(e, "main"),
+                on_click=lambda e: create_character("main"),
                 icon_color=ft.Colors.PRIMARY,  # Match expanded color
             )
         )
         side_characters.controls.append(
             ft.IconButton(
                 ft.Icons.ADD_ROUNDED, 
-                on_click=lambda e: create_character(e, "side"),
+                on_click=lambda e: create_character("side"),
                 icon_color=ft.Colors.PRIMARY,  # Match expanded color
             )
         )
         background_characters.controls.append(
             ft.IconButton(
                 ft.Icons.ADD_ROUNDED, 
-                on_click=lambda e: create_character(e, "background"),
+                on_click=lambda e: create_character("background"),
                 icon_color=ft.Colors.PRIMARY,  # Match expanded color
             )
         )
@@ -475,7 +550,6 @@ def characters_rail(page: ft.Page):
 
     # Initially load our rail
     reload_character_rail()
-    arrange_widgets()
     render_widgets(page) 
 
 
