@@ -16,6 +16,7 @@ from ui.workspace import create_workspace
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
+    # Grab active story, if blank fallback and grab default
     story = user.active_story  # Get our story object from the user
 
     # if user.settings=empty
@@ -24,8 +25,10 @@ def main(page: ft.Page):
         # load them
     user.settings = Settings()
     # Settings is special and needs to be manually added to a pin. No other object does
+    # This is because it is the only widget not stored in the story object, but in the user
     user.active_story.add_object_to_pin(user.settings)
 
+    
 
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"

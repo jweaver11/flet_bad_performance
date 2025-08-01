@@ -12,7 +12,7 @@ import json
 
 
 
-def characters_rail(page: ft.Page):
+def create_characters_rail(page: ft.Page):
     story = user.active_story  # Get our story object from the user
 
     # Initially create some characters to test with

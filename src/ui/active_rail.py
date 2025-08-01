@@ -1,7 +1,7 @@
 import flet as ft
 
 from models.user import user
-from workspaces.character.character_rail import characters_rail  
+from workspaces.character.character_rail import create_characters_rail  
 from workspaces.content.content_rail import content_rail
 from workspaces.plot_timeline.plot_timeline_rail import plot_timeline_rail
 from workspaces.world_building.world_building_rail import world_building_rail
@@ -16,12 +16,12 @@ def create_active_rail(page: ft.Page):
     story = user.active_story
     
     # Create our rails
-    chars_rail = characters_rail(page)
+    characters_rail = create_characters_rail(page)
 
     # Add our rails to the dict/map
     story.workspace_rails.update({
         0: content_rail,
-        1: chars_rail,
+        1: characters_rail,
         2: plot_timeline_rail, 
         3: world_building_rail,
         4: drawing_board_rail,
