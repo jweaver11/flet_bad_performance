@@ -39,7 +39,7 @@ def main(page: ft.Page):
     
     # if user.all_workspaces rail blank, create it. else load it
     #all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
-    user.all_workspaces_rail = All_Workspaces_Rail()
+    user.all_workspaces_rail = All_Workspaces_Rail(page)
 
 
     active_rail = create_active_rail(page)  # Render whichever rail is active

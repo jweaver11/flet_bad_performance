@@ -1,6 +1,5 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
-#from ui.active_rail import workspace_rails, default_rail, active_rail
 from models.user import user
 
 
@@ -110,7 +109,7 @@ class All_Workspaces_Rail(ft.Container):
         self.update()
 
     # Constructor
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         # Checks to see if we are reordering or collapsed
         self.is_reorderable = False
         self.is_collapsed = False
@@ -142,6 +141,7 @@ class All_Workspaces_Rail(ft.Container):
 
             # Update our UI
             self.update()
+            page.update()
           
 
         # Called on workspace changes. Deselects all the other rails
