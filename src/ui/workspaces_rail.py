@@ -8,8 +8,8 @@ def create_rails(page: ft.Page):
 
     story = user.active_story
 
-    is_reorderable = False  # Flag to check if we are in reorder mode
-    is_collapsed = False
+    #is_reorderable = False  # Flag to check if we are in reorder mode
+    #is_collapsed = False
 
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
@@ -115,47 +115,50 @@ def create_rails(page: ft.Page):
         ],
     )
 
-    # List our controls so we can save re-orders
-    rail_controls = [r0, r1, r2, r3, r4, r5]
+    # Creates our rail using our variables from above, only if it does not exist already
+    if len(user.workspaces_order) == 0:
+        user.workspaces_order = [r0, r1, r2, r3, r4, r5]
+    else:
+        print("workspaces rail already exists")
 
     def handle_reorder(e: ft.OnReorderEvent):
         print(f"Reordered from {e.old_index} to {e.new_index}")
 
-        item = rail_controls.pop(e.old_index)
-        rail_controls.insert(e.new_index, item)
+        item = user.workspaces_order.pop(e.old_index)
+        user.workspaces_order.insert(e.new_index, item)
         # Update the ReorderableListView's controls
-        all_workspaces_rail.controls = rail_controls
+        all_workspaces_rail.controls = user.workspaces_order
         page.update()
 
     all_workspaces_rail = ft.Column(
         spacing=0, 
         alignment=ft.alignment.center,
-        controls=rail_controls
+        controls=user.workspaces_order
     )
 
     # Called by clicking button on bottom left of rail. Only available when expanded
     # Set sthe rail to reordeable or not 
     def make_rail_reorderable(e):
         
-        nonlocal is_reorderable, all_workspaces_rail, is_collapsed
+        nonlocal all_workspaces_rail
 
-        if is_collapsed:
+        if user.is_collapsed:
             return
         else:
-            is_reorderable = not is_reorderable
+            user.is_reorderable = not user.is_reorderable
 
-            if is_reorderable:
+            if user.is_reorderable:
                 print("true called")
                 all_workspaces_rail = ft.ReorderableListView(
                     on_reorder=handle_reorder,
-                    controls=rail_controls,
+                    controls=user.workspaces_order,
                 )
             else:
                 print("false called")
                 all_workspaces_rail = ft.Column(
                     spacing=0, 
                     alignment=ft.alignment.center,
-                    controls=rail_controls
+                    controls=user.workspaces_order
                 )
 
             all_workspaces_rail_container.content.controls[0] = all_workspaces_rail
@@ -165,14 +168,15 @@ def create_rails(page: ft.Page):
     # Collapses or expands the rail
     def collapse_rail(e):
         print("collapse called")
-        nonlocal is_collapsed, is_reorderable, r0, r1, r2, r3, r4, r5
+        r0, r1, r2, r3, r4, r5
 
-        if is_reorderable:
+        # Disable reorder before collapsing. Phasing out later
+        if user.is_reorderable:
             make_rail_reorderable(e)
 
-        is_collapsed = not is_collapsed
+        user.is_collapsed = not user.is_collapsed
 
-        if is_collapsed:
+        if user.is_collapsed:
             r0.destinations[0].label = None
             r1.destinations[0].label = None
             r2.destinations[0].label = None

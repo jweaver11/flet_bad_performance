@@ -12,6 +12,13 @@ class User:
         }
         self.active_story = self.stories['empty_story']  # Default to empty story. Make this fetch a story from function in future
 
+
+        # List our controls so we can save re-orders
+        self.workspaces_order = []
+        self.is_reorderable = False
+        self.is_collapsed = False
+
+
     def __repr__(self):
         return f"User(username={self.username}, email={self.email})"
 
