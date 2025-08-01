@@ -6,7 +6,7 @@ story = user.active_story  # Get our story object from the user
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
-    def __init__(self, name, ):
+    def __init__(self, name):
         self.title = name  # Name of character, but all objects have a title for identification
         self.tag = "character"  # Tag for logic, mostly for routing it through our story object
 

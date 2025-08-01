@@ -1,4 +1,5 @@
 import flet as ft
+from models.user import user
 
 # Auto green characters = good, red = bad
 
@@ -13,3 +14,19 @@ ft.TextButton(
 ),
 '''
 # Snackbar alerts?
+
+
+class Settings(ft.Container):
+    def __init__(self):
+        self.yo_momma = "yo mommaa"
+        self.pin_location = "main"
+
+
+        super().__init__(
+            expand=True, 
+            padding=6,
+            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            bgcolor = ft.Colors.GREY_900,
+            content=ft.TextButton("settings"),
+            #on_click=user.workspaces_rail.make_reorderable()
+        )

@@ -8,8 +8,8 @@ def create_rails(page: ft.Page):
 
     story = user.active_story
 
-    #is_reorderable = False  # Flag to check if we are in reorder mode
-    #is_collapsed = False
+    is_reorderable = False
+    is_collapsed = False
 
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
@@ -115,8 +115,8 @@ def create_rails(page: ft.Page):
         ],
     )
 
-    # Creates our rail using our variables from above, only if it does not exist already
-    if len(user.workspaces_order) == 0:
+    # Checks if our workspaces list has been created. If not, set to default order.
+    if not user.workspaces_order:
         user.workspaces_order = [r0, r1, r2, r3, r4, r5]
     else:
         print("workspaces rail already exists")
@@ -140,14 +140,14 @@ def create_rails(page: ft.Page):
     # Set sthe rail to reordeable or not 
     def make_rail_reorderable(e):
         
-        nonlocal all_workspaces_rail
+        nonlocal all_workspaces_rail, is_reorderable, is_collapsed
 
-        if user.is_collapsed:
+        if is_collapsed:
             return
         else:
-            user.is_reorderable = not user.is_reorderable
+            is_reorderable = not is_reorderable
 
-            if user.is_reorderable:
+            if is_reorderable:
                 print("true called")
                 all_workspaces_rail = ft.ReorderableListView(
                     on_reorder=handle_reorder,
@@ -168,15 +168,16 @@ def create_rails(page: ft.Page):
     # Collapses or expands the rail
     def collapse_rail(e):
         print("collapse called")
-        r0, r1, r2, r3, r4, r5
+        nonlocal is_collapsed, is_reorderable, r0, r1, r2, r3, r4, r5
+        
 
         # Disable reorder before collapsing. Phasing out later
-        if user.is_reorderable:
+        if is_reorderable:
             make_rail_reorderable(e)
 
-        user.is_collapsed = not user.is_collapsed
+        is_collapsed = not is_collapsed
 
-        if user.is_collapsed:
+        if is_collapsed:
             r0.destinations[0].label = None
             r1.destinations[0].label = None
             r2.destinations[0].label = None

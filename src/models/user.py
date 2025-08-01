@@ -6,6 +6,8 @@ class User:
     def __init__(self, username: str, email: str):
         self.username = username
         self.email = email
+
+        self.settings = ft.Container()
         
         self.stories = {
             'empty_story': Story("Story Title") 
@@ -13,10 +15,9 @@ class User:
         self.active_story = self.stories['empty_story']  # Default to empty story. Make this fetch a story from function in future
 
 
+
         # List our controls so we can save re-orders
         self.workspaces_order = []
-        self.is_reorderable = False
-        self.is_collapsed = False
 
 
     def __repr__(self):
@@ -39,5 +40,6 @@ class User:
 
 
 
-
+# load user. If empty, create new one
 user = User("exp_user", "exp_email")
+

@@ -49,9 +49,6 @@ class Story:
             controls=self.workspace_rails[0],    # On startup, set to char rail
         )  
 
-
-
-
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
@@ -60,23 +57,6 @@ class Story:
     def add_object_to_story(self, obj):
         print("Adding object in story: " + obj.title)
 
-        # Adds our object to one of our five pin locations
-        def add_object_to_pin(obj):
-            print("add object to pin called")
-
-            # check objects pin and that its not already in that pin
-            if obj.pin_location == "top" and obj not in self.top_pin.controls:
-                self.top_pin.controls.append(obj)
-            elif obj.pin_location == "left" and obj not in self.left_pin.controls:
-                self.left_pin.controls.append(obj)
-            elif obj.pin_location == "main" and obj not in self.main_pin.controls:
-                self.main_pin.controls.append(obj)
-            elif obj.pin_location == "right" and obj not in self.right_pin.controls:
-                self.right_pin.controls.append(obj)
-            elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:
-                self.bottom_pin.controls.append(obj)
-            else:
-                print("object has an invalid pin location")
 
         # Runs to save our character to our story object, and save it to file
         def save_character(obj):
@@ -104,7 +84,7 @@ class Story:
 
             # Checks our pin location and then adds it to a pin
             if hasattr(obj, 'pin_location'):  
-                add_object_to_pin(obj)
+                self.add_object_to_pin(obj)
 
             # If object has no pin location, we don't pin it anywhere
             else:
@@ -115,13 +95,23 @@ class Story:
             print("obj has no tag, did not save it")
 
 
-        
+    # Adds our object to one of our five pin locations
+    def add_object_to_pin(self, obj):
+        print("add object to pin called")
 
-        
-
-        
-
-
+        # check objects pin and that its not already in that pin
+        if obj.pin_location == "top" and obj not in self.top_pin.controls:
+            self.top_pin.controls.append(obj)
+        elif obj.pin_location == "left" and obj not in self.left_pin.controls:
+            self.left_pin.controls.append(obj)
+        elif obj.pin_location == "main" and obj not in self.main_pin.controls:
+            self.main_pin.controls.append(obj)
+        elif obj.pin_location == "right" and obj not in self.right_pin.controls:
+            self.right_pin.controls.append(obj)
+        elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:
+            self.bottom_pin.controls.append(obj)
+        else:
+            print("object has an invalid pin location")
 
     # Handles saving our object to a file for permanent data storage, not just client
     def save_object_to_file(self, obj):
