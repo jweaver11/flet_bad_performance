@@ -1,9 +1,12 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
-from ui.active_rail import workspace_rails, default_rail, active_rail
+#from ui.active_rail import workspace_rails, default_rail, active_rail
+from models.user import user
 
 # Creates our container that holds all our different navigational raila
 def create_rails(page: ft.Page):
+
+    story = user.active_story
 
     is_reorderable = False  # Flag to check if we are in reorder mode
     is_collapsed = False
@@ -25,10 +28,10 @@ def create_rails(page: ft.Page):
         elif e.control == r5:
             rail_index = 5
 
-        new_rail = workspace_rails.get(rail_index, default_rail) # Grab our active rail from dict/map
+        new_rail = story.workspace_rails.get(rail_index, story.default_rail) # Grab our active rail from dict/map
         
         deselect_all_other_rails(rail_index)    # De-select all rails icons but selected one
-        active_rail.controls = new_rail     # Set our new rail to the active rail
+        story.active_rail.controls = new_rail     # Set our new rail to the active rail
         print("New workspace selected", rail_index)
 
         page.update()   # update our UI

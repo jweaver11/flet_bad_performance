@@ -35,6 +35,22 @@ class Story:
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
 
 
+        # Default active workspace rail if none selected/on startup rn
+        self.default_rail = [ft.TextButton("Select a workspace")]
+
+        # Map of all the workspace rails - Rails must be a list of flet controls
+        self.workspace_rails = {
+            0: self.default_rail,
+        }  
+
+        # Format our active rail 
+        self.active_rail = ft.Column(  
+            spacing=0,
+            controls=self.workspace_rails[0],    # On startup, set to char rail
+        )  
+
+
+
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
