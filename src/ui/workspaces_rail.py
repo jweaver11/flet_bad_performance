@@ -1,15 +1,37 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
 #from ui.active_rail import workspace_rails, default_rail, active_rail
-from models.user import user
+
+
+# MAKE THIS A FLET CONTAINER OBJECT
+
+def load_all_workspaces_rail(page: ft.Page):
+    # if rail exists
+        # load al workspaces rail
+    # else
+        # Create the rail
+    create_all_workspaces_rail(page)
+
 
 # Creates our container that holds all our different navigational raila
-def create_rails(page: ft.Page):
-
-    story = user.active_story
+def create_all_workspaces_rail(page: ft.Page):
 
     is_reorderable = False  # Flag to check if we are in reorder mode
     is_collapsed = False
+
+    default_rail = [ft.TextButton("Select a workspace")]
+
+
+    # Map of all the workspace rails - Rails must be a list of flet controls
+    workspace_rails = {
+        0: default_rail,
+    }  
+
+    # Format our active rail 
+    active_rail = ft.Column(  
+        spacing=0,
+        controls=workspace_rails[0],    # On startup, set to char rail
+    )  
 
     # Change rail depending on which workspace is selected
     def on_workspace_change(e):
@@ -28,10 +50,10 @@ def create_rails(page: ft.Page):
         elif e.control == r5:
             rail_index = 5
 
-        new_rail = story.workspace_rails.get(rail_index, story.default_rail) # Grab our active rail from dict/map
+        new_rail = workspace_rails.get(rail_index, default_rail) # Grab our active rail from dict/map
         
         deselect_all_other_rails(rail_index)    # De-select all rails icons but selected one
-        story.active_rail.controls = new_rail     # Set our new rail to the active rail
+        active_rail.controls = new_rail     # Set our new rail to the active rail
         print("New workspace selected", rail_index)
 
         page.update()   # update our UI

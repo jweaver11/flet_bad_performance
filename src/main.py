@@ -7,7 +7,7 @@ so they can update themselves dynamically
 import flet as ft
 from models.user import user
 from ui.menu_bar import create_menu_bar
-from ui.workspaces_rail import create_rails
+from ui.workspaces_rail import load_all_workspaces_rail
 from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
 
@@ -17,6 +17,7 @@ def main(page: ft.Page):
 
     story = user.active_story  # Get our story object from the user
 
+    user.test_function(page)
 
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"
@@ -26,8 +27,15 @@ def main(page: ft.Page):
     page.window.maximized = True
 
     # Create our page elements as their own pages so they can update
-    menubar = create_menu_bar(page)     # menubar
-    all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
+    # Menubar at top of the page
+    # This won't change for different users, so it can be remade here everytime
+    menubar = create_menu_bar(page)     
+
+    # The 'workspaces rail' that shows all availble workspaces on the left of the screen
+    # We save it to the user so we can save order and collapsed state from story to story
+    user.all_workspaces_rail = load_all_workspaces_rail(page)
+    
+    # 
     active_rail = create_active_rail(page)  # Render whichever rail is active
     workspace = create_workspace(page)  # render our workspace containing our widgets
 
@@ -37,7 +45,7 @@ def main(page: ft.Page):
         expand=True,  # Makes sure it takes up the entire window/screen
 
         controls=[
-            all_workspaces_rail,  # Main rail of all available workspaces
+            user.all_workspaces_rail,  # Main rail of all available workspaces
             ft.VerticalDivider(width=2, thickness=2, trailing_indent=10, leading_indent=10),
 
             active_rail,    # Rail for the selected workspace
