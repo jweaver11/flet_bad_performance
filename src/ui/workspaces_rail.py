@@ -1,10 +1,8 @@
 ''' The master navigation bar for the 'workspaces' on the left side of the screen'''
 import flet as ft
 from ui.active_rail import workspace_rails, default_rail, active_rail
-from models.user import user
 
-story = user.stories['empty_story']  # Get our story object from the user
-
+# Creates our container that holds all our different navigational raila
 def create_rails(page: ft.Page):
 
     is_reorderable = False  # Flag to check if we are in reorder mode
@@ -52,7 +50,7 @@ def create_rails(page: ft.Page):
         if rail_index != 5:
             r5.selected_index = None
 
-    # Our navigation rails as their own variable for manipulation
+    # Our navigation rails as their own variable so we can reorder them
     r0 = ft.NavigationRail(
         height=70,  # Set height of each rail
         on_change=on_workspace_change,  # When the rail is clicked
@@ -132,8 +130,9 @@ def create_rails(page: ft.Page):
         controls=rail_controls
     )
 
-    # Toggle is reorderable or not
-    def make_reorderable(e):
+    # Called by clicking button on bottom left of rail. Only available when expanded
+    # Set sthe rail to reordeable or not 
+    def make_rail_reorderable(e):
         
         nonlocal is_reorderable, all_workspaces_rail, is_collapsed
 
@@ -159,12 +158,14 @@ def create_rails(page: ft.Page):
             all_workspaces_rail_container.content.controls[0] = all_workspaces_rail
             page.update()
 
-    def collapse(e):
+    # Called by clicking button on bottom right of rail
+    # Collapses or expands the rail
+    def collapse_rail(e):
         print("collapse called")
         nonlocal is_collapsed, is_reorderable, r0, r1, r2, r3, r4, r5
 
         if is_reorderable:
-            make_reorderable(e)
+            make_rail_reorderable(e)
 
         is_collapsed = not is_collapsed
 
@@ -182,7 +183,7 @@ def create_rails(page: ft.Page):
                 ft.Container(expand=True, width=50),
                 ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED,
-                        on_click=collapse,
+                        on_click=collapse_rail,
                     ),
             ]
         else:
@@ -199,12 +200,12 @@ def create_rails(page: ft.Page):
                 ft.Row(spacing=0, controls=[
                     ft.IconButton( 
                         icon=ft.Icons.REORDER_ROUNDED, 
-                        on_click=make_reorderable,
+                        on_click=make_rail_reorderable,
                     ),
                     ft.Container(expand=True),
                     ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
-                        on_click=collapse,
+                        on_click=collapse_rail,
                     ),
                 ]),
             ]
@@ -228,12 +229,12 @@ def create_rails(page: ft.Page):
                 ft.Row(spacing=0, controls=[
                     ft.IconButton( 
                         icon=ft.Icons.REORDER_ROUNDED,
-                        on_click=make_reorderable,
+                        on_click=make_rail_reorderable,
                     ),
                     ft.Container(expand=True),
                     ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
-                        on_click=collapse,
+                        on_click=collapse_rail,
                     ),
                 ]),
                 

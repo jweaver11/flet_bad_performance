@@ -10,10 +10,10 @@ from models.character import Character
 from handlers.render_widgets import render_widgets
 import json
 
-story = user.active_story  # Get our story object from the user
 
 
 def characters_rail(page: ft.Page):
+    story = user.active_story  # Get our story object from the user
 
     # Initially create some characters to test with
     story.add_object_to_story(Character("Bob"))

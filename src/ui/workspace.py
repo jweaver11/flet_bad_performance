@@ -7,10 +7,12 @@ Formatted areas are: top pin, left pin, main work area, right pin, and bottom pi
 import flet as ft
 from models.user import user
 
-story = user.active_story  # Get our story object from the user
+
 
 # Function to return our container for our widgets
-def create_workspace(page: ft.Page):    
+def create_workspace(page: ft.Page):   
+
+    story = user.active_story  # Get our story object from the user 
     
     page.update()
 

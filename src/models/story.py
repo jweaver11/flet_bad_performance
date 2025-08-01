@@ -35,6 +35,7 @@ class Story:
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
 
 
+
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
@@ -43,37 +44,73 @@ class Story:
     def add_object_to_story(self, obj):
         print("Adding object in story: " + obj.title)
 
-        # Checks our pin location and then adds it to a pin
-        if hasattr(obj, 'pin_location'):  
-            self.add_object_to_pin(obj)
-        else:
-            print("Object does not have a pin location, did not pin to story")
+        # Adds our object to one of our five pin locations
+        def add_object_to_pin(obj):
+            print("add object to pin called")
+
+            # check objects pin and that its not already in that pin
+            if obj.pin_location == "top" and obj not in self.top_pin.controls:
+                self.top_pin.controls.append(obj)
+            elif obj.pin_location == "left" and obj not in self.left_pin.controls:
+                self.left_pin.controls.append(obj)
+            elif obj.pin_location == "main" and obj not in self.main_pin.controls:
+                self.main_pin.controls.append(obj)
+            elif obj.pin_location == "right" and obj not in self.right_pin.controls:
+                self.right_pin.controls.append(obj)
+            elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:
+                self.bottom_pin.controls.append(obj)
+            else:
+                print("object has an invalid pin location")
+
+        # Runs to save our character to our story object, and save it to file
+        def save_character(obj):
+            print("save character called")
+            self.characters.append(obj)
+            self.save_object_to_file(obj)
+
+        # Is called when the parent f
+        def save_chapter(obj):
+            print("save chapter called")
+            print(obj)
+
 
         # Checks our objects tag, then figures out what to do with it
-        if obj.tag == "character":
-            self.characters.append(obj)
+        if hasattr(obj, 'tag'):
+            # Characters
+            if obj.tag == "character":
+                save_character(obj)
+            # Chapters
+            elif obj.tag == "chapter":
+                save_chapter(obj)
+            
+            else:
+                print("object does not have a valid tag")
 
-        # Saves our object permanently
-        self.save_object_to_file(obj)
+            # Checks our pin location and then adds it to a pin
+            if hasattr(obj, 'pin_location'):  
+                add_object_to_pin(obj)
+
+            # If object has no pin location, we don't pin it anywhere
+            else:
+                print("Object does not have a pin location, did not pin to story")
+
+        # If no tag exists, we do nothing
+        else:
+            print("obj has no tag, did not save it")
+
+
+        
+
+        
+
+        
+
 
 
     # Handles saving our object to a file for permanent data storage, not just client
     def save_object_to_file(self, obj):
         print("object saved to file called")
 
-    # Handles where to pin newly added objects to our story
-    def add_object_to_pin(self, obj):
-        # check objects pin and that its not already in that pin
-        if obj.pin_location == "top" and obj not in self.top_pin.controls:
-            self.top_pin.controls.append(obj)
-        elif obj.pin_location == "left" and obj not in self.left_pin.controls:
-            self.left_pin.controls.append(obj)
-        elif obj.pin_location == "main" and obj not in self.main_pin.controls:
-            self.main_pin.controls.append(obj)
-        elif obj.pin_location == "right" and obj not in self.right_pin.controls:
-            self.right_pin.controls.append(obj)
-        elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:
-            self.bottom_pin.controls.append(obj)
 
     # Delete an object from the story. Only works for certain objects
     def delete_object_from_story(self, obj):
