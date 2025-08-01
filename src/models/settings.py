@@ -2,6 +2,7 @@ import flet as ft
 from models.user import user
 
 # Auto green characters = good, red = bad
+# Checkbox labeled 'reorder_workspaces' that triggers the reorder event
 
 # re-order the list of workspaces in the rail, show and hide them
 '''
@@ -27,6 +28,6 @@ class Settings(ft.Container):
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor = ft.Colors.GREY_900,
-            content=ft.TextButton("settings"),
-            #on_click=user.workspaces_rail.make_reorderable()
+            content=ft.TextButton("settings", on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()),
+
         )

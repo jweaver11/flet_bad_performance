@@ -17,7 +17,7 @@ class User:
 
 
         # List our controls so we can save re-orders
-        self.workspaces_order = []
+        self.all_workspaces_rail = ft.Container()
 
 
     def __repr__(self):
