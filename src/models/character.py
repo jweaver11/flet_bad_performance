@@ -128,18 +128,28 @@ class Character(ft.Container):
         self.reload_widget()
 
         from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.page)
+        reload_character_rail(self.p)
     
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
-        if self.character_data['Good'] == True:
-            self.name_color = ft.Colors.GREEN_200
-        elif self.character_data['Evil'] == True:
-            self.name_color = ft.Colors.RED_200
-        elif self.character_data['Neutral'] == True:
-            self.name_color = ft.Colors.GREY_300
+        if user.settings.change_name_colors.value == True:
+            print("color changing is true, we running the logic")
+            if self.character_data['Good'] == True:
+                self.name_color = ft.Colors.GREEN_200
+            elif self.character_data['Evil'] == True:
+                self.name_color = ft.Colors.RED_200
+            elif self.character_data['Neutral'] == True:
+                self.name_color = ft.Colors.GREY_300
+            else:
+                self.name_color = ft.Colors.PRIMARY
         else:
-            self.name_color = ft.Colors.PRIMARY
+            for char in story.characters:
+                char.name_color = ft.Colors.PRIMARY
+                self.p.update()
+
+            return print("Color changing disabled")
+        from workspaces.character.character_rail import reload_character_rail
+        reload_character_rail(self.p)
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):

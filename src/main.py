@@ -23,7 +23,7 @@ def main(page: ft.Page):
         # Create them
     # else
         # load them
-    user.settings = Settings()
+    user.settings = Settings(page)
     # Settings is special and needs to be manually added to a pin. No other object does
     # This is because it is the only widget not stored in the story object, but in the user
     user.active_story.add_object_to_pin(user.settings)
