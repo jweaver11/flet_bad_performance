@@ -26,6 +26,7 @@ class Settings(ft.Container):
         super().__init__(
             expand=True, 
             padding=6,
+            visible=False,  # Start invisible
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor = ft.Colors.GREY_900,
             content=ft.Column([ft.TextButton(
