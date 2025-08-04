@@ -452,9 +452,6 @@ def reload_character_rail(page: ft.Page):
     main_characters.controls.clear()
     side_characters.controls.clear()
     background_characters.controls.clear()
-    main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
-    side_characters_drag_target.on_accept=lambda e: make_side_character(e, page)
-    background_characters_drag_target.on_accept=lambda e: make_background_character(e, page)
 
     # Run through each character in our story
     for character in story.characters:
@@ -574,6 +571,11 @@ def create_characters_rail(page: ft.Page):
     story.add_object_to_story(Character("Bob", page))
     story.add_object_to_story(Character("Alice", page))
     story.add_object_to_story(Character("Joe", page))
+
+    # Set our drag targets on accept methods here so we can pass in our page
+    main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
+    side_characters_drag_target.on_accept=lambda e: make_side_character(e, page)
+    background_characters_drag_target.on_accept=lambda e: make_background_character(e, page)
 
     # List of controls that we return from our page. 
     # This is static and should not change
