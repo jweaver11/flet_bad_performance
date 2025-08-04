@@ -60,10 +60,6 @@ class All_Workspaces_Rail(ft.Container):
                 self.all_workspaces_rail,
                 ft.Container(expand=True),
                 ft.Row(spacing=0, controls=[
-                    ft.IconButton( 
-                        icon=ft.Icons.REORDER_ROUNDED, 
-                        on_click=self.make_rail_reorderable,
-                    ),
                     ft.Container(expand=True),
                     ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
@@ -247,10 +243,6 @@ class All_Workspaces_Rail(ft.Container):
                     self.all_workspaces_rail,
                     ft.Container(expand=True),
                     ft.Row(spacing=0, controls=[
-                        ft.IconButton( 
-                            icon=ft.Icons.REORDER_ROUNDED,
-                            on_click=self.make_rail_reorderable,
-                        ),
                         ft.Container(expand=True),
                         ft.IconButton(
                             icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
