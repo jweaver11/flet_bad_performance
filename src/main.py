@@ -44,8 +44,10 @@ def main(page: ft.Page):
     #all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
     user.all_workspaces_rail = All_Workspaces_Rail(page)
 
-
+    # Just create it each time
     active_rail = create_active_rail(page)  # Render whichever rail is active
+
+    
     workspace = create_workspace(page)  # render our workspace containing our widgets
 
     # Save our 2 rails, dividers, and our workspace container in a row

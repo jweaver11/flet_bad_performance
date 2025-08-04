@@ -6,7 +6,7 @@ story = user.active_story  # Get our story object from the user
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
-    def __init__(self, name):
+    def __init__(self, name, page: ft.Page):
         self.title = name  # Name of character, but all objects have a title for identification
         self.tag = "character"  # Tag for logic, mostly for routing it through our story object
 
@@ -91,6 +91,10 @@ class Character(ft.Container):
         self.reload_widget()
         self.update()
 
+        # Import and reload the rail 
+        from workspaces.character.character_rail import reload_character_rail
+        reload_character_rail(self.page)
+
     # Called when the 'evil' character option is clicked in the widget body
     def make_character_evil(self):
         self.char_data['Good'] = False
@@ -99,6 +103,8 @@ class Character(ft.Container):
         self.check_morality()
         self.reload_widget()
         self.update()
+        from workspaces.character.character_rail import reload_character_rail
+        reload_character_rail(self.page)
 
     # Called when the neutral character option is clicked in the widget body
     def make_character_neutral(self):
@@ -108,6 +114,8 @@ class Character(ft.Container):
         self.check_morality()
         self.reload_widget()
         self.update()
+        from workspaces.character.character_rail import reload_character_rail
+        reload_character_rail(self.page)
 
     # Called when the n/a character option is clicked in the widget body
     def make_character_na(self):
@@ -117,6 +125,8 @@ class Character(ft.Container):
         self.check_morality()
         self.reload_widget()
         self.update()
+        from workspaces.character.character_rail import reload_character_rail
+        reload_character_rail(self.page)
     
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
