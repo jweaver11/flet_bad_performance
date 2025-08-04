@@ -39,7 +39,7 @@ class Character(ft.Container):
 
         # Data about the character that the user will manipulate
         # Can't call this 'data' since containers already have that property
-        self.char_data = {
+        self.character_data = {
             'Good': True,
             'Evil': False,
             'Neutral': False,
@@ -86,9 +86,9 @@ class Character(ft.Container):
     # Called when the 'good' character option is clicked in the widget body
     def make_character_good(self):
         # Make sure our other 2 options are false, and good is true
-        self.char_data['Good'] = True
-        self.char_data['Evil'] = False
-        self.char_data['Neutral'] = False
+        self.character_data['Good'] = True
+        self.character_data['Evil'] = False
+        self.character_data['Neutral'] = False
         self.check_morality()   # Changes the name_color variable based on our updated tags
         self.reload_widget()
 
@@ -99,9 +99,9 @@ class Character(ft.Container):
 
     # Called when the 'evil' character option is clicked in the widget body
     def make_character_evil(self):
-        self.char_data['Good'] = False
-        self.char_data['Evil'] = True
-        self.char_data['Neutral'] = False
+        self.character_data['Good'] = False
+        self.character_data['Evil'] = True
+        self.character_data['Neutral'] = False
         self.check_morality()
         self.reload_widget()
 
@@ -110,9 +110,9 @@ class Character(ft.Container):
 
     # Called when the neutral character option is clicked in the widget body
     def make_character_neutral(self):
-        self.char_data['Good'] = False
-        self.char_data['Evil'] = False
-        self.char_data['Neutral'] = True
+        self.character_data['Good'] = False
+        self.character_data['Evil'] = False
+        self.character_data['Neutral'] = True
         self.check_morality()
         self.reload_widget()
 
@@ -121,9 +121,9 @@ class Character(ft.Container):
 
     # Called when the n/a character option is clicked in the widget body
     def make_character_na(self):
-        self.char_data['Good'] = False
-        self.char_data['Evil'] = False
-        self.char_data['Neutral'] = False
+        self.character_data['Good'] = False
+        self.character_data['Evil'] = False
+        self.character_data['Neutral'] = False
         self.check_morality()
         self.reload_widget()
         self.update()
@@ -132,11 +132,11 @@ class Character(ft.Container):
     
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
-        if self.char_data['Good'] == True:
+        if self.character_data['Good'] == True:
             self.name_color = ft.Colors.GREEN
-        elif self.char_data['Evil'] == True:
+        elif self.character_data['Evil'] == True:
             self.name_color = ft.Colors.RED
-        elif self.char_data['Neutral'] == True:
+        elif self.character_data['Neutral'] == True:
             self.name_color = ft.Colors.GREY
         else:
             self.name_color = ft.Colors.PRIMARY

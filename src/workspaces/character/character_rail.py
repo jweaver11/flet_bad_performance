@@ -409,6 +409,7 @@ main_characters = ft.ExpansionTile(
     shape=ft.RoundedRectangleBorder(),
     controls_padding=None,
     maintain_state=True,
+    initially_expanded=True,
 )
 side_characters = ft.ExpansionTile(
     title=ft.Text("Side"),
@@ -416,6 +417,7 @@ side_characters = ft.ExpansionTile(
     tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
     shape=ft.RoundedRectangleBorder(),
     maintain_state=True,
+    initially_expanded=True,
 )
 background_characters = ft.ExpansionTile(
     title=ft.Text("Background"),
@@ -424,23 +426,24 @@ background_characters = ft.ExpansionTile(
     controls_padding=None,
     shape=ft.RoundedRectangleBorder(),
     maintain_state=True,
+    initially_expanded=True,
 )
 
 # Our drag targets so we can easily drag and drop characters into their categories
 # These hold the expansion tiles lists from above, and are directly rendered in the rail
 main_characters_drag_target = ft.DragTarget(
     group="widgets",
-    #on_accept=make_main_character,
+    #on_accept=make_main_character,     # We set this later because we need to pass in the page
     content=main_characters
 )
 side_characters_drag_target = ft.DragTarget(
     group="widgets",
-    #=make_side_character,
+    #=make_side_character,  # We set this later because we need to pass in the page
     content=side_characters
 )
 background_characters_drag_target = ft.DragTarget(
     group="widgets",
-    #on_accept=make_background_character,
+    #on_accept=make_background_character,   # We set this later because we need to pass in the page
     content=background_characters
 )
 
