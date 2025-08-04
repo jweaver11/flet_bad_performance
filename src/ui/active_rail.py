@@ -12,15 +12,13 @@ from workspaces.notes.notes_rail import notes_rail
 
 # Creates our 'active_rail', which holds all of our rails, and renderes the selected one
 def create_active_rail(page: ft.Page):
-
-    story = user.active_story
     
     # Create our rails
     characters_rail = create_characters_rail(page)
     print(characters_rail)
 
     # Add our rails to the dict/map
-    story.workspace_rails.update({
+    user.active_story.workspace_rails.update({
         0: content_rail,
         1: characters_rail,
         2: plot_timeline_rail, 
@@ -34,7 +32,7 @@ def create_active_rail(page: ft.Page):
         alignment=ft.alignment.center,  # Aligns content to the
         padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
         width=200,  # Sets the width
-        content=story.active_rail,    # Sets our active rail column
+        content=user.active_story.active_rail,    # Sets our active rail column
     )
 
 

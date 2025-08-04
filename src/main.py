@@ -32,9 +32,15 @@ def main(page: ft.Page):
 
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"
+
+    # Sets our theme modes, but we start dark
+    # If theme mode un-set, set dark...
+    page.theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
     page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
+    page.theme_mode = ft.ThemeMode.DARK
+
     page.title = title
-    page.padding=ft.padding.only(top=0, left=0, right=0, bottom=0)
+    page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)
     page.window.maximized = True
 
     # Create our page elements as their own pages so they can update

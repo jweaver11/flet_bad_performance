@@ -33,7 +33,7 @@ class Character(ft.Container):
         self.sex = ""    # Add selecteble male, female, other - custom write in
 
         self.color = "none"     # Changable border color of widget and character on rail
-        self.rendered_color = ft.Colors.TRANSPARENT   # Flet colors formatting based on our above color
+        self.rendered_color = ft.Colors.GREY_800   # Flet colors formatting based on our above color
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
 
@@ -72,7 +72,7 @@ class Character(ft.Container):
             expand=True, 
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor = ft.Colors.GREY_900,
+            bgcolor = ft.Colors.TRANSPARENT,
             content=None,
         )
         self.reload_widget() # Builds our widgets content when object is created

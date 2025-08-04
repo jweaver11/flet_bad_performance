@@ -12,6 +12,7 @@ import json
 
 story = user.active_story  # Get our story object from the user
 
+
 # Called when user clicks a character on the rail, and it shows its widget
 def show_character_widget(character, page: ft.Page):
     # Show our widget and update it
@@ -594,5 +595,5 @@ def create_characters_rail(page: ft.Page):
     reload_character_rail(page)
     render_widgets(page) 
 
-
+    # Return our created character rail (which is a list of controls)
     return characters_rail

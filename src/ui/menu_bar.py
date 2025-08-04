@@ -248,7 +248,7 @@ def create_menu_bar(page: ft.Page):
 
     # Create our container for the menu bar
     menubar_container = ft.Container(
-        bgcolor=ft.Colors.GREY_900,     # Set background color
+        border=ft.border.only(bottom=ft.BorderSide(width=1, color=ft.Colors.OUTLINE)),
         border_radius=ft.border_radius.all(4),  # 4px radius on all corners
 
         content=ft.Row(
