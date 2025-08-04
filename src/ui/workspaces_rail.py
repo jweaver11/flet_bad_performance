@@ -165,7 +165,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,  # When the rail is clicked
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.LIBRARY_BOOKS_OUTLINED, selected_icon=ft.Icons.LIBRARY_BOOKS_ROUNDED, #icons
+                    icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), #icons
                     label="Content", padding=10,
                 ),
             ],
@@ -175,7 +176,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.PEOPLE_OUTLINE_ROUNDED, selected_icon=ft.Icons.PEOPLE_ROUNDED,
+                    icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
                     label="Characters", padding=6,
                 ),
             ],
@@ -185,7 +187,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.TIMELINE_ROUNDED, selected_icon=ft.Icons.TIMELINE_OUTLINED,
+                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY),
                     label="Plot & Timeline", padding=6,
                 ),
             ],
@@ -195,7 +198,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.PUBLIC_OUTLINED, selected_icon=ft.Icons.PUBLIC,
+                    icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
                     label="World Building", padding=6,
                 ),
             ],
@@ -205,7 +209,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.DRAW_OUTLINED, selected_icon=ft.Icons.DRAW,
+                    icon=ft.Icon(ft.Icons.DRAW_OUTLINED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.DRAW, color=ft.Colors.PRIMARY),
                     label="Drawing Board", padding=6,
                 ),
             ],
@@ -215,7 +220,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.STICKY_NOTE_2_OUTLINED, selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2),
+                    icon=ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2, color=ft.Colors.PRIMARY),
                     label="Notes", padding=6,
                 ),
             ],
