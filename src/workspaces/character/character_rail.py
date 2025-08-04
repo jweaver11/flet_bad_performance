@@ -349,7 +349,6 @@ def make_main_character(e, page: ft.Page):
         print("Object does not have tags attribute, cannot change character type")
 
     reload_character_rail(page)  # Reload our character rail to show new character
-    
     print("Character added to main characters")
 # Side character
 def make_side_character(e, page: ft.Page):
@@ -409,36 +408,39 @@ main_characters = ft.ExpansionTile(
     tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
     shape=ft.RoundedRectangleBorder(),
     controls_padding=None,
+    maintain_state=True,
 )
 side_characters = ft.ExpansionTile(
     title=ft.Text("Side"),
     collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
     tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
-    shape=ft.RoundedRectangleBorder()
+    shape=ft.RoundedRectangleBorder(),
+    maintain_state=True,
 )
 background_characters = ft.ExpansionTile(
     title=ft.Text("Background"),
     collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
     tile_padding=ft.padding.symmetric(horizontal=8),  # Reduce tile padding
     controls_padding=None,
-    shape=ft.RoundedRectangleBorder()
+    shape=ft.RoundedRectangleBorder(),
+    maintain_state=True,
 )
 
 # Our drag targets so we can easily drag and drop characters into their categories
 # These hold the expansion tiles lists from above, and are directly rendered in the rail
 main_characters_drag_target = ft.DragTarget(
     group="widgets",
-    on_accept=make_main_character,
+    #on_accept=make_main_character,
     content=main_characters
 )
 side_characters_drag_target = ft.DragTarget(
     group="widgets",
-    on_accept=make_side_character,
+    #=make_side_character,
     content=side_characters
 )
 background_characters_drag_target = ft.DragTarget(
     group="widgets",
-    on_accept=make_background_character,
+    #on_accept=make_background_character,
     content=background_characters
 )
 
@@ -450,6 +452,9 @@ def reload_character_rail(page: ft.Page):
     main_characters.controls.clear()
     side_characters.controls.clear()
     background_characters.controls.clear()
+    main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
+    side_characters_drag_target.on_accept=lambda e: make_side_character(e, page)
+    background_characters_drag_target.on_accept=lambda e: make_background_character(e, page)
 
     # Run through each character in our story
     for character in story.characters:

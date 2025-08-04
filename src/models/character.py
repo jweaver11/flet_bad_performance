@@ -91,7 +91,8 @@ class Character(ft.Container):
         self.reload_widget()
         self.update()
 
-        # Import and reload the rail 
+        # Import and reload the rail. We import this dynamically to avoid circular imports
+        # Try to avoid this when we can, but its a pretty limited use case, so we do it this way here
         from workspaces.character.character_rail import reload_character_rail
         reload_character_rail(self.page)
 
