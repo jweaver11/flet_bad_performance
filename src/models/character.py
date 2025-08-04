@@ -9,6 +9,8 @@ class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
         self.title = name  # Name of character, but all objects have a title for identification
         self.tag = "character"  # Tag for logic, mostly for routing it through our story object
+        self.p = page   # Grab our page correctly, as sometimes the container doesn't load it correctly
+        # with all the UI changes that happen
 
         self.pin_location = "left"  # Start in main pin location
 
@@ -89,12 +91,11 @@ class Character(ft.Container):
         self.char_data['Neutral'] = False
         self.check_morality()   # Changes the name_color variable based on our updated tags
         self.reload_widget()
-        self.update()
 
         # Import and reload the rail. We import this dynamically to avoid circular imports
         # Try to avoid this when we can, but its a pretty limited use case, so we do it this way here
         from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.page)
+        reload_character_rail(self.p)
 
     # Called when the 'evil' character option is clicked in the widget body
     def make_character_evil(self):
@@ -103,9 +104,9 @@ class Character(ft.Container):
         self.char_data['Neutral'] = False
         self.check_morality()
         self.reload_widget()
-        self.update()
+
         from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.page)
+        reload_character_rail(self.p)
 
     # Called when the neutral character option is clicked in the widget body
     def make_character_neutral(self):
@@ -114,9 +115,9 @@ class Character(ft.Container):
         self.char_data['Neutral'] = True
         self.check_morality()
         self.reload_widget()
-        self.update()
+
         from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.page)
+        reload_character_rail(self.p)
 
     # Called when the n/a character option is clicked in the widget body
     def make_character_na(self):

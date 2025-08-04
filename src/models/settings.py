@@ -28,10 +28,10 @@ class Settings(ft.Container):
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor = ft.Colors.GREY_900,
-            content=ft.TextButton(
+            content=ft.Column([ft.TextButton(
                 "make rail reorderable", 
                 icon=ft.Icons.REORDER_ROUNDED,
                 on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()
-            ),
+            ),])
 
         )

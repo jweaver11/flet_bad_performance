@@ -1,5 +1,6 @@
 ''' Menu bar at the top of the page '''
 import flet as ft
+from models.user import user
 from handlers.render_widgets import remove_drag_targets
 
 def create_menu_bar(page: ft.Page):
@@ -241,6 +242,10 @@ def create_menu_bar(page: ft.Page):
         ], 
     )
 
+    def settings_clicked(e):
+        user.settings.visible = not user.settings.visible
+        page.update()
+
     # Create our container for the menu bar
     menubar_container = ft.Container(
         bgcolor=ft.Colors.GREY_900,     # Set background color
@@ -254,7 +259,7 @@ def create_menu_bar(page: ft.Page):
                 # Fix broken widgets button
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
-                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icon(ft.Icons.SETTINGS)),   # Settings button
+                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button
                 ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # users account name
             ]))
 

@@ -562,7 +562,7 @@ def reload_character_rail(page: ft.Page):
             icon_color=ft.Colors.PRIMARY,  # Match expanded color
         )
     )
-    return page.update()
+    page.update()
 
 
 def create_characters_rail(page: ft.Page):
