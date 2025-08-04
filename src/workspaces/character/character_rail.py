@@ -460,7 +460,7 @@ def reload_character_rail(page: ft.Page):
     for character in story.characters:
         # Create a new character widget for the rail
         new_char = ft.Container(
-            border=ft.border.all(2, character.rendered_color),  # Gives a border to match the widgets border
+            #border=ft.border.all(2, character.rendered_color),  # Gives a border to match the widgets border
             padding=ft.padding.only(left=4, right=4),   # padding
             margin=ft.margin.only(bottom=2),    # Margin between characters on rail
             border_radius=ft.border_radius.all(10),
@@ -493,7 +493,7 @@ def reload_character_rail(page: ft.Page):
                                     opacity=0,
                                     scale=.9,
                                     tooltip="",
-                                    icon_color=ft.Colors.PRIMARY, 
+                                    icon_color=character.name_color, 
                                     items=[
                                         # Button to rename a character
                                         ft.PopupMenuItem(

@@ -126,18 +126,18 @@ class Character(ft.Container):
         self.character_data['Neutral'] = False
         self.check_morality()
         self.reload_widget()
-        self.update()
+
         from workspaces.character.character_rail import reload_character_rail
         reload_character_rail(self.page)
     
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
         if self.character_data['Good'] == True:
-            self.name_color = ft.Colors.GREEN
+            self.name_color = ft.Colors.GREEN_200
         elif self.character_data['Evil'] == True:
-            self.name_color = ft.Colors.RED
+            self.name_color = ft.Colors.RED_200
         elif self.character_data['Neutral'] == True:
-            self.name_color = ft.Colors.GREY
+            self.name_color = ft.Colors.GREY_300
         else:
             self.name_color = ft.Colors.PRIMARY
 
@@ -183,7 +183,7 @@ class Character(ft.Container):
                 expand=True,
                 content=ft.Column([
                     ft.TextButton(text="good", on_click=lambda e: self.make_character_good()),
-                    ft.TextButton(text="bad", on_click=lambda e: self.make_character_evil()),
+                    ft.TextButton(text="evil", on_click=lambda e: self.make_character_evil()),
                     ft.TextButton(text="neutral", on_click=lambda e: self.make_character_neutral()),
                     ft.TextButton(text="N/A", on_click=lambda e: self.make_character_na()),
                 ])
