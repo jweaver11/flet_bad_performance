@@ -26,6 +26,7 @@ class Settings(ft.Container):
         # Save theme mode of either light or dark
         self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
         self.theme_color_scheme = ft.Colors.BLUE    # Save our color scheme for the theme
+
         # Our dropdown options for our color scheme dropdown control
         self.theme_color_scheme_options = [
             ft.Colors.RED,
@@ -116,7 +117,7 @@ class Settings(ft.Container):
         super().__init__(
             expand=True, 
             padding=6,
-            visible=True,
+            visible=False,
             border = ft.border.all(2, ft.Colors.GREY_800),
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             #bgcolor = self.widget_bgcolor,

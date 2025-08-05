@@ -29,40 +29,43 @@ class Character(ft.Container):
 
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
-        self.age = ""
-        self.sex = ""    # Add selecteble male, female, other - custom write in
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col=3)
+        
 
         self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
+        
 
 
         # Data about the character that the user will manipulate
         # Can't call this 'data' since containers already have that property
         self.character_data = {
-            'Good': True,
-            'Evil': False,
-            'Neutral': False,
-            'Family': {'Father': "", 'Mother': ""}, #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
-            'Occupation': "",
-            'Goals': "",
-            'Origin': {
-                'Birthplace': "",
-                'Birth Date': "",
-                'Hometown': "",
-                'Education': "",
+            'Morality': "good",     # Radio selection of good, evil, neutral, or none selected is N/A
+            'Sex': "male",      # Radio with custom write in option
+            'Age': "0",   # Text field
+            'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
+                'Father': "",   # Textfield with selectable options
+                'Mother': ""    # Textfield with selectable options
+            },   
+            'Occupation': "",   # Textfield
+            'Goals': "",    # Textfield list
+            'Origin': {     # Category on the left
+                'Birth Date': "",   # textfield
+                'Hometown': "",     # Textfield and a select from location radio picker
+                'Education': "",        # Textfield
             },
             'Physical Description': {
-                'Hair Color': "",
-                'Eye Color': "",
-                'Height': "",
-                'Weight': "",
-                'Build': "",
-                'Distinguishing Features': "",
+                'Hair Color': "",   # Textfield
+                'Eye Color': "",    # Textfield
+                'Height': "",   # TextField
+                'Weight': "",   # TextField
+                'Build': "",    # Expandable textfield
+                'Distinguishing Features': "",  # some sort of flet list
             },
-            'Personality': "",
-            'Backstory': "",
-            'Abilities': "",
-            'Notes' : "",
+            'Personality': "",  # expandable ft.TextField
+            'Backstory': "",    # expandable ft.TextField
+            'Abilities': "",    # Some sort of list
+            'Notes' : "",   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
 
         # Make a markdown as content of container
@@ -85,10 +88,8 @@ class Character(ft.Container):
 
     # Called when the 'good' character option is clicked in the widget body
     def make_character_good(self):
-        # Make sure our other 2 options are false, and good is true
-        self.character_data['Good'] = True
-        self.character_data['Evil'] = False
-        self.character_data['Neutral'] = False
+        # Changes our morality
+        self.character_data['Morality'] = "good"
         self.check_morality()   # Changes the name_color variable based on our updated tags
         self.reload_widget()
 
@@ -99,9 +100,7 @@ class Character(ft.Container):
 
     # Called when the 'evil' character option is clicked in the widget body
     def make_character_evil(self):
-        self.character_data['Good'] = False
-        self.character_data['Evil'] = True
-        self.character_data['Neutral'] = False
+        self.character_data['Morality'] = "evil"
         self.check_morality()
         self.reload_widget()
 
@@ -110,9 +109,7 @@ class Character(ft.Container):
 
     # Called when the neutral character option is clicked in the widget body
     def make_character_neutral(self):
-        self.character_data['Good'] = False
-        self.character_data['Evil'] = False
-        self.character_data['Neutral'] = True
+        self.character_data['Morality'] = "neutral"
         self.check_morality()
         self.reload_widget()
 
@@ -121,9 +118,8 @@ class Character(ft.Container):
 
     # Called when the n/a character option is clicked in the widget body
     def make_character_na(self):
-        self.character_data['Good'] = False
-        self.character_data['Evil'] = False
-        self.character_data['Neutral'] = False
+        self.character_data['Moraily'] = "n/a"
+        
         self.check_morality()
         self.reload_widget()
 
@@ -132,22 +128,28 @@ class Character(ft.Container):
     
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
+        # If we have the setting turned on to change char name colors, change them
         if user.settings.change_name_colors.value == True:
             print("color changing is true, we running the logic")
-            if self.character_data['Good'] == True:
+            # Check the morality and change color accordingly
+            if self.character_data['Morality'] == "good":
                 self.name_color = ft.Colors.GREEN_200
-            elif self.character_data['Evil'] == True:
+            elif self.character_data['Morality'] == "evil":
                 self.name_color = ft.Colors.RED_200
-            elif self.character_data['Neutral'] == True:
+            elif self.character_data['Morality'] == "neutral":
                 self.name_color = ft.Colors.GREY_300
             else:
+                # If none are selected, make it color scheme
                 self.name_color = ft.Colors.PRIMARY
+        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
         else:
             for char in story.characters:
                 char.name_color = ft.Colors.PRIMARY
-                self.p.update()
+            # Apply our changes
+            self.p.update()
 
             return print("Color changing disabled")
+        # Reload the rail
         from workspaces.character.character_rail import reload_character_rail
         reload_character_rail(self.p)
 
@@ -189,9 +191,8 @@ class Character(ft.Container):
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
-                content=ft.ResponsiveRow(
-                    spacing=10, 
-                    run_spacing=10,
+                content=ft.Column(
+                    
                     #col={"xs": 12, "md": 6, "lg": 3, "xl": 1, "xxl": 1},  # The 'col' property changes how many controls...
                     # will fit in a row based on each screen size. The "xs", "md", etc measure the parent container size in width
                     # If a col=12, it will be the only control on that row,
@@ -200,26 +201,49 @@ class Character(ft.Container):
                     # If col=9 would take up 3/4 the row
                     # If col=3 it would take up 1/4 that row
 
-                    controls=[
-                        ft.Icon(ft.Icons.PERSON, col=9, size=100),
-                        ft.TextButton(text="good", width=100, on_click=lambda e: self.make_character_good(), col=1,),
-                        ft.TextButton(
-                            text="evil", 
-                            width=100, 
-                            on_click=lambda e: self.make_character_evil(), 
-                            col=1,
-                        ),
-                        ft.TextButton(text="neutral", width=100, on_click=lambda e: self.make_character_neutral(), col={"xs": 6, "md": 6, "lg": 6}),
-                        ft.TextButton(text="N/A", width=100, on_click=lambda e: self.make_character_na(), col={"xs": 12, "md": 3, "lg": 3}),
+                    scroll=ft.ScrollMode.AUTO,
+                    expand=True,
+                    controls=[             
 
-                        ft.Column(col=12, controls=[ft.Text("Column 1")]),
-                        ft.Column(col=12, controls=[ft.Text("Column 2")]),     
-                        ft.Column(col=1, controls=[ft.Text("Column 3")]),
-                        ft.Column(col=1, controls=[ft.Text("Column 4")]),      
-                        ft.Column(col=3, controls=[ft.Text("Column 5")]),
-                        ft.Column(col=3, controls=[ft.Text("Column 6")]),     
-                        ft.Column(col=3, controls=[ft.Text("Column 7")]),
-                        ft.Column(col=3, controls=[ft.Text("Column 8")]),                                    
+                        ft.ResponsiveRow(
+                            #wrap=True, 
+                            expand=True,
+                            controls=[
+                                self.icon, 
+
+                                ft.Column([
+                                ft.RadioGroup(
+                                    content=ft.Row(
+                                        col=9,
+                                        expand=True,
+                                        controls=[
+                                            ft.Radio(label="Good", value="good", toggleable=True),
+                                            ft.Radio(label="Evil", value="evil", toggleable=True),
+                                            ft.Radio(label="Neutral", value="neutral", toggleable=True),
+                                        ]
+                                    )
+                                ),
+                                ft.RadioGroup(
+                                    content=ft.Row(
+                                        expand=True,
+                                        controls=[
+                                            ft.Radio(label="Man", value="man", toggleable=True),
+                                            ft.Radio(label="Woman", value="woman", toggleable=True),
+                                            ft.Radio(label="Other", value="other", toggleable=True),    # make writein
+                                    ])
+                                )
+                                ]),
+
+                                
+                            ]
+                        ),
+                        ft.TextButton(text="good", width=100, on_click=lambda e: self.make_character_good()),
+                        ft.TextButton(text="evil", width=100, on_click=lambda e: self.make_character_evil()),
+
+                        ft.TextButton(text="neutral", width=100, on_click=lambda e: self.make_character_neutral()),
+                        ft.TextButton(text="N/A", width=100, on_click=lambda e: self.make_character_na()),
+
+                    
                     ]
                 )
             )
