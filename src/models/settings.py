@@ -41,6 +41,7 @@ class Settings(ft.Container):
             on_change=change_name_colors_switch
         )
 
+        # Called when thme switch is changed. Switches from dark to light theme
         def toggle_theme(e):
             print("switch_theme called")
             print(self.p.theme_mode)
@@ -65,7 +66,7 @@ class Settings(ft.Container):
             padding=6,
             visible=True,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor = ft.Colors.GREY_900,
+            bgcolor = ft.Colors.ON_INVERSE_SURFACE,
             content=ft.Column([
                 ft.TextButton(
                     "Reorder Workspaces", 

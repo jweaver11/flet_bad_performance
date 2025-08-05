@@ -28,6 +28,10 @@ def create_menu_bar(page: ft.Page):
     def handle_submenu_hover(e):
         print(f"{e.control.content.content.value}.on_hover")
 
+    menubar_style = ft.ButtonStyle(
+        bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
+    )
+
 
 
     # Create our menu bar with submenu items
@@ -47,194 +51,78 @@ def create_menu_bar(page: ft.Page):
             # Parent submenu item with child items on hover
             ft.SubmenuButton(
                 content=ft.Container(
-                    content=ft.Text("File"),
+                    content=ft.Text("File", weight=ft.FontWeight.BOLD),
                     alignment=ft.alignment.center
                 ),
-                style=ft.ButtonStyle(
-                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
-                ),
+                style=menubar_style,
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
                 controls=[
                     ft.MenuItemButton(
-                        content=ft.Text("New"),
+                        content=ft.Text("New", weight=ft.FontWeight.BOLD),
+                        leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
+                        style=menubar_style,
+                        on_click=lambda e: print("New Story Clicked"),
+                    ),
+                    ft.MenuItemButton(
+                        content=ft.Text("Save", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_menu_item_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Save"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Save as"),
+                        content=ft.Text("Save as", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.SAVE),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_menu_item_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Open"),
+                        content=ft.Text("Open", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.CLOSE),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Import"),
+                        content=ft.Text("Import", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.CLOSE),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Export"),
+                        content=ft.Text("Export", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.CLOSE),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Quit"),
+                        content=ft.Text("Quit", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.CLOSE),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_menu_item_click,
                     ),
                 ],
             ),
             ft.SubmenuButton(
                 content=ft.Container(
-                    content=ft.Text("Edit"),
+                    content=ft.Text("Edit", weight=ft.FontWeight.BOLD),
                     alignment=ft.alignment.center
                 ),
-                style=ft.ButtonStyle(
-                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                ),
+                style=menubar_style,
                 on_open=handle_submenu_open,
                 on_close=handle_submenu_close,
                 on_hover=handle_submenu_hover,
                 controls=[
                     ft.MenuItemButton(
-                        content=ft.Text("Copy"),
+                        content=ft.Text("Copy", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_menu_item_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Paste"),
+                        content=ft.Text("Paste", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                ],
-            ),
-            ft.SubmenuButton(
-                content=ft.Container(
-                    content=ft.Text("  Upload  "),
-                    alignment=ft.alignment.center
-                ),
-                style=ft.ButtonStyle(
-                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                ),
-                on_open=handle_submenu_open,
-                on_close=handle_submenu_close,
-                on_hover=handle_submenu_hover,
-                controls=[
-                    ft.MenuItemButton(
-                        content=ft.Text("Text-chapters"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Image (comics)"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Video (animations?)"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Projects (other stories)"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Characters"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Worldbuilding, etc"),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                ],
-            ),
-            ft.SubmenuButton(
-                content=ft.Container(
-                    content=ft.Text(" View "),
-                    alignment=ft.alignment.center
-                ),
-                style=ft.ButtonStyle(
-                    bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                ),
-                on_open=handle_submenu_open,
-                on_close=handle_submenu_close,
-                on_hover=handle_submenu_hover,
-                controls=[
-                    ft.MenuItemButton(
-                        content=ft.Text("Zoom In"),
-                        leading=ft.Icon(ft.Icons.ZOOM_IN),
-                        close_on_click=False,
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Zoom Out"),
-                        leading=ft.Icon(ft.Icons.ZOOM_OUT),
-                        close_on_click=False,
-                        style=ft.ButtonStyle(
-                            bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT}
-                        ),
+                        style=menubar_style,
                         on_click=handle_menu_item_click,
                     ),
                 ],
