@@ -1,6 +1,6 @@
 import flet as ft
 from models.user import user
-from handlers.render_widgets import show_pin_drag_targets
+from handlers.render_widgets import show_pin_drag_targets, render_widgets
 
 story = user.active_story  # Get our story object from the user
 
@@ -72,7 +72,7 @@ class Character(ft.Container):
             expand=True, 
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor = ft.Colors.TRANSPARENT,
+            bgcolor = ft.Colors.ON_INVERSE_SURFACE,
             content=None,
         )
         self.reload_widget() # Builds our widgets content when object is created
@@ -82,6 +82,7 @@ class Character(ft.Container):
     def hide_widget(self):
         self.visible = False
         story.master_stack.update()
+        render_widgets(self.p)
 
     # Called when the 'good' character option is clicked in the widget body
     def make_character_good(self):

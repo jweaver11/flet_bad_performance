@@ -28,8 +28,6 @@ def main(page: ft.Page):
     # This is because it is the only widget not stored in the story object, but in the user
     user.active_story.add_object_to_pin(user.settings)
 
-    
-
     # Adds our page title and theme
     title = "StoryBoard -- " + story.title + " -- Saved status"
 
@@ -63,10 +61,10 @@ def main(page: ft.Page):
 
         controls=[
             user.all_workspaces_rail,  # Main rail of all available workspaces
-            ft.VerticalDivider(width=2, thickness=2, trailing_indent=10, leading_indent=10),
+            ft.VerticalDivider(width=2, thickness=2),   # Divider between workspaces rail and active_rail
 
             active_rail,    # Rail for the selected workspace
-            ft.VerticalDivider(width=2, thickness=2, trailing_indent=10, leading_indent=10),   # Divider between rail and work area
+            ft.VerticalDivider(width=2, thickness=2),   # Divider between rail and work area
             
             workspace,    # Work area for pagelets
         ],

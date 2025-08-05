@@ -187,8 +187,8 @@ class All_Workspaces_Rail(ft.Container):
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY), 
-                    selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY),
+                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY, scale=1.2), 
+                    selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
                     label="Plot & Timeline", padding=6,
                 ),
             ],

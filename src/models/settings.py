@@ -47,10 +47,10 @@ class Settings(ft.Container):
             print(self.p.theme_mode)
             if self.p.theme_mode == ft.ThemeMode.DARK:
                 self.p.theme_mode = ft.ThemeMode.LIGHT
-                self.theme_button.icon = ft.Icons.LIGHT_MODE
+                self.theme_button.icon = ft.Icons.DARK_MODE
             elif self.p.theme_mode == ft.ThemeMode.LIGHT:
                 self.p.theme_mode = ft.ThemeMode.DARK
-                self.theme_button.icon = ft.Icons.DARK_MODE
+                self.theme_button.icon = ft.Icons.LIGHT_MODE
 
             self.p.update()
             print(self.p.theme_mode)
@@ -65,6 +65,7 @@ class Settings(ft.Container):
             expand=True, 
             padding=6,
             visible=True,
+            border = ft.border.all(2, ft.Colors.GREY_800),
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             bgcolor = ft.Colors.ON_INVERSE_SURFACE,
             content=ft.Column([
@@ -75,7 +76,5 @@ class Settings(ft.Container):
                 ),
                 self.change_name_colors,
                 self.theme_button,
-
             ])
-
         )

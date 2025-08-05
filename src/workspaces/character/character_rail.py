@@ -17,6 +17,7 @@ story = user.active_story  # Get our story object from the user
 def show_character_widget(character, page: ft.Page):
     # Show our widget and update it
     character.visible = True
+    render_widgets(page)
     page.update()
 
 # Called when hovered over a character on the rail
