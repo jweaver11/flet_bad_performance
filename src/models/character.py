@@ -72,7 +72,7 @@ class Character(ft.Container):
             expand=True, 
             padding=6,
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor = ft.Colors.ON_INVERSE_SURFACE,
+            #bgcolor = user.settings.workspace_bgcolor,
             content=None,
         )
         self.reload_widget() # Builds our widgets content when object is created

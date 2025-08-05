@@ -30,6 +30,8 @@ class User:
         # Main builds the actual rail, but it is an extended flet container
         self.all_workspaces_rail = ft.Container()
 
+        self.workspace = ft.Container()
+
 
     def __repr__(self):
         return f"User(username={self.username}, email={self.email})"

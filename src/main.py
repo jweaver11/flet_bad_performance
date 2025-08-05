@@ -33,9 +33,9 @@ def main(page: ft.Page):
 
     # Sets our theme modes, but we start dark
     # If theme mode un-set, set dark...
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
-    page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
-    page.theme_mode = ft.ThemeMode.DARK
+    page.theme = ft.Theme(color_scheme_seed=user.settings.theme_color_scheme)
+    page.dark_theme = ft.Theme(color_scheme_seed=user.settings.theme_color_scheme)
+    page.theme_mode = user.settings.user_theme_mode
 
     page.title = title
     page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)
@@ -51,8 +51,7 @@ def main(page: ft.Page):
     # Just create it each time
     active_rail = create_active_rail(page)  # Render whichever rail is active
 
-    
-    workspace = create_workspace(page)  # render our workspace containing our widgets
+    user.workspace = create_workspace(page) # render our workspace containing our widgets
 
     # Save our 2 rails, dividers, and our workspace container in a row
     row = ft.Row(
@@ -66,7 +65,7 @@ def main(page: ft.Page):
             active_rail,    # Rail for the selected workspace
             ft.VerticalDivider(width=2, thickness=2),   # Divider between rail and work area
             
-            workspace,    # Work area for pagelets
+            user.workspace,    # Work area for pagelets
         ],
     )
 

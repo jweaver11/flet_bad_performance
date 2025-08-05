@@ -23,6 +23,53 @@ class Settings(ft.Container):
         self.pin_location = "main"
         self.p = page
 
+        # Save theme mode of either light or dark
+        self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
+        self.theme_color_scheme = ft.Colors.BLUE    # Save our color scheme for the theme
+        # Our dropdown options for our color scheme dropdown control
+        self.theme_color_scheme_options = [
+            ft.Colors.RED,
+            ft.Colors.BLUE,
+            ft.Colors.YELLOW,
+            ft.Colors.PURPLE,
+            ft.Colors.LIME,
+            ft.Colors.CYAN,
+        ]
+
+        # Function to add our color scheme options when our dropdown expands
+        def get_color_scheme_options():
+            options = []
+            for color in self.theme_color_scheme_options:
+                options.append(
+                    ft.DropdownOption(
+                        key=color.value,
+                        content=ft.Text(
+                            value=color.value,
+                            color=color,
+                        ),
+                    )
+                )
+            return options
+        
+        # Called when a dropdown option is selected. Saves our choice, and applies it to the page
+        def change_color_scheme_picked(e):
+            self.theme_color_scheme = e.control.value
+            self.p.theme = ft.Theme(color_scheme_seed=self.theme_color_scheme)
+            self.p.dark_theme = ft.Theme(color_scheme_seed=self.theme_color_scheme)
+            self.p.update()
+
+        # Dropdown so user can change their color scheme
+        self.color_scheme_dropdown = ft.Dropdown(
+            editable=True,
+            label="Color",
+            options=get_color_scheme_options(),
+            on_change=change_color_scheme_picked,
+        )
+        
+        # Background color of widgets that changes depending if in light theme or dark theme
+        self.workspace_bgcolor = ft.Colors.GREY_900 if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+
+
         # Runs when the switch toggling the color change of characters names based on morality is clicked
         def change_name_colors_switch(e):
             # runs through all our characters, and updates their name color accordingly
@@ -41,22 +88,27 @@ class Settings(ft.Container):
             on_change=change_name_colors_switch
         )
 
-        # Called when thme switch is changed. Switches from dark to light theme
+        # Called when thme switch is changed. Switches from dark to light theme, or reverse
         def toggle_theme(e):
             print("switch_theme called")
             print(self.p.theme_mode)
-            if self.p.theme_mode == ft.ThemeMode.DARK:
-                self.p.theme_mode = ft.ThemeMode.LIGHT
-                self.theme_button.icon = ft.Icons.DARK_MODE
-            elif self.p.theme_mode == ft.ThemeMode.LIGHT:
-                self.p.theme_mode = ft.ThemeMode.DARK
+            if self.user_theme_mode == ft.ThemeMode.DARK:   # Check which theme we're on
+                self.user_theme_mode = ft.ThemeMode.LIGHT   # change the theme mode so we can save it
+                self.theme_button.icon = ft.Icons.DARK_MODE # Change the icon of theme button
+                self.workspace_bgcolor = ft.Colors.GREY_200
+            elif self.user_theme_mode == ft.ThemeMode.LIGHT:
+                self.user_theme_mode = ft.ThemeMode.DARK
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
+                self.workspace_bgcolor = ft.Colors.GREY_900
 
+            user.workspace.bgcolor = self.workspace_bgcolor
+            self.p.theme_mode = self.user_theme_mode
             self.p.update()
-            print(self.p.theme_mode)
-            #self.update()
+            print(self.user_theme_mode)
 
+        # Icon of the theme button that changes depending on if we're dark or light mode
         self.theme_icon = ft.Icons.DARK_MODE if page.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
+        # Button that changes the theme from dark or light when clicked
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
 
 
@@ -67,7 +119,7 @@ class Settings(ft.Container):
             visible=True,
             border = ft.border.all(2, ft.Colors.GREY_800),
             border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            bgcolor = ft.Colors.ON_INVERSE_SURFACE,
+            #bgcolor = self.widget_bgcolor,
             content=ft.Column([
                 ft.TextButton(
                     "Reorder Workspaces", 
@@ -76,5 +128,7 @@ class Settings(ft.Container):
                 ),
                 self.change_name_colors,
                 self.theme_button,
+                self.color_scheme_dropdown,
+
             ])
         )

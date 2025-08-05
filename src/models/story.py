@@ -20,11 +20,11 @@ class Story:
         self.title=title
 
         # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
-        self.top_pin = ft.Row(spacing=8, height=0, controls=[],)
-        self.left_pin = ft.Column(spacing=8, width=0, controls=[])
-        self.main_pin = ft.Row(spacing=8, expand=True, controls=[])
-        self.right_pin = ft.Column(spacing=8, width=0, controls=[])
-        self.bottom_pin = ft.Row(spacing=8, height=0, controls=[])
+        self.top_pin = ft.Row(spacing=6, height=0, controls=[],)
+        self.left_pin = ft.Column(spacing=6, width=0, controls=[])
+        self.main_pin = ft.Row(spacing=6, expand=True, controls=[])
+        self.right_pin = ft.Column(spacing=6, width=0, controls=[])
+        self.bottom_pin = ft.Row(spacing=6, height=0, controls=[])
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
