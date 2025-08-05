@@ -32,8 +32,7 @@ class Character(ft.Container):
         self.age = ""
         self.sex = ""    # Add selecteble male, female, other - custom write in
 
-        self.color = "none"     # Changable border color of widget and character on rail
-        self.rendered_color = ft.Colors.GREY_800   # Flet colors formatting based on our above color
+        self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
 
@@ -157,9 +156,7 @@ class Character(ft.Container):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        # Gives our container a border and adjusts the user selected color to it
-        self.border = ft.border.all(2, self.rendered_color)
-
+        self.border = ft.border.all(2, self.color)  # Gives our container a border and adjusts the user selected color to it
        
         self.content=ft.Column(spacing=0, controls=[
             ft.Stack([
@@ -187,17 +184,44 @@ class Character(ft.Container):
                 )])
             ]),
             # Divider between title and body of widget
-            ft.Divider(color=ft.Colors.PRIMARY),
+            ft.Divider(color=self.color),
 
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
-                content=ft.Column([
-                    ft.TextButton(text="good", on_click=lambda e: self.make_character_good()),
-                    ft.TextButton(text="evil", on_click=lambda e: self.make_character_evil()),
-                    ft.TextButton(text="neutral", on_click=lambda e: self.make_character_neutral()),
-                    ft.TextButton(text="N/A", on_click=lambda e: self.make_character_na()),
-                ])
+                content=ft.ResponsiveRow(
+                    spacing=10, 
+                    run_spacing=10,
+                    #col={"xs": 12, "md": 6, "lg": 3, "xl": 1, "xxl": 1},  # The 'col' property changes how many controls...
+                    # will fit in a row based on each screen size. The "xs", "md", etc measure the parent container size in width
+                    # If a col=12, it will be the only control on that row,
+                    # If col=1, there will be 12 controls on that row
+                    # If col=6, it will take up half of that row,
+                    # If col=9 would take up 3/4 the row
+                    # If col=3 it would take up 1/4 that row
+
+                    controls=[
+                        ft.Icon(ft.Icons.PERSON, col=9, size=100),
+                        ft.TextButton(text="good", width=100, on_click=lambda e: self.make_character_good(), col=1,),
+                        ft.TextButton(
+                            text="evil", 
+                            width=100, 
+                            on_click=lambda e: self.make_character_evil(), 
+                            col=1,
+                        ),
+                        ft.TextButton(text="neutral", width=100, on_click=lambda e: self.make_character_neutral(), col={"xs": 6, "md": 6, "lg": 6}),
+                        ft.TextButton(text="N/A", width=100, on_click=lambda e: self.make_character_na(), col={"xs": 12, "md": 3, "lg": 3}),
+
+                        ft.Column(col=12, controls=[ft.Text("Column 1")]),
+                        ft.Column(col=12, controls=[ft.Text("Column 2")]),     
+                        ft.Column(col=1, controls=[ft.Text("Column 3")]),
+                        ft.Column(col=1, controls=[ft.Text("Column 4")]),      
+                        ft.Column(col=3, controls=[ft.Text("Column 5")]),
+                        ft.Column(col=3, controls=[ft.Text("Column 6")]),     
+                        ft.Column(col=3, controls=[ft.Text("Column 7")]),
+                        ft.Column(col=3, controls=[ft.Text("Column 8")]),                                    
+                    ]
+                )
             )
         ])
     

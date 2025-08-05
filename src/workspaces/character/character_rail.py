@@ -107,39 +107,11 @@ def change_character_color(character, page: ft.Page):
 
         dlg.open = False
         page.update()
-        
-        character.color = color
 
-        # Check our color and change our 'rendered_color' to match
-        # rendered_color is what can be directly used by controls from the object
-        if color == "red":
-            character.rendered_color = ft.Colors.RED_900
-        elif color == "pink":
-            character.rendered_color = ft.Colors.PINK_900
-        elif color == "purple":
-            character.rendered_color = ft.Colors.PURPLE_900
-        elif color == "blue":
-            character.rendered_color = ft.Colors.BLUE_900
-        elif color == "cyan":
-            character.rendered_color = ft.Colors.CYAN_900
-        elif color == "teal":
-            character.rendered_color = ft.Colors.TEAL_900
-        elif color == "green":
-            character.rendered_color = ft.Colors.GREEN_900
-        elif character.color == "lime":
-            character.rendered_color = ft.Colors.LIME_900
-        elif color == "yellow":
-            character.rendered_color = ft.Colors.YELLOW_900
-        elif color == "orange":
-            character.rendered_color = ft.Colors.ORANGE_900
-        elif color == "brown":
-            character.rendered_color = ft.Colors.BROWN_900
-        elif color == "light_grey":
-            character.rendered_color = ft.Colors.GREY_500
-        elif color == "grey":
-            character.rendered_color = ft.Colors.GREY_800
-        else:
-            character.rendered_color = ft.Colors.TRANSPARENT
+        # Set our characters color
+        if color is not None:
+            character.color = color
+
         print(character.color)
         
         
@@ -156,20 +128,20 @@ def change_character_color(character, page: ft.Page):
         content=ft.RadioGroup(
             ref=radio_group_ref,
             content=ft.Row([
-                ft.Radio(value="red", label="Red", adaptive=True),
-                ft.Radio(value="pink", label="Pink", adaptive=True),
-                ft.Radio(value="purple", label="Purple", adaptive=True),
-                ft.Radio(value="blue", label="Blue", adaptive=True),
-                ft.Radio(value="cyan", label="Cyan", adaptive=True),
-                ft.Radio(value="teal", label="Teal", adaptive=True),
-                ft.Radio(value="green", label="Green", adaptive=True),
-                ft.Radio(value="lime", label="Lime", adaptive=True),
-                ft.Radio(value="yellow", label="Yellow", adaptive=True),
-                ft.Radio(value="orange", label="Orange", adaptive=True),
-                ft.Radio(value="brown", label="Brown", adaptive=True),
-                ft.Radio(value="light_grey", label="Light Grey", adaptive=True),
-                ft.Radio(value="grey", label="Grey", adaptive=True),
-                ft.Radio(value="none", label="None", adaptive=True),
+                ft.Radio(value=ft.Colors.RED.value, label="Red", adaptive=True),
+                ft.Radio(value=ft.Colors.PINK.value, label="Pink", adaptive=True),
+                ft.Radio(value=ft.Colors.PURPLE.value, label="Purple", adaptive=True),
+                ft.Radio(value=ft.Colors.BLUE.value, label="Blue", adaptive=True),
+                ft.Radio(value=ft.Colors.CYAN.value, label="Cyan", adaptive=True),
+                ft.Radio(value=ft.Colors.TEAL.value, label="Teal", adaptive=True),
+                ft.Radio(value=ft.Colors.GREEN.value, label="Green", adaptive=True),
+                ft.Radio(value=ft.Colors.LIME.value, label="Lime", adaptive=True),
+                ft.Radio(value=ft.Colors.YELLOW.value, label="Yellow", adaptive=True),
+                ft.Radio(value=ft.Colors.ORANGE.value, label="Orange", adaptive=True),
+                ft.Radio(value=ft.Colors.BROWN.value, label="Brown", adaptive=True),
+                ft.Radio(value=ft.Colors.GREY_300.value, label="Light Grey", adaptive=True),
+                ft.Radio(value=ft.Colors.GREY_800.value, label="Grey", adaptive=True),
+                ft.Radio(value=ft.Colors.GREY_900.value, label="None", adaptive=True),
             ]),
         ),
         actions=[
@@ -461,7 +433,7 @@ def reload_character_rail(page: ft.Page):
     for character in story.characters:
         # Create a new character widget for the rail
         new_char = ft.Container(
-            #border=ft.border.all(2, character.rendered_color),  # Gives a border to match the widgets border
+            #border=ft.border.all(2, character.color),  # Gives a border to match the widgets border
             padding=ft.padding.only(left=4, right=4),   # padding
             margin=ft.margin.only(bottom=2),    # Margin between characters on rail
             border_radius=ft.border_radius.all(10),
