@@ -54,6 +54,8 @@ class Character(ft.Container):
                 on_change=self.sex_submit,
             ),
             'Age': "0",   # Text field
+            'Race': "",
+            'Skin Color': "",
             'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
                 'Father': "",   # Textfield with selectable options
                 'Mother': ""    # Textfield with selectable options
@@ -78,6 +80,7 @@ class Character(ft.Container):
             'Abilities': "",    # Some sort of list
             'Dead': [True, "when they died"],
             'Notes' : "",   # Category that says Notes on the left, then lists the expandable ft.TextField
+
         }
 
 
@@ -120,9 +123,8 @@ class Character(ft.Container):
                 elif self.character_data['Morality'].data == "N/A":
                     self.name_color = ft.Colors.GREY_300
                 elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
-                    self.name_color = ft.Colors.GREY_300
+                    self.name_color = ft.Colors.PRIMARY
                     self.character_data['Morality'].value = None
-                    self.reload_widget()
                     
                 # Update our color
                 self.character_data['Morality'].color = self.name_color
@@ -141,6 +143,7 @@ class Character(ft.Container):
             reload_character_rail(self.p)
 
         check_morality()
+        self.reload_widget()
 
         self.p.update()
 
@@ -235,19 +238,5 @@ class Character(ft.Container):
         ])
     
 
-    # origin = Origin
 
-    # unique data types, (not str)
-    #color : str
-    icon : str
-
-    # Add ons that won't show by default
-    race: str
-    species : str
-    parents = []
-
-
-
-
-# Make widget container contain markdown for rendereding, and scrollable
 
