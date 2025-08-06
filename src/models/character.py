@@ -29,18 +29,17 @@ class Character(ft.Container):
 
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
-        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col=3)
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col={'xs': 12, 'sm': 12, 'md': 3})
         
 
         self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
         
 
-
         # Data about the character that the user will manipulate
         # Can't call this 'data' since containers already have that property
         self.character_data = {
-            'Morality': "good",     # Radio selection of good, evil, neutral, or none selected is N/A
+            'Morality': "",     # Radio selection of good, evil, neutral, or none selected is N/A
             'Sex': "male",      # Radio with custom write in option
             'Age': "0",   # Text field
             'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
@@ -86,45 +85,26 @@ class Character(ft.Container):
         story.master_stack.update()
         render_widgets(self.p)
 
-    # Called when the 'good' character option is clicked in the widget body
-    def make_character_good(self):
-        # Changes our morality
-        self.character_data['Morality'] = "good"
-        self.check_morality()   # Changes the name_color variable based on our updated tags
-        self.reload_widget()
+    # Pull our options for our morality dropdown
+    def get_morality_options(e):
+        morality_options = ["Good", "Evil", "Neutral", "N/a"]
 
-        # Import and reload the rail. We import this dynamically to avoid circular imports
-        # Try to avoid this when we can, but its a pretty limited use case, so we do it this way here
-        from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.p)
-
-    # Called when the 'evil' character option is clicked in the widget body
-    def make_character_evil(self):
-        self.character_data['Morality'] = "evil"
+        list = []
+        for option in morality_options:   
+            list.append(
+                ft.DropdownOption(
+                    text=option
+                )
+            )
+        return list
+    
+    # Called when the morality dropdown is changed
+    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
+    def morality_change(self, e):
+        self.character_data['Morality'] = e.control.value
         self.check_morality()
         self.reload_widget()
-
-        from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.p)
-
-    # Called when the neutral character option is clicked in the widget body
-    def make_character_neutral(self):
-        self.character_data['Morality'] = "neutral"
-        self.check_morality()
-        self.reload_widget()
-
-        from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.p)
-
-    # Called when the n/a character option is clicked in the widget body
-    def make_character_na(self):
-        self.character_data['Moraily'] = "n/a"
-        
-        self.check_morality()
-        self.reload_widget()
-
-        from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.p)
+        self.p.update()
     
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
@@ -132,11 +112,11 @@ class Character(ft.Container):
         if user.settings.change_name_colors.value == True:
             print("color changing is true, we running the logic")
             # Check the morality and change color accordingly
-            if self.character_data['Morality'] == "good":
+            if self.character_data['Morality'] == "Good":
                 self.name_color = ft.Colors.GREEN_200
-            elif self.character_data['Morality'] == "evil":
+            elif self.character_data['Morality'] == "Evil":
                 self.name_color = ft.Colors.RED_200
-            elif self.character_data['Morality'] == "neutral":
+            elif self.character_data['Morality'] == "Neutral":
                 self.name_color = ft.Colors.GREY_300
             else:
                 # If none are selected, make it color scheme
@@ -191,6 +171,7 @@ class Character(ft.Container):
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
+               
                 content=ft.Column(
                     
                     #col={"xs": 12, "md": 6, "lg": 3, "xl": 1, "xxl": 1},  # The 'col' property changes how many controls...
@@ -205,38 +186,30 @@ class Character(ft.Container):
                     expand=True,
                     controls=[             
 
-                        ft.ResponsiveRow(
-                            #wrap=True, 
+                        ft.Row(
+                            wrap=True, 
                             expand=True,
                             controls=[
                                 self.icon, 
-
-                                ft.Column([
-                                ft.RadioGroup(
-                                    content=ft.Row(
-                                        col=9,
-                                        expand=True,
-                                        controls=[
-                                            ft.Radio(label="Good", value="good", toggleable=True),
-                                            ft.Radio(label="Evil", value="evil", toggleable=True),
-                                            ft.Radio(label="Neutral", value="neutral", toggleable=True),
-                                        ]
-                                    )
+                                ft.Dropdown(
+                                    label="Morality",
+                                    options=self.get_morality_options(),
+                                    on_change=self.morality_change,
                                 ),
-                                ft.RadioGroup(
-                                    content=ft.Row(
-                                        expand=True,
-                                        controls=[
-                                            ft.Radio(label="Man", value="man", toggleable=True),
-                                            ft.Radio(label="Woman", value="woman", toggleable=True),
-                                            ft.Radio(label="Other", value="other", toggleable=True),    # make writein
-                                    ])
-                                )
-                                ]),
-
-                                
+                               
                             ]
                         ),
+
+                        ft.RadioGroup(
+                                        content=ft.Row(
+                                            expand=True,
+                                            controls=[
+                                                ft.Radio(label="Man", value="man", toggleable=True),
+                                                ft.Radio(label="Woman", value="woman", toggleable=True),
+                                                ft.Radio(label="Other", value="other", toggleable=True),    # make writein
+                                        ])
+                                    ),
+
                         ft.TextButton(text="good", width=100, on_click=lambda e: self.make_character_good()),
                         ft.TextButton(text="evil", width=100, on_click=lambda e: self.make_character_evil()),
 
