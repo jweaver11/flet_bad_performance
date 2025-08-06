@@ -59,10 +59,10 @@ def main(page: ft.Page):
 
         controls=[
             user.all_workspaces_rail,  # Main rail of all available workspaces
-            ft.VerticalDivider(width=2, thickness=2),   # Divider between workspaces rail and active_rail
+            ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
             active_rail,    # Rail for the selected workspace
-            ft.VerticalDivider(width=2, thickness=2),   # Divider between rail and work area
+            ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between rail and work area
             
             user.workspace,    # Work area for pagelets
         ],

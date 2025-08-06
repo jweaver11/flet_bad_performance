@@ -1,21 +1,9 @@
 import flet as ft
 from models.user import user
 
-# Auto green characters = good, red = bad
-# Checkbox labeled 'reorder_workspaces' that triggers the reorder event
-
-# re-order the list of workspaces in the rail, show and hide them
-'''
-# Inside of workspaces rail to make reorderable or not,
-# But will move here
-# from hud.workspaces.rail import make_reorderable
-ft.TextButton( 
-    text="Reorder", 
-    on_click=make_reorderable,
-),
-'''
-# Snackbar alerts?
-
+# 
+# OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS
+#
 
 class Settings(ft.Container):
     def __init__(self, page: ft.Page):
