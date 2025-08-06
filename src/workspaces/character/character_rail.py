@@ -225,18 +225,13 @@ def create_character(tag, page: ft.Page):
 
             # Set the appropriate tag based on the category
             if tag == "main":
-                new_character.tags['main_character'] = True
-                new_character.tags['side_character'] = False
-                new_character.tags['background_character'] = False
+                new_character.character_data["Role"] = "Main"
             elif tag == "side":
-                new_character.tags['main_character'] = False
-                new_character.tags['side_character'] = True
-                new_character.tags['background_character'] = False
+                new_character.character_data["Role"] = "Side"
+
             elif tag == "background":
-                new_character.tags['main_character'] = False
-                new_character.tags['side_character'] = False
-                new_character.tags['background_character'] = True
-            
+                new_character.character_data["Role"] = "Background"
+
             # Add our object (in this case character) to the story.
             # This story function handles pinning it and adding it to any lists
             story.add_object_to_story(new_character)
@@ -313,11 +308,8 @@ def make_main_character(e, page: ft.Page):
         print("src_id not found in event data")
         
     # Change our character tags to reflect its new category    
-    if hasattr(object, 'tags'):
-        object.tags['main_character'] = True
-        object.tags['side_character'] = False
-        object.tags['background_character'] = False
-        print(object.tags)
+    if hasattr(object, 'character_data'):
+        object.character_data["Role"] = "Main"
     else:
         print("Object does not have tags attribute, cannot change character type")
 
@@ -338,11 +330,8 @@ def make_side_character(e, page: ft.Page):
     else:
         print("src_id not found in event data")
         
-    if hasattr(object, 'tags'):
-        object.tags['main_character'] = False
-        object.tags['side_character'] = True
-        object.tags['background_character'] = False
-        print(object.tags)
+    if hasattr(object, 'character_data'):
+        object.character_data["Role"] = "Side"
     else:
         print("Object does not have tags attribute, cannot change character type")
     reload_character_rail(page)
@@ -362,11 +351,8 @@ def make_background_character(e, page: ft.Page):
     else:
         print("src_id not found in event data")
         
-    if hasattr(object, 'tags'):
-        object.tags['main_character'] = False
-        object.tags['side_character'] = False
-        object.tags['background_character'] = True
-        print(object.tags)
+    if hasattr(object, 'character_data'):
+        object.character_data["Role"] = "Background"
     else:
         print("Object does not have tags attribute, cannot change character type")
     reload_character_rail(page)
@@ -509,11 +495,11 @@ def reload_character_rail(page: ft.Page):
         
 
         # Still in for loop, add our character to category based on its tag
-        if character.tags['main_character'] == True:
+        if character.character_data["Role"] == "Main":
             main_characters.controls.append(new_char)
-        elif character.tags['side_character'] == True:
+        elif character.character_data["Role"] == "Side":
             side_characters.controls.append(new_char)
-        elif character.tags['background_character'] == True:
+        elif character.character_data["Role"] == "Background":
             background_characters.controls.append(new_char)
 
     # Add our 'create character' button at bottom of each category

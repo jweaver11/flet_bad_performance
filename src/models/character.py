@@ -14,19 +14,6 @@ class Character(ft.Container):
 
         self.pin_location = "left"  # Start in main pin location
 
-        self.tags = {   # adjectives about the character for easier identification
-            'main_character': True,      
-            'side_character' : True,     
-            'background_character': True,     
-            'good' : True,
-            'evil' : False,
-            'neutral' : False,
-            #man : bool
-            #woman : bool
-            #alive : 
-            'color': True,
-        }
-
         # These 3 outside of data so they can render differently
         self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col={'xs': 12, 'sm': 12, 'md': 3})
@@ -39,7 +26,8 @@ class Character(ft.Container):
         # Data about the character that the user will manipulate
         # Can't call this 'data' since containers already have that property
         self.character_data = {
-            'Morality': "",     # Radio selection of good, evil, neutral, or none selected is N/A
+            'Role': "Main",
+            'Morality': "",     # Dropdown selection of good, evil, neutral, and n/a
             'Sex': "male",      # Radio with custom write in option
             'Age': "0",   # Text field
             'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
@@ -64,6 +52,7 @@ class Character(ft.Container):
             'Personality': "",  # expandable ft.TextField
             'Backstory': "",    # expandable ft.TextField
             'Abilities': "",    # Some sort of list
+            'Dead': [True, "when they died"],
             'Notes' : "",   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
 
@@ -193,6 +182,8 @@ class Character(ft.Container):
                                 self.icon, 
                                 ft.Dropdown(
                                     label="Morality",
+                                    color=self.name_color,
+                                    value=self.character_data['Morality'],
                                     options=self.get_morality_options(),
                                     on_change=self.morality_change,
                                 ),
