@@ -26,7 +26,7 @@ class Character(ft.Container):
         # Our data is stored as normal json, or as flet controls as well, and the values are stored in the parameter called "data" within each control
         # Example: print(self.character_data['Sex'].data) -> Male
         self.character_data = {
-            'Role': "Main",     # Character is either main, side, or bg.     
+            'Role': "Main",     # Character is either main, side, or bg. Not its own control because it does not show up on screen    
             'Morality': ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                 label="Morality",
                 padding=ft.padding.all(0),
@@ -37,10 +37,11 @@ class Character(ft.Container):
                     ft.DropdownOption(text="Evil"),
                     ft.DropdownOption(text="Neutral"),
                     ft.DropdownOption(text="N/A"),
+                    ft.DropdownOption(text="Deselect"),
                 ],
                 on_change=self.morality_change,
             ),
-            'Sex': ft.Dropdown(      
+            'Sex': ft.Dropdown(      # Sex of each character
                 label="Sex",
                 padding=ft.padding.all(0),
                 color=self.name_color,
@@ -48,6 +49,7 @@ class Character(ft.Container):
                 options=[
                     ft.DropdownOption(text="Male"),
                     ft.DropdownOption(text="Female"),
+                    ft.DropdownOption(text="Deselect"),
                 ],
                 on_change=self.sex_submit,
             ),
@@ -78,21 +80,6 @@ class Character(ft.Container):
             'Notes' : "",   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
 
-        # Icon button that shows the custom textfield when clicked
-        #self.add_sex_icon = ft.IconButton(icon=ft.Icons.ADD_ROUNDED, on_click=self.show_custom_sex_textfield)
-        #self.add_sex_icon = ft.IconButton(icon=ft.Icons.ADD_ROUNDED, on_click=self.show_custom_sex_textfield)
-        # Textfield so user can input custom sex's
-        #self.custom_sex_textfield = ft.TextField(label="Custom", width=100, visible=True, on_submit=self.submit_custom_sex)
-        
-        #self.custom_sex_textfield = ft.TextField(label="Custom", width=100, visible=True, on_submit=self.submit_custom_sex)
-
-        #self.sex_options_dropdown = ft.Dropdown(
-            #label="Sex",
-            #value=self.character_data['Sex'],
-            #on_change=self.sex_change,
-           # on_blur=self.sex_change,    # Saves custom write ins
-            #options=user.active_story.sex_options,
-        #)
 
         # Make a markdown as content of container
         # Gives us our initial widget as a container
@@ -117,41 +104,45 @@ class Character(ft.Container):
     # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
     def morality_change(self, e):
         e.control.data = e.control.value
-        self.check_morality()
-        self.reload_widget()
+    
+        # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
+        def check_morality():
+            # If we have the setting turned on to change char name colors, change them
+            if user.settings.change_name_colors.value == True:
+                print("color changing is true, we running the logic")
+                # Check the morality and change color accordingly
+                if self.character_data['Morality'].data == "Good":
+                    self.name_color = ft.Colors.GREEN_200
+                elif self.character_data['Morality'].data == "Evil":
+                    self.name_color = ft.Colors.RED_200
+                elif self.character_data['Morality'].data == "Neutral":
+                    self.name_color = ft.Colors.GREY_300
+                elif self.character_data['Morality'].data == "N/A":
+                    self.name_color = ft.Colors.GREY_300
+                elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
+                    self.name_color = ft.Colors.GREY_300
+                    self.character_data['Morality'].value = None
+                    self.reload_widget()
+                    
+                # Update our color
+                self.character_data['Morality'].color = self.name_color
+
+            # If setting is turned off for char name colors, make all characters name_color the primary color scheme
+            else:
+                print("Color changing disabled, turning off all their colors")
+                for character in user.active_story.characters:
+                    character.name_color = ft.Colors.PRIMARY
+                # Apply our changes
+                self.p.update()
+                return
+
+            # Reload the rail
+            from workspaces.character.character_rail import reload_character_rail
+            reload_character_rail(self.p)
+
+        check_morality()
 
         self.p.update()
-    
-    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
-    def check_morality(self):
-        # If we have the setting turned on to change char name colors, change them
-        if user.settings.change_name_colors.value == True:
-            print("color changing is true, we running the logic")
-            # Check the morality and change color accordingly
-            if self.character_data['Morality'].data == "Good":
-                self.name_color = ft.Colors.GREEN_200
-            elif self.character_data['Morality'].data == "Evil":
-                self.name_color = ft.Colors.RED_200
-            elif self.character_data['Morality'].data == "Neutral":
-                self.name_color = ft.Colors.GREY_300
-            else:
-                # If none are selected, make it color scheme
-                self.name_color = ft.Colors.PRIMARY
-            # Update our color
-            self.character_data['Morality'].color = self.name_color
-
-        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
-        else:
-            print("Color changing disabled, turning off all their colors")
-            for character in user.active_story.characters:
-                character.name_color = ft.Colors.PRIMARY
-            # Apply our changes
-            self.p.update()
-            return
-
-        # Reload the rail
-        from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.p)
 
     # Called when the textfield for writing in custom sex's is submitted
     # Adds our custom sex to our stories sex_options list
@@ -161,15 +152,19 @@ class Character(ft.Container):
         # Save most of our variables in our data in the flet controls
         e.control.data = e.control.value
 
+        # If deselect is clicked
+        if self.character_data['Sex'].data == "Deselect":
+            self.character_data['Sex'].value = None
+            self.reload_widget()    # When manually resetting value, must reload widget
+        
+        # If deselect is not clicked
+        elif self.character_data['Sex'].data == "Male":
         # Checks that our data saved correctly, and changes color accordingly
-        if self.character_data['Sex'].data == "Male":
             self.character_data['Sex'].color = ft.Colors.BLUE
             
         elif self.character_data['Sex'].data == "Female":
             self.character_data['Sex'].color = ft.Colors.PINK
-           
-        else:
-            self.character_data['Sex'].color = ft.Colors.PRIMARY
+        
         self.p.update()
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
