@@ -17,7 +17,6 @@ from ui.workspace import create_workspace
 def main(page: ft.Page):
 
     # Grab active story, if blank fallback and grab default
-    story = user.active_story  # Get our story object from the user
 
     # if user.settings=empty
         # Create them
@@ -29,7 +28,7 @@ def main(page: ft.Page):
     user.active_story.add_object_to_pin(user.settings)
 
     # Adds our page title and theme
-    title = "StoryBoard -- " + story.title + " -- Saved status"
+    title = "StoryBoard -- " + user.active_story.title + " -- Saved status"
 
     # Sets our theme modes, but we start dark
     # If theme mode un-set, set dark...
@@ -51,7 +50,7 @@ def main(page: ft.Page):
     # Just create it each time
     active_rail = create_active_rail(page)  # Render whichever rail is active
 
-    user.workspace = create_workspace(page) # render our workspace containing our widgets
+    user.workspace = create_workspace(page)# render our workspace containing our widgets
 
     # Save our 2 rails, dividers, and our workspace container in a row
     row = ft.Row(

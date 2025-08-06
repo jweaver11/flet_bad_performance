@@ -14,10 +14,11 @@ my_file_path = os.path.join(app_data_path, "characters.json")
 
 class Story:
     # Constructor for when new story is created
-    def __init__(self, title):
+    def __init__(self, title: str):
        
        # Gives our story a title when its created
         self.title=title
+       
 
         # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
         self.top_pin = ft.Row(spacing=6, height=0, controls=[],)
@@ -51,6 +52,26 @@ class Story:
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
+
+        # Since users can add sex options, we save it per story
+        self.sex_options = [
+            ft.DropdownOption(key="Male"),
+            ft.DropdownOption(key="Female"),
+        ]
+        
+
+    # Called from within a character when they click the x to the right of a custom written sex
+    def delete_sex_option(self, value):
+        print("del ran")
+        print(self.sex_options)
+        for option in self.sex_options:
+            if option.text == value:
+                print("removed: " , value)
+                self.sex_options.remove(option)
+                print(self.sex_options)
+        
+
+                    
 
     # Add our created object to story. This will add it to any lists it should be in, pin location, etc.
     # All our story objects are extended flet containers, and require a title, pin location, tag,...

@@ -61,7 +61,7 @@ class Settings(ft.Container):
 
         # Dropdown so user can change their color scheme
         self.color_scheme_dropdown = ft.Dropdown(
-            editable=True,
+            #editable=True,
             label="Color",
             options=get_color_scheme_options(),
             on_change=change_color_scheme_picked,

@@ -2,7 +2,7 @@ import flet as ft
 from models.user import user
 from handlers.render_widgets import show_pin_drag_targets, render_widgets
 
-story = user.active_story  # Get our story object from the user
+#story = user.active_story  # Get our story object from the user
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
@@ -12,12 +12,10 @@ class Character(ft.Container):
         self.p = page   # Grab our page correctly, as sometimes the container doesn't load it correctly
         # with all the UI changes that happen
 
-        self.pin_location = "left"  # Start in main pin location
+        self.pin_location = "left"  # Start in left pin location
 
-        # These 3 outside of data so they can render differently
-        self.image = "" # Use AI to gen based off characteristics, or mini icon generator, or upload img
+        self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col={'xs': 12, 'sm': 12, 'md': 3})
-        
 
         self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
@@ -26,7 +24,7 @@ class Character(ft.Container):
         # Data about the character that the user will manipulate
         # Can't call this 'data' since containers already have that property
         self.character_data = {
-            'Role': "Main",
+            'Role': "Main",     # Character is either main, side, or bg. 
             'Morality': "",     # Dropdown selection of good, evil, neutral, and n/a
             'Sex': "male",      # Radio with custom write in option
             'Age': "0",   # Text field
@@ -56,22 +54,36 @@ class Character(ft.Container):
             'Notes' : "",   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
 
+        # Icon button that shows the custom textfield when clicked
+        self.add_sex_icon = ft.IconButton(icon=ft.Icons.ADD_ROUNDED, on_click=self.show_custom_sex_textfield)
+        # Textfield so user can input custom sex's
+        self.custom_sex_textfield = ft.TextField(label="Custom", width=100, visible=False, on_submit=self.submit_custom_sex)
+
+        self.sex_options_dropdown = ft.Dropdown(
+            label="Sex",
+            value=self.character_data['Sex'],
+            on_change=self.sex_change,
+            on_blur=self.sex_change,    # Saves custom write ins
+            options=user.active_story.sex_options,
+        )
+
         # Make a markdown as content of container
         # Gives us our initial widget as a container
         super().__init__(
             expand=True, 
             padding=6,
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             #bgcolor = user.settings.workspace_bgcolor,
             content=None,
         )
         self.reload_widget() # Builds our widgets content when object is created
-           
+
+    
  
     # Makes our widget invisible
     def hide_widget(self):
         self.visible = False
-        story.master_stack.update()
+        user.active_story.master_stack.update()
         render_widgets(self.p)
 
     # Pull our options for our morality dropdown
@@ -112,7 +124,7 @@ class Character(ft.Container):
                 self.name_color = ft.Colors.PRIMARY
         # If setting is turned off for char name colors, make all characters name_color the primary color scheme
         else:
-            for char in story.characters:
+            for char in user.active_story.characters:
                 char.name_color = ft.Colors.PRIMARY
             # Apply our changes
             self.p.update()
@@ -121,6 +133,61 @@ class Character(ft.Container):
         # Reload the rail
         from workspaces.character.character_rail import reload_character_rail
         reload_character_rail(self.p)
+
+
+    # Called when 'plus' button next to Sex dropdown is clicked
+    # Shows our textfield on the page so we can input custom sex's
+    def show_custom_sex_textfield(self, e):
+        print("show custom sex textfield pressed")
+        self.custom_sex_textfield.visible = True
+        self.custom_sex_textfield.focus()
+        self.custom_sex_textfield.update()
+        self.p.update()
+
+    def hide_custom_sex_textfield(self, e):
+        self.p.update()
+
+    # Called when the textfield for writing in custom sex's is submitted
+    # Adds our custom sex to our stories sex_options list
+    def submit_custom_sex(self, e):
+        value = e.control.value.capitalize()
+        user.active_story.sex_options.append(
+            ft.DropdownOption(
+                text=value,
+                content=ft.Row([
+                    ft.Text(value), 
+                    ft.Container(expand=True), 
+                    ft.IconButton(
+                        icon=ft.Icons.CLOSE_ROUNDED, 
+                        scale=.7, 
+                        icon_color=ft.Colors.PRIMARY,
+                        on_click=lambda e, val=value: self.del_sex_option(val)
+                    )
+                    ])
+            )
+        )
+        e.control.value = None
+        e.control.label = "Custom"
+        e.control.visible = False
+        #e.control.update()
+        self.sex_options_dropdown.update()
+        self.p.update()
+
+    # Deletes a sex option when button to the right of the option is pressed
+    def del_sex_option(self, value):
+        user.active_story.delete_sex_option(value)
+        
+        self.sex_options_dropdown.options = user.active_story.sex_options
+        self.sex_options_dropdown.update()
+        self.p.update()
+
+    # Called when user selects a sex from the dropdown
+    def sex_change(self, e):
+        self.character_data['Sex'] = e.control.value
+        print(self.character_data['Sex'])
+        self.sex_options_dropdown.update()
+        #self.reload_widget()
+        self.p.update()
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
@@ -174,7 +241,6 @@ class Character(ft.Container):
                     scroll=ft.ScrollMode.AUTO,
                     expand=True,
                     controls=[             
-
                         ft.Row(
                             wrap=True, 
                             expand=True,
@@ -182,30 +248,23 @@ class Character(ft.Container):
                                 self.icon, 
                                 ft.Dropdown(
                                     label="Morality",
+                                    padding=ft.padding.all(0),
                                     color=self.name_color,
                                     value=self.character_data['Morality'],
                                     options=self.get_morality_options(),
                                     on_change=self.morality_change,
                                 ),
-                               
                             ]
                         ),
-
-                        ft.RadioGroup(
-                                        content=ft.Row(
-                                            expand=True,
-                                            controls=[
-                                                ft.Radio(label="Man", value="man", toggleable=True),
-                                                ft.Radio(label="Woman", value="woman", toggleable=True),
-                                                ft.Radio(label="Other", value="other", toggleable=True),    # make writein
-                                        ])
-                                    ),
-
-                        ft.TextButton(text="good", width=100, on_click=lambda e: self.make_character_good()),
-                        ft.TextButton(text="evil", width=100, on_click=lambda e: self.make_character_evil()),
-
-                        ft.TextButton(text="neutral", width=100, on_click=lambda e: self.make_character_neutral()),
-                        ft.TextButton(text="N/A", width=100, on_click=lambda e: self.make_character_na()),
+                        ft.Row(
+                            expand=True,
+                            spacing=0,
+                            controls=[
+                                self.sex_options_dropdown,
+                                self.custom_sex_textfield,
+                                self.add_sex_icon,
+                            ]
+                        ),
 
                     
                     ]

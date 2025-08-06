@@ -41,8 +41,4 @@ class User:
             return False
         return self.username == other.username and self.email == other.email
     
-
-
-# load user. If empty, create new one
 user = User("exp_user", "exp_email")
-
