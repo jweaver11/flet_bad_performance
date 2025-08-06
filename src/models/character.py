@@ -23,10 +23,20 @@ class Character(ft.Container):
 
         # Data about the character that the user will manipulate
         # Can't call this 'data' since containers already have that property
+        # Our data is stored as flet controls as well, and the values are stored in the parameter called "data" within each control
+        # Example: print(self.character_data['Sex'].data) -> Male
         self.character_data = {
             'Role': "Main",     # Character is either main, side, or bg. 
             'Morality': "",     # Dropdown selection of good, evil, neutral, and n/a
-            'Sex': "male",      # Radio with custom write in option
+            'Sex': ft.Dropdown(      # Dropdown of male and female, with button next to it to write in customs
+                label="Sex",
+                data="", 
+                options=[
+                    ft.DropdownOption(key="Male"),
+                    ft.DropdownOption(key="Female"),
+                ],
+                on_change=self.sex_submit
+            ),
             'Age': "0",   # Text field
             'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
                 'Father': "",   # Textfield with selectable options
@@ -55,17 +65,20 @@ class Character(ft.Container):
         }
 
         # Icon button that shows the custom textfield when clicked
-        self.add_sex_icon = ft.IconButton(icon=ft.Icons.ADD_ROUNDED, on_click=self.show_custom_sex_textfield)
+        #self.add_sex_icon = ft.IconButton(icon=ft.Icons.ADD_ROUNDED, on_click=self.show_custom_sex_textfield)
+        #self.add_sex_icon = ft.IconButton(icon=ft.Icons.ADD_ROUNDED, on_click=self.show_custom_sex_textfield)
         # Textfield so user can input custom sex's
-        self.custom_sex_textfield = ft.TextField(label="Custom", width=100, visible=False, on_submit=self.submit_custom_sex)
+        #self.custom_sex_textfield = ft.TextField(label="Custom", width=100, visible=True, on_submit=self.submit_custom_sex)
+        
+        #self.custom_sex_textfield = ft.TextField(label="Custom", width=100, visible=True, on_submit=self.submit_custom_sex)
 
-        self.sex_options_dropdown = ft.Dropdown(
-            label="Sex",
-            value=self.character_data['Sex'],
-            on_change=self.sex_change,
-            on_blur=self.sex_change,    # Saves custom write ins
-            options=user.active_story.sex_options,
-        )
+        #self.sex_options_dropdown = ft.Dropdown(
+            #label="Sex",
+            #value=self.character_data['Sex'],
+            #on_change=self.sex_change,
+           # on_blur=self.sex_change,    # Saves custom write ins
+            #options=user.active_story.sex_options,
+        #)
 
         # Make a markdown as content of container
         # Gives us our initial widget as a container
@@ -134,59 +147,26 @@ class Character(ft.Container):
         from workspaces.character.character_rail import reload_character_rail
         reload_character_rail(self.p)
 
-
-    # Called when 'plus' button next to Sex dropdown is clicked
-    # Shows our textfield on the page so we can input custom sex's
-    def show_custom_sex_textfield(self, e):
-        print("show custom sex textfield pressed")
-        self.custom_sex_textfield.visible = True
-        self.custom_sex_textfield.focus()
-        self.custom_sex_textfield.update()
-        self.p.update()
-
-    def hide_custom_sex_textfield(self, e):
-        self.p.update()
-
     # Called when the textfield for writing in custom sex's is submitted
     # Adds our custom sex to our stories sex_options list
-    def submit_custom_sex(self, e):
-        value = e.control.value.capitalize()
-        user.active_story.sex_options.append(
-            ft.DropdownOption(
-                text=value,
-                content=ft.Row([
-                    ft.Text(value), 
-                    ft.Container(expand=True), 
-                    ft.IconButton(
-                        icon=ft.Icons.CLOSE_ROUNDED, 
-                        scale=.7, 
-                        icon_color=ft.Colors.PRIMARY,
-                        on_click=lambda e, val=value: self.del_sex_option(val)
-                    )
-                    ])
-            )
-        )
-        e.control.value = None
-        e.control.label = "Custom"
-        e.control.visible = False
-        #e.control.update()
-        self.sex_options_dropdown.update()
-        self.p.update()
+    def sex_submit(self, e):
+        print(e.control.value)
 
-    # Deletes a sex option when button to the right of the option is pressed
-    def del_sex_option(self, value):
-        user.active_story.delete_sex_option(value)
+        value = e.control.value
+
+        # Save most of our variables in our data in the flet controls
+        self.character_data['Sex'].data = e.control.value
+
+        print("Data: ", self.character_data['Sex'].data)
         
-        self.sex_options_dropdown.options = user.active_story.sex_options
-        self.sex_options_dropdown.update()
-        self.p.update()
-
-    # Called when user selects a sex from the dropdown
-    def sex_change(self, e):
-        self.character_data['Sex'] = e.control.value
-        print(self.character_data['Sex'])
-        self.sex_options_dropdown.update()
-        #self.reload_widget()
+        if value == "Male" or value == "Man" or value == "Boy" or value == "Guy":
+            e.control.text_style = ft.TextStyle(color=ft.Colors.BLUE_ACCENT)
+        elif value == "Woman" or value == "Female" or value == "Girl":
+            e.control.text_style = ft.TextStyle(color=ft.Colors.PINK)
+        else:
+            e.control.text_style = ft.TextStyle(color=ft.Colors.PRIMARY)
+        
+        e.control.update()
         self.p.update()
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
@@ -254,15 +234,16 @@ class Character(ft.Container):
                                     options=self.get_morality_options(),
                                     on_change=self.morality_change,
                                 ),
+                                self.character_data['Sex'],
                             ]
                         ),
                         ft.Row(
                             expand=True,
                             spacing=0,
                             controls=[
-                                self.sex_options_dropdown,
-                                self.custom_sex_textfield,
-                                self.add_sex_icon,
+                                #self.sex_options_dropdown,
+                                
+                                #self.add_sex_icon,
                             ]
                         ),
 
