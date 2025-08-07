@@ -27,7 +27,7 @@ class Character(ft.Container):
         # Objects are passed through their own draggables to move pins around.
         # Example: print(self.character_data['Sex'].data) -> Male
         self.character_data = {
-            'Role': "Main",     # Character is either main, side, or bg. Not its own control because it does not show up on screen    
+            'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                 label="Morality",
                 padding=ft.padding.all(0),
@@ -60,23 +60,62 @@ class Character(ft.Container):
                 adaptive=True,      # Changes textfield depending on device (apple vs non-apple)
                 capitalization=ft.TextCapitalization.SENTENCES, 
                 width=80,
-                on_submit=self.age_change,
-                on_blur=self.age_change,        # Ensures our value saves even if enter is not pressed
+                on_blur=self.age_change,        # Runs on either submission or click off
                 #on_change=self.age_change      # This would run every keystroke
             ),
-            'Race': ft.TextField(
-                label="Race",
-                adaptive=True,
-                capitalization=ft.TextCapitalization.SENTENCES, 
-                width=80,
-                on_submit=self.race_change,
-                on_blur=self.race_change,
+            'Physical Description': ft.Row(
+                wrap=True,
+                data={
+                    'Skin Color': "",
+                    'Hair Color': "",   # Textfield
+                    'Eye Color': "",    # Textfield
+                    'Height': "",   # TextField
+                    'Weight': "",   # TextField
+                    'Build': "",    # Expandable textfield
+                    'Distinguishing Features': "",  # some sort of flet list
+                },
+                controls=[
+
+                ],
             ),
-            'Skin Color': "",
-            'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
-                'Father': "",   # Textfield with selectable options
-                'Mother': ""    # Textfield with selectable options
-            },   
+            'Physical Description': {
+                'Race': ft.TextField(
+                    label="Race",
+                    adaptive=True,
+                    capitalization=ft.TextCapitalization.SENTENCES, 
+                    width=80,
+                    on_blur=self.race_change,   
+                ),
+                
+            },
+            'Family': ft.ExpansionTile(     # Expandable
+                title=ft.Text("Family"),
+                width=200,
+                data={     
+                    'Love Interest': Character or str,
+                    'Father': "",   # Textfield with selectable options
+                    'Mother': "",    
+                    'Siblings': "",
+                    'Children': "",
+                    'Ancestors': "",
+                },  
+                controls=[
+                    ft.TextField(
+                        label="Love Interest",
+                        adaptive=True,
+                        capitalization=ft.TextCapitalization.SENTENCES, 
+                        width=320,
+                        on_blur=self.race_change,   
+                    ),
+                    ft.TextField(
+                        label="Love Interest",
+                        adaptive=True,
+                        capitalization=ft.TextCapitalization.SENTENCES, 
+                        width=120,
+                        on_blur=self.race_change,   
+                    ),
+                ]
+            ),
             'Occupation': "",   # Textfield
             'Goals': "",    # Textfield list
             'Origin': {     # Category on the left
@@ -84,20 +123,12 @@ class Character(ft.Container):
                 'Hometown': "",     # Textfield and a select from location radio picker
                 'Education': "",        # Textfield
             },
-            'Physical Description': {
-                'Hair Color': "",   # Textfield
-                'Eye Color': "",    # Textfield
-                'Height': "",   # TextField
-                'Weight': "",   # TextField
-                'Build': "",    # Expandable textfield
-                'Distinguishing Features': "",  # some sort of flet list
-            },
+            
             'Personality': "",  # expandable ft.TextField
             'Backstory': "",    # expandable ft.TextField
             'Abilities': "",    # Some sort of list
-            'Dead': [True, "when they died"],
-            'Notes' : "",   # Category that says Notes on the left, then lists the expandable ft.TextField
-
+            'Dead': [bool, "when they died"],
+            'Notes' : [],   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
 
 
@@ -196,9 +227,9 @@ class Character(ft.Container):
 
     # Called when the race is changed. Changes the race data
     def race_change(self, e):
-        print("Age change ran")
-        self.character_data['Race'].data = e.control.value
-        print(self.character_data['Race'].data)
+        print("Race change ran")
+        self.character_data['Physical Description']['Race'].data = e.control.value
+        print(self.character_data['Physical Description']['Race'].data)
         
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
@@ -245,7 +276,7 @@ class Character(ft.Container):
                     scroll=ft.ScrollMode.AUTO,
                     expand=True,
                     controls=[             
-                        ft.Row(
+                        ft.Row(     # Top row that shows icon, morality, sex, age
                             wrap=True, 
                             expand=True,
                             controls=[
@@ -253,9 +284,23 @@ class Character(ft.Container):
                                 self.character_data['Morality'],
                                 self.character_data['Sex'],
                                 self.character_data['Age'],
-                                self.character_data['Race'],
+                        
                             ]
                         ),
+                        # Next row which shows the physical desciption    
+                        self.character_data['Physical Description'],    # Is already a row since it expands
+
+                        ft.Row(     # Next row that shows family, which can expand right to left
+                            wrap=True,
+                            expand=True,
+
+                            controls=[
+                                self.character_data['Family'],
+                            ]
+                        ),
+                        
+                        
+                        
                     ]
                 )
             )
