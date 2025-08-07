@@ -11,6 +11,7 @@ from ui.menu_bar import create_menu_bar
 from ui.workspaces_rail import All_Workspaces_Rail
 from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
+from handlers.render_widgets import remove_drag_targets
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
@@ -74,12 +75,18 @@ def main(page: ft.Page):
         expand=True, 
         controls=[
             menubar, 
-            #ft.Divider(color=ft.Colors.PRIMARY, height=2, thickness=2, opacity=0.2),
             row
         ]
     )
 
-    page.add(col)
+    # Only exists to fix our workspace area on a failed drag. clicking fixes it
+    gd = ft.GestureDetector(
+        expand=True,
+        on_tap_up=lambda e: remove_drag_targets(),
+        content=col
+    )
+
+    page.add(gd)
 
 
 ft.app(main)
