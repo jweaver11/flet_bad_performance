@@ -107,7 +107,7 @@ class Settings(ft.Container):
             padding=6,
             visible=False,
             border = ft.border.all(2, ft.Colors.GREY_800),
-            border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             #bgcolor = self.widget_bgcolor,
             content=ft.Column([
                 ft.TextButton(

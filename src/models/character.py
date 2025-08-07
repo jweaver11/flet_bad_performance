@@ -54,7 +54,15 @@ class Character(ft.Container):
                 ],
                 on_change=self.sex_submit,
             ),
-            'Age': "0",   # Text field
+            #'Age': "0",   # Text field
+            'Age': ft.TextField(
+                label="Age",
+                adaptive=True,      # Changes textfield depending on device (apple vs non-apple)
+                capitalization=ft.TextCapitalization.SENTENCES, 
+                width=80,
+                on_submit=self.age_change,
+                on_blur=self.age_change,
+            ),
             'Race': "",
             'Skin Color': "",
             'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
@@ -108,45 +116,46 @@ class Character(ft.Container):
     # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
     def morality_change(self, e):
         e.control.data = e.control.value
-    
-        # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
-        def check_morality():
-            # If we have the setting turned on to change char name colors, change them
-            if user.settings.change_name_colors.value == True:
-                print("color changing is true, we running the logic")
-                # Check the morality and change color accordingly
-                if self.character_data['Morality'].data == "Good":
-                    self.name_color = ft.Colors.GREEN_200
-                elif self.character_data['Morality'].data == "Evil":
-                    self.name_color = ft.Colors.RED_200
-                elif self.character_data['Morality'].data == "Neutral":
-                    self.name_color = ft.Colors.GREY_300
-                elif self.character_data['Morality'].data == "N/A":
-                    self.name_color = ft.Colors.GREY_300
-                elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
-                    self.name_color = ft.Colors.PRIMARY
-                    self.character_data['Morality'].value = None
-                    
-                # Update our color
-                self.character_data['Morality'].color = self.name_color
 
-            # If setting is turned off for char name colors, make all characters name_color the primary color scheme
-            else:
-                print("Color changing disabled, turning off all their colors")
-                for character in user.active_story.characters:
-                    character.name_color = ft.Colors.PRIMARY
-                # Apply our changes
-                self.p.update()
-                return
-
-            # Reload the rail
-            from workspaces.character.character_rail import reload_character_rail
-            reload_character_rail(self.p)
-
-        check_morality()
+        self.check_morality()
         self.reload_widget()    # Apply our changes to the name at top of widget
 
         self.p.update()
+    
+    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
+    def check_morality(self):
+        # If we have the setting turned on to change char name colors, change them
+        if user.settings.change_name_colors.value == True:
+            print("color changing is true, we running the logic")
+            # Check the morality and change color accordingly
+            if self.character_data['Morality'].data == "Good":
+                self.name_color = ft.Colors.GREEN_200
+            elif self.character_data['Morality'].data == "Evil":
+                self.name_color = ft.Colors.RED_200
+            elif self.character_data['Morality'].data == "Neutral":
+                self.name_color = ft.Colors.GREY_300
+            elif self.character_data['Morality'].data == "N/A":
+                self.name_color = ft.Colors.GREY_300
+            elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
+                self.name_color = ft.Colors.PRIMARY
+                self.character_data['Morality'].value = None
+                
+            # Update our color
+            self.character_data['Morality'].color = self.name_color
+
+        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
+        else:
+            print("Color changing disabled, turning off all their colors")
+            for character in user.active_story.characters:
+                character.name_color = ft.Colors.PRIMARY
+            # Apply our changes
+            self.p.update()
+            return
+
+        # Reload the rail
+        from workspaces.character.character_rail import reload_character_rail
+        reload_character_rail(self.p)
+
 
     # Called when the textfield for writing in custom sex's is submitted
     # Adds our custom sex to our stories sex_options list
@@ -170,6 +179,15 @@ class Character(ft.Container):
             self.character_data['Sex'].color = ft.Colors.PINK
         
         self.p.update()
+
+    # Called when the age is changed. Changes the age value
+    def age_change(self, e):
+        print("Age change ran")
+        
+       
+        self.character_data['Age'].data = e.control.value
+        print(self.character_data['Age'].data)
+        
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
@@ -211,14 +229,6 @@ class Character(ft.Container):
                 expand=True,
                
                 content=ft.Column(
-                    
-                    #col={"xs": 12, "md": 6, "lg": 3, "xl": 1, "xxl": 1},  # The 'col' property changes how many controls...
-                    # will fit in a row based on each screen size. The "xs", "md", etc measure the parent container size in width
-                    # If a col=12, it will be the only control on that row,
-                    # If col=1, there will be 12 controls on that row
-                    # If col=6, it will take up half of that row,
-                    # If col=9 would take up 3/4 the row
-                    # If col=3 it would take up 1/4 that row
 
                     scroll=ft.ScrollMode.AUTO,
                     expand=True,
@@ -230,9 +240,9 @@ class Character(ft.Container):
                                 self.icon, 
                                 self.character_data['Morality'],
                                 self.character_data['Sex'],
+                                self.character_data['Age'],
                             ]
                         ),
-                    
                     ]
                 )
             )
