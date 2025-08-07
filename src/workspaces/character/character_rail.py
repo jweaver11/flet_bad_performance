@@ -24,13 +24,17 @@ def show_character_widget(character, page: ft.Page):
 # Shows our two buttons rename and delete
 def show_options(e):
     e.control.content.controls[2].opacity = 1
+    e.control.content.controls[3].opacity = 1
     e.control.content.controls[2].update()
+    e.control.content.controls[3].update()
 
 # Called when mouse leaves a character on the rail
 # Hides our two buttons rename and delete
 def hide_options(e):
     e.control.content.controls[2].opacity = 0
+    e.control.content.controls[3].opacity = 0
     e.control.content.controls[2].update()
+    e.control.content.controls[3].update()
 
 # Called when user clicks rename button on the character on the rail
 # Opens an alert dialog to change the characters name
@@ -92,6 +96,17 @@ def rename_character(character, page: ft.Page):
 
     page.overlay.append(dlg)
     dlg.open = True
+    page.update()
+
+
+def change_char_color(character: Character, color, page: ft.Page):
+    print(character.title)
+    print(color)
+
+    character.color = color
+
+    reload_character_rail(page)
+    character.reload_widget()
     page.update()
 
 # Called when the 'color' button next to character on the rail is clicked
@@ -447,6 +462,89 @@ def reload_character_rail(page: ft.Page):
                                 ),
                                 # Space between name of character in the rail and menu button on right
                                 ft.Container(expand=True),
+
+                                # Color pallet picker to change the characters color of outline of widget
+                                ft.PopupMenuButton(
+                                    opacity=0,
+                                    scale=.9,
+                                    tooltip="",
+                                    icon=ft.Icons.COLOR_LENS,
+                                    icon_color=character.name_color, 
+                                    items=[
+                                        #on_click=lambda e, char=character: change_character_color(char, page),
+                                        ft.PopupMenuItem(
+                                            text="Red",
+                                            content=ft.Text("Red", color=ft.Colors.RED), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.RED, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Pink",
+                                            content=ft.Text("Pink", color=ft.Colors.PINK), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.PINK, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Purple",
+                                            content=ft.Text("Purple", color=ft.Colors.PURPLE), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.PURPLE, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Blue",
+                                            content=ft.Text("Blue", color=ft.Colors.BLUE), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.BLUE, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Cyan",
+                                            content=ft.Text("Cyan", color=ft.Colors.CYAN), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.CYAN, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Teal",
+                                            content=ft.Text("Teal", color=ft.Colors.TEAL), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.TEAL, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Green",
+                                            content=ft.Text("Green", color=ft.Colors.GREEN), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.GREEN, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Lime",
+                                            content=ft.Text("Lime", color=ft.Colors.LIME), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.LIME, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Yellow",
+                                            content=ft.Text("Yellow", color=ft.Colors.YELLOW), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.YELLOW, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Orange",
+                                            content=ft.Text("Orange", color=ft.Colors.ORANGE), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.ORANGE, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Brown",
+                                            content=ft.Text("Brown", color=ft.Colors.BROWN), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.BROWN, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Light Grey",
+                                            content=ft.Text("Light Grey", color=ft.Colors.GREY_300), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.GREY_300, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Grey",
+                                            content=ft.Text("Grey", color=ft.Colors.GREY_300), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.GREY_800, page)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="None",
+                                            content=ft.Text("None", color=ft.Colors.GREY_300), 
+                                            on_click=lambda e, char=character: change_char_color(char, ft.Colors.TRANSPARENT, page)
+                                        ),
+                                    
+                                    ]
+                                ),
                                 # Menu button for options to edit character in the rail
                                 ft.PopupMenuButton(
                                     opacity=0,
@@ -460,14 +558,8 @@ def reload_character_rail(page: ft.Page):
                                             text="Rename",
                                             # Needs to save a character reference because of pythons late binding, or this wont work
                                             on_click=lambda e, char=character: rename_character(char, page),
-                                            
                                         ),
-                                        # Button for changing a characters color (background of widget and rail)
-                                        ft.PopupMenuItem(
-                                            icon=ft.Icons.COLOR_LENS,
-                                            text="Color",
-                                            on_click=lambda e, char=character: change_character_color(char, page),
-                                        ),
+                                        
                                         # Button to delete a character
                                         ft.PopupMenuItem(  
                                             icon=ft.Icons.DELETE,
@@ -480,7 +572,7 @@ def reload_character_rail(page: ft.Page):
                                 
                             ],
                         ),
-                        #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click
+                        #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click.. Causes other buttons to be delayed rn
                         on_hover=show_options,
                         on_exit=hide_options,
                         on_tap_down=lambda e, char=character: show_character_widget(char, page),  # Show our widget if hidden when character clicked

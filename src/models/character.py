@@ -66,31 +66,28 @@ class Character(ft.Container):
             'Physical Description': ft.Row(
                 wrap=True,
                 data={
+                    'Race': "",
                     'Skin Color': "",
                     'Hair Color': "",   # Textfield
                     'Eye Color': "",    # Textfield
                     'Height': "",   # TextField
                     'Weight': "",   # TextField
-                    'Build': "",    # Expandable textfield
+                    'Build': "",    # 
                     'Distinguishing Features': "",  # some sort of flet list
                 },
                 controls=[
-
+                    ft.Container(ft.Text("Physical Description"), on_click=self.expand_physical_description),
+                    ft.TextField(
+                        label="Race",
+                        adaptive=True,
+                        capitalization=ft.TextCapitalization.SENTENCES, 
+                        width=80,
+                        on_blur=self.race_change,   
+                    ),
                 ],
             ),
-            'Physical Description': {
-                'Race': ft.TextField(
-                    label="Race",
-                    adaptive=True,
-                    capitalization=ft.TextCapitalization.SENTENCES, 
-                    width=80,
-                    on_blur=self.race_change,   
-                ),
-                
-            },
-            'Family': ft.ExpansionTile(     # Expandable
-                title=ft.Text("Family"),
-                width=200,
+            'Family': ft.Row(     # Expandable
+                wrap=True,
                 data={     
                     'Love Interest': Character or str,
                     'Father': "",   # Textfield with selectable options
@@ -100,6 +97,7 @@ class Character(ft.Container):
                     'Ancestors': "",
                 },  
                 controls=[
+                    ft.Container(ft.TextButton("Family")),
                     ft.TextField(
                         label="Love Interest",
                         adaptive=True,
@@ -228,8 +226,13 @@ class Character(ft.Container):
     # Called when the race is changed. Changes the race data
     def race_change(self, e):
         print("Race change ran")
-        self.character_data['Physical Description']['Race'].data = e.control.value
-        print(self.character_data['Physical Description']['Race'].data)
+        self.character_data['Physical Description'].data['Race'] = e.control.value
+        print(self.character_data['Physical Description'].data['Race'])
+        self.p.update()
+
+    # Expand the tile to show physical descriptions
+    def expand_physical_description(self, e):
+        print("expand physical description ran")
         
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
@@ -270,34 +273,29 @@ class Character(ft.Container):
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
-               
-                content=ft.Column(
+                content=ft.Column(  # List our character data inside a column, use rows to format left to right
 
-                    scroll=ft.ScrollMode.AUTO,
+                    scroll=ft.ScrollMode.AUTO,  # Enable scrolling if it doesnt all fit
                     expand=True,
                     controls=[             
                         ft.Row(     # Top row that shows icon, morality, sex, age
-                            wrap=True, 
+                            wrap=True,  # Enable increasing rows height and putting items that dont fit into columns
+                            # ^^ Keeps formatting nice when expanding and shrinking widget
                             expand=True,
                             controls=[
                                 self.icon, 
                                 self.character_data['Morality'],
                                 self.character_data['Sex'],
                                 self.character_data['Age'],
-                        
                             ]
                         ),
-                        # Next row which shows the physical desciption    
-                        self.character_data['Physical Description'],    # Is already a row since it expands
 
-                        ft.Row(     # Next row that shows family, which can expand right to left
-                            wrap=True,
-                            expand=True,
+                        # Next row which shows the physical desciption. Expands when button clicked
+                        self.character_data['Physical Description'], 
 
-                            controls=[
-                                self.character_data['Family'],
-                            ]
-                        ),
+                        # Next row that shows family, which can expand right to left
+                        self.character_data['Family'],
+                    
                         
                         
                         
