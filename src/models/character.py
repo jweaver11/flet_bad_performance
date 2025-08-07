@@ -7,11 +7,10 @@ from handlers.render_widgets import show_pin_drag_targets, render_widgets
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
-        self.title = name  # Name of character, but all objects have a title for identification
+        # Variables that all widgets will have, so we'll store them outside of data
+        self.title = name  # Name of character, but all objects have a 'title' for identification, so characters do too
         self.tag = "character"  # Tag for logic, mostly for routing it through our story object
-        self.p = page   # Grab our page correctly, as sometimes the container doesn't load it correctly
-        # with all the UI changes that happen
-
+        self.p = page   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
         self.pin_location = "left"  # Start in left pin location
 
         self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
@@ -20,10 +19,12 @@ class Character(ft.Container):
         self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
         
-
         # Data about the character that the user will manipulate
-        # Can't call this 'data' since containers already have that property
-        # Our data is stored as normal json, or as flet controls as well, and the values are stored in the parameter called "data" within each control
+        # Can't call this 'data' since containers already have that property, and generally that data needs to be a string
+        # Our data is stored as normal json...
+        # or as flet controls, which have the values stored in the parameter called "data" within each control
+        # Data inside of a flet control must be a simple data type, usually str, bool, or int. Complex ones are a pain to read, as shown when
+        # Objects are passed through their own draggables to move pins around.
         # Example: print(self.character_data['Sex'].data) -> Male
         self.character_data = {
             'Role': "Main",     # Character is either main, side, or bg. Not its own control because it does not show up on screen    
@@ -143,7 +144,7 @@ class Character(ft.Container):
             reload_character_rail(self.p)
 
         check_morality()
-        self.reload_widget()
+        self.reload_widget()    # Apply our changes to the name at top of widget
 
         self.p.update()
 

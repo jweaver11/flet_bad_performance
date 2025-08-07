@@ -273,7 +273,7 @@ def render_widgets(page: ft.Page):
 
     # The control that holds our divider, which we drag to resize the top pin
     top_pin_resizer = ft.GestureDetector(
-        content=ft.Divider(color=ft.Colors.TRANSPARENT, height=6),
+        content=ft.Divider(color=ft.Colors.TRANSPARENT, height=6, thickness=10),
         on_pan_update=move_top_pin_divider,
         on_hover=show_vertical_cursor,
     )
@@ -301,7 +301,7 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     right_pin_resizer = ft.GestureDetector(
-        content=ft.VerticalDivider(width=6, color=ft.Colors.TRANSPARENT),  # color=ft.Colors.TRANSPARENT
+        content=ft.VerticalDivider(thickness=10, width=6, color=ft.Colors.TRANSPARENT),  # color=ft.Colors.TRANSPARENT
         on_pan_update=move_right_pin_divider,
         on_hover=show_horizontal_cursor,
     )
@@ -314,7 +314,7 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     bottom_pin_resizer = ft.GestureDetector(
-        content=ft.Divider(color=ft.Colors.TRANSPARENT, height=6),
+        content=ft.Divider(color=ft.Colors.TRANSPARENT, height=6, thickness=10),
         on_pan_update=move_bottom_pin_divider,
         on_hover=show_vertical_cursor,
     )
@@ -395,7 +395,6 @@ def render_widgets(page: ft.Page):
         ]),
         formatted_right_pin,    # formatted right pin
     ]
-    #story.widgets.update()
     page.update()
 
 
