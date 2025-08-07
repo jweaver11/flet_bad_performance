@@ -61,9 +61,17 @@ class Character(ft.Container):
                 capitalization=ft.TextCapitalization.SENTENCES, 
                 width=80,
                 on_submit=self.age_change,
-                on_blur=self.age_change,
+                on_blur=self.age_change,        # Ensures our value saves even if enter is not pressed
+                #on_change=self.age_change      # This would run every keystroke
             ),
-            'Race': "",
+            'Race': ft.TextField(
+                label="Race",
+                adaptive=True,
+                capitalization=ft.TextCapitalization.SENTENCES, 
+                width=80,
+                on_submit=self.race_change,
+                on_blur=self.race_change,
+            ),
             'Skin Color': "",
             'Family': {     #'Siblings': [], 'Children': [], 'Spouse': [], 'Ancestors': []
                 'Father': "",   # Textfield with selectable options
@@ -180,13 +188,17 @@ class Character(ft.Container):
         
         self.p.update()
 
-    # Called when the age is changed. Changes the age value
+    # Called when the age is changed. Changes the age data
     def age_change(self, e):
         print("Age change ran")
-        
-       
         self.character_data['Age'].data = e.control.value
         print(self.character_data['Age'].data)
+
+    # Called when the race is changed. Changes the race data
+    def race_change(self, e):
+        print("Age change ran")
+        self.character_data['Race'].data = e.control.value
+        print(self.character_data['Race'].data)
         
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
@@ -241,6 +253,7 @@ class Character(ft.Container):
                                 self.character_data['Morality'],
                                 self.character_data['Sex'],
                                 self.character_data['Age'],
+                                self.character_data['Race'],
                             ]
                         ),
                     ]
