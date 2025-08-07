@@ -134,7 +134,7 @@ class Character(ft.Container):
         # Gives us our initial widget as a container
         super().__init__(
             expand=True, 
-            padding=6,
+            #padding=6,
             #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             #bgcolor = user.settings.workspace_bgcolor,
             content=None,
@@ -240,39 +240,37 @@ class Character(ft.Container):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        self.border = ft.border.all(2, self.color)  # Gives our container a border and adjusts the user selected color to it
+        self.border = ft.border.all(0, ft.Colors.GREY_800)  # Gives our container a border and adjusts the user selected color to it
        
         self.content=ft.Column(spacing=0, controls=[
-            ft.Stack([
-                # Draggable title of character at top center of widget
-                ft.Row(
+        
+            # Draggable title of character at top center of widget
+            ft.Container(
+                border = ft.border.all(2, self.color),
+                content=ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
                     controls=[
                         ft.Draggable(
                             group="widgets",
-                            content=ft.TextButton(content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title)),
+                            content=ft.TextButton(content=ft.Text(weight=ft.FontWeight.BOLD, size=20, color=self.name_color, value=self.title)),
                             data=self,       # Pass our object as the data so we can access it
                             on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
                             # No on_complete method since the drag target will handle that
                             # If an on_cancel method gets added to flet, we add it here to remove the drag targets
-                        )
-                    ]
-                ),
-                # Hide widget eyeball button at top right of widget
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.END,
-                    controls=[
+                        ),
                         ft.IconButton(
                             on_click=lambda e: self.hide_widget(),
                             icon=ft.Icons.VISIBILITY_OFF_ROUNDED
-                )])
-            ]),
-            # Divider between title and body of widget
-            ft.Divider(color=self.color),
+                        ),
+                    ]
+                ),
+            ),
+
 
             # Body of our widget
             ft.Container(       # Body of the widget
                 expand=True,
+                padding=6,
                 content=ft.Column(  # List our character data inside a column, use rows to format left to right
 
                     scroll=ft.ScrollMode.AUTO,  # Enable scrolling if it doesnt all fit
