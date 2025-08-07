@@ -148,6 +148,17 @@ class Character(ft.Container):
         user.active_story.master_stack.update()
         render_widgets(self.p)
 
+    def show_widget(self):
+        self.visible = True
+        user.active_story.master_stack.update()
+        render_widgets(self.p)
+        self.p.update()
+
+    def change_color(self, color):
+        self.color = color
+        self.reload_widget()
+        self.p.update()
+
     
     # Called when the morality dropdown is changed
     # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
@@ -265,6 +276,7 @@ class Character(ft.Container):
                     ]
                 ),
             ),
+           # ft.Divider(color=ft.Colors.OUTLINE_VARIANT),
 
 
             # Body of our widget
@@ -282,6 +294,87 @@ class Character(ft.Container):
                             expand=True,
                             controls=[
                                 self.icon, 
+                                # Color pallet picker to change the characters color of outline of widget
+                                ft.PopupMenuButton(
+                                    opacity=1,
+                                    scale=1.4,
+                                    tooltip="",
+                                    icon=ft.Icons.COLOR_LENS,
+                                    icon_color=ft.Colors.PRIMARY, 
+                                    items=[
+                                        #on_click=lambda e, char=character: change_character_color(char, page),
+                                        ft.PopupMenuItem(
+                                            text="Red",
+                                            content=ft.Text("Red", color=ft.Colors.RED, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.RED)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Pink",
+                                            content=ft.Text("Pink", color=ft.Colors.PINK, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.PINK)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Purple",
+                                            content=ft.Text("Purple", color=ft.Colors.PURPLE, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.PURPLE)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Blue",
+                                            content=ft.Text("Blue", color=ft.Colors.BLUE, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.BLUE)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Cyan",
+                                            content=ft.Text("Cyan", color=ft.Colors.CYAN, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.CYAN)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Teal",
+                                            content=ft.Text("Teal", color=ft.Colors.TEAL, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.TEAL)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Green",
+                                            content=ft.Text("Green", color=ft.Colors.GREEN, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.GREEN)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Lime",
+                                            content=ft.Text("Lime", color=ft.Colors.LIME, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.LIME)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Yellow",
+                                            content=ft.Text("Yellow", color=ft.Colors.YELLOW, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.YELLOW)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Orange",
+                                            content=ft.Text("Orange", color=ft.Colors.ORANGE, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.ORANGE)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Brown",
+                                            content=ft.Text("Brown", color=ft.Colors.BROWN, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.BROWN)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Light Grey",
+                                            content=ft.Text("Light Grey", color=ft.Colors.GREY_500, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.GREY_300)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="Grey",
+                                            content=ft.Text("Grey", color=ft.Colors.GREY_700, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.GREY_800)
+                                        ),
+                                        ft.PopupMenuItem(
+                                            text="None",
+                                            content=ft.Text("None", color=ft.Colors.GREY_300, weight=ft.FontWeight.BOLD), 
+                                            on_click=lambda e: self.change_color(ft.Colors.TRANSPARENT)
+                                        ),
+                                    ]
+                                ),
                                 self.character_data['Morality'],
                                 self.character_data['Sex'],
                                 self.character_data['Age'],
