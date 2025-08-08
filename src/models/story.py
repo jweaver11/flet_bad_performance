@@ -21,14 +21,18 @@ class Story:
        
 
         # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
+        # The pins are rows/columns that need to hold tabs, that then hold our objects, which are extended flet tabs
         self.top_pin = ft.Row(spacing=0, height=0, controls=[],)
         self.left_pin = ft.Column(spacing=0, width=0, controls=[])
-        self.main_pin = ft.Row(spacing=0, expand=True, controls=[])
+        #self.main_pin = ft.Row(spacing=0, expand=True, controls=[ft.Tabs()])
+        self.main_pin = ft.Tabs(selected_index=1)
         self.right_pin = ft.Column(spacing=0, width=0, controls=[])
         self.bottom_pin = ft.Row(spacing=0, height=0, controls=[])
 
+
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
+
 
         # Master stack that holds our widgets
         # And our drag targets when we start dragging widgets.
@@ -106,8 +110,8 @@ class Story:
             self.top_pin.controls.append(obj)
         elif obj.pin_location == "left" and obj not in self.left_pin.controls:
             self.left_pin.controls.append(obj)
-        elif obj.pin_location == "main" and obj not in self.main_pin.controls:
-            self.main_pin.controls.append(obj)
+        elif obj.pin_location == "main" and obj not in self.main_pin.tabs:
+            self.main_pin.tabs.append(obj)
         elif obj.pin_location == "right" and obj not in self.right_pin.controls:
             self.right_pin.controls.append(obj)
         elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:

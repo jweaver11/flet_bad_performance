@@ -2,7 +2,166 @@ import flet as ft
 from models.user import user
 from handlers.render_widgets import show_pin_drag_targets, render_widgets
 
-#story = user.active_story  # Get our story object from the user
+
+class New_Char(ft.Tab):
+    def __init__(self, name, page: ft.Page):
+        # Variables that all widgets will have, so we'll store them outside of data
+        self.title = name  # Name of character, but all objects have a 'title' for identification, so characters do too
+        self.tag = "character"  # Tag for logic, mostly for routing it through our story object
+        self.p = page   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+        self.pin_location = "main"  # Start in left pin location
+
+        self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col={'xs': 12, 'sm': 12, 'md': 3})
+
+        self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
+        self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
+
+        self.character_data = {
+            'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
+            'Morality': ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                label="Morality",
+                padding=ft.padding.all(0),
+                color=self.name_color,
+                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                options=[
+                    ft.DropdownOption(text="Good"),
+                    ft.DropdownOption(text="Evil"),
+                    ft.DropdownOption(text="Neutral"),
+                    ft.DropdownOption(text="N/A"),
+                    ft.DropdownOption(text="Deselect"),
+                ],
+                #on_change=self.morality_change,
+            ),
+            'Sex': ft.Dropdown(      # Sex of each character
+                label="Sex",
+                padding=ft.padding.all(0),
+                color=self.name_color,
+                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                options=[
+                    ft.DropdownOption(text="Male"),
+                    ft.DropdownOption(text="Female"),
+                    ft.DropdownOption(text="Deselect"),
+                ],
+                #on_change=self.sex_submit,
+            ),
+            #'Age': "0",   # Text field
+            'Age': ft.TextField(
+                label="Age",
+                adaptive=True,      # Changes textfield depending on device (apple vs non-apple)
+                capitalization=ft.TextCapitalization.SENTENCES, 
+                width=80,
+                #on_blur=self.age_change,        # Runs on either submission or click off
+                #on_change=self.age_change      # This would run every keystroke
+            ),
+            'Physical Description': ft.Row(
+                wrap=True,
+                data={
+                    'Race': "",
+                    'Skin Color': "",
+                    'Hair Color': "",   # Textfield
+                    'Eye Color': "",    # Textfield
+                    'Height': "",   # TextField
+                    'Weight': "",   # TextField
+                    'Build': "",    # 
+                    'Distinguishing Features': "",  # some sort of flet list
+                },
+                controls=[
+                    #ft.Container(ft.Text("Physical Description"), on_click=self.expand_physical_description),
+                    ft.TextField(
+                        label="Race",
+                        adaptive=True,
+                        capitalization=ft.TextCapitalization.SENTENCES, 
+                        width=80,
+                        #on_blur=self.race_change,   
+                    ),
+                ],
+            ),
+            'Family': ft.Row(     # Expandable
+                wrap=True,
+                data={     
+                    'Love Interest': Character or str,
+                    'Father': "",   # Textfield with selectable options
+                    'Mother': "",    
+                    'Siblings': "",
+                    'Children': "",
+                    'Ancestors': "",
+                },  
+                controls=[
+                    ft.Container(ft.TextButton("Family")),
+                    ft.TextField(
+                        label="Love Interest",
+                        adaptive=True,
+                        capitalization=ft.TextCapitalization.SENTENCES, 
+                        width=320,
+                        #on_blur=self.race_change,   
+                    ),
+                    ft.TextField(
+                        label="Love Interest",
+                        adaptive=True,
+                        capitalization=ft.TextCapitalization.SENTENCES, 
+                        width=120,
+                        #on_blur=self.race_change,   
+                    ),
+                ]
+            ),
+            'Occupation': "",   # Textfield
+            'Goals': "",    # Textfield list
+            'Origin': {     # Category on the left
+                'Birth Date': "",   # textfield
+                'Hometown': "",     # Textfield and a select from location radio picker
+                'Education': "",        # Textfield
+            },
+            
+            'Personality': "",  # expandable ft.TextField
+            'Backstory': "",    # expandable ft.TextField
+            'Abilities': "",    # Some sort of list
+            'Dead': [bool, "when they died"],
+            'Notes' : [],   # Category that says Notes on the left, then lists the expandable ft.TextField
+        }
+
+        # Make a markdown as content of container
+        # Gives us our initial widget as a container
+        super().__init__(
+            #expand=True, 
+            #padding=6,
+            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor = user.settings.workspace_bgcolor,
+            #visible=False,
+            content=None,
+        )
+        self.reload_widget()
+        # Reloads/builds our widget. Called after any changes happen to the data in it
+    def reload_widget(self):
+
+        #self.controls.append(ft.Image(src=self.image, width=100, height=100))
+
+        #self.border = ft.border.all(0, ft.Colors.GREY_800)  # Gives our container a border and adjusts the user selected color to it
+
+        self.text=self.title
+        self.tab_content=ft.Row(
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[
+                ft.Draggable(
+                    group="widgets",
+                    content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title),
+                    data=self,       # Pass our object as the data so we can access it
+                    on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
+                    # No on_complete method since the drag target will handle that
+                    # If an on_cancel method gets added to flet, we add it here to remove the drag targets
+                ),
+                ft.IconButton(
+                    #on_click=lambda e: self.hide_widget(),
+                    icon=ft.Icons.VISIBILITY_OFF_ROUNDED
+                ),
+            ]
+        )
+       
+        self.content=ft.Container()
+            
+
+
+
 
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
@@ -133,7 +292,7 @@ class Character(ft.Container):
         # Make a markdown as content of container
         # Gives us our initial widget as a container
         super().__init__(
-            expand=True, 
+            #expand=True, 
             #padding=6,
             #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             #bgcolor = user.settings.workspace_bgcolor,
@@ -251,7 +410,7 @@ class Character(ft.Container):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        self.border = ft.border.all(0, ft.Colors.GREY_800)  # Gives our container a border and adjusts the user selected color to it
+        #self.border = ft.border.all(0, ft.Colors.GREY_800)  # Gives our container a border and adjusts the user selected color to it
        
         self.content=ft.Column(spacing=0, controls=[
         

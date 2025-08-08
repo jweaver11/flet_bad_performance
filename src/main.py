@@ -68,6 +68,7 @@ def main(page: ft.Page):
             user.workspace,    # Work area for pagelets
         ],
     )
+    
 
     # Format our page. Add our menubar at the top, then then our row built above
     col = ft.Column(
@@ -75,9 +76,10 @@ def main(page: ft.Page):
         expand=True, 
         controls=[
             menubar, 
-            row
+            row,
         ]
     )
+
 
     # Only exists to fix our workspace area on a failed drag. clicking fixes it
     gd = ft.GestureDetector(

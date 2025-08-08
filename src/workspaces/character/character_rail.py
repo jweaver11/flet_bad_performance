@@ -6,7 +6,7 @@ the create 'character button' at the bottom.
 
 import flet as ft
 from models.user import user
-from models.character import Character
+from models.character import Character, New_Char
 from handlers.render_widgets import render_widgets
 import json
 
@@ -17,7 +17,6 @@ story = user.active_story  # Get our story object from the user
 # Shows our two buttons rename and delete
 def show_options(e):
     e.control.content.controls[2].opacity = 1
-    
     e.control.content.controls[2].update()
     
 
@@ -25,7 +24,6 @@ def show_options(e):
 # Hides our two buttons rename and delete
 def hide_options(e):
     e.control.content.controls[2].opacity = 0
-    
     e.control.content.controls[2].update()
     
 
@@ -469,9 +467,12 @@ def reload_character_rail(page: ft.Page):
 def create_characters_rail(page: ft.Page):
 
     # Initially create some characters to test with
-    story.add_object_to_story(Character("Bob", page))
-    story.add_object_to_story(Character("Alice", page))
-    story.add_object_to_story(Character("Joe", page))
+    #story.add_object_to_story(Character("Bob", page))
+    #story.add_object_to_story(Character("Alice", page))
+    #story.add_object_to_story(Character("Joe", page))
+    story.add_object_to_story(New_Char("Bob", page))
+    story.add_object_to_story(New_Char("Alice", page))
+    story.add_object_to_story(New_Char("Joe", page))
 
     # Set our drag targets on accept methods here so we can pass in our page
     main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)

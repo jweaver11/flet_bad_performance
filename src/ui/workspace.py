@@ -14,6 +14,7 @@ def create_workspace(page: ft.Page):
     
     page.update()
 
+    
     # Container for 1 or more widgets open on the workspace area right side of screen
     workspace_container = ft.Container(
         expand=True,
@@ -21,6 +22,7 @@ def create_workspace(page: ft.Page):
         #padding=ft.padding.all(4),
         #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
         content=story.master_stack,
+        
     )
     
 
