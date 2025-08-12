@@ -1,9 +1,10 @@
 import flet as ft
 from models.user import user
 from handlers.render_widgets import show_pin_drag_targets, render_widgets
+from custom_controls.custom_draggable import MyDraggable, drag_manager
 
 
-class New_Char(ft.Tab):
+class Character(ft.Tab):
     def __init__(self, name, page: ft.Page):
         # Variables that all widgets will have, so we'll store them outside of data
         self.title = name  # Name of character, but all objects have a 'title' for identification, so characters do too
@@ -80,7 +81,8 @@ class New_Char(ft.Tab):
             'Family': ft.Row(     # Expandable
                 wrap=True,
                 data={     
-                    'Love Interest': Character or str,
+                    #'Love Interest': Character or str,
+                    'Love Interest': str,
                     'Father': "",   # Textfield with selectable options
                     'Mother': "",    
                     'Siblings': "",
@@ -142,13 +144,12 @@ class New_Char(ft.Tab):
         self.tab_content=ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[
-                ft.Draggable(
+                MyDraggable(
                     group="widgets",
                     content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title),
                     data=self,       # Pass our object as the data so we can access it
                     on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
-                    # No on_complete method since the drag target will handle that
-                    # If an on_cancel method gets added to flet, we add it here to remove the drag targets
+                    on_cancel=lambda: print(f"cancelled drag for {self.title}"),  # Remove the 'e' parameter
                 ),
                 ft.IconButton(
                     #on_click=lambda e: self.hide_widget(),
@@ -156,13 +157,18 @@ class New_Char(ft.Tab):
                 ),
             ]
         )
-       
+        
         self.content=ft.Container()
             
 
 
 
 
+
+
+
+
+'''
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
@@ -553,7 +559,6 @@ class Character(ft.Container):
                 )
             )
         ])
-    
-
+'''
 
 

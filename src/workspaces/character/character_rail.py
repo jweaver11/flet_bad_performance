@@ -6,7 +6,8 @@ the create 'character button' at the bottom.
 
 import flet as ft
 from models.user import user
-from models.character import Character, New_Char
+#from models.character import Character, New_Char
+from models.character import Character
 from handlers.render_widgets import render_widgets
 import json
 
@@ -470,9 +471,9 @@ def create_characters_rail(page: ft.Page):
     #story.add_object_to_story(Character("Bob", page))
     #story.add_object_to_story(Character("Alice", page))
     #story.add_object_to_story(Character("Joe", page))
-    story.add_object_to_story(New_Char("Bob", page))
-    story.add_object_to_story(New_Char("Alice", page))
-    story.add_object_to_story(New_Char("Joe", page))
+    story.add_object_to_story(Character("Bob", page))
+    story.add_object_to_story(Character("Alice", page))
+    story.add_object_to_story(Character("Joe", page))
 
     # Set our drag targets on accept methods here so we can pass in our page
     main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
