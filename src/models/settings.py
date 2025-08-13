@@ -1,15 +1,22 @@
 import flet as ft
 from models.user import user
+from models.widget import Widget
 
 # 
 # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS
 #
 
-class Settings(ft.Container):
+class Settings(Widget):
     def __init__(self, page: ft.Page):
-        self.yo_momma = "yo mommaa"
-        self.pin_location = "main"
-        self.p = page
+
+        super().__init__(
+            title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
+            tag = "settings",  # Tag for logic, mostly for routing it through our story object
+            p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+            pin_location = "main",  # Start in left pin location
+
+            
+        )
 
         # Save theme mode of either light or dark
         self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
@@ -102,23 +109,37 @@ class Settings(ft.Container):
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
 
 
-        # Init our settings container(widget) with the uniform formatting of the other objects
-        super().__init__(
-            expand=True, 
-            padding=6,
-            visible=False,
-            border = ft.border.all(2, ft.Colors.GREY_800),
-            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor = self.widget_bgcolor,
-            content=ft.Column([
-                ft.TextButton(
-                    "Reorder Workspaces", 
-                    icon=ft.Icons.REORDER_ROUNDED,
-                    on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()
-                ),
-                self.change_name_colors,
-                self.theme_button,
-                self.color_scheme_dropdown,
+        self.visible = False
+        self.text = self.title    # Good for a backup, but content will be used if its not empty
 
-            ])
+        self.tab_content = ft.Row(
+            #alignment=ft.MainAxisAlignment.CENTER,
+            controls=[
+                ft.Text(
+                    weight=ft.FontWeight.BOLD, 
+                    color=ft.Colors.PRIMARY, 
+                    value=self.title, 
+                ),
+                ft.IconButton(
+                    scale=0.7,
+                    on_click=lambda e: self.hide_widget(),
+                    icon=ft.Icons.CLOSE_ROUNDED,
+                ),
+            ]
         )
+
+        self.content=ft.Column([
+            ft.TextButton(
+                "Reorder Workspaces", 
+                icon=ft.Icons.REORDER_ROUNDED,
+                on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()
+            ),
+            self.change_name_colors,
+            self.theme_button,
+            self.color_scheme_dropdown,
+
+        ])
+
+        
+    
+        
