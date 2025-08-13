@@ -13,7 +13,7 @@ class Character(Widget):
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            pin_location = "main",  # Start in left pin location
+            pin_location = "left",  # Start in left pin location
         )
 
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
@@ -133,14 +133,15 @@ class Character(Widget):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        self.text=self.title    # Good for a backup, but content will be used if its not empty
+        #self.text=self.title    # Good for a backup, but content will be used if its not empty
 
-        self.tab_content = ft.Draggable(
+        self.content = ft.Draggable(
             group="widgets",
             data=self,
             on_drag_start=show_pin_drag_targets,
             on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
             #on_drag_cancel=impliment when we have custom draggables
+            content_feedback=ft.TextButton(self.title),
             content=ft.Row(
                 #alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
@@ -157,10 +158,11 @@ class Character(Widget):
                 ]
             )
         )
-            
-        self.content=ft.Container()
+        
+        #self.content = ft.Text("hi from " + self.title)
+        
 
-
+    
     # Change our tab color of widget. Accepts a flet color as parameter
     def change_color(self, color):
         self.tab_color = color

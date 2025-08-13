@@ -179,7 +179,7 @@ def bottom_pin_drag_accept(e):
 
 # set minimumm fallbacks for our pins, and our drag targets
 minimum_pin_height = 200
-minimum_pin_width = 200
+minimum_pin_width = 230
 
 # Pin drag targets
 top_pin_drag_target = ft.DragTarget(
@@ -329,13 +329,13 @@ def render_widgets(page: ft.Page):
 
     # Check if our pins have any visible widgets or not, so if they should show up on screen
     # Check if top pin is empty. If yes, hide the formatted pin
-    if len(story.top_pin.tabs) == 0:
+    if len(story.top_pin.controls) == 0:
         formatted_top_pin.visible = False
     # If top pin not empty, make sure there is at least one visible widget
-    elif all(obj.visible == False for obj in story.top_pin.tabs[:]):
+    elif all(obj.visible == False for obj in story.top_pin.controls[:]):
         formatted_top_pin.visible = False
     else:   # If not empty, check if any of the widgets are visible
-        for obj in story.top_pin.tabs:
+        for obj in story.top_pin.controls:
             if obj.visible == True:     # If any widgets are visible, show our formatted pin
                 formatted_top_pin.visible = True
                 break   # No need to keep checking if at least one is visible
@@ -344,12 +344,12 @@ def render_widgets(page: ft.Page):
             story.top_pin.height = minimum_pin_height
 
     # Left pin
-    if len(story.left_pin.tabs) == 0:
+    if len(story.left_pin.controls) == 0:
         formatted_left_pin.visible = False
-    elif all(obj.visible == False for obj in story.left_pin.tabs[:]):
+    elif all(obj.visible == False for obj in story.left_pin.controls[:]):
         formatted_left_pin.visible = False
     else:
-        for obj in story.left_pin.tabs:
+        for obj in story.left_pin.controls:
             if obj.visible == True:
                 formatted_left_pin.visible = True
                 break
@@ -357,12 +357,12 @@ def render_widgets(page: ft.Page):
             story.left_pin.width = minimum_pin_width
 
     # Right pin
-    if len(story.right_pin.tabs) == 0:
+    if len(story.right_pin.controls) == 0:
         formatted_right_pin.visible = False
-    elif all(obj.visible == False for obj in story.right_pin.tabs[:]):
+    elif all(obj.visible == False for obj in story.right_pin.controls[:]):
         formatted_right_pin.visible = False
     else:
-        for obj in story.right_pin.tabs:
+        for obj in story.right_pin.controls:
             if obj.visible == True:
                 formatted_right_pin.visible = True
                 break
@@ -370,12 +370,12 @@ def render_widgets(page: ft.Page):
             story.right_pin.width = minimum_pin_width
 
     # Bottom pin
-    if len(story.bottom_pin.tabs) == 0:
+    if len(story.bottom_pin.controls) == 0:
         formatted_bottom_pin.visible = False
-    elif all(obj.visible == False for obj in story.bottom_pin.tabs[:]):
+    elif all(obj.visible == False for obj in story.bottom_pin.controls[:]):
         formatted_bottom_pin.visible = False
     else:
-        for obj in story.bottom_pin.tabs:
+        for obj in story.bottom_pin.controls:
             if obj.visible == True:
                 formatted_bottom_pin.visible = True
                 break

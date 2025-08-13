@@ -420,8 +420,7 @@ def reload_character_rail(page: ft.Page):
                             ),
                                     
                                     
-                                ],
-                            
+                                ],   
                 )
             )
             )
@@ -478,9 +477,6 @@ def create_characters_rail(page: ft.Page):
     # List of controls that we return from our page. 
     # This is static and should not change
     characters_rail = [
-
-        
-
         ft.Column(
             spacing=0, 
             expand=True, 
