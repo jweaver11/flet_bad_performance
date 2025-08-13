@@ -56,6 +56,24 @@ def main(page: ft.Page):
 
     user.workspace = create_workspace(page)# render our workspace containing our widgets
 
+    def show_horizontal_cursor(e: ft.HoverEvent):
+        e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+        e.control.update()
+
+    # Left pin reisizer method and variable
+    def move_active_rail_divider(e: ft.DragUpdateEvent):
+        if (e.delta_x > 0 and active_rail.width < page.width/2) or (e.delta_x < 0 and active_rail.width > 100):
+            active_rail.width += e.delta_x
+            print("Active rail width: " + str(active_rail.width))
+        active_rail.update()
+        user.active_story.widgets.update()
+        user.active_story.master_stack.update()
+    active_rail_resizer = ft.GestureDetector(
+        content=ft.VerticalDivider(thickness=2, width=10, color=ft.Colors.OUTLINE_VARIANT),  # Makes it invisible
+        on_pan_update=move_active_rail_divider,
+        on_hover=show_horizontal_cursor,
+    )
+
     # Save our 2 rails, dividers, and our workspace container in a row
     row = ft.Row(
         spacing=0,  # No space between elements
@@ -66,7 +84,7 @@ def main(page: ft.Page):
             ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
             active_rail,    # Rail for the selected workspace
-            ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between rail and work area
+            active_rail_resizer,   # Divider between rail and work area
             
             user.workspace,    # Work area for pagelets
         ],

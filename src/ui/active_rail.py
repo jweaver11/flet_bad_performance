@@ -12,27 +12,6 @@ from ui.rails.notes_rail import notes_rail
 
 # Creates our 'active_rail', which holds all of our rails, and renderes the selected one
 def create_active_rail(page: ft.Page):
-    story = user.active_story
-
-    def show_horizontal_cursor(e: ft.HoverEvent):
-        e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-        e.control.update()
-
-    # Method called when our divider (inside a gesture detector) is dragged
-    # Updates the size of our pin in the story object
-    def move_top_pin_divider(e: ft.DragUpdateEvent):
-        if (e.delta_y > 0 and story.top_pin.height < page.height/2) or (e.delta_y < 0 and story.top_pin.height > 100):
-            story.top_pin.height += e.delta_y
-        active_workspace_rail_container.update()
-        story.widgets.update() # Update the main pin, as it is affected by all pins resizing
-        story.master_stack.update()
-
-    # The control that holds our divider, which we drag to resize the top pin
-    rail_resizer = ft.GestureDetector(
-        content=ft.VerticalDivider(color=ft.Colors.TRANSPARENT, width=6, thickness=10),
-        on_pan_update=move_top_pin_divider,
-        on_hover=show_horizontal_cursor,
-    )
     
     # Create our rails
     characters_rail = create_characters_rail(page)
@@ -54,14 +33,6 @@ def create_active_rail(page: ft.Page):
         padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
         width=200,  # Sets the width
         content=user.active_story.active_rail,  # Sets our active rail column
-        #ft.Row(
-            #expand=True,
-            #spacing=0,
-            #controls=[
-                #user.active_story.active_rail,    # Sets our active rail column
-                #rail_resizer,
-            #]
-        #)
     )
 
 

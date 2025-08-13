@@ -67,7 +67,6 @@ class Story:
     def add_object_to_story(self, obj):
         print("Adding object in story: " + obj.title)
 
-
         # Runs to save our character to our story object, and save it to file
         def save_character(obj):
             print("save character called")

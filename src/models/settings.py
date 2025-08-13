@@ -3,19 +3,17 @@ from models.user import user
 from models.widget import Widget
 
 # 
-# OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS
+# OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
 #
 
 class Settings(Widget):
     def __init__(self, page: ft.Page):
-
+        # Arguments our widget needs
         super().__init__(
             title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "main",  # Start in left pin location
-
-            
         )
 
         # Save theme mode of either light or dark
@@ -64,7 +62,9 @@ class Settings(Widget):
         )
         
         # Background color of widgets that changes depending if in light theme or dark theme
-        self.workspace_bgcolor = ft.Colors.GREY_900 if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+        self.workspace_bgcolor = ft.Colors.ON_SECONDARY if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+
+        
 
 
         # Runs when the switch toggling the color change of characters names based on morality is clicked
