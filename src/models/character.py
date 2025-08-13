@@ -7,7 +7,7 @@ from handlers.render_widgets import show_pin_drag_targets
 class Character(Widget):
     def __init__(self, name, page: ft.Page):
 
-        # Sets our Character as an extended Widget object, which is a subclass of a flet Tab
+        # Sets our Character as an extended Widget object, which is a subclass of a flet Container
         # Widget requires a title, tag, page reference, and a pin location
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
@@ -18,7 +18,6 @@ class Character(Widget):
 
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
-
         
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
@@ -135,31 +134,51 @@ class Character(Widget):
 
         #self.text=self.title    # Good for a backup, but content will be used if its not empty
 
-        self.content = ft.Draggable(
-            group="widgets",
-            data=self,
-            on_drag_start=show_pin_drag_targets,
-            on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
-            #on_drag_cancel=impliment when we have custom draggables
-            content_feedback=ft.TextButton(self.title),
-            content=ft.Row(
-                #alignment=ft.MainAxisAlignment.CENTER,
-                controls=[
-                    ft.Text(
-                        weight=ft.FontWeight.BOLD, 
-                        color=self.name_color, 
-                        value=self.title, 
+        tab = ft.GestureDetector(
+            mouse_cursor=ft.MouseCursor.CLICK,  # Not working
+            content=ft.Draggable(
+                group="widgets",
+                data=self,
+                on_drag_start=show_pin_drag_targets,
+                on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
+                #on_drag_cancel=impliment when we have custom draggables
+                content_feedback=ft.TextButton(self.title),
+                content=ft.Column([
+                    ft.Row(
+                        #alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[
+                            ft.Text(
+                                weight=ft.FontWeight.BOLD, 
+                                color=self.name_color, 
+                                value=self.title, 
+                            ),
+                            ft.IconButton(
+                                scale=0.8,
+                                on_click=lambda e: self.hide_widget(),
+                                icon=ft.Icons.CLOSE_ROUNDED,
+                            ),
+                        ]
                     ),
-                    ft.IconButton(
-                        scale=0.7,
-                        on_click=lambda e: self.hide_widget(),
-                        icon=ft.Icons.CLOSE_ROUNDED,
-                    ),
-                ]
-            )
-        )
+                    ft.Divider(color=self.tab_color, thickness=2),
+                ])
         
-        #self.content = ft.Text("hi from " + self.title)
+                )
+            )
+        
+        
+        
+        body = ft.Text("hi from " + self.title)
+        
+        # Set our content
+        self.content = ft.Column(
+            spacing=0,
+            expand=True,
+            controls=[
+                tab,
+                #ft.Divider(color=self.tab_color, thickness=2),
+                body
+            ]
+        )
         
 
     

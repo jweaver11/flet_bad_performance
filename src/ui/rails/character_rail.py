@@ -417,12 +417,10 @@ def reload_character_rail(page: ft.Page):
                                         on_click=lambda e, char=character: delete_character(char, page),
                                     ),
                                 ]
-                            ),
-                                    
-                                    
-                                ],   
+                            ),    
+                        ],   
+                    )
                 )
-            )
             )
         )
 

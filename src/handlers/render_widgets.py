@@ -215,34 +215,26 @@ pin_drag_targets = [
     ft.Container(
         content=top_pin_drag_target,
         height=200,
-        margin=ft.margin.only(left=20, right=20),
-        top=0, left=200, right=200,
-        border_radius=ft.border_radius.all(10),  
+        top=0, left=200, right=200, 
     ),
     ft.Container(
         content=left_pin_drag_target,
         width=200,
         left=0, top=0, bottom=0,
-        border_radius=ft.border_radius.all(10), 
     ),
     ft.Container(
         content=main_pin_drag_target,
-        margin=ft.margin.only(top=20, left=20, right=20, bottom=20,),
-        top=200, left=200, right=200, bottom=200,
-        border_radius=ft.border_radius.all(10),  
+        top=200, left=200, right=200, bottom=200, 
     ),
     ft.Container(
         content=right_pin_drag_target,
         width=200,
-        right=0, top=0, bottom=0,
-        border_radius=ft.border_radius.all(10),  
+        right=0, top=0, bottom=0, 
     ),
     ft.Container(
         content=bottom_pin_drag_target,
         height=200,
         bottom=0, left=200, right=200,
-        margin=ft.margin.only(left=20, right=20),
-        border_radius=ft.border_radius.all(10), 
     ),
 ]
 print("render_widgets called")

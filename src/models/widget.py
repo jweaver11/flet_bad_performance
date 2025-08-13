@@ -17,9 +17,9 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             padding=6,
+            #border=ft.border.all(1, self.tab_color),  # Gives a border to match the widgets border
             #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor = user.settings.workspace_bgcolor,
-            content=None,
+            bgcolor=ft.Colors.ON_SECONDARY,
         )
 
             
