@@ -11,7 +11,7 @@ class Widget(ft.Tab):
         self.tag = tag  # Tag for logic, mostly for routing it through our story object
         self.p = p   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
         self.pin_location = pin_location  # Start in left pin location
-        self.tab_color = ft.Colors.PRIMARY
+        self.tab_color = ft.Colors.PRIMARY  # Since all objects are tabs, we can mess with their tab color
 
         super().__init__(
             #expand=True, 
@@ -34,10 +34,4 @@ class Widget(ft.Tab):
         self.visible = True
         user.active_story.master_stack.update()
         render_widgets(self.p)
-        self.p.update()
-
-    # Change our tab color of widget. Accepts a flet color as parameter
-    def change_color(self, color):
-        self.tab_color = color
-        self.reload_widget()
         self.p.update()

@@ -31,9 +31,9 @@ class Settings(ft.Container):
             for color in self.theme_color_scheme_options:
                 options.append(
                     ft.DropdownOption(
-                        key=color.value,
+                        key=color.value.capitalize(),
                         content=ft.Text(
-                            value=color.value,
+                            value=color.value.capitalize(),
                             color=color,
                         ),
                     )
@@ -50,7 +50,8 @@ class Settings(ft.Container):
         # Dropdown so user can change their color scheme
         self.color_scheme_dropdown = ft.Dropdown(
             #editable=True,
-            label="Color",
+            label="Theme Color",
+            capitalization= ft.TextCapitalization.SENTENCES,
             options=get_color_scheme_options(),
             on_change=change_color_scheme_picked,
         )
@@ -99,9 +100,6 @@ class Settings(ft.Container):
         self.theme_icon = ft.Icons.DARK_MODE if page.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
         # Button that changes the theme from dark or light when clicked
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
-
-        self.allow_tab_grouping_top_bottom = True
-        self.allow_tab_grouping_left_right = False  # Allow tabs to be grouped rather than displayed vertically
 
 
         # Init our settings container(widget) with the uniform formatting of the other objects

@@ -1,25 +1,25 @@
 import flet as ft
 from models.user import user
 from models.widget import Widget
-from handlers.render_widgets import show_pin_drag_targets, render_widgets
+from handlers.render_widgets import show_pin_drag_targets
 
-
+# Class for character objects in the story. Every object needs a title, and a page reference when created
 class Character(Widget):
     def __init__(self, name, page: ft.Page):
 
-        # Gives us our initial widget as a tab
+        # Sets our Character as an extended Widget object, which is a subclass of a flet Tab
+        # Widget requires a title, tag, page reference, and a pin location
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "main",  # Start in left pin location
-
         )
 
-        self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
+        #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
 
-        #self.tab_color = ft.Colors.GREY_800   # User defined color of the widget of the character
+        
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
         self.character_data = {
@@ -133,31 +133,39 @@ class Character(Widget):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        #self.border = ft.border.all(0, ft.Colors.GREY_800)  # Gives our container a border and adjusts the user selected color to it
+        self.text=self.title    # Good for a backup, but content will be used if its not empty
 
-        self.text=self.title
-        self.tab_content=ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                ft.Draggable(
-                    group="widgets",
-                    content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title),
-                    data=self,
-                    on_drag_start=show_pin_drag_targets,
-                    on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
-                    #on_drag_cancel=impliment when we have custom draggables
-                ),
-                ft.IconButton(
-                    on_click=lambda e: self.hide_widget(),
-                    icon=ft.Icons.CLOSE_ROUNDED,
-                ),
-            ]
+        self.tab_content = ft.Draggable(
+            group="widgets",
+            data=self,
+            on_drag_start=show_pin_drag_targets,
+            on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
+            #on_drag_cancel=impliment when we have custom draggables
+            content=ft.Row(
+                #alignment=ft.MainAxisAlignment.CENTER,
+                controls=[
+                    ft.Text(
+                        weight=ft.FontWeight.BOLD, 
+                        color=self.name_color, 
+                        value=self.title, 
+                    ),
+                    ft.IconButton(
+                        scale=0.7,
+                        on_click=lambda e: self.hide_widget(),
+                        icon=ft.Icons.CLOSE_ROUNDED,
+                    ),
+                ]
+            )
         )
             
         self.content=ft.Container()
 
 
-    
+    # Change our tab color of widget. Accepts a flet color as parameter
+    def change_color(self, color):
+        self.tab_color = color
+        self.reload_widget()
+        self.p.update()
 
     
     # Called when the morality dropdown is changed
