@@ -1,7 +1,6 @@
 import flet as ft
 from models.user import user
 from handlers.render_widgets import show_pin_drag_targets, render_widgets
-from custom_controls.custom_draggable import MyDraggable, drag_manager
 
 
 class Character(ft.Tab):
@@ -13,7 +12,7 @@ class Character(ft.Tab):
         self.pin_location = "main"  # Start in left pin location
 
         self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
-        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col={'xs': 12, 'sm': 12, 'md': 3})
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
 
         self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
@@ -144,21 +143,126 @@ class Character(ft.Tab):
         self.tab_content=ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[
-                MyDraggable(
+                ft.Draggable(
                     group="widgets",
                     content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title),
-                    data=self,       # Pass our object as the data so we can access it
-                    on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
-                    on_cancel=lambda: print(f"cancelled drag for {self.title}"),  # Remove the 'e' parameter
+                    data=self,
+                    on_drag_start=show_pin_drag_targets,
+                    on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
+                    #on_drag_cancel=impliment when we have custom draggables
                 ),
                 ft.IconButton(
-                    #on_click=lambda e: self.hide_widget(),
-                    icon=ft.Icons.VISIBILITY_OFF_ROUNDED
+                    on_click=lambda e: self.hide_widget(),
+                    icon=ft.Icons.CLOSE_ROUNDED,
                 ),
             ]
         )
-        
+            
         self.content=ft.Container()
+
+
+    # Makes our widget invisible
+    def hide_widget(self):
+        self.visible = False
+        user.active_story.master_stack.update()
+        render_widgets(self.p)
+
+    def show_widget(self):
+        self.visible = True
+        user.active_story.master_stack.update()
+        render_widgets(self.p)
+        self.p.update()
+
+    def change_color(self, color):
+        self.color = color
+        self.reload_widget()
+        self.p.update()
+
+    
+    # Called when the morality dropdown is changed
+    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
+    def morality_change(self, e):
+        e.control.data = e.control.value
+
+        self.check_morality()
+        self.reload_widget()    # Apply our changes to the name at top of widget
+
+        self.p.update()
+    
+    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
+    def check_morality(self):
+        # If we have the setting turned on to change char name colors, change them
+        if user.settings.change_name_colors.value == True:
+            print("color changing is true, we running the logic")
+            # Check the morality and change color accordingly
+            if self.character_data['Morality'].data == "Good":
+                self.name_color = ft.Colors.GREEN_200
+            elif self.character_data['Morality'].data == "Evil":
+                self.name_color = ft.Colors.RED_200
+            elif self.character_data['Morality'].data == "Neutral":
+                self.name_color = ft.Colors.GREY_300
+            elif self.character_data['Morality'].data == "N/A":
+                self.name_color = ft.Colors.GREY_300
+            elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
+                self.name_color = ft.Colors.PRIMARY
+                self.character_data['Morality'].value = None
+                
+            # Update our color
+            self.character_data['Morality'].color = self.name_color
+
+        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
+        else:
+            print("Color changing disabled, turning off all their colors")
+            for character in user.active_story.characters:
+                character.name_color = ft.Colors.PRIMARY
+            # Apply our changes
+            self.p.update()
+            return
+
+        # Reload the rail
+        from ui.rails.character_rail import reload_character_rail
+        reload_character_rail(self.p)
+
+
+    # Called when the textfield for writing in custom sex's is submitted
+    # Adds our custom sex to our stories sex_options list
+    def sex_submit(self, e):
+        print("Color change ran")
+
+        # Save most of our variables in our data in the flet controls
+        e.control.data = e.control.value
+
+        # If deselect is clicked
+        if self.character_data['Sex'].data == "Deselect":
+            self.character_data['Sex'].value = None
+            self.reload_widget()    # When manually resetting value, must reload widget
+        
+        # If deselect is not clicked
+        elif self.character_data['Sex'].data == "Male":
+        # Checks that our data saved correctly, and changes color accordingly
+            self.character_data['Sex'].color = ft.Colors.BLUE
+            
+        elif self.character_data['Sex'].data == "Female":
+            self.character_data['Sex'].color = ft.Colors.PINK
+        
+        self.p.update()
+
+    # Called when the age is changed. Changes the age data
+    def age_change(self, e):
+        print("Age change ran")
+        self.character_data['Age'].data = e.control.value
+        print(self.character_data['Age'].data)
+
+    # Called when the race is changed. Changes the race data
+    def race_change(self, e):
+        print("Race change ran")
+        self.character_data['Physical Description'].data['Race'] = e.control.value
+        print(self.character_data['Physical Description'].data['Race'])
+        self.p.update()
+
+    # Expand the tile to show physical descriptions
+    def expand_physical_description(self, e):
+        print("expand physical description ran")
             
 
 

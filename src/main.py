@@ -14,8 +14,11 @@ from ui.workspace import create_workspace
 from handlers.render_widgets import remove_drag_targets
 
 
+
+
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
+
 
     # Grab active story, if blank fallback and grab default
 
@@ -80,18 +83,10 @@ def main(page: ft.Page):
         ]
     )
 
-
-    # Only exists to fix our workspace area on a failed drag. clicking fixes it
-    gd = ft.GestureDetector(
-        expand=True,
-        on_tap_up=lambda e: remove_drag_targets(),
-        content=col
-    )
-
-    page.add(gd)
+    page.add(col)
 
 
 ft.app(main)
 
 
-# Add custom title bar 
+# Add custom title bar

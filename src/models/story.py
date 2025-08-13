@@ -22,13 +22,17 @@ class Story:
 
         # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
         # The pins are rows/columns that need to hold tabs, that then hold our objects, which are extended flet tabs
-        self.top_pin = ft.Row(spacing=0, height=0, controls=[],)
-        self.left_pin = ft.Column(spacing=0, width=0, controls=[])
+        #self.top_pin = ft.Row(spacing=0, height=0, controls=[],)
+        #self.left_pin = ft.Column(spacing=0, width=0, controls=[])
         #self.main_pin = ft.Row(spacing=0, expand=True, controls=[ft.Tabs()])
-        self.main_pin = ft.Tabs(selected_index=1)
-        self.right_pin = ft.Column(spacing=0, width=0, controls=[])
-        self.bottom_pin = ft.Row(spacing=0, height=0, controls=[])
+        #self.right_pin = ft.Column(spacing=0, width=0, controls=[])
+        #self.bottom_pin = ft.Row(spacing=0, height=0, controls=[])
 
+        self.top_pin = ft.Tabs(selected_index=0, height=0)
+        self.left_pin = ft.Tabs(selected_index=0, width=0)
+        self.main_pin = ft.Tabs(selected_index=0)
+        self.right_pin = ft.Tabs(selected_index=0, width=0)
+        self.bottom_pin = ft.Tabs(selected_index=0, height=0)
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])

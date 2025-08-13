@@ -17,15 +17,15 @@ story = user.active_story  # Get our story object from the user
 # Called when hovered over a character on the rail
 # Shows our two buttons rename and delete
 def show_options(e):
-    e.control.content.controls[2].opacity = 1
-    e.control.content.controls[2].update()
+    e.control.content.content.content.controls[2].opacity = 1
+    e.control.content.content.content.controls[2].update()
     
 
 # Called when mouse leaves a character on the rail
 # Hides our two buttons rename and delete
 def hide_options(e):
-    e.control.content.controls[2].opacity = 0
-    e.control.content.controls[2].update()
+    e.control.content.content.content.controls[2].opacity = 0
+    e.control.content.content.content.controls[2].update()
     
 
 # Called when user clicks rename button on the character on the rail
@@ -350,6 +350,7 @@ background_characters_drag_target = ft.DragTarget(
     content=background_characters
 )
 
+
 # Rebuilds our character rail from scratch whenever changes are made in data to the rail (add or del character, etc.)
 # Characters are organized based on their tag of main, side, or background
 # Have their colors change based on good, evil, neutral. Widget will reflect that
@@ -362,75 +363,69 @@ def reload_character_rail(page: ft.Page):
     # Run through each character in our story
     for character in story.characters:
         # Create a new character widget for the rail
-        new_char = ft.Container(
-            #border=ft.border.all(2, character.color),  # Gives a border to match the widgets border
-            padding=ft.padding.only(left=4, right=4),   # padding
-            margin=ft.margin.only(bottom=2),    # Margin between characters on rail
-            border_radius=ft.border_radius.all(10),
-            content=ft.Draggable(
-            content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
-            data=character,     # Pass in our character object when dragging
-            group="widgets",
-            content=ft.Row(
-                alignment=ft.MainAxisAlignment.START,
-                expand=True,
-                controls=[
-                    ft.GestureDetector(
-                        content=ft.Row(
-                            spacing=0,
-                            controls=[
-                                ft.Container(
-                                    content=ft.Text(
-                                        value=character.title,
-                                        color=character.name_color,
-                                        max_lines=1,    # Handle too long of names
-                                        overflow=ft.TextOverflow.CLIP,  # Handle too long of names
-                                        weight=ft.FontWeight.BOLD,  # Make text bold
-                                        no_wrap=True,
-                                    ),
-                                ),
-                                # Space between name of character in the rail and menu button on right
-                                ft.Container(expand=True),
-
-                                # Menu button for options to edit character in the rail
-                                ft.PopupMenuButton(
-                                    opacity=0,
-                                    scale=.9,
-                                    tooltip="",
-                                    icon_color=character.name_color, 
-                                    items=[
-                                        # Button to rename a character
-                                        ft.PopupMenuItem(
-                                            icon=ft.Icons.EDIT_ROUNDED,
-                                            text="Rename",
-                                            # Needs to save a character reference because of pythons late binding, or this wont work
-                                            on_click=lambda e, char=character: rename_character(char, page),
-                                        ),
-                                        # Button to delete a character
-                                        ft.PopupMenuItem(  
-                                            icon=ft.Icons.DELETE,
-                                            text="Delete",
-                                            on_click=lambda e, char=character: delete_character(char, page),
-                                        ),
-                                    ]
-                                ),
-                                
-                                
-                            ],
-                        ),
-                        #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click.. Causes other buttons to be delayed rn
-                        on_hover=show_options,
-                        on_exit=hide_options,
-                        on_tap_down=lambda e, char=character: char.show_widget(),  # Show our widget if hidden when character clicked
-                        mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+        new_char = ft.GestureDetector(
+            #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click.. Causes other buttons to be delayed rn
+            on_hover=show_options,
+            on_exit=hide_options,
+            on_tap_down=lambda e, char=character: char.show_widget(),  # Show our widget if hidden when character clicked
+            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+            expand=True,
+            content=ft.Container(
+                #border=ft.border.all(2, character.color),  # Gives a border to match the widgets border
+                padding=ft.padding.only(left=4, right=4),   # padding
+                margin=ft.margin.only(bottom=2),    # Margin between characters on rail
+                border_radius=ft.border_radius.all(10),
+                content=ft.Draggable(
+                    content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
+                    data=character,     # Pass in our character object when dragging
+                    group="widgets",
+                    content=ft.Row(
+                        alignment=ft.MainAxisAlignment.START,
                         expand=True,
-                    ),
-                    
-                ], 
+                        controls=[
+                            ft.Container(
+                                content=ft.Text(
+                                    value=character.title,
+                                    color=character.name_color,
+                                    max_lines=1,    # Handle too long of names
+                                    overflow=ft.TextOverflow.CLIP,  # Handle too long of names
+                                    weight=ft.FontWeight.BOLD,  # Make text bold
+                                    no_wrap=True,
+                                ),
+                            ),
+                            # Space between name of character in the rail and menu button on right
+                            ft.Container(expand=True),
+
+                            # Menu button for options to edit character in the rail
+                            ft.PopupMenuButton(
+                                opacity=0,
+                                scale=.9,
+                                tooltip="",
+                                icon_color=character.name_color, 
+                                items=[
+                                    # Button to rename a character
+                                    ft.PopupMenuItem(
+                                        icon=ft.Icons.EDIT_ROUNDED,
+                                        text="Rename",
+                                        # Needs to save a character reference because of pythons late binding, or this wont work
+                                        on_click=lambda e, char=character: rename_character(char, page),
+                                    ),
+                                    # Button to delete a character
+                                    ft.PopupMenuItem(  
+                                        icon=ft.Icons.DELETE,
+                                        text="Delete",
+                                        on_click=lambda e, char=character: delete_character(char, page),
+                                    ),
+                                ]
+                            ),
+                                    
+                                    
+                                ],
+                            
+                )
+            )
             )
         )
-        )
-        
 
         # Still in for loop, add our character to category based on its tag
         if character.character_data["Role"] == "Main":
@@ -484,10 +479,19 @@ def create_characters_rail(page: ft.Page):
     # This is static and should not change
     characters_rail = [
 
-        # Our drag targets that hold each character list for each category
-        main_characters_drag_target,
-        side_characters_drag_target,
-        background_characters_drag_target,
+        
+
+        ft.Column(
+            spacing=0, 
+            expand=True, 
+            scroll=ft.ScrollMode.AUTO,  # Column to hold our character lists
+            controls=[
+                # Our drag targets that hold each character list for each category
+                main_characters_drag_target,
+                side_characters_drag_target,
+                background_characters_drag_target,
+            ], 
+        )
 
     ]
 
