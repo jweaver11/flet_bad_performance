@@ -1,20 +1,25 @@
 import flet as ft
 from models.user import user
+from models.widget import Widget
 from handlers.render_widgets import show_pin_drag_targets, render_widgets
 
 
-class Character(ft.Tab):
+class Character(Widget):
     def __init__(self, name, page: ft.Page):
-        # Variables that all widgets will have, so we'll store them outside of data
-        self.title = name  # Name of character, but all objects have a 'title' for identification, so characters do too
-        self.tag = "character"  # Tag for logic, mostly for routing it through our story object
-        self.p = page   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-        self.pin_location = "main"  # Start in left pin location
+
+        # Gives us our initial widget as a tab
+        super().__init__(
+            title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
+            tag = "character",  # Tag for logic, mostly for routing it through our story object
+            p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+            pin_location = "main",  # Start in left pin location
+
+        )
 
         self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
 
-        self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
+        #self.tab_color = ft.Colors.GREY_800   # User defined color of the widget of the character
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
         self.character_data = {
@@ -120,18 +125,9 @@ class Character(ft.Tab):
             'Dead': [bool, "when they died"],
             'Notes' : [],   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
-
-        # Make a markdown as content of container
-        # Gives us our initial widget as a container
-        super().__init__(
-            #expand=True, 
-            #padding=6,
-            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor = user.settings.workspace_bgcolor,
-            #visible=False,
-            content=None,
-        )
+        # Build our widget on start
         self.reload_widget()
+
         # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
 
@@ -161,22 +157,7 @@ class Character(ft.Tab):
         self.content=ft.Container()
 
 
-    # Makes our widget invisible
-    def hide_widget(self):
-        self.visible = False
-        user.active_story.master_stack.update()
-        render_widgets(self.p)
-
-    def show_widget(self):
-        self.visible = True
-        user.active_story.master_stack.update()
-        render_widgets(self.p)
-        self.p.update()
-
-    def change_color(self, color):
-        self.color = color
-        self.reload_widget()
-        self.p.update()
+    
 
     
     # Called when the morality dropdown is changed
