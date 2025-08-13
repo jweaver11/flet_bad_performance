@@ -69,7 +69,11 @@ def main(page: ft.Page):
         user.active_story.widgets.update()
         user.active_story.master_stack.update()
     active_rail_resizer = ft.GestureDetector(
-        content=ft.VerticalDivider(thickness=2, width=10, color=ft.Colors.OUTLINE_VARIANT),  # Makes it invisible
+        content=ft.Container(
+            width=10,
+            padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+            content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT)
+        ),
         on_pan_update=move_active_rail_divider,
         on_hover=show_horizontal_cursor,
     )
