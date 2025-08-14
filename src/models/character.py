@@ -144,8 +144,7 @@ class Character(Widget):
         tab = ft.Tabs(
             selected_index=0,
             animation_duration=0,
-            #overlay_color=ft.Colors.with_opacity(0.1, ft.Colors.ON_SECONDARY),
-            #overlay_color=ft.Colors.RED,
+            #divider_color=ft.Colors.TRANSPARENT,
             padding=ft.padding.all(0),
             label_padding=ft.padding.all(0),
             mouse_cursor=ft.MouseCursor.BASIC,

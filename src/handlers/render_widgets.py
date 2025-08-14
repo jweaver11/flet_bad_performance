@@ -247,6 +247,7 @@ def render_widgets(page: ft.Page):
 
     # Runs our arrange widgets function to make sure all widgets are in correct locations
     arrange_widgets()
+    
 
     # Change our cursor when we hover over a resizer (divieder). Either vertical or horizontal
     def show_vertical_cursor(e: ft.HoverEvent):
@@ -255,6 +256,123 @@ def render_widgets(page: ft.Page):
     def show_horizontal_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
         e.control.update()
+
+    # Remove any existing dividers from our pins that are from previous renders
+    story.top_pin.controls = [control for control in story.top_pin.controls if type(control) != ft.GestureDetector]
+    story.left_pin.controls = [control for control in story.left_pin.controls if type(control) != ft.GestureDetector]
+    story.main_pin.controls = [control for control in story.main_pin.controls if type(control) != ft.GestureDetector]
+    story.right_pin.controls = [control for control in story.right_pin.controls if type(control) != ft.GestureDetector]
+    story.bottom_pin.controls = [control for control in story.bottom_pin.controls if type(control) != ft.GestureDetector]
+
+    # Create gesture detector dividers and insert them between each control. Start with top pin
+    # First, get only visible controls to determine where dividers should go
+    visible_top_controls = [control for control in story.top_pin.controls if getattr(control, 'visible', True)]
+    if len(visible_top_controls) > 1:
+        # Work backwards to avoid index shifting issues when inserting
+        # Find positions of visible controls in the original list and insert dividers between them
+        visible_indices = [i for i, control in enumerate(story.top_pin.controls) if getattr(control, 'visible', True)]
+        for i in range(len(visible_indices) - 1, 0, -1):
+            # Insert divider after the (i-1)th visible control
+            insert_position = visible_indices[i]
+            gd = ft.GestureDetector(
+                content=ft.Container(
+                    width=10,
+                    bgcolor=ft.Colors.TRANSPARENT,
+                    padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+                    content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
+                ),
+                on_hover=show_horizontal_cursor,
+                #on_pan_update=resize the left pin controls
+            )
+            story.top_pin.controls.insert(insert_position, gd)
+    
+    # left pin
+    # First, get only visible controls to determine where dividers should go
+    visible_left_controls = [control for control in story.left_pin.controls if getattr(control, 'visible', True)]
+    if len(visible_left_controls) > 1:
+        # Work backwards to avoid index shifting issues when inserting
+        # Find positions of visible controls in the original list and insert dividers between them
+        visible_indices = [i for i, control in enumerate(story.left_pin.controls) if getattr(control, 'visible', True)]
+        for i in range(len(visible_indices) - 1, 0, -1):
+            # Insert divider after the (i-1)th visible control
+            insert_position = visible_indices[i]
+            gd = ft.GestureDetector(
+                content=ft.Container(
+                    height=10,
+                    bgcolor=ft.Colors.TRANSPARENT,
+                    padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
+                    content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
+                ),
+                on_hover=show_vertical_cursor,
+                #on_pan_update=resize the left pin controls
+            )
+            story.left_pin.controls.insert(insert_position, gd)
+
+    # Create gesture detector dividers and insert them between each control for main pin
+    # First, get only visible controls to determine where dividers should go
+    visible_main_controls = [control for control in story.main_pin.controls if getattr(control, 'visible', True)]
+    if len(visible_main_controls) > 1:
+        # Work backwards to avoid index shifting issues when inserting
+        # Find positions of visible controls in the original list and insert dividers between them
+        visible_indices = [i for i, control in enumerate(story.main_pin.controls) if getattr(control, 'visible', True)]
+        for i in range(len(visible_indices) - 1, 0, -1):
+            # Insert divider after the (i-1)th visible control
+            insert_position = visible_indices[i]
+            gd = ft.GestureDetector(
+                content=ft.Container(
+                    width=10,
+                    bgcolor=ft.Colors.TRANSPARENT,
+                    padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+                    content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
+                ),
+                on_hover=show_horizontal_cursor,
+                #on_pan_update=resize the left pin controls
+            )
+            story.main_pin.controls.insert(insert_position, gd)
+
+    # right pin
+    # First, get only visible controls to determine where dividers should go
+    visible_right_controls = [control for control in story.right_pin.controls if getattr(control, 'visible', True)]
+    if len(visible_right_controls) > 1:
+        # Work backwards to avoid index shifting issues when inserting
+        # Find positions of visible controls in the original list and insert dividers between them
+        visible_indices = [i for i, control in enumerate(story.right_pin.controls) if getattr(control, 'visible', True)]
+        for i in range(len(visible_indices) - 1, 0, -1):
+            # Insert divider after the (i-1)th visible control
+            insert_position = visible_indices[i]
+            gd = ft.GestureDetector(
+                content=ft.Container(
+                    height=10,
+                    bgcolor=ft.Colors.TRANSPARENT,
+                    padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
+                    content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
+                ),
+                on_hover=show_vertical_cursor,
+            )
+            story.right_pin.controls.insert(insert_position, gd)
+
+    # bottom pin
+    # First, get only visible controls to determine where dividers should go
+    visible_bottom_controls = [control for control in story.bottom_pin.controls if getattr(control, 'visible', True)]
+    if len(visible_bottom_controls) > 1:
+        # Work backwards to avoid index shifting issues when inserting
+        # Find positions of visible controls in the original list and insert dividers between them
+        visible_indices = [i for i, control in enumerate(story.bottom_pin.controls) if getattr(control, 'visible', True)]
+        for i in range(len(visible_indices) - 1, 0, -1):
+            # Insert divider after the (i-1)th visible control
+            insert_position = visible_indices[i]
+            gd = ft.GestureDetector(
+                content=ft.Container(
+                    width=10,
+                    bgcolor=ft.Colors.TRANSPARENT,
+                    padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+                    content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
+                ),
+                on_hover=show_horizontal_cursor,
+            )
+            story.bottom_pin.controls.insert(insert_position, gd)
+    
+
 
     # Method called when our divider (inside a gesture detector) is dragged
     # Updates the size of our pin in the story object
@@ -268,10 +386,9 @@ def render_widgets(page: ft.Page):
 
     # The control that holds our divider, which we drag to resize the top pin
     top_pin_resizer = ft.GestureDetector(
-        #content=ft.Divider(thickness=1, height=10, opacity=.7, color=ft.Colors.PRIMARY),
         content=ft.Container(
             height=10,
-            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,
             padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
             content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
@@ -287,7 +404,6 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     left_pin_resizer = ft.GestureDetector(
-        #content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # Makes it invisible
         content=ft.Container(
             width=10,
             bgcolor=ft.Colors.TRANSPARENT,
@@ -308,10 +424,9 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     right_pin_resizer = ft.GestureDetector(
-        #content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
         content=ft.Container(
             width=10,
-            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,
             padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
             content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
@@ -327,10 +442,9 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     bottom_pin_resizer = ft.GestureDetector(
-        #content=ft.Divider(thickness=1, height=10, opacity=.7, color=ft.Colors.PRIMARY),
         content=ft.Container(
             height=10,
-            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,
             padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
             content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
@@ -338,7 +452,8 @@ def render_widgets(page: ft.Page):
         on_hover=show_vertical_cursor,
     )
 
-    
+
+
     # Formatted pin locations that hold our drag targets, and our resizer gesture detectors.
     # Main pin is always expanded and has no resizer, so it doesnt need to be formatted
     formatted_top_pin = ft.Column(spacing=0, controls=[story.top_pin, top_pin_resizer])
@@ -416,5 +531,3 @@ def render_widgets(page: ft.Page):
     ]
     page.update()
 
-
-# Add stack so drag targets are same size as pin??
