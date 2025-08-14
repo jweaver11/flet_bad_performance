@@ -1,6 +1,7 @@
 import flet as ft
 from models.user import user
 from handlers.render_widgets import render_widgets
+from handlers.render_widgets import show_pin_drag_targets
 
 # An extended flet tab that every object in our story will derive from
 # Has a title, tag, page reference, and pin location
@@ -20,6 +21,48 @@ class Widget(ft.Container):
             icon_color=ft.Colors.OUTLINE,
         )
 
+        # Tab that holds our widget label and body.
+        # This needs to be nested in a ft.Tabs control or it wont render.
+        # We do this so we can use tabs in the main pin area, and user it as a container on the other pins
+        self.tab = ft.Tab(
+            content=ft.Container(), #Initialize the content
+            tab_content=ft.Draggable(       # Keeps each tab draggable and uniform
+                group="widgets",
+                data=self,
+                on_drag_start=show_pin_drag_targets,
+                on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
+                #on_drag_cancel=impliment when we have custom draggables
+                content_feedback=ft.TextButton(self.title),
+                content=ft.GestureDetector(
+                    mouse_cursor=ft.MouseCursor.CLICK,
+                    on_hover=self.hover_tab,
+                    on_exit=self.stop_hover_tab,
+                    #on_tap=self.on_tab_click,  # Add click handler for tab switching
+                    content=ft.Row(
+                        controls=[
+                            ft.Container(width=6), # Padding we can still drag
+                            ft.Text(
+                                weight=ft.FontWeight.BOLD, 
+                                color=self.tab_color, 
+                                theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
+                                value=self.title, 
+                                
+                                #on_click=None,
+                                #style=ft.ButtonStyle(
+                                    #padding=ft.padding.only(left=6),
+                                    #shadow_color="transparent",       # No shadow
+                                    #overlay_color="transparent"       # No click effect/splash
+                                #),
+                                #text=self.title,
+                            ),
+                            self.hide_tab_icon,    # From the widget class
+                        ]
+                    )
+                ),
+            ),
+                                
+        )
+
         super().__init__(
             expand=True, 
             #padding=6,
@@ -37,6 +80,31 @@ class Widget(ft.Container):
     def stop_hover_tab(self, e):
         self.hide_tab_icon.icon_color = ft.Colors.OUTLINE
         self.p.update()
+
+    def on_tab_click(self, e):
+        """Handle tab click to switch to this tab"""
+        # Find the parent Tabs control and set this tab as selected
+        try:
+            # Get the story object
+            from models.user import user
+            story = user.active_story
+            
+            # Find the tabs control in the main pin area
+            visible_main_controls = [control for control in story.main_pin.controls if getattr(control, 'visible', True)]
+            if len(visible_main_controls) > 1:
+                # Find which tab index this widget corresponds to
+                for i, control in enumerate(visible_main_controls):
+                    if control == self:
+                        # Find the tabs control and set the selected index
+                        # We need to trigger a re-render to update the tabs
+                        from handlers.render_widgets import render_widgets
+                        
+                        # Store the selected tab index in the story object
+                        story.selected_main_tab_index = i
+                        render_widgets(self.p)
+                        break
+        except Exception as ex:
+            print(f"Error switching tab: {ex}")
 
         
 

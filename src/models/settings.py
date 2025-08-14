@@ -16,6 +16,8 @@ class Settings(Widget):
             pin_location = "main",  # Start in left pin location
         )
 
+        self.visible = False
+
         # Save theme mode of either light or dark
         self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
         self.theme_color_scheme = ft.Colors.BLUE    # Save our color scheme for the theme
@@ -109,24 +111,7 @@ class Settings(Widget):
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
 
 
-        self.visible = False
-        self.text = self.title    # Good for a backup, but content will be used if its not empty
-
-        self.tab_content = ft.Row(
-            #alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                ft.Text(
-                    weight=ft.FontWeight.BOLD, 
-                    color=ft.Colors.PRIMARY, 
-                    value=self.title, 
-                ),
-                ft.IconButton(
-                    scale=0.7,
-                    on_click=lambda e: self.hide_widget(),
-                    icon=ft.Icons.CLOSE_ROUNDED,
-                ),
-            ]
-        )
+        
 
         self.content=ft.Column([
             ft.TextButton(
@@ -139,6 +124,8 @@ class Settings(Widget):
             self.color_scheme_dropdown,
 
         ])
+
+        self.tab.content = self.content
 
         
     

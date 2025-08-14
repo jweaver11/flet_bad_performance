@@ -38,6 +38,7 @@ def arrange_widgets():
         if hasattr(obj, 'pin_location') and obj.pin_location != "main":
             story.main_pin.controls.remove(obj)
             update_pin_location(obj)
+    
     for obj in story.right_pin.controls[:]:
         if hasattr(obj, 'pin_location') and obj.pin_location != "right":
             story.right_pin.controls.remove(obj)

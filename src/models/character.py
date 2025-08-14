@@ -1,7 +1,7 @@
 import flet as ft
 from models.user import user
 from models.widget import Widget
-from handlers.render_widgets import show_pin_drag_targets
+
 
 # Class for character objects in the story. Every object needs a title, and a page reference when created
 class Character(Widget):
@@ -141,6 +141,9 @@ class Character(Widget):
             content=ft.Text("hi from " + self.title),
         )
 
+        self.tab.content=body
+
+        # Sets our header
         tab = ft.Tabs(
             selected_index=0,
             animation_duration=0,
@@ -148,43 +151,11 @@ class Character(Widget):
             padding=ft.padding.all(0),
             label_padding=ft.padding.all(0),
             mouse_cursor=ft.MouseCursor.BASIC,
-            tabs=[
-                ft.Tab(
-                    tab_content=ft.Draggable(
-                        group="widgets",
-                        data=self,
-                        on_drag_start=show_pin_drag_targets,
-                        on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
-                        #on_drag_cancel=impliment when we have custom draggables
-                        content_feedback=ft.TextButton(self.title),    
-                        content=ft.GestureDetector(
-                            mouse_cursor=ft.MouseCursor.CLICK,
-                            on_hover=self.hover_tab,
-                            on_exit=self.stop_hover_tab,
-                            content=ft.Row(
-                            controls=[
-                                #ft.Container(width=6), # Padding we can still drag
-                                ft.TextButton(
-                                    #weight=ft.FontWeight.BOLD, 
-                                    #color=self.name_color, 
-                                    #theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
-                                    #value=self.title, 
-                                    style=ft.ButtonStyle(
-                                        padding=ft.padding.only(left=6),
-                                        shadow_color="transparent",       # No shadow
-                                        overlay_color="transparent"       # No click effect/splash
-                                    ),
-                                    text=self.title,
-                                ),
-                                self.hide_tab_icon,    # From the widget class
-                            ]
-                        ))
-                    ),
-                    content=body,
-                                
-        )]
+            tabs=[self.tab,]    # Gives our tab control here
+                 
+        )
           
-         )
+         
 
         
         # Set our content

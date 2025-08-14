@@ -105,7 +105,7 @@ class Story:
         elif obj.pin_location == "left" and obj not in self.left_pin.controls:
             self.left_pin.controls.append(obj)
         elif obj.pin_location == "main" and obj not in self.main_pin.controls:
-            self.main_pin.controls.append(obj)
+            self.main_pin.controls.append(obj)  
         elif obj.pin_location == "right" and obj not in self.right_pin.controls:
             self.right_pin.controls.append(obj)
         elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:

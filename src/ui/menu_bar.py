@@ -2,6 +2,7 @@
 import flet as ft
 from models.user import user
 from handlers.render_widgets import remove_drag_targets
+from handlers.render_widgets import render_widgets
 
 def create_menu_bar(page: ft.Page):
     
@@ -132,6 +133,7 @@ def create_menu_bar(page: ft.Page):
 
     def settings_clicked(e):
         user.settings.visible = not user.settings.visible
+        render_widgets(page)  # Re-render the page to show/hide settings
         page.update()
 
     # Create our container for the menu bar
