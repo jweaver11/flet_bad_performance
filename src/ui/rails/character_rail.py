@@ -436,6 +436,7 @@ def reload_character_rail(page: ft.Page):
     main_characters.controls.append(
         ft.IconButton(
             ft.Icons.ADD_ROUNDED, 
+            tooltip="Create Main Character",
             on_click=lambda e: create_character("main", page),
             icon_color=ft.Colors.PRIMARY,  # Match expanded color
         )
@@ -443,6 +444,7 @@ def reload_character_rail(page: ft.Page):
     side_characters.controls.append(
         ft.IconButton(
             ft.Icons.ADD_ROUNDED, 
+            tooltip="Create Side Character",
             on_click=lambda e: create_character("side", page),
             icon_color=ft.Colors.PRIMARY,  # Match expanded color
         )
@@ -450,6 +452,7 @@ def reload_character_rail(page: ft.Page):
     background_characters.controls.append(
         ft.IconButton(
             ft.Icons.ADD_ROUNDED, 
+            tooltip="Create Background Character",
             on_click=lambda e: create_character("background", page),
             icon_color=ft.Colors.PRIMARY,  # Match expanded color
         )

@@ -229,12 +229,12 @@ pin_drag_targets = [
     ),
     ft.Container(
         content=left_pin_drag_target,
-        width=200,
+        width=220,
         left=0, top=0, bottom=0,
     ),
     ft.Container(
         content=right_pin_drag_target,
-        width=200,
+        width=220,
         right=0, top=0, bottom=0, 
     ),
     
