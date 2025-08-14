@@ -62,7 +62,7 @@ class Settings(Widget):
         )
         
         # Background color of widgets that changes depending if in light theme or dark theme
-        self.workspace_bgcolor = ft.Colors.ON_SECONDARY #if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+        #self.workspace_bgcolor = ft.Colors.ON_SECONDARY #if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
 
         
 
@@ -92,13 +92,13 @@ class Settings(Widget):
             if self.user_theme_mode == ft.ThemeMode.DARK:   # Check which theme we're on
                 self.user_theme_mode = ft.ThemeMode.LIGHT   # change the theme mode so we can save it
                 self.theme_button.icon = ft.Icons.DARK_MODE # Change the icon of theme button
-                self.workspace_bgcolor = ft.Colors.GREY_200
+                
             elif self.user_theme_mode == ft.ThemeMode.LIGHT:
                 self.user_theme_mode = ft.ThemeMode.DARK
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
-                self.workspace_bgcolor = ft.Colors.GREY_900
+               
 
-            user.workspace.bgcolor = self.workspace_bgcolor
+            #user.workspace.bgcolor = self.workspace_bgcolor
             self.p.theme_mode = self.user_theme_mode
             self.p.update()
             print(self.user_theme_mode)

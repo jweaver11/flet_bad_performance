@@ -162,6 +162,7 @@ class All_Workspaces_Rail(ft.Container):
         # so we can reorder them
         self.r0 = ft.NavigationRail(
             height=70,  # Set height of each rail
+            bgcolor=ft.Colors.TRANSPARENT,
             on_change=on_workspace_change,  # When the rail is clicked
             destinations=[
                 ft.NavigationRailDestination(
@@ -173,6 +174,7 @@ class All_Workspaces_Rail(ft.Container):
         )
         self.r1 = ft.NavigationRail(
             height=70,
+            bgcolor=ft.Colors.TRANSPARENT,
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
@@ -184,6 +186,7 @@ class All_Workspaces_Rail(ft.Container):
         )
         self.r2 = ft.NavigationRail(
             height=70,
+            bgcolor=ft.Colors.TRANSPARENT,
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
@@ -195,6 +198,7 @@ class All_Workspaces_Rail(ft.Container):
         )
         self.r3 = ft.NavigationRail(
             height=70,
+            bgcolor=ft.Colors.TRANSPARENT,
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
@@ -206,6 +210,7 @@ class All_Workspaces_Rail(ft.Container):
         )
         self.r4 = ft.NavigationRail(
             height=70,
+            bgcolor=ft.Colors.TRANSPARENT,
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
@@ -217,6 +222,7 @@ class All_Workspaces_Rail(ft.Container):
         )
         self.r5 = ft.NavigationRail(
             height=70,
+            bgcolor=ft.Colors.TRANSPARENT,
             on_change=on_workspace_change,
             destinations=[
                 ft.NavigationRailDestination(
@@ -242,6 +248,7 @@ class All_Workspaces_Rail(ft.Container):
         super().__init__(
             alignment=ft.alignment.center,  # Aligns content to the 
             width=130,
+            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
             padding=ft.padding.only(bottom=10),
             content=ft.Column(
                 alignment=ft.alignment.center,

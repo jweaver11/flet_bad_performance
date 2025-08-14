@@ -20,17 +20,24 @@ class Widget(ft.Container):
             icon_color=ft.Colors.OUTLINE,
         )
 
-
         super().__init__(
             expand=True, 
             #padding=6,
             #border=ft.border.all(1, self.tab_color),  # Gives a border to match the widgets border
             #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
             #bgcolor=ft.Colors.ON_SECONDARY,
-            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
         )
 
-            
+    def hover_tab(self, e):
+        self.hide_tab_icon.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
+        self.p.update()
+
+    def stop_hover_tab(self, e):
+        self.hide_tab_icon.icon_color = ft.Colors.OUTLINE
+        self.p.update()
+
         
 
     # Makes our widget invisible

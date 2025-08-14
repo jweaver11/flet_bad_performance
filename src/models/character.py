@@ -134,17 +134,23 @@ class Character(Widget):
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
 
-        body = ft.Text("hi from " + self.title)
+        body = ft.Container(
+            expand=True,
+            padding=6,
+            #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            content=ft.Text("hi from " + self.title),
+        )
 
         tab = ft.Tabs(
             selected_index=0,
             animation_duration=0,
+            #overlay_color=ft.Colors.with_opacity(0.1, ft.Colors.ON_SECONDARY),
+            #overlay_color=ft.Colors.RED,
             padding=ft.padding.all(0),
             label_padding=ft.padding.all(0),
             mouse_cursor=ft.MouseCursor.BASIC,
             tabs=[
                 ft.Tab(
-                    
                     tab_content=ft.Draggable(
                         group="widgets",
                         data=self,
@@ -158,13 +164,14 @@ class Character(Widget):
                             on_exit=self.stop_hover_tab,
                             content=ft.Row(
                             controls=[
-                                ft.Container(width=6), # Padding we can still drag
+                                #ft.Container(width=6), # Padding we can still drag
                                 ft.TextButton(
                                     #weight=ft.FontWeight.BOLD, 
                                     #color=self.name_color, 
                                     #theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
                                     #value=self.title, 
                                     style=ft.ButtonStyle(
+                                        padding=ft.padding.only(left=6),
                                         shadow_color="transparent",       # No shadow
                                         overlay_color="transparent"       # No click effect/splash
                                     ),
@@ -179,27 +186,14 @@ class Character(Widget):
         )]
           
          )
-            
-                   
-            
-            
-            
-        
-        
+
         
         # Set our content
         self.content = tab
                             #ft.Divider(color=self.tab_color, thickness=2),
                        
             
-        
-    def hover_tab(self, e):
-        self.hide_tab_icon.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
-        self.p.update()
-
-    def stop_hover_tab(self, e):
-        self.hide_tab_icon.icon_color = ft.Colors.OUTLINE
-        self.p.update()
+    
     
     # Change our tab color of widget. Accepts a flet color as parameter
     def change_color(self, color):

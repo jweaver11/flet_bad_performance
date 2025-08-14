@@ -290,7 +290,7 @@ def render_widgets(page: ft.Page):
         #content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # Makes it invisible
         content=ft.Container(
             width=10,
-            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,
             padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
             content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),

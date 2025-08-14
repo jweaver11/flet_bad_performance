@@ -71,6 +71,7 @@ def main(page: ft.Page):
     active_rail_resizer = ft.GestureDetector(
         content=ft.Container(
             width=10,
+            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
             padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
             content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT)
         ),
