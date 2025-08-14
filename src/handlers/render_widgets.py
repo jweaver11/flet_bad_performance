@@ -354,10 +354,18 @@ def render_widgets(page: ft.Page):
     visible_main_controls = [control for control in story.main_pin.controls if getattr(control, 'visible', True)]
     print("visible main controls:", len(visible_main_controls))
     if len(visible_main_controls) > 1:
+        # Get the selected tab index from the story object, default to 0
+        selected_tab_index = getattr(story, 'selected_main_tab_index', 0)
+        # Ensure the index is within bounds
+        if selected_tab_index >= len(visible_main_controls):
+            selected_tab_index = 0
+            story.selected_main_tab_index = 0
+            
         # Temporary
         formatted_main_pin = ft.Tabs(
-            selected_index=0,
+            selected_index=selected_tab_index,
             animation_duration=0,
+            expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
             #divider_color=ft.Colors.TRANSPARENT,
             padding=ft.padding.all(0),
             label_padding=ft.padding.all(0),
@@ -522,7 +530,7 @@ def render_widgets(page: ft.Page):
             controls=[
                 formatted_top_pin,    # formatted top pin
                 formatted_main_pin,     # main work area with widgets
-                formatted_bottom_pin     # formatted bottom pin
+                formatted_bottom_pin,     # formatted bottom pin
         ]),
         formatted_right_pin,    # formatted right pin
     ]
