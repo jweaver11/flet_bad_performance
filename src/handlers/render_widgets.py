@@ -184,12 +184,12 @@ minimum_pin_width = 230
 # Pin drag targets
 top_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    content=ft.Container(expand=True, bgcolor=ft.Colors.WHITE, opacity=0), 
     on_accept=top_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
 left_pin_drag_target = ft.DragTarget(
     group="widgets",
-    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    content=ft.Container(expand=True, width=minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
     on_accept=left_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
 main_pin_drag_target = ft.DragTarget(
@@ -199,7 +199,7 @@ main_pin_drag_target = ft.DragTarget(
 )
 right_pin_drag_target = ft.DragTarget(
     group="widgets", 
-    content=ft.Container(expand=True, height=minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
+    content=ft.Container(expand=True, width=minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
     on_accept=right_pin_drag_accept, on_will_accept=on_hover_pin_drag_target, on_leave=on_leave_pin,
 )
 bottom_pin_drag_target = ft.DragTarget(
@@ -210,12 +210,22 @@ bottom_pin_drag_target = ft.DragTarget(
 
 # List of Controls (Containers) that hold our drag targets we just created
 # Must be in containers in order to position them inside the stack
-# Surrounding drag target is on the bottom
+# Surrounding drag target is on the bottom. Order matters here
 pin_drag_targets = [
+    ft.Container(
+        expand=True, height=minimum_pin_height,
+        content=main_pin_drag_target,
+        top=200, left=200, right=200, bottom=200, 
+    ),
     ft.Container(
         content=top_pin_drag_target,
         height=200,
-        top=0, left=200, right=200, 
+        top=0, left=0, right=0, 
+    ),
+    ft.Container(
+        content=bottom_pin_drag_target,
+        height=200,
+        bottom=0, left=0, right=0,
     ),
     ft.Container(
         content=left_pin_drag_target,
@@ -223,19 +233,11 @@ pin_drag_targets = [
         left=0, top=0, bottom=0,
     ),
     ft.Container(
-        content=main_pin_drag_target,
-        top=200, left=200, right=200, bottom=200, 
-    ),
-    ft.Container(
         content=right_pin_drag_target,
         width=200,
         right=0, top=0, bottom=0, 
     ),
-    ft.Container(
-        content=bottom_pin_drag_target,
-        height=200,
-        bottom=0, left=200, right=200,
-    ),
+    
 ]
 print("render_widgets called")
 
@@ -259,13 +261,20 @@ def render_widgets(page: ft.Page):
     def move_top_pin_divider(e: ft.DragUpdateEvent):
         if (e.delta_y > 0 and story.top_pin.height < page.height/2) or (e.delta_y < 0 and story.top_pin.height > 200):
             story.top_pin.height += e.delta_y
+            top_pin_drag_target.content.height = story.top_pin.height  # Update the drag target height to match the pin height
         formatted_top_pin.update()
         story.widgets.update() # Update the main pin, as it is affected by all pins resizing
         story.master_stack.update()
 
     # The control that holds our divider, which we drag to resize the top pin
     top_pin_resizer = ft.GestureDetector(
-        content=ft.Divider(thickness=1, height=10, opacity=.7, color=ft.Colors.PRIMARY),
+        #content=ft.Divider(thickness=1, height=10, opacity=.7, color=ft.Colors.PRIMARY),
+        content=ft.Container(
+            height=10,
+            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
+            content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
+        ),
         on_pan_update=move_top_pin_divider,
         on_hover=show_vertical_cursor,
     )
@@ -278,7 +287,13 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     left_pin_resizer = ft.GestureDetector(
-        content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # Makes it invisible
+        #content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # Makes it invisible
+        content=ft.Container(
+            width=10,
+            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+            content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
+        ),
         on_pan_update=move_left_pin_divider,
         on_hover=show_horizontal_cursor,
     )
@@ -293,7 +308,13 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     right_pin_resizer = ft.GestureDetector(
-        content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
+        #content=ft.VerticalDivider(thickness=1, width=10, opacity=.7, color=ft.Colors.PRIMARY),  # color=ft.Colors.TRANSPARENT
+        content=ft.Container(
+            width=10,
+            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+            content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
+        ),
         on_pan_update=move_right_pin_divider,
         on_hover=show_horizontal_cursor,
     )
@@ -306,7 +327,13 @@ def render_widgets(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     bottom_pin_resizer = ft.GestureDetector(
-        content=ft.Divider(thickness=1, height=10, opacity=.7, color=ft.Colors.PRIMARY),
+        #content=ft.Divider(thickness=1, height=10, opacity=.7, color=ft.Colors.PRIMARY),
+        content=ft.Container(
+            height=10,
+            bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
+            content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
+        ),
         on_pan_update=move_bottom_pin_divider,
         on_hover=show_vertical_cursor,
     )

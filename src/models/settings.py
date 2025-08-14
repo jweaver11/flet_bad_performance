@@ -62,7 +62,7 @@ class Settings(Widget):
         )
         
         # Background color of widgets that changes depending if in light theme or dark theme
-        self.workspace_bgcolor = ft.Colors.ON_SECONDARY if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+        self.workspace_bgcolor = ft.Colors.ON_SECONDARY #if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
 
         
 

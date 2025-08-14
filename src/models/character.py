@@ -21,6 +21,7 @@ class Character(Widget):
         
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
+
         self.character_data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
@@ -132,55 +133,73 @@ class Character(Widget):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        #self.text=self.title    # Good for a backup, but content will be used if its not empty
 
-        tab = ft.GestureDetector(
-            mouse_cursor=ft.MouseCursor.CLICK,  # Not working
-            content=ft.Draggable(
-                group="widgets",
-                data=self,
-                on_drag_start=show_pin_drag_targets,
-                on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
-                #on_drag_cancel=impliment when we have custom draggables
-                content_feedback=ft.TextButton(self.title),
-                content=ft.Column([
-                    ft.Row(
-                        #alignment=ft.MainAxisAlignment.CENTER,
-                        controls=[
-                            ft.Text(
-                                weight=ft.FontWeight.BOLD, 
-                                color=self.name_color, 
-                                value=self.title, 
-                            ),
-                            ft.IconButton(
-                                scale=0.8,
-                                on_click=lambda e: self.hide_widget(),
-                                icon=ft.Icons.CLOSE_ROUNDED,
-                            ),
-                        ]
-                    ),
-                    ft.Divider(color=self.tab_color, thickness=2),
-                ])
-        
-                )
-            )
-        
-        
-        
         body = ft.Text("hi from " + self.title)
+
+        tab = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+            tabs=[
+                ft.Tab(
+                    
+                    tab_content=ft.Draggable(
+                        group="widgets",
+                        data=self,
+                        on_drag_start=show_pin_drag_targets,
+                        on_drag_complete=lambda e: print(f"Drag completed for {self.title}"),
+                        #on_drag_cancel=impliment when we have custom draggables
+                        content_feedback=ft.TextButton(self.title),    
+                        content=ft.GestureDetector(
+                            mouse_cursor=ft.MouseCursor.CLICK,
+                            on_hover=self.hover_tab,
+                            on_exit=self.stop_hover_tab,
+                            content=ft.Row(
+                            controls=[
+                                ft.Container(width=6), # Padding we can still drag
+                                ft.TextButton(
+                                    #weight=ft.FontWeight.BOLD, 
+                                    #color=self.name_color, 
+                                    #theme_style=ft.TextThemeStyle.TITLE_MEDIUM,
+                                    #value=self.title, 
+                                    style=ft.ButtonStyle(
+                                        shadow_color="transparent",       # No shadow
+                                        overlay_color="transparent"       # No click effect/splash
+                                    ),
+                                    text=self.title,
+                                ),
+                                self.hide_tab_icon,    # From the widget class
+                            ]
+                        ))
+                    ),
+                    content=body,
+                                
+        )]
+          
+         )
+            
+                   
+            
+            
+            
+        
+        
         
         # Set our content
-        self.content = ft.Column(
-            spacing=0,
-            expand=True,
-            controls=[
-                tab,
-                #ft.Divider(color=self.tab_color, thickness=2),
-                body
-            ]
-        )
+        self.content = tab
+                            #ft.Divider(color=self.tab_color, thickness=2),
+                       
+            
         
+    def hover_tab(self, e):
+        self.hide_tab_icon.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
+        self.p.update()
 
+    def stop_hover_tab(self, e):
+        self.hide_tab_icon.icon_color = ft.Colors.OUTLINE
+        self.p.update()
     
     # Change our tab color of widget. Accepts a flet color as parameter
     def change_color(self, color):

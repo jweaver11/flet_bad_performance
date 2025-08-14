@@ -19,11 +19,11 @@ class Story:
        # Gives our story a title when its created
         self.title=title
 
-        self.top_pin = ft.Row(height=0, controls=[])
-        self.left_pin = ft.Column(width=0, controls=[])
-        self.main_pin = ft.Row(expand=True, controls=[])
-        self.right_pin = ft.Column(width=0, controls=[])
-        self.bottom_pin = ft.Row(height=0, controls=[])
+        self.top_pin = ft.Row(height=0, spacing=0, controls=[])
+        self.left_pin = ft.Column(width=0, spacing=0, controls=[])
+        self.main_pin = ft.Row(expand=True, spacing=0, controls=[])
+        self.right_pin = ft.Column(width=0, spacing=0, controls=[])
+        self.bottom_pin = ft.Row(height=0, spacing=0, controls=[])
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
