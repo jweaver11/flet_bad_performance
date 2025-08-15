@@ -168,7 +168,9 @@ class Story:
             # If we got here, the original object is serializable
             return character
         except Exception as e:
-            print(f"Original character not serializable: {e}")
+            # Flet controls contain non-serializable event handlers, so we fall back to dictionary serialization
+            # This is expected behavior and not an error
+            print(f"Using dictionary serialization for character '{character.title}' (Flet controls detected)")
             # Create a minimal serializable version
             serializable_data = {
                 'title': character.title,
@@ -245,6 +247,12 @@ class Story:
                             character.character_data[key].value = value
                         elif hasattr(character.character_data[key], 'data'):
                             character.character_data[key].data = value
+                        else:
+                            # For simple values like Role, set directly
+                            character.character_data[key] = value
+            
+            # Debug: Check what Role was restored
+            print(f"Character '{character.title}' reconstructed with Role: {character.character_data.get('Role', 'No Role')}")
             
             print(f"Successfully reconstructed character '{character.title}' from serialized data")
             return character

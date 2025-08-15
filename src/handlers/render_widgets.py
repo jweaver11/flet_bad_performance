@@ -146,6 +146,7 @@ def right_pin_drag_accept(e):
         print("src_id not found in event data")
 
     object.pin_location = "right"
+    print("object moved to ", object.pin_location, " pin")
     arrange_widgets()       
     render_widgets(e.page)  
     

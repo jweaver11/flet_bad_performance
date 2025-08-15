@@ -14,15 +14,15 @@ import json
 # Called when hovered over a character on the rail
 # Shows our two buttons rename and delete
 def show_options(e):
-    e.control.content.content.content.controls[2].opacity = 1
-    e.control.content.content.content.controls[2].update()
+    e.control.content.controls[2].opacity = 1
+    e.control.content.controls[2].update()
     
 
 # Called when mouse leaves a character on the rail
 # Hides our two buttons rename and delete
 def hide_options(e):
-    e.control.content.content.content.controls[2].opacity = 0
-    e.control.content.content.content.controls[2].update()
+    e.control.content.controls[2].opacity = 0
+    e.control.content.controls[2].update()
     
 
 # Called when user clicks rename button on the character on the rail
@@ -251,6 +251,8 @@ def make_main_character(e, page: ft.Page):
     # Change our character tags to reflect its new category    
     if hasattr(object, 'character_data'):
         object.character_data["Role"] = "Main"
+        # Save the updated character data to pickle file
+        object.save_to_file()
     else:
         print("Object does not have tags attribute, cannot change character type")
 
@@ -273,6 +275,8 @@ def make_side_character(e, page: ft.Page):
         
     if hasattr(object, 'character_data'):
         object.character_data["Role"] = "Side"
+        # Save the updated character data to pickle file
+        object.save_to_file()
     else:
         print("Object does not have tags attribute, cannot change character type")
     reload_character_rail(page)
@@ -294,6 +298,9 @@ def make_background_character(e, page: ft.Page):
         
     if hasattr(object, 'character_data'):
         object.character_data["Role"] = "Background"
+        print(object.character_data["Role"])
+        # Save the updated character data to pickle file
+        object.save_to_file()
     else:
         print("Object does not have tags attribute, cannot change character type")
     reload_character_rail(page)
@@ -360,22 +367,22 @@ def reload_character_rail(page: ft.Page):
     # Run through each character in our story
     for character in user.active_story.characters:
         # Create a new character widget for the rail
-        new_char = ft.GestureDetector(
-            #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click.. Causes other buttons to be delayed rn
-            on_hover=show_options,
-            on_exit=hide_options,
-            on_tap_down=lambda e, char=character: char.show_widget(),  # Show our widget if hidden when character clicked
-            mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
-            expand=True,
+
+        new_char = ft.Draggable(
+            content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
+            data=character,     # Pass in our character object when dragging
+            group="widgets",
             content=ft.Container(
-                #border=ft.border.all(2, character.color),  # Gives a border to match the widgets border
                 padding=ft.padding.only(left=4, right=4),   # padding
                 margin=ft.margin.only(bottom=2),    # Margin between characters on rail
                 border_radius=ft.border_radius.all(10),
-                content=ft.Draggable(
-                    content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
-                    data=character,     # Pass in our character object when dragging
-                    group="widgets",
+                content=ft.GestureDetector(
+                    #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click.. Causes other buttons to be delayed rn
+                    on_hover=show_options,
+                    on_exit=hide_options,
+                    on_tap_down=lambda e, char=character: char.show_widget(),  # Show our widget if hidden when character clicked
+                    mouse_cursor=ft.MouseCursor.CLICK,      # Change our cursor to the select cursor (not working)
+                    expand=True,
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         expand=True,
@@ -417,9 +424,13 @@ def reload_character_rail(page: ft.Page):
                             ),    
                         ],   
                     )
-                )
+                    )
             )
+
         )
+
+
+        
 
         # Still in for loop, add our character to category based on its tag
         if character.character_data["Role"] == "Main":
@@ -428,6 +439,19 @@ def reload_character_rail(page: ft.Page):
             side_characters.controls.append(new_char)
         elif character.character_data["Role"] == "Background":
             background_characters.controls.append(new_char)
+
+        if len(main_characters.controls) == 0:
+            main_characters.initially_expanded=False
+        else:
+            main_characters.initially_expanded=True
+        if len(side_characters.controls) == 0:
+            side_characters.initially_expanded=False
+        else:
+            side_characters.initially_expanded=True
+        if len(background_characters.controls) == 0:
+            background_characters.initially_expanded=False
+        else:
+            background_characters.initially_expanded=True
 
     # Add our 'create character' button at bottom of each category
     main_characters.controls.append(

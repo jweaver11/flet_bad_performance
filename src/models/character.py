@@ -1,6 +1,7 @@
 import flet as ft
 from models.user import user
 from models.widget import Widget
+import os
 
 
 # Class for character objects in the story. Every object needs a title, and a page reference when created
@@ -128,7 +129,17 @@ class Character(Widget):
         # Build our widget on start
         self.reload_widget()
 
-        # Reloads/builds our widget. Called after any changes happen to the data in it
+    def save_to_file(self):
+        """Save the character to its pickle file"""
+        try:
+            # Use the story's save method to handle the actual saving
+            user.active_story.save_object_to_file(self)
+            print(f"Character '{self.title}' saved successfully")
+        except Exception as e:
+            print(f"Error saving character '{self.title}': {e}")
+            
+
+    # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
@@ -151,7 +162,7 @@ class Character(Widget):
             padding=ft.padding.all(0),
             label_padding=ft.padding.all(0),
             mouse_cursor=ft.MouseCursor.BASIC,
-            tabs=[self.tab,]    # Gives our tab control here
+            tabs=[self.tab]    # Gives our tab control here
                  
         )
           
@@ -507,6 +518,16 @@ class Character(ft.Container):
     def expand_physical_description(self, e):
         print("expand physical description ran")
         
+
+    # Save this character to its pickle file
+    def save_to_file(self):
+        """Save the character to its pickle file"""
+        try:
+            # Use the story's save method to handle the actual saving
+            user.active_story.save_object_to_file(self)
+            print(f"Character '{self.title}' saved successfully")
+        except Exception as e:
+            print(f"Error saving character '{self.title}': {e}")
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
