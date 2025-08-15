@@ -3,21 +3,16 @@ Master Story class that contains data and methods for the entire story
 This is a dead-end model. Imports nothing else from project, or things will ciruclar import
 '''
 
-import os
 import flet as ft
-
-# Saving objects locally
-app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
-my_file_path = os.path.join(app_data_path, "characters.json")
-#with open(my_file_path, "w") as f:
-    #f.write(obj.title)  # Need to write object to json
+import json
+import os
 
 class Story:
     # Constructor for when new story is created
-    def __init__(self, title: str):
+    def __init__(self, title: str, path: str):
        
-       # Gives our story a title when its created
-        self.title=title
+        self.title=title # Gives our story a title when its created
+        self.path=path  # Gives us a path to save/load the story
 
         self.top_pin = ft.Row(height=0, spacing=0, controls=[])
         self.left_pin = ft.Column(width=0, spacing=0, controls=[])
@@ -117,6 +112,17 @@ class Story:
     def save_object_to_file(self, obj):
         print("object saved to file called")
 
+        if obj.tag == "character":
+            characters_path = self.path + "/characters/"
+            try:
+                with open(characters_path, 'w', encoding='utf-8') as f:
+                    json.dump(object.character_data, f, indent=2, ensure_ascii=False)
+                print(f"Character '{obj.title}' saved to {characters_path}")
+            except Exception as e:
+                print(f"Error saving character to file: {e}")
+            print("Saving character to file called")
+
+
 
     # Delete an object from the story. Only works for certain objects
     def delete_object_from_story(self, obj):
@@ -145,15 +151,6 @@ class Story:
 
         # delete_from_file()
 
-
-    # Workspaces within each story object
-    # Description
-    # Content
-    # Plot & imeline = ?
-    # World Building = ?
-    # Drawing Board = ?
-    # Notes = []
-    # Other workspaces??
 
 
 

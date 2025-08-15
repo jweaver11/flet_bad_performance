@@ -6,12 +6,9 @@ the create 'character button' at the bottom.
 
 import flet as ft
 from models.user import user
-#from models.character import Character, New_Char
 from models.character import Character
 from handlers.render_widgets import render_widgets
 import json
-
-story = user.active_story  # Get our story object from the user
 
 
 # Called when hovered over a character on the rail
@@ -65,7 +62,7 @@ def rename_character(character, page: ft.Page):
         )
         page.update()
 
-        for char in story.characters:
+        for char in user.active_story.characters:
             print (char.title)
 
     dialog_textfield_ref = ft.Ref[ft.TextField]()
@@ -112,7 +109,7 @@ def delete_character(character, page: ft.Page):
     def del_char(character):
         dlg.open = False
         page.update()
-        story.delete_object_from_story(character)
+        user.active_story.delete_object_from_story(character)
         reload_character_rail(page)
         render_widgets(page)
         page.open(
@@ -178,7 +175,7 @@ def create_character(tag, page: ft.Page):
 
             # Add our object (in this case character) to the story.
             # This story function handles pinning it and adding it to any lists
-            story.add_object_to_story(new_character)
+            user.active_story.add_object_to_story(new_character)
             reload_character_rail(page)   
             render_widgets(page)  
 
@@ -208,7 +205,7 @@ def create_character(tag, page: ft.Page):
 
     # checks if our character name is unique
     def check_character(name):
-        for character in story.characters:
+        for character in user.active_story.characters:
             if character.title.lower() == name.lower():
                 page.open(
                     ft.SnackBar(
@@ -361,7 +358,7 @@ def reload_character_rail(page: ft.Page):
     background_characters.controls.clear()
 
     # Run through each character in our story
-    for character in story.characters:
+    for character in user.active_story.characters:
         # Create a new character widget for the rail
         new_char = ft.GestureDetector(
             #on_double_tap=lambda e, char=character: rename_character(e, char),  # Rename character on double click.. Causes other buttons to be delayed rn
@@ -463,12 +460,9 @@ def reload_character_rail(page: ft.Page):
 def create_characters_rail(page: ft.Page):
 
     # Initially create some characters to test with
-    #story.add_object_to_story(Character("Bob", page))
-    #story.add_object_to_story(Character("Alice", page))
-    #story.add_object_to_story(Character("Joe", page))
-    story.add_object_to_story(Character("Bob", page))
-    story.add_object_to_story(Character("Alice", page))
-    story.add_object_to_story(Character("Joe", page))
+    user.active_story.add_object_to_story(Character("Bob", page))
+    user.active_story.add_object_to_story(Character("Alice", page))
+    user.active_story.add_object_to_story(Character("Joe", page))
 
     # Set our drag targets on accept methods here so we can pass in our page
     main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
@@ -481,7 +475,7 @@ def create_characters_rail(page: ft.Page):
         ft.Column(
             spacing=0, 
             expand=True, 
-            scroll=ft.ScrollMode.AUTO,  # Column to hold our character lists
+            scroll=ft.ScrollMode.AUTO, 
             controls=[
                 # Our drag targets that hold each character list for each category
                 main_characters_drag_target,

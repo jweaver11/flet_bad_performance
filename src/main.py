@@ -12,6 +12,7 @@ from ui.workspaces_rail import All_Workspaces_Rail
 from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
 from handlers.render_widgets import remove_drag_targets
+import os
 
 
 
@@ -45,7 +46,10 @@ def main(page: ft.Page):
     page.window.maximized = True
 
     # Create our page elements as their own pages so they can update
-    menubar = create_menu_bar(page)     
+    menubar = create_menu_bar(page)  
+
+    app_data_path = os.getenv("FLET_APP_STORAGE_DATA")  # Path to the app
+    print("App data path: ", app_data_path)   
     
     # if user.all_workspaces rail blank, create it. else load it
     #all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
