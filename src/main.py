@@ -32,6 +32,9 @@ def main(page: ft.Page):
     # This is because it is the only widget not stored in the story object, but in the user
     user.active_story.add_object_to_pin(user.settings)
 
+    # Initialize the active story with saved data now that we have a page reference
+    user.active_story.initialize_with_saved_data(page)
+
     # Adds our page title and theme
     title = "StoryBoard -- " + user.active_story.title + " -- Saved status"
 

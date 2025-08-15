@@ -14,7 +14,15 @@ class User:
         self.email = email
 
         # Saving objects locally - Create project structure
-        self.app_data_path = os.getenv("FLET_APP_STORAGE_DATA")  # Path to the app
+        self.app_data_path = os.getenv("FLET_APP_STORAGE_DATA")
+        
+        # If FLET_APP_STORAGE_DATA is not set, use a default path
+        if self.app_data_path is None:
+            # Use the storage directory in the project root
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            self.app_data_path = os.path.join(project_root, "storage", "data")
+        
+        print(f"Using app data path: {self.app_data_path}")
         
         # Create main project structure
         self.stories_path = os.path.join(self.app_data_path, "stories")

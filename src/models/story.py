@@ -6,6 +6,7 @@ This is a dead-end model. Imports nothing else from project, or things will ciru
 import flet as ft
 import json
 import os
+import pickle       # Saving python objects to files since json won't work
 
 class Story:
     # Constructor for when new story is created
@@ -46,6 +47,16 @@ class Story:
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
+        
+        # Store page reference for loading objects later
+        self.page_reference = None
+
+    # Initialize story with saved data - call this after page is available
+    def initialize_with_saved_data(self, page_reference):
+        """Load all saved objects when the story is initialized with a page reference"""
+        self.page_reference = page_reference
+        self.load_all_characters(page_reference)
+        print(f"Story '{self.title}' initialized with {len(self.characters)} saved characters")
             
 
     # Add our created object to story. This will add it to any lists it should be in, pin location, etc.
@@ -113,14 +124,159 @@ class Story:
         print("object saved to file called")
 
         if obj.tag == "character":
-            characters_path = self.path + "/characters/"
+            characters_dir = self.path + "/characters/"
+            # Ensure the characters directory exists
+            os.makedirs(characters_dir, exist_ok=True)
+            
+            # Create a safe filename from the character's title
+            safe_filename = "".join(c for c in obj.title if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            safe_filename = safe_filename.replace(' ', '_')
+            character_file_path = os.path.join(characters_dir, f"{safe_filename}.pkl")
+            
+            print(f"Attempting to save character to: {character_file_path}")
+            print(f"Character object type: {type(obj)}")
+            print(f"Character has title: {hasattr(obj, 'title')}")
+            print(f"Character has character_data: {hasattr(obj, 'character_data')}")
+            
             try:
-                with open(characters_path, 'w', encoding='utf-8') as f:
-                    json.dump(object.character_data, f, indent=2, ensure_ascii=False)
-                print(f"Character '{obj.title}' saved to {characters_path}")
+                # Try to save with a safer approach - create a copy without problematic references
+                safe_obj = self.create_serializable_character_copy(obj)
+                
+                with open(character_file_path, 'wb') as f:
+                    pickle.dump(safe_obj, f)
+                    
+                # Verify the file was written
+                file_size = os.path.getsize(character_file_path)
+                print(f"Character '{obj.title}' saved to {character_file_path} (size: {file_size} bytes)")
+                
+                if file_size == 0:
+                    print("WARNING: Saved file is 0 bytes!")
+                    
             except Exception as e:
                 print(f"Error saving character to file: {e}")
-            print("Saving character to file called")
+                import traceback
+                traceback.print_exc()
+            print("Saving character to file completed")
+
+    def create_serializable_character_copy(self, character):
+        """Create a copy of character that can be safely pickled"""
+        try:
+            # First try to pickle the original object to see if it works
+            import io
+            buffer = io.BytesIO()
+            pickle.dump(character, buffer)
+            buffer.seek(0)
+            # If we got here, the original object is serializable
+            return character
+        except Exception as e:
+            print(f"Original character not serializable: {e}")
+            # Create a minimal serializable version
+            serializable_data = {
+                'title': character.title,
+                'tag': character.tag,
+                'pin_location': getattr(character, 'pin_location', None),
+                'character_data': {},
+                'class_name': character.__class__.__name__
+            }
+            
+            # Extract values from character_data
+            if hasattr(character, 'character_data'):
+                for key, value in character.character_data.items():
+                    try:
+                        if hasattr(value, 'value'):
+                            serializable_data['character_data'][key] = value.value
+                        elif hasattr(value, 'data'):
+                            serializable_data['character_data'][key] = value.data
+                        else:
+                            serializable_data['character_data'][key] = str(value)
+                    except Exception as ve:
+                        print(f"Could not serialize character_data[{key}]: {ve}")
+                        serializable_data['character_data'][key] = None
+            
+            return serializable_data
+
+    # Load an object from file
+    def load_object_from_file(self, file_path, page_reference):
+        """Load a saved object from file"""
+        try:
+            with open(file_path, 'rb') as f:
+                obj = pickle.load(f)
+            
+            # Check if it's a full character object or serializable data
+            if isinstance(obj, dict) and 'class_name' in obj:
+                # It's serialized data, need to reconstruct the character
+                obj = self.reconstruct_character_from_data(obj, page_reference)
+            else:
+                # It's a full object, just update page references
+                if hasattr(obj, 'p'):
+                    obj.p = page_reference
+                    
+                # Update any controls that might need page reference
+                if hasattr(obj, 'character_data'):
+                    for key, control in obj.character_data.items():
+                        if hasattr(control, 'page'):
+                            control.page = page_reference
+                        
+            print(f"Successfully loaded object '{obj.title if hasattr(obj, 'title') else 'Unknown'}' from {file_path}")
+            return obj
+        except Exception as e:
+            print(f"Error loading object from file {file_path}: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+    def reconstruct_character_from_data(self, data, page_reference):
+        """Reconstruct a character object from serialized data"""
+        try:
+            # Import Character class dynamically to avoid circular imports
+            from models.character import Character
+            
+            # Create a new character with the saved title
+            character = Character(data['title'], page_reference)
+            
+            # Restore basic properties
+            if 'pin_location' in data:
+                character.pin_location = data['pin_location']
+                
+            # Restore character data values
+            if 'character_data' in data:
+                for key, value in data['character_data'].items():
+                    if key in character.character_data:
+                        if hasattr(character.character_data[key], 'value'):
+                            character.character_data[key].value = value
+                        elif hasattr(character.character_data[key], 'data'):
+                            character.character_data[key].data = value
+            
+            print(f"Successfully reconstructed character '{character.title}' from serialized data")
+            return character
+        except Exception as e:
+            print(f"Error reconstructing character from data: {e}")
+            return None
+
+    # Load all characters from the characters directory
+    def load_all_characters(self, page_reference):
+        """Load all saved characters"""
+        characters_dir = self.path + "/characters/"
+        if not os.path.exists(characters_dir):
+            print("Characters directory does not exist")
+            return
+            
+        pkl_files = [f for f in os.listdir(characters_dir) if f.endswith('.pkl')]
+        print(f"Found {len(pkl_files)} character files to load: {pkl_files}")
+        
+        for filename in pkl_files:
+            file_path = os.path.join(characters_dir, filename)
+            character = self.load_object_from_file(file_path, page_reference)
+            if character:
+                # Add to characters list if not already present
+                if character not in self.characters:
+                    self.characters.append(character)
+                    
+                # Add to appropriate pin location if not already present
+                if hasattr(character, 'pin_location'):
+                    self.add_object_to_pin(character)
+                    
+        print(f"Loaded {len(self.characters)} characters total")
 
 
 

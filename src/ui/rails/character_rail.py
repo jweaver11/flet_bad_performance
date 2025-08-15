@@ -460,9 +460,11 @@ def reload_character_rail(page: ft.Page):
 def create_characters_rail(page: ft.Page):
 
     # Initially create some characters to test with
-    user.active_story.add_object_to_story(Character("Bob", page))
-    user.active_story.add_object_to_story(Character("Alice", page))
-    user.active_story.add_object_to_story(Character("Joe", page))
+    #user.active_story.add_object_to_story(Character("Bob", page))
+    #user.active_story.add_object_to_story(Character("Alice", page))
+    #user.active_story.add_object_to_story(Character("Joe", page))
+    # Characters are now loaded automatically during story initialization in main.py
+    # user.active_story.load_all_characters(page_reference=page)  # Removed - causes duplicates
 
     # Set our drag targets on accept methods here so we can pass in our page
     main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
