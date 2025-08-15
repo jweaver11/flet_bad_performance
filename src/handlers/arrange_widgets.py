@@ -3,25 +3,7 @@ import flet as ft
 
 
 
-
-
-
 # Save our pins locally and load them in story.py
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -29,6 +11,7 @@ import flet as ft
 # And if they don't match their actual pin location, it moves them to the correct one BASED of the tag
 # Also handles making sure there is always a widget in the main_pin, so long as there is at least 1 visible widget
 def arrange_widgets():
+
     print("arrange widgets called")
     
     # Append a reference obj (pointer) to the pin location based on its pin location tag
@@ -134,3 +117,29 @@ def arrange_widgets():
         # If all objects are invisible, steal. Otherwise do nothing
         if all(obj.visible == False for obj in user.active_story.main_pin.controls[:]):
           steal_from_other_pins()
+
+
+
+    # Called when we have an object somewhere that is not in any pin
+    # Adds our object to one of our five pin locations
+    def add_object_to_pin(obj):
+        print("add object to pin called")
+        # check objects pin and that its not already in that pin
+        if obj.pin_location == "top" and obj not in user.active_story.top_pin.controls:
+            user.active_story.top_pin.controls.append(obj)
+        elif obj.pin_location == "left" and obj not in user.active_story.left_pin.controls:
+            user.active_story.left_pin.controls.append(obj)
+        elif obj.pin_location == "main" and obj not in user.active_story.main_pin.controls:
+            user.active_story.main_pin.controls.append(obj)  
+        elif obj.pin_location == "right" and obj not in user.active_story.right_pin.controls:
+            user.active_story.right_pin.controls.append(obj)
+        elif obj.pin_location == "bottom" and obj not in user.active_story.bottom_pin.controls:
+            user.active_story.bottom_pin.controls.append(obj)
+
+    
+    # Checks all our objects (widgets) to check if they are in a pin or not. If not, add them to their pin location
+    for char in user.active_story.characters:
+        add_object_to_pin(char)
+    if user.settings is not None: 
+        add_object_to_pin(user.settings)
+

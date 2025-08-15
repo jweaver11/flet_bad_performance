@@ -41,10 +41,11 @@ class User:
         # Create Story object structure folders inside empty_story
         story_folders = [
             "characters",
-            "scenes", 
+            "notes",
+            "pins",
             "plotlines",
+            "scenes", 
             #"settings",
-            "notes"
         ]
         
         # Creates our folders in the active story path
@@ -57,12 +58,16 @@ class User:
 
         # initialize the settings, before creating them in main
         # Also an extended flet container, so it shows up in the pins
-        self.settings = ft.Container()
+        
+        # Sets our settings to empty, and we create them in main.py since we need page reference
+        self.settings = None 
         
         # Dict of all our stories. Starts with an 'empty_story'
         self.stories = {
             
         }
+
+
         self.create_new_story("default_story")
         
         # The selected story. Many part of the program call this selection
@@ -74,6 +79,7 @@ class User:
         self.all_workspaces_rail = ft.Container()
 
         self.workspace = ft.Container()
+
 
     def create_new_story(self, title: str):
         print("Create new story called")
@@ -105,4 +111,20 @@ class User:
             return False
         return self.username == other.username and self.email == other.email
     
-user = User("exp_user", "exp_email")
+
+
+def load_user(username: str, email: str) -> User:
+    # Check our user path. Active user variable??
+    # If there is an active user, load them
+    # Else, create a new user
+
+    print("load user called")
+    return create_user(username, email)
+
+def create_user(username: str, email: str) -> User:
+    user = User(username, email)
+    return user
+
+
+
+user = load_user("exp_user", "exp_email")

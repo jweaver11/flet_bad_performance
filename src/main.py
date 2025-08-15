@@ -5,7 +5,7 @@ so they can update themselves dynamically
 '''
 
 import flet as ft
-from models.user import user
+from models.user import user, User
 from models.settings import Settings
 from ui.menu_bar import create_menu_bar
 from ui.workspaces_rail import All_Workspaces_Rail
@@ -13,6 +13,7 @@ from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
 from handlers.render_widgets import remove_drag_targets
 import os
+from models.settings import Settings
 
 
 
@@ -20,21 +21,17 @@ import os
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
 
+    # User file loads the user or creates them if they don't exist on program start
 
-    # Grab active story, if blank fallback and grab default
-
-    # if user.settings=empty
-        # Create them
-    # else
-        # load them
-    user.settings = Settings(page)  # We create here because circular imports
-    # Settings is special and needs to be manually added to a pin. No other object does
-    # This is because it is the only widget not stored in the story object, but in the user
-    user.active_story.add_object_to_pin(user.settings)
-
-    # Initialize the active story with saved data now that we have a page reference
-    user.active_story.initialize_with_saved_data(page)
-
+ 
+    
+    # Checks if our user settings exist. This will only run if the user is newly created
+    # Otherwise, when the user loads in, their settings will load as well
+    if user.settings is None:
+        # We create our user settings here because we need the page reference
+        user.settings = Settings(page)  
+    
+   
     # Adds our page title and theme
     title = "StoryBoard -- " + user.active_story.title + " -- Saved status"
 

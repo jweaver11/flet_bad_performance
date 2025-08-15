@@ -129,6 +129,7 @@ class Character(Widget):
         # Build our widget on start
         self.reload_widget()
 
+    # Shortcut to save our character object to its pickle file. Routing and logic handled in the story object
     def save_to_file(self):
         """Save the character to its pickle file"""
         try:
@@ -137,7 +138,7 @@ class Character(Widget):
             print(f"Character '{self.title}' saved successfully")
         except Exception as e:
             print(f"Error saving character '{self.title}': {e}")
-            
+
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
