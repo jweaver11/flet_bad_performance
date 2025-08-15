@@ -3,32 +3,22 @@ Master Story class that contains data and methods for the entire story
 This is a dead-end model. Imports nothing else from project, or things will ciruclar import
 '''
 
-import os
 import flet as ft
-
-# Saving objects locally
-app_data_path = os.getenv("FLET_APP_STORAGE_TEMP")  # write to non-temp storage later /storage/data/characters
-my_file_path = os.path.join(app_data_path, "characters.json")
-#with open(my_file_path, "w") as f:
-    #f.write(obj.title)  # Need to write object to json
+import json
+import os
 
 class Story:
     # Constructor for when new story is created
-    def __init__(self, title: str):
+    def __init__(self, title: str, path: str):
        
-       # Gives our story a title when its created
-        self.title=title
-       
+        self.title=title # Gives our story a title when its created
+        self.path=path  # Gives us a path to save/load the story
 
-        # Hold a reference object (pointer) of our story objects (Which are all extended flet containers)
-        # The pins are rows/columns that need to hold tabs, that then hold our objects, which are extended flet tabs
-        self.top_pin = ft.Row(spacing=0, height=0, controls=[],)
-        self.left_pin = ft.Column(spacing=0, width=0, controls=[])
-        #self.main_pin = ft.Row(spacing=0, expand=True, controls=[ft.Tabs()])
-        self.main_pin = ft.Tabs(selected_index=1)
-        self.right_pin = ft.Column(spacing=0, width=0, controls=[])
-        self.bottom_pin = ft.Row(spacing=0, height=0, controls=[])
-
+        self.top_pin = ft.Row(height=0, spacing=0, controls=[])
+        self.left_pin = ft.Column(width=0, spacing=0, controls=[])
+        self.main_pin = ft.Row(expand=True, spacing=0, controls=[])
+        self.right_pin = ft.Column(width=0, spacing=0, controls=[])
+        self.bottom_pin = ft.Row(height=0, spacing=0, controls=[])
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
@@ -62,7 +52,6 @@ class Story:
     # All our story objects are extended flet containers, and require a title, pin location, tag,...
     def add_object_to_story(self, obj):
         print("Adding object in story: " + obj.title)
-
 
         # Runs to save our character to our story object, and save it to file
         def save_character(obj):
@@ -110,8 +99,8 @@ class Story:
             self.top_pin.controls.append(obj)
         elif obj.pin_location == "left" and obj not in self.left_pin.controls:
             self.left_pin.controls.append(obj)
-        elif obj.pin_location == "main" and obj not in self.main_pin.tabs:
-            self.main_pin.tabs.append(obj)
+        elif obj.pin_location == "main" and obj not in self.main_pin.controls:
+            self.main_pin.controls.append(obj)  
         elif obj.pin_location == "right" and obj not in self.right_pin.controls:
             self.right_pin.controls.append(obj)
         elif obj.pin_location == "bottom" and obj not in self.bottom_pin.controls:
@@ -122,6 +111,17 @@ class Story:
     # Handles saving our object to a file for permanent data storage, not just client
     def save_object_to_file(self, obj):
         print("object saved to file called")
+
+        if obj.tag == "character":
+            characters_path = self.path + "/characters/"
+            try:
+                with open(characters_path, 'w', encoding='utf-8') as f:
+                    json.dump(object.character_data, f, indent=2, ensure_ascii=False)
+                print(f"Character '{obj.title}' saved to {characters_path}")
+            except Exception as e:
+                print(f"Error saving character to file: {e}")
+            print("Saving character to file called")
+
 
 
     # Delete an object from the story. Only works for certain objects
@@ -151,15 +151,6 @@ class Story:
 
         # delete_from_file()
 
-
-    # Workspaces within each story object
-    # Description
-    # Content
-    # Plot & imeline = ?
-    # World Building = ?
-    # Drawing Board = ?
-    # Notes = []
-    # Other workspaces??
 
 
 

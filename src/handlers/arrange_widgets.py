@@ -1,4 +1,5 @@
 from models.user import user
+import flet as ft
 
 story = user.active_story  # Get our story object from the user
 
@@ -16,7 +17,7 @@ def arrange_widgets():
         elif pin_location == "left":
             story.left_pin.controls.append(obj)
         elif pin_location == "main":
-            story.main_pin.tabs.append(obj)
+            story.main_pin.controls.append(obj)
         elif pin_location == "right":
             story.right_pin.controls.append(obj)
         elif pin_location == "bottom":
@@ -33,10 +34,11 @@ def arrange_widgets():
         if hasattr(obj, 'pin_location') and obj.pin_location != "left":
             story.left_pin.controls.remove(obj)
             update_pin_location(obj)
-    for obj in story.main_pin.tabs[:]:
+    for obj in story.main_pin.controls[:]:
         if hasattr(obj, 'pin_location') and obj.pin_location != "main":
-            story.main_pin.tabs.remove(obj)
+            story.main_pin.controls.remove(obj)
             update_pin_location(obj)
+    
     for obj in story.right_pin.controls[:]:
         if hasattr(obj, 'pin_location') and obj.pin_location != "right":
             story.right_pin.controls.remove(obj)
@@ -103,10 +105,10 @@ def arrange_widgets():
 
     # Steal from other pins if main pin is empty. 
     # Check if empty. if yes, steal from other pins
-    if len(story.main_pin.tabs) == 0:   
+    if len(story.main_pin.controls) == 0:   
         steal_from_other_pins()
     # If not empty, check if any of the objects are visible
     else:
         # If all objects are invisible, steal. Otherwise do nothing
-        if all(obj.visible == False for obj in story.main_pin.tabs[:]):
+        if all(obj.visible == False for obj in story.main_pin.controls[:]):
           steal_from_other_pins()

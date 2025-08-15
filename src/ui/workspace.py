@@ -18,7 +18,8 @@ def create_workspace(page: ft.Page):
     # Container for 1 or more widgets open on the workspace area right side of screen
     workspace_container = ft.Container(
         expand=True,
-        bgcolor=user.settings.workspace_bgcolor,
+        bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+        #bgcolor=user.settings.workspace_bgcolor,
         #padding=ft.padding.all(4),
         #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
         content=story.master_stack,

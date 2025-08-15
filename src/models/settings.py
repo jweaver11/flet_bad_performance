@@ -1,15 +1,22 @@
 import flet as ft
 from models.user import user
+from models.widget import Widget
 
 # 
-# OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS
+# OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
 #
 
-class Settings(ft.Container):
+class Settings(Widget):
     def __init__(self, page: ft.Page):
-        self.yo_momma = "yo mommaa"
-        self.pin_location = "main"
-        self.p = page
+        # Arguments our widget needs
+        super().__init__(
+            title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
+            tag = "settings",  # Tag for logic, mostly for routing it through our story object
+            p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+            pin_location = "main",  # Start in left pin location
+        )
+
+        self.visible = False
 
         # Save theme mode of either light or dark
         self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
@@ -31,9 +38,9 @@ class Settings(ft.Container):
             for color in self.theme_color_scheme_options:
                 options.append(
                     ft.DropdownOption(
-                        key=color.value,
+                        key=color.value.capitalize(),
                         content=ft.Text(
-                            value=color.value,
+                            value=color.value.capitalize(),
                             color=color,
                         ),
                     )
@@ -50,13 +57,16 @@ class Settings(ft.Container):
         # Dropdown so user can change their color scheme
         self.color_scheme_dropdown = ft.Dropdown(
             #editable=True,
-            label="Color",
+            label="Theme Color",
+            capitalization= ft.TextCapitalization.SENTENCES,
             options=get_color_scheme_options(),
             on_change=change_color_scheme_picked,
         )
         
         # Background color of widgets that changes depending if in light theme or dark theme
-        self.workspace_bgcolor = ft.Colors.GREY_900 if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+        #self.workspace_bgcolor = ft.Colors.ON_SECONDARY #if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
+
+        
 
 
         # Runs when the switch toggling the color change of characters names based on morality is clicked
@@ -67,7 +77,7 @@ class Settings(ft.Container):
                 char.reload_widget()    # Updates their widget accordingly
 
             # Reloads the rail. Its better here than running it twice for no reason in character class    
-            from workspaces.character.character_rail import reload_character_rail
+            from ui.rails.character_rail import reload_character_rail
             reload_character_rail(self.p)
 
         # The switch for toggling if characters names change colors based on morality
@@ -84,13 +94,13 @@ class Settings(ft.Container):
             if self.user_theme_mode == ft.ThemeMode.DARK:   # Check which theme we're on
                 self.user_theme_mode = ft.ThemeMode.LIGHT   # change the theme mode so we can save it
                 self.theme_button.icon = ft.Icons.DARK_MODE # Change the icon of theme button
-                self.workspace_bgcolor = ft.Colors.GREY_200
+                
             elif self.user_theme_mode == ft.ThemeMode.LIGHT:
                 self.user_theme_mode = ft.ThemeMode.DARK
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
-                self.workspace_bgcolor = ft.Colors.GREY_900
+               
 
-            user.workspace.bgcolor = self.workspace_bgcolor
+            #user.workspace.bgcolor = self.workspace_bgcolor
             self.p.theme_mode = self.user_theme_mode
             self.p.update()
             print(self.user_theme_mode)
@@ -101,23 +111,22 @@ class Settings(ft.Container):
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
 
 
-        # Init our settings container(widget) with the uniform formatting of the other objects
-        super().__init__(
-            expand=True, 
-            padding=6,
-            visible=False,
-            border = ft.border.all(2, ft.Colors.GREY_800),
-            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor = self.widget_bgcolor,
-            content=ft.Column([
-                ft.TextButton(
-                    "Reorder Workspaces", 
-                    icon=ft.Icons.REORDER_ROUNDED,
-                    on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()
-                ),
-                self.change_name_colors,
-                self.theme_button,
-                self.color_scheme_dropdown,
+        
 
-            ])
-        )
+        self.content=ft.Column([
+            ft.TextButton(
+                "Reorder Workspaces", 
+                icon=ft.Icons.REORDER_ROUNDED,
+                on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()
+            ),
+            self.change_name_colors,
+            self.theme_button,
+            self.color_scheme_dropdown,
+
+        ])
+
+        self.tab.content = self.content
+
+        
+    
+        

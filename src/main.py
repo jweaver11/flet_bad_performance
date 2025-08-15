@@ -12,10 +12,14 @@ from ui.workspaces_rail import All_Workspaces_Rail
 from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
 from handlers.render_widgets import remove_drag_targets
+import os
+
+
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
 def main(page: ft.Page):
+
 
     # Grab active story, if blank fallback and grab default
 
@@ -42,7 +46,10 @@ def main(page: ft.Page):
     page.window.maximized = True
 
     # Create our page elements as their own pages so they can update
-    menubar = create_menu_bar(page)     
+    menubar = create_menu_bar(page)  
+
+    app_data_path = os.getenv("FLET_APP_STORAGE_DATA")  # Path to the app
+    print("App data path: ", app_data_path)   
     
     # if user.all_workspaces rail blank, create it. else load it
     #all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
@@ -52,6 +59,29 @@ def main(page: ft.Page):
     active_rail = create_active_rail(page)  # Render whichever rail is active
 
     user.workspace = create_workspace(page)# render our workspace containing our widgets
+
+    def show_horizontal_cursor(e: ft.HoverEvent):
+        e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+        e.control.update()
+
+    # Left pin reisizer method and variable
+    def move_active_rail_divider(e: ft.DragUpdateEvent):
+        if (e.delta_x > 0 and active_rail.width < page.width/2) or (e.delta_x < 0 and active_rail.width > 100):
+            active_rail.width += e.delta_x
+            print("Active rail width: " + str(active_rail.width))
+        active_rail.update()
+        user.active_story.widgets.update()
+        user.active_story.master_stack.update()
+    active_rail_resizer = ft.GestureDetector(
+        content=ft.Container(
+            width=10,
+            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+            padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+            content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT)
+        ),
+        on_pan_update=move_active_rail_divider,
+        on_hover=show_horizontal_cursor,
+    )
 
     # Save our 2 rails, dividers, and our workspace container in a row
     row = ft.Row(
@@ -63,7 +93,7 @@ def main(page: ft.Page):
             ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
             active_rail,    # Rail for the selected workspace
-            ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between rail and work area
+            active_rail_resizer,   # Divider between rail and work area
             
             user.workspace,    # Work area for pagelets
         ],
@@ -80,18 +110,10 @@ def main(page: ft.Page):
         ]
     )
 
-
-    # Only exists to fix our workspace area on a failed drag. clicking fixes it
-    gd = ft.GestureDetector(
-        expand=True,
-        on_tap_up=lambda e: remove_drag_targets(),
-        content=col
-    )
-
-    page.add(gd)
+    page.add(col)
 
 
 ft.app(main)
 
 
-# Add custom title bar 
+# Add custom title bar

@@ -1,12 +1,12 @@
 import flet as ft
 
 from models.user import user
-from workspaces.character.character_rail import create_characters_rail  
-from workspaces.content.content_rail import content_rail
-from workspaces.plot_timeline.plot_timeline_rail import plot_timeline_rail
-from workspaces.world_building.world_building_rail import world_building_rail
-from workspaces.drawing_board.drawing_board_rail import drawing_board_rail
-from workspaces.notes.notes_rail import notes_rail
+from ui.rails.character_rail import create_characters_rail  
+from ui.rails.content_rail import content_rail
+from ui.rails.plot_timeline_rail import plot_timeline_rail
+from ui.rails.world_building_rail import world_building_rail
+from ui.rails.drawing_board_rail import drawing_board_rail
+from ui.rails.notes_rail import notes_rail
 
 
 
@@ -31,8 +31,9 @@ def create_active_rail(page: ft.Page):
     active_workspace_rail_container = ft.Container(
         alignment=ft.alignment.center,  # Aligns content to the
         padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
+        bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
         width=200,  # Sets the width
-        content=user.active_story.active_rail,    # Sets our active rail column
+        content=user.active_story.active_rail,  # Sets our active rail column
     )
 
 

@@ -1,21 +1,26 @@
 import flet as ft
 from models.user import user
-from handlers.render_widgets import show_pin_drag_targets, render_widgets
+from models.widget import Widget
 
 
-class New_Char(ft.Tab):
+# Class for character objects in the story. Every object needs a title, and a page reference when created
+class Character(Widget):
     def __init__(self, name, page: ft.Page):
-        # Variables that all widgets will have, so we'll store them outside of data
-        self.title = name  # Name of character, but all objects have a 'title' for identification, so characters do too
-        self.tag = "character"  # Tag for logic, mostly for routing it through our story object
-        self.p = page   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-        self.pin_location = "main"  # Start in left pin location
 
-        self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
-        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False, col={'xs': 12, 'sm': 12, 'md': 3})
+        # Sets our Character as an extended Widget object, which is a subclass of a flet Container
+        # Widget requires a title, tag, page reference, and a pin location
+        super().__init__(
+            title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
+            tag = "character",  # Tag for logic, mostly for routing it through our story object
+            p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+            pin_location = "left",  # Start in left pin location
+        )
 
-        self.color = ft.Colors.GREY_800   # User defined color of the widget of the character
+        #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
+        
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
+
 
         self.character_data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
@@ -80,7 +85,8 @@ class New_Char(ft.Tab):
             'Family': ft.Row(     # Expandable
                 wrap=True,
                 data={     
-                    'Love Interest': Character or str,
+                    #'Love Interest': Character or str,
+                    'Love Interest': str,
                     'Father': "",   # Textfield with selectable options
                     'Mother': "",    
                     'Siblings': "",
@@ -119,50 +125,147 @@ class New_Char(ft.Tab):
             'Dead': [bool, "when they died"],
             'Notes' : [],   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
-
-        # Make a markdown as content of container
-        # Gives us our initial widget as a container
-        super().__init__(
-            #expand=True, 
-            #padding=6,
-            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor = user.settings.workspace_bgcolor,
-            #visible=False,
-            content=None,
-        )
+        # Build our widget on start
         self.reload_widget()
+
         # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-        #self.border = ft.border.all(0, ft.Colors.GREY_800)  # Gives our container a border and adjusts the user selected color to it
 
-        self.text=self.title
-        self.tab_content=ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                ft.Draggable(
-                    group="widgets",
-                    content=ft.Text(weight=ft.FontWeight.BOLD, color=self.name_color, value=self.title),
-                    data=self,       # Pass our object as the data so we can access it
-                    on_drag_start=show_pin_drag_targets,    # Called from rendered_widgets handler
-                    # No on_complete method since the drag target will handle that
-                    # If an on_cancel method gets added to flet, we add it here to remove the drag targets
-                ),
-                ft.IconButton(
-                    #on_click=lambda e: self.hide_widget(),
-                    icon=ft.Icons.VISIBILITY_OFF_ROUNDED
-                ),
-            ]
+        body = ft.Container(
+            expand=True,
+            padding=6,
+            #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            content=ft.Text("hi from " + self.title),
         )
-       
-        self.content=ft.Container()
+
+        self.tab.content=body
+
+        # Sets our header
+        tab = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            #divider_color=ft.Colors.TRANSPARENT,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+            tabs=[self.tab,]    # Gives our tab control here
+                 
+        )
+          
+         
+
+        
+        # Set our content
+        self.content = tab
+                            #ft.Divider(color=self.tab_color, thickness=2),
+                       
+            
+    
+    
+    # Change our tab color of widget. Accepts a flet color as parameter
+    def change_color(self, color):
+        self.tab_color = color
+        self.reload_widget()
+        self.p.update()
+
+    
+    # Called when the morality dropdown is changed
+    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
+    def morality_change(self, e):
+        e.control.data = e.control.value
+
+        self.check_morality()
+        self.reload_widget()    # Apply our changes to the name at top of widget
+
+        self.p.update()
+    
+    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
+    def check_morality(self):
+        # If we have the setting turned on to change char name colors, change them
+        if user.settings.change_name_colors.value == True:
+            print("color changing is true, we running the logic")
+            # Check the morality and change color accordingly
+            if self.character_data['Morality'].data == "Good":
+                self.name_color = ft.Colors.GREEN_200
+            elif self.character_data['Morality'].data == "Evil":
+                self.name_color = ft.Colors.RED_200
+            elif self.character_data['Morality'].data == "Neutral":
+                self.name_color = ft.Colors.GREY_300
+            elif self.character_data['Morality'].data == "N/A":
+                self.name_color = ft.Colors.GREY_300
+            elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
+                self.name_color = ft.Colors.PRIMARY
+                self.character_data['Morality'].value = None
+                
+            # Update our color
+            self.character_data['Morality'].color = self.name_color
+
+        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
+        else:
+            print("Color changing disabled, turning off all their colors")
+            for character in user.active_story.characters:
+                character.name_color = ft.Colors.PRIMARY
+            # Apply our changes
+            self.p.update()
+            return
+
+        # Reload the rail
+        from ui.rails.character_rail import reload_character_rail
+        reload_character_rail(self.p)
+
+
+    # Called when the textfield for writing in custom sex's is submitted
+    # Adds our custom sex to our stories sex_options list
+    def sex_submit(self, e):
+        print("Color change ran")
+
+        # Save most of our variables in our data in the flet controls
+        e.control.data = e.control.value
+
+        # If deselect is clicked
+        if self.character_data['Sex'].data == "Deselect":
+            self.character_data['Sex'].value = None
+            self.reload_widget()    # When manually resetting value, must reload widget
+        
+        # If deselect is not clicked
+        elif self.character_data['Sex'].data == "Male":
+        # Checks that our data saved correctly, and changes color accordingly
+            self.character_data['Sex'].color = ft.Colors.BLUE
+            
+        elif self.character_data['Sex'].data == "Female":
+            self.character_data['Sex'].color = ft.Colors.PINK
+        
+        self.p.update()
+
+    # Called when the age is changed. Changes the age data
+    def age_change(self, e):
+        print("Age change ran")
+        self.character_data['Age'].data = e.control.value
+        print(self.character_data['Age'].data)
+
+    # Called when the race is changed. Changes the race data
+    def race_change(self, e):
+        print("Race change ran")
+        self.character_data['Physical Description'].data['Race'] = e.control.value
+        print(self.character_data['Physical Description'].data['Race'])
+        self.p.update()
+
+    # Expand the tile to show physical descriptions
+    def expand_physical_description(self, e):
+        print("expand physical description ran")
             
 
 
 
 
+
+
+
+
+'''
 # Class for each character. Requires passing in a name
 class Character(ft.Container):
     def __init__(self, name, page: ft.Page):
@@ -553,7 +656,6 @@ class Character(ft.Container):
                 )
             )
         ])
-    
-
+'''
 
 
