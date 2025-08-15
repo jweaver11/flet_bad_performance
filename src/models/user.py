@@ -80,7 +80,7 @@ class User:
         # Create a new story object and add it to our stories dict
         new_story = Story(title, os.path.join(self.stories_path, title))
         self.stories[title] = new_story
-        self.active_story_path = new_story.path # Set new story as the active story path
+        self.active_story_path = new_story.file_path # Set new story as the active story path
         return new_story
 
     # Called when we switch to another story

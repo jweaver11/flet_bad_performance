@@ -27,7 +27,7 @@ def main(page: ft.Page):
         # Create them
     # else
         # load them
-    user.settings = Settings(page)
+    user.settings = Settings(page)  # We create here because circular imports
     # Settings is special and needs to be manually added to a pin. No other object does
     # This is because it is the only widget not stored in the story object, but in the user
     user.active_story.add_object_to_pin(user.settings)
@@ -49,10 +49,7 @@ def main(page: ft.Page):
     page.window.maximized = True
 
     # Create our page elements as their own pages so they can update
-    menubar = create_menu_bar(page)  
-
-    app_data_path = os.getenv("FLET_APP_STORAGE_DATA")  # Path to the app
-    print("App data path: ", app_data_path)   
+    menubar = create_menu_bar(page)    
     
     # if user.all_workspaces rail blank, create it. else load it
     #all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail

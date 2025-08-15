@@ -10,10 +10,10 @@ import pickle       # Saving python objects to files since json won't work
 
 class Story:
     # Constructor for when new story is created
-    def __init__(self, title: str, path: str):
+    def __init__(self, title: str, file_path: str):
        
         self.title=title # Gives our story a title when its created
-        self.path=path  # Gives us a path to save/load the story
+        self.file_path=file_path  # Gives us a path to save/load the story
 
         self.top_pin = ft.Row(height=0, spacing=0, controls=[])
         self.left_pin = ft.Column(width=0, spacing=0, controls=[])
@@ -23,7 +23,6 @@ class Story:
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
-
 
         # Master stack that holds our widgets
         # And our drag targets when we start dragging widgets.
@@ -124,7 +123,7 @@ class Story:
         print("object saved to file called")
 
         if obj.tag == "character":
-            characters_dir = self.path + "/characters/"
+            characters_dir = self.file_path + "/characters/"
             # Ensure the characters directory exists
             os.makedirs(characters_dir, exist_ok=True)
             
@@ -256,7 +255,7 @@ class Story:
     # Load all characters from the characters directory
     def load_all_characters(self, page_reference):
         """Load all saved characters"""
-        characters_dir = self.path + "/characters/"
+        characters_dir = self.file_path + "/characters/"
         if not os.path.exists(characters_dir):
             print("Characters directory does not exist")
             return
