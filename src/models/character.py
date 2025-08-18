@@ -23,25 +23,10 @@ class Character(Widget):
         
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
 
-        self.save_to_file()
-
 
         self.character_data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
-            'Morality': ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                label="Morality",
-                padding=ft.padding.all(0),
-                color=self.name_color,
-                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                options=[
-                    ft.DropdownOption(text="Good"),
-                    ft.DropdownOption(text="Evil"),
-                    ft.DropdownOption(text="Neutral"),
-                    ft.DropdownOption(text="N/A"),
-                    ft.DropdownOption(text="Deselect"),
-                ],
-                #on_change=self.morality_change,
-            ),
+            'Morality': "",
             'Sex': ft.Dropdown(      # Sex of each character
                 label="Sex",
                 padding=ft.padding.all(0),
@@ -132,17 +117,6 @@ class Character(Widget):
         # Build our widget on start
         self.reload_widget()
 
-    # Shortcut to save our character object to its pickle file. Routing and logic handled in the story object
-    def save_to_file(self):
-        """Save the character to its pickle file"""
-        try:
-            # Use the story's save method to handle the actual saving
-            user.active_story.save_object_to_file(self)
-            print(f"Character '{self.title}' saved successfully")
-        except Exception as e:
-            print(f"Error saving character '{self.title}': {e}")
-
-
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
 
@@ -153,7 +127,25 @@ class Character(Widget):
             expand=True,
             padding=6,
             #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
-            content=ft.Text("hi from " + self.title),
+            content=ft.Column([
+                ft.Text("hi from " + self.title),
+                ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                    label="Morality",
+                    value=self.character_data['Morality'],
+                    padding=ft.padding.all(0),
+                    color=self.name_color,
+                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                    options=[
+                        ft.DropdownOption(text="Good"),
+                        ft.DropdownOption(text="Evil"),
+                        ft.DropdownOption(text="Neutral"),
+                        ft.DropdownOption(text="N/A"),
+                        ft.DropdownOption(text="Deselect"),
+                    ],
+                    on_change=self.morality_change,
+                ),
+            ])
+
         )
 
         self.tab.content=body
@@ -170,8 +162,6 @@ class Character(Widget):
                  
         )
           
-         
-
         
         # Set our content
         self.content = tab
@@ -188,33 +178,35 @@ class Character(Widget):
     # Called when the morality dropdown is changed
     # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
     def morality_change(self, e):
-        e.control.data = e.control.value
+        print("Morality change ran")
+        self.character_data['Morality'] = e.control.value
 
-        self.check_morality()
+        self.check_morality(e)
         self.reload_widget()    # Apply our changes to the name at top of widget
 
         self.p.update()
     
-    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
-    def check_morality(self):
+    # Called by the changes in characters morality. Changes the name_color property to reflect those changes
+    def check_morality(self, e):
         # If we have the setting turned on to change char name colors, change them
         if user.settings.change_name_colors.value == True:
             print("color changing is true, we running the logic")
             # Check the morality and change color accordingly
-            if self.character_data['Morality'].data == "Good":
+            if self.character_data['Morality'] == "Good":
                 self.name_color = ft.Colors.GREEN_200
-            elif self.character_data['Morality'].data == "Evil":
+            elif self.character_data['Morality'] == "Evil":
                 self.name_color = ft.Colors.RED_200
-            elif self.character_data['Morality'].data == "Neutral":
+            elif self.character_data['Morality'] == "Neutral":
                 self.name_color = ft.Colors.GREY_300
-            elif self.character_data['Morality'].data == "N/A":
+            elif self.character_data['Morality'] == "N/A":
                 self.name_color = ft.Colors.GREY_300
-            elif self.character_data['Morality'].data == "Deselect":    # Deselect all choices
+            elif self.character_data['Morality'] == "Deselect":    # Deselect all choices
                 self.name_color = ft.Colors.PRIMARY
-                self.character_data['Morality'].value = None
+                self.character_data['Morality'] = None
                 
             # Update our color
-            self.character_data['Morality'].color = self.name_color
+            e.control.color = self.name_color
+            e.control.value = self.character_data['Morality']
 
         # If setting is turned off for char name colors, make all characters name_color the primary color scheme
         else:
