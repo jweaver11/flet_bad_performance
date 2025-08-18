@@ -22,23 +22,13 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
         
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
+        self.sex_color = ft.Colors.PRIMARY     # Color in the control used for the sex dropdown
 
 
         self.character_data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
-            'Morality': "",
-            'Sex': ft.Dropdown(      # Sex of each character
-                label="Sex",
-                padding=ft.padding.all(0),
-                color=self.name_color,
-                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                options=[
-                    ft.DropdownOption(text="Male"),
-                    ft.DropdownOption(text="Female"),
-                    ft.DropdownOption(text="Deselect"),
-                ],
-                #on_change=self.sex_submit,
-            ),
+            'Morality': None,
+            'Sex': None,
             #'Age': "0",   # Text field
             'Age': ft.TextField(
                 label="Age",
@@ -123,27 +113,44 @@ class Character(Widget):
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
 
+
         body = ft.Container(
             expand=True,
             padding=6,
             #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
             content=ft.Column([
                 ft.Text("hi from " + self.title),
-                ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                    label="Morality",
-                    value=self.character_data['Morality'],
-                    padding=ft.padding.all(0),
-                    color=self.name_color,
-                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                    options=[
-                        ft.DropdownOption(text="Good"),
-                        ft.DropdownOption(text="Evil"),
-                        ft.DropdownOption(text="Neutral"),
-                        ft.DropdownOption(text="N/A"),
-                        ft.DropdownOption(text="Deselect"),
-                    ],
-                    on_change=self.morality_change,
-                ),
+                ft.Row([
+                    ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                        label="Morality",
+                        value=self.character_data['Morality'],
+                        padding=ft.padding.all(0),
+                        color=self.name_color,
+                        text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                        options=[
+                            ft.DropdownOption(text="Good"),
+                            ft.DropdownOption(text="Evil"),
+                            ft.DropdownOption(text="Neutral"),
+                            ft.DropdownOption(text="N/A"),
+                            ft.DropdownOption(text="None"),
+                        ],
+                        on_change=self.morality_change,
+                    ),
+                    ft.Dropdown(      # Sex of each character
+                        label="Sex",
+                        value=self.character_data['Sex'],
+                        padding=ft.padding.all(0),
+                        color=self.sex_color,
+                        text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                        options=[
+                            ft.DropdownOption(text="Male"),
+                            ft.DropdownOption(text="Female"),
+                            ft.DropdownOption(text="Other"),
+                            ft.DropdownOption(text="None"),
+                        ],
+                        on_change=self.sex_submit,
+                    ),
+                ]),
             ])
 
         )
@@ -200,13 +207,10 @@ class Character(Widget):
                 self.name_color = ft.Colors.GREY_300
             elif self.character_data['Morality'] == "N/A":
                 self.name_color = ft.Colors.GREY_300
-            elif self.character_data['Morality'] == "Deselect":    # Deselect all choices
+            elif self.character_data['Morality'] == "None":    # Deselect all choices
                 self.name_color = ft.Colors.PRIMARY
                 self.character_data['Morality'] = None
                 
-            # Update our color
-            e.control.color = self.name_color
-            e.control.value = self.character_data['Morality']
 
         # If setting is turned off for char name colors, make all characters name_color the primary color scheme
         else:
@@ -225,24 +229,26 @@ class Character(Widget):
     # Called when the textfield for writing in custom sex's is submitted
     # Adds our custom sex to our stories sex_options list
     def sex_submit(self, e):
-        print("Color change ran")
+        print("sex submit ran")
 
-        # Save most of our variables in our data in the flet controls
-        e.control.data = e.control.value
+        self.character_data['Sex'] = e.control.value
 
-        # If deselect is clicked
-        if self.character_data['Sex'].data == "Deselect":
-            self.character_data['Sex'].value = None
-            self.reload_widget()    # When manually resetting value, must reload widget
+        if e.control.value == "None":
+            self.character_data['Sex'] = None
+        else:
+            self.character_data['Sex'] = e.control.value
+
+        print(self.character_data['Sex'])
+
+        if self.character_data['Sex'] == "Male":
+            self.sex_color = ft.Colors.BLUE
+        elif self.character_data['Sex'] == "Female":
+            self.sex_color = ft.Colors.PINK
+        else:
+            self.sex_color = ft.Colors.PRIMARY
         
-        # If deselect is not clicked
-        elif self.character_data['Sex'].data == "Male":
-        # Checks that our data saved correctly, and changes color accordingly
-            self.character_data['Sex'].color = ft.Colors.BLUE
-            
-        elif self.character_data['Sex'].data == "Female":
-            self.character_data['Sex'].color = ft.Colors.PINK
         
+        self.reload_widget()
         self.p.update()
 
     # Called when the age is changed. Changes the age data

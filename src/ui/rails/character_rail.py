@@ -252,7 +252,6 @@ def make_main_character(e, page: ft.Page):
     if hasattr(object, 'character_data'):
         object.character_data["Role"] = "Main"
         # Save the updated character data to pickle file
-        object.save_to_file()
     else:
         print("Object does not have tags attribute, cannot change character type")
 
