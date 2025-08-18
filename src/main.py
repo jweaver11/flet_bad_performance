@@ -21,7 +21,7 @@ from models.settings import Settings
 def main(page: ft.Page):
 
     # User file loads the user or creates them if they don't exist on program start
-
+# 
  
     
     # Checks if our user settings exist. This will only run if the user is newly created
