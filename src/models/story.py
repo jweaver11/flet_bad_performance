@@ -6,6 +6,7 @@ This is a dead-end model. Imports nothing else from project, or things will ciru
 import flet as ft
 import os
 import pickle
+import json
 
 class Story:
     # Constructor for when new story is created
@@ -73,7 +74,9 @@ class Story:
             path = os.path.join(self.file_path, "characters", f"{obj.title}.pkl")   # Sets our correct path
             self.characters.append(obj) # Saves 
             print(path)
-            self.save_object_to_file(obj, path)
+
+
+            #self.save_object_to_file(obj, path)
 
         # Is called when the parent f
         def save_chapter(obj):

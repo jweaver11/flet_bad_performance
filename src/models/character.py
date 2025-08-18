@@ -25,71 +25,34 @@ class Character(Widget):
         self.sex_color = ft.Colors.PRIMARY     # Color in the control used for the sex dropdown
 
 
-        self.character_data = {
+        self.data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': None,
             'Sex': None,
-            #'Age': "0",   # Text field
-            'Age': ft.TextField(
-                label="Age",
-                adaptive=True,      # Changes textfield depending on device (apple vs non-apple)
-                capitalization=ft.TextCapitalization.SENTENCES, 
-                width=80,
-                #on_blur=self.age_change,        # Runs on either submission or click off
-                #on_change=self.age_change      # This would run every keystroke
-            ),
-            'Physical Description': ft.Row(
-                wrap=True,
-                data={
-                    'Race': "",
-                    'Skin Color': "",
-                    'Hair Color': "",   # Textfield
-                    'Eye Color': "",    # Textfield
-                    'Height': "",   # TextField
-                    'Weight': "",   # TextField
-                    'Build': "",    # 
-                    'Distinguishing Features': "",  # some sort of flet list
-                },
-                controls=[
-                    #ft.Container(ft.Text("Physical Description"), on_click=self.expand_physical_description),
-                    ft.TextField(
-                        label="Race",
-                        adaptive=True,
-                        capitalization=ft.TextCapitalization.SENTENCES, 
-                        width=80,
-                        #on_blur=self.race_change,   
-                    ),
-                ],
-            ),
-            'Family': ft.Row(     # Expandable
-                wrap=True,
-                data={     
-                    #'Love Interest': Character or str,
-                    'Love Interest': str,
-                    'Father': "",   # Textfield with selectable options
-                    'Mother': "",    
-                    'Siblings': "",
-                    'Children': "",
-                    'Ancestors': "",
-                },  
-                controls=[
-                    ft.Container(ft.TextButton("Family")),
-                    ft.TextField(
-                        label="Love Interest",
-                        adaptive=True,
-                        capitalization=ft.TextCapitalization.SENTENCES, 
-                        width=320,
-                        #on_blur=self.race_change,   
-                    ),
-                    ft.TextField(
-                        label="Love Interest",
-                        adaptive=True,
-                        capitalization=ft.TextCapitalization.SENTENCES, 
-                        width=120,
-                        #on_blur=self.race_change,   
-                    ),
-                ]
-            ),
+            'Age': "0",   # Text field
+            
+            'Physical Description': {
+                'Race': "",
+                'Skin Color': "",
+                'Hair Color': "",   # Textfield
+                'Eye Color': "",    # Textfield
+                'Height': "",   # TextField
+                'Weight': "",   # TextField
+                'Build': "",    # 
+                'Distinguishing Features': "",  # some sort of flet list
+            },
+               
+            
+            'Family':  {
+                #'Love Interest': Character or str,
+                'Love Interest': str,
+                'Father': "",   # Textfield with selectable options
+                'Mother': "",    
+                'Siblings': "",
+                'Children': "",
+                'Ancestors': "",
+            },  
+                
             'Occupation': "",   # Textfield
             'Goals': "",    # Textfield list
             'Origin': {     # Category on the left
@@ -112,8 +75,6 @@ class Character(Widget):
 
         #self.controls.append(ft.Image(src=self.image, width=100, height=100))
 
-
-
         body = ft.Container(
             expand=True,
             padding=6,
@@ -123,7 +84,7 @@ class Character(Widget):
                 ft.Row([
                     ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                         label="Morality",
-                        value=self.character_data['Morality'],
+                        value=self.data['Morality'],
                         padding=ft.padding.all(0),
                         color=self.name_color,
                         text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
@@ -138,7 +99,7 @@ class Character(Widget):
                     ),
                     ft.Dropdown(      # Sex of each character
                         label="Sex",
-                        value=self.character_data['Sex'],
+                        value=self.data['Sex'],
                         padding=ft.padding.all(0),
                         color=self.sex_color,
                         text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
@@ -151,6 +112,69 @@ class Character(Widget):
                         on_change=self.sex_submit,
                     ),
                 ]),
+                '''
+                'Age': ft.TextField(
+                    label="Age",
+                    adaptive=True,      # Changes textfield depending on device (apple vs non-apple)
+                    capitalization=ft.TextCapitalization.SENTENCES, 
+                    width=80,
+                    #on_blur=self.age_change,        # Runs on either submission or click off
+                    #on_change=self.age_change      # This would run every keystroke
+                ),
+                'Physical Description': ft.Row(
+                    wrap=True,
+                    data={
+                        'Race': "",
+                        'Skin Color': "",
+                        'Hair Color': "",   # Textfield
+                        'Eye Color': "",    # Textfield
+                        'Height': "",   # TextField
+                        'Weight': "",   # TextField
+                        'Build': "",    # 
+                        'Distinguishing Features': "",  # some sort of flet list
+                    },
+                    controls=[
+                        #ft.Container(ft.Text("Physical Description"), on_click=self.expand_physical_description),
+                        ft.TextField(
+                            label="Race",
+                            adaptive=True,
+                            capitalization=ft.TextCapitalization.SENTENCES, 
+                            width=80,
+                            #on_blur=self.race_change,   
+                        ),
+                    ],
+                ),
+                
+                'Family': ft.Row(     # Expandable
+                    wrap=True,
+                    data={     
+                        #'Love Interest': Character or str,
+                        'Love Interest': str,
+                        'Father': "",   # Textfield with selectable options
+                        'Mother': "",    
+                        'Siblings': "",
+                        'Children': "",
+                        'Ancestors': "",
+                    },  
+                    controls=[
+                        ft.Container(ft.TextButton("Family")),
+                        ft.TextField(
+                            label="Love Interest",
+                            adaptive=True,
+                            capitalization=ft.TextCapitalization.SENTENCES, 
+                            width=320,
+                            #on_blur=self.race_change,   
+                        ),
+                        ft.TextField(
+                            label="Love Interest",
+                            adaptive=True,
+                            capitalization=ft.TextCapitalization.SENTENCES, 
+                            width=120,
+                            #on_blur=self.race_change,   
+                        ),
+                    ]
+                ),
+                '''
             ])
 
         )

@@ -109,7 +109,7 @@ def delete_character(character, page: ft.Page):
     def del_char(character):
         dlg.open = False
         page.update()
-        user.active_story.delete_object_from_story(character)
+        user.active_story.delete_object(character)
         reload_character_rail(page)
         render_widgets(page)
         page.open(
@@ -166,12 +166,12 @@ def create_character(tag, page: ft.Page):
 
             # Set the appropriate tag based on the category
             if tag == "main":
-                new_character.character_data["Role"] = "Main"
+                new_character.data["Role"] = "Main"
             elif tag == "side":
-                new_character.character_data["Role"] = "Side"
+                new_character.data["Role"] = "Side"
 
             elif tag == "background":
-                new_character.character_data["Role"] = "Background"
+                new_character.data["Role"] = "Background"
 
             # Add our object (in this case character) to the story.
             # This story function handles pinning it and adding it to any lists
@@ -432,11 +432,11 @@ def reload_character_rail(page: ft.Page):
         
 
         # Still in for loop, add our character to category based on its tag
-        if character.character_data["Role"] == "Main":
+        if character.data["Role"] == "Main":
             main_characters.controls.append(new_char)
-        elif character.character_data["Role"] == "Side":
+        elif character.data["Role"] == "Side":
             side_characters.controls.append(new_char)
-        elif character.character_data["Role"] == "Background":
+        elif character.data["Role"] == "Background":
             background_characters.controls.append(new_char)
 
         if len(main_characters.controls) == 0:
