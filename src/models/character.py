@@ -2,6 +2,7 @@ import flet as ft
 from models.user import user
 from models.widget import Widget
 import os
+import json
 
 
 # Class for character objects in the story. Every object needs a title, and a page reference when created
@@ -21,6 +22,8 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
         
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
+
+        self.save_to_file()
 
 
         self.character_data = {
@@ -174,8 +177,6 @@ class Character(Widget):
         self.content = tab
                             #ft.Divider(color=self.tab_color, thickness=2),
                        
-            
-    
     
     # Change our tab color of widget. Accepts a flet color as parameter
     def change_color(self, color):

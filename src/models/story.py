@@ -4,7 +4,8 @@ This is a dead-end model. Imports nothing else from project, or things will ciru
 '''
 
 import flet as ft
-
+import os
+import pickle
 
 class Story:
     # Constructor for when new story is created
@@ -50,19 +51,29 @@ class Story:
         
         # Store page reference for loading objects later
         self.page_reference = None
+
+
+    def load_story_objects(self):
+        print("load story objects called")
+        # Load all our objects from our story file.
+        # For char in filepath/characters, append to self.characters
+        #...
         
 
 
     # Add our created object to story. This will add it to any lists it should be in, pin location, etc.
     # All our story objects are extended flet containers, and require a title, pin location, tag,...
-    def add_object_to_story(self, obj):
+    def save_object(self, obj):
         print("Adding object in story: " + obj.title)
 
         # Runs to save our character to our story object, and save it to file
         def save_character(obj):
             print("save character called")
-            self.characters.append(obj)
-            self.save_object_to_file(obj)
+
+            path = os.path.join(self.file_path, "characters", f"{obj.title}.pkl")   # Sets our correct path
+            self.characters.append(obj) # Saves 
+            print(path)
+            self.save_object_to_file(obj, path)
 
         # Is called when the parent f
         def save_chapter(obj):
@@ -90,23 +101,8 @@ class Story:
         from handlers.arrange_widgets import arrange_widgets
         arrange_widgets()
 
-
-    # Called when we need to save new objects or changes to existing objects
-    # Handles saving our object to a file for permanent data storage
-    # Updates existing objects, creates new objects if they don't exist
-    def save_object_to_file(self, obj):
-        print("object saved to file called")
-
-        
-    # Load an object from file
-    def load_object_from_file(self, file_path, page_reference):
-        """Load a saved object from file"""
-        print("load object from file called")
-
-
-
-    # Delete an object from the story. Only works for certain objects
-    def delete_object_from_story(self, obj):
+    # Deletes an object from the story, and calls function to remove it from file
+    def delete_object(self, obj):
         print("Removing object from story: " + obj.title)
 
     
@@ -127,15 +123,16 @@ class Story:
             # Remove object from the characters list
             if obj in self.characters:
                 self.characters.remove(obj)
-            
-
-        # delete_from_file()
 
 
+    # Called by tthe save_object method to save the object to file storage
+    def save_object_to_file(self, obj, file_path):
+        print("object saved to file called")
+        
+    # Load an object from file
+    def load_object_from_file(self, file_path, page_reference):
+        print("load object from file called")
 
-
-# Add all this to user file??
-# Save stories locally - folder structure:
-# user/stories/story_name/
-# - characters/character
-# - workspace_name/...
+    # Called by the delete object method to permanently remove the object from file storage as well
+    def delete_object_from_file(self, obj, file_path):
+        print("delete object from file called")

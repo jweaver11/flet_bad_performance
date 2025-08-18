@@ -5,13 +5,12 @@ so they can update themselves dynamically
 '''
 
 import flet as ft
-from models.user import user, User
+from models.user import user
 from models.settings import Settings
 from ui.menu_bar import create_menu_bar
 from ui.workspaces_rail import All_Workspaces_Rail
 from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
-from handlers.render_widgets import remove_drag_targets
 import os
 from models.settings import Settings
 

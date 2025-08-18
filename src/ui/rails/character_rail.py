@@ -175,7 +175,7 @@ def create_character(tag, page: ft.Page):
 
             # Add our object (in this case character) to the story.
             # This story function handles pinning it and adding it to any lists
-            user.active_story.add_object_to_story(new_character)
+            user.active_story.save_object(new_character)
             reload_character_rail(page)   
             render_widgets(page)  
 

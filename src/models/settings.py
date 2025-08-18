@@ -18,6 +18,8 @@ class Settings(Widget):
 
         self.visible = False
 
+        self.workspace_order = []
+
         # Save theme mode of either light or dark
         self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
         self.theme_color_scheme = ft.Colors.BLUE    # Save our color scheme for the theme
