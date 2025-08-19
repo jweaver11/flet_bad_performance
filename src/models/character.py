@@ -196,7 +196,7 @@ class Character(Widget):
         
         # Set our content
         self.content = tab
-                            #ft.Divider(color=self.tab_color, thickness=2),
+                            
                        
     
     # Change our tab color of widget. Accepts a flet color as parameter

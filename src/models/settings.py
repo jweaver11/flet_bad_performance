@@ -18,6 +18,12 @@ class Settings(Widget):
 
         self.visible = False
 
+        # User defined options
+        self.data = {
+
+        }
+
+
         self.workspace_order = []
 
         # Save theme mode of either light or dark
@@ -128,6 +134,22 @@ class Settings(Widget):
         ])
 
         self.tab.content = self.content
+
+        # Sets our header
+        tab = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            #divider_color=ft.Colors.TRANSPARENT,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+            tabs=[self.tab]    # Gives our tab control here
+                 
+        )
+          
+        
+        # Set our content
+        self.content = tab
 
         
     
