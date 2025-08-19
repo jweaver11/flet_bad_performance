@@ -1,8 +1,7 @@
 import flet as ft
 from models.user import user
 from models.widget import Widget
-import os
-import json
+
 
 
 # Class for character objects in the story. Every object needs a title, and a page reference when created
@@ -24,8 +23,8 @@ class Character(Widget):
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
         self.sex_color = ft.Colors.PRIMARY     # Color in the control used for the sex dropdown
 
-
-        self.character_data = {
+        # Data about the character that the user will manipulate
+        self.data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': None,
             'Sex': None,
@@ -172,7 +171,7 @@ class Character(Widget):
         
         # Set our content
         self.content = tab
-                            #ft.Divider(color=self.tab_color, thickness=2),
+                            
                        
     
     # Change our tab color of widget. Accepts a flet color as parameter
@@ -271,7 +270,69 @@ class Character(Widget):
 
 
 
-
+'''
+                'Age': ft.TextField(
+                    label="Age",
+                    adaptive=True,      # Changes textfield depending on device (apple vs non-apple)
+                    capitalization=ft.TextCapitalization.SENTENCES, 
+                    width=80,
+                    #on_blur=self.age_change,        # Runs on either submission or click off
+                    #on_change=self.age_change      # This would run every keystroke
+                ),
+                'Physical Description': ft.Row(
+                    wrap=True,
+                    data={
+                        'Race': "",
+                        'Skin Color': "",
+                        'Hair Color': "",   # Textfield
+                        'Eye Color': "",    # Textfield
+                        'Height': "",   # TextField
+                        'Weight': "",   # TextField
+                        'Build': "",    # 
+                        'Distinguishing Features': "",  # some sort of flet list
+                    },
+                    controls=[
+                        #ft.Container(ft.Text("Physical Description"), on_click=self.expand_physical_description),
+                        ft.TextField(
+                            label="Race",
+                            adaptive=True,
+                            capitalization=ft.TextCapitalization.SENTENCES, 
+                            width=80,
+                            #on_blur=self.race_change,   
+                        ),
+                    ],
+                ),
+                
+                'Family': ft.Row(     # Expandable
+                    wrap=True,
+                    data={     
+                        #'Love Interest': Character or str,
+                        'Love Interest': str,
+                        'Father': "",   # Textfield with selectable options
+                        'Mother': "",    
+                        'Siblings': "",
+                        'Children': "",
+                        'Ancestors': "",
+                    },  
+                    controls=[
+                        ft.Container(ft.TextButton("Family")),
+                        ft.TextField(
+                            label="Love Interest",
+                            adaptive=True,
+                            capitalization=ft.TextCapitalization.SENTENCES, 
+                            width=320,
+                            #on_blur=self.race_change,   
+                        ),
+                        ft.TextField(
+                            label="Love Interest",
+                            adaptive=True,
+                            capitalization=ft.TextCapitalization.SENTENCES, 
+                            width=120,
+                            #on_blur=self.race_change,   
+                        ),
+                    ]
+                ),
+                '''
 
 
 

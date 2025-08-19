@@ -6,15 +6,48 @@ This is a dead-end model. Imports nothing else from project, or things will ciru
 import flet as ft
 import os
 import pickle
+import json
+from constants import data_paths
 
 class Story:
     # Constructor for when new story is created
-    def __init__(self, title: str, file_path: str):
+    def __init__(self, title: str):
        
         self.title=title # Gives our story a title when its created
-        self.file_path=file_path  # Gives us a path to save/load the story
+
+        data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
+        
+        # Set the file path to the active story path
+        self.file_path = data_paths.active_story_path
 
         self.load_object_from_file("", "")
+
+        # Create Story object structure folders inside empty_story
+        story_folders = [
+            "content",
+            "characters",
+            "plot_and_timeline",
+            "worldbuilding",
+            "drawing_board",
+            "notes",
+        ]
+        
+        # Creates our folders in the active story path
+        for folder in story_folders:
+            folder_path = os.path.join(data_paths.active_story_path, folder)
+            os.makedirs(folder_path, exist_ok=True)
+
+
+
+        # Metadata for the story
+        self.metadata = {
+            "title": title,
+            "character_count": int,
+            "created_at": None,
+            "last_modified": None
+        }
+        # Create story metadata file
+        self.metadata_path = os.path.join(data_paths.active_story_path, "story_info.json")
 
 
         self.top_pin = ft.Row(height=0, spacing=0, controls=[])
@@ -52,9 +85,9 @@ class Story:
         # Store page reference for loading objects later
         self.page_reference = None
 
-
-    def load_story_objects(self):
-        print("load story objects called")
+    # Called when a story is loaded. Loads all our objects from files
+    def startup(self):
+        print("startup called")
         # Load all our objects from our story file.
         # For char in filepath/characters, append to self.characters
         #...
