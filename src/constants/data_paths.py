@@ -1,5 +1,4 @@
 import os
-from constants.logging import logging
 
 
 # Set our data path for the app
@@ -22,6 +21,8 @@ active_story_path = ""
 def set_active_story_path(story_title: str) -> str:
     global active_story_path
 
+    print("Old active story path: ", active_story_path)
+    
     active_story_path = os.path.join(stories_path, story_title)
     print("new active story path: ", active_story_path)
     

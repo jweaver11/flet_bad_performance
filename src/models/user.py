@@ -6,11 +6,12 @@ All other files can import the user variable
 from models.story import Story
 import flet as ft
 import os
+import pickle
+import flet as ft
 from constants.data_paths import app_data_path, stories_path, settings_path, active_story_path
 
 class User:
     def __init__(self):
-        
 
         # initialize the settings, before creating them in main
         # Also an extended flet container, so it shows up in the pins
@@ -36,12 +37,14 @@ class User:
 
         self.workspace = ft.Container()
 
+    # Called when user creates a new story
     def create_new_story(self, title: str):
-        print("Create new story called")
+        
         # Create a new story object and add it to our stories dict
-        new_story = Story(title, os.path.join(stories_path, title))
+        new_story = Story(title)
         self.stories[title] = new_story
         return new_story
+
 
     
 
@@ -49,13 +52,14 @@ def load_user() -> User:
     # Check our user path. Active user variable??
     # If there is an active user, load them
     # Else, create a new user
-    os.path.join(stories_path, user.active_story.title)
 
     print("load user called")
     return create_user()
 
 def create_user() -> User:
+    
     user = User()
+    
     return user
 
 

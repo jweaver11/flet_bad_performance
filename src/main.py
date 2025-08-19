@@ -11,10 +11,7 @@ from ui.menu_bar import create_menu_bar
 from ui.workspaces_rail import All_Workspaces_Rail
 from ui.active_rail import create_active_rail
 from ui.workspace import create_workspace
-import os
 from models.settings import Settings
-
-
 
 
 # MAIN FUNCTION TO RUN PROGRAM ---------------------------------------------------------
