@@ -258,6 +258,9 @@ def render_widgets(page: ft.Page):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
         e.control.update()
 
+    def do_nothing(e: ft.HoverEvent):
+        pass
+
     # Rendering adds dividers between each widget. So if we remove old ones here
     story.top_pin.controls = [control for control in story.top_pin.controls if type(control) != ft.GestureDetector]
     story.left_pin.controls = [control for control in story.left_pin.controls if type(control) != ft.GestureDetector]
@@ -280,7 +283,8 @@ def render_widgets(page: ft.Page):
                     padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
                     content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
                 ),
-                on_hover=show_horizontal_cursor,
+                #on_hover=show_horizontal_cursor,
+                on_hover= do_nothing,  # No hover effect for left pin
                 #on_pan_update=resize the left pin controls
             )
             story.top_pin.controls.insert(insert_position, gd)
@@ -302,7 +306,8 @@ def render_widgets(page: ft.Page):
                     padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
                     content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
                 ),
-                on_hover=show_vertical_cursor,
+                #on_hover=show_vertical_cursor,
+                on_hover= do_nothing,  # No hover effect for left pin
                 #on_pan_update=resize the left pin controls
             )
             story.left_pin.controls.insert(insert_position, gd)
@@ -325,7 +330,8 @@ def render_widgets(page: ft.Page):
                     padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
                     content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
                 ),
-                on_hover=show_vertical_cursor,
+                #on_hover=show_vertical_cursor,
+                on_hover= do_nothing,  # No hover effect for left pin
             )
             story.right_pin.controls.insert(insert_position, gd)
 
@@ -346,7 +352,8 @@ def render_widgets(page: ft.Page):
                     padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
                     content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
                 ),
-                on_hover=show_horizontal_cursor,
+                #on_hover=show_horizontal_cursor,
+                on_hover= do_nothing,  # No hover effect for left pin
             )
             story.bottom_pin.controls.insert(insert_position, gd)
 

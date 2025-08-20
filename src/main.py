@@ -27,6 +27,8 @@ def main(page: ft.Page):
         # We create our user settings here because we need the page reference
         user.settings = Settings(page)  
 
+    user.active_story.startup(page)
+
     #if user.settings is None:
         #user.settings = Settings()
         #user.settings.save_settings()  # Save our settings to the file

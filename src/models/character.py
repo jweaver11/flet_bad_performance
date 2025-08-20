@@ -1,10 +1,17 @@
+'''
+Most model classes really container 2 models: the character model itself and the associated widget model.
+Inside of the 'data' dict, we store our characters model for the manipulative data...
+the user will change. Everything else is built upon program launch so we can display it in the UI.
+'''
+
 import flet as ft
+import json
+import os
 from models.user import user
 from models.widget import Widget
+from constants.data_paths import characters_path
 
 
-
-# Class for character objects in the story. Every object needs a title, and a page reference when created
 class Character(Widget):
     def __init__(self, name, page: ft.Page):
 
@@ -15,7 +22,10 @@ class Character(Widget):
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "left",  # Start in left pin location
+            tab_color = ft.Colors.PRIMARY,
         )
+
+        self.__load_from_dict()  # Load our character data from the file, or set default data
 
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
@@ -23,12 +33,28 @@ class Character(Widget):
         self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
         self.sex_color = ft.Colors.PRIMARY     # Color in the control used for the sex dropdown
 
-        # Data about the character that the user will manipulate
-        self.data = {
+        # Build our widget on start, but just reloads it later
+        self.reload_widget()
+
+
+     # Save our object as a dictionary for json serialization
+    def __save_dict(self):
+        print("save settings dict called")
+        character_file_path = os.path.join(characters_path, f"{self.title}.json")
+        
+        with open(character_file_path, "w") as f:
+            json.dump(self.data, f, indent=4)
+
+    def __load_from_dict(self):
+        print("load from dict called")
+        character_file_path = os.path.join(characters_path, f"{self.title}.json")
+
+        # Data set upon first launch of program, or if file can't be loaded
+        default_data = {
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
-            'Morality': None,
-            'Sex': None,
-            'Age': "0",   # Text field
+            'Morality': "",
+            'Sex': "",
+            'Age': "",   # Text field
             
             'Physical Description': {
                 'Race': "",
@@ -40,11 +66,9 @@ class Character(Widget):
                 'Build': "",    # 
                 'Distinguishing Features': "",  # some sort of flet list
             },
-               
-            
             'Family':  {
                 #'Love Interest': Character or str,
-                'Love Interest': str,
+                'Love Interest': "",    # Sets a string
                 'Father': "",   # Textfield with selectable options
                 'Mother': "",    
                 'Siblings': "",
@@ -63,11 +87,41 @@ class Character(Widget):
             'Personality': "",  # expandable ft.TextField
             'Backstory': "",    # expandable ft.TextField
             'Abilities': "",    # Some sort of list
-            'Dead': [bool, "when they died"],
+            'Dead': [False, {'death_date': "when they died"}],
             'Notes' : [],   # Category that says Notes on the left, then lists the expandable ft.TextField
         }
-        # Build our widget on start
-        self.reload_widget()
+        
+        try:
+            # Try to load existing settings from file
+            if os.path.exists(character_file_path):
+                with open(character_file_path, "r") as f:
+                    loaded_data = json.load(f)
+                
+                # Start with default data and update with loaded data
+                self.data = default_data.copy()
+                self.data.update(loaded_data)
+                
+                print(f"Settings loaded successfully from {character_file_path}")
+            else:
+                # File doesn't exist, use default data
+                self.data = default_data
+                print("Settings file does not exist, using default values.")
+                
+                # Optionally create the file with default data
+                self.__save_dict()  # This will save the default data to file
+                
+        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
+            # Handle JSON parsing errors or file access issues
+            print(f"Error loading settings: {e}")
+            print("Using default values.")
+            self.data = default_data
+            
+            # Optionally create/overwrite the file with default data
+            try:
+                self.__save_dict()  # This will save the default data to file
+            except Exception as save_error:
+                print(f"Could not save default settings: {save_error}")
+
 
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
@@ -132,6 +186,9 @@ class Character(Widget):
         
         # Set our content
         self.content = tab
+
+
+   
                             
                        
     

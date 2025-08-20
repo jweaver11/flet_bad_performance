@@ -19,11 +19,10 @@ class Settings(Widget):
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "main",  # Start in left pin location
+            tab_color = ft.Colors.PRIMARY,
         )
 
         self.__load_from_dict()
-
-
 
         self.visible = False
 
@@ -126,7 +125,6 @@ class Settings(Widget):
 
 
         
-
         self.content=ft.Column([
             ft.TextButton(
                 "Reorder Workspaces", 
@@ -159,7 +157,7 @@ class Settings(Widget):
 
     # Save our object as a dictionary for json serialization
     def __save_dict(self):
-        print("dict called")
+        print("save settings dict called")
         settings_file_path = os.path.join(settings_path, "settings.json")
         
         with open(settings_file_path, "w") as f:
@@ -169,7 +167,7 @@ class Settings(Widget):
         print("load from dict called")
         settings_file_path = os.path.join(settings_path, "settings.json")
 
-        # Default fallback data
+        # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'theme_mode': "dark",      
             'theme_color_scheme': "blue",

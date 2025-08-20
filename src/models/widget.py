@@ -1,18 +1,27 @@
+'''
+An extended flet container that is the parent of all our story objects.
+Handles uniform UI, and has some functionality all objects need for easy data use.
+All objects contain a title, tag, page reference, pin location, tab color, and a file path
+'''
+
+
 import flet as ft
 from models.user import user
 from handlers.render_widgets import render_widgets
 from handlers.render_widgets import show_pin_drag_targets
 
-# An extended flet tab that every object in our story will derive from
-# Has a title, tag, page reference, and pin location
+
 class Widget(ft.Container):
-    def __init__(self, title: str, tag: str, p: ft.Page, pin_location: str):
-    # Variables that all widgets will have, so we'll store them outside of data
-        self.title = title  # Name of character, but all objects have a 'title' for identification, so characters do too
-        self.tag = tag  # Tag for logic, mostly for routing it through our story object
-        self.p = p   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-        self.pin_location = pin_location  # Start in left pin location
-        self.tab_color = ft.Colors.PRIMARY  # Since all objects are containers
+    def __init__(self, title: str, tag: str, p: ft.Page, pin_location: str, tab_color: str):
+    
+        self.title = title  # Title of our object
+        self.tag = tag  # Tag for logic routing and identification
+        self.p = p   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen...
+        # p.update() always works - (self.update() and page.update() sometimes don't work because of outdated references)
+        self.pin_location = pin_location  # Pin location of our object upon creation
+        self.tab_color = tab_color  # Users can change the tab color of their widgets for better organization
+        self.path = ""  # The path to the json file that stores this widget's data
+
 
         self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
