@@ -24,7 +24,7 @@ class Settings(Widget):
 
         self.__load_from_dict()
 
-        self.visible = False
+        #self.visible = False
 
 
         self.workspace_order = []
@@ -169,6 +169,7 @@ class Settings(Widget):
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
+            'visible': False,
             'theme_mode': "dark",      
             'theme_color_scheme': "blue",
             'change_name_colors_based_on_morality': True,
@@ -183,6 +184,7 @@ class Settings(Widget):
                 # Start with default data and update with loaded data
                 self.data = default_data.copy()
                 self.data.update(loaded_data)
+                self.visible = self.data.get('visible', False)
                 
                 print(f"Settings loaded successfully from {settings_file_path}")
             else:
@@ -204,6 +206,11 @@ class Settings(Widget):
                 self.__save_dict()  # This will save the default data to file
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
+
+    def change_visibility(self):
+        self.visible = not user.settings.visible
+        self.data['visible'] = user.settings.visible
+        self.__save_dict()
 
 
         

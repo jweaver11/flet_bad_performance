@@ -22,6 +22,16 @@ class Widget(ft.Container):
         self.tab_color = tab_color  # Users can change the tab color of their widgets for better organization
         self.path = ""  # The path to the json file that stores this widget's data
 
+        super().__init__(
+            expand=True, 
+            #padding=6,
+            #border=ft.border.all(1, self.tab_color),  # Gives a border to match the widgets border
+            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.ON_SECONDARY,
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
+        )
+
 
         self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
@@ -72,15 +82,6 @@ class Widget(ft.Container):
                                 
         )
 
-        super().__init__(
-            expand=True, 
-            #padding=6,
-            #border=ft.border.all(1, self.tab_color),  # Gives a border to match the widgets border
-            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor=ft.Colors.ON_SECONDARY,
-            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_SECONDARY),
-            bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
-        )
 
     def hover_tab(self, e):
         self.hide_tab_icon.icon_color = ft.Colors.ON_PRIMARY_CONTAINER

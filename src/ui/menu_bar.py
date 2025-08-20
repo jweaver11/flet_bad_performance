@@ -132,7 +132,7 @@ def create_menu_bar(page: ft.Page):
     )
 
     def settings_clicked(e):
-        user.settings.visible = not user.settings.visible
+        user.settings.change_visibility()
         render_widgets(page)  # Re-render the page to show/hide settings
         page.update()
 
