@@ -11,27 +11,6 @@ import json
 
 
 
-class New_Settings:
-    def __init__(self):
-        self.color = "red"
-        self.visible = False
-
-        #self.build_widget()
-
-    def save_settings(self):
-        settings_file_path = os.path.join(settings_path, "settings.json")
-        settings_data = {
-            "color": self.color,
-            "visible": self.visible
-        }
-        with open(settings_file_path, "w") as f:
-            json.dump(settings_data, f, indent=4)
-        
-
-        
-
-
-
 class Settings(Widget):
     def __init__(self, page: ft.Page):
         # Arguments our widget needs
@@ -49,12 +28,7 @@ class Settings(Widget):
         self.visible = False
 
 
-
         self.workspace_order = []
-
-        # Save theme mode of either light or dark
-        self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
-        #self.theme_color_scheme = self.data    # Save our color scheme for the theme
 
         # Our dropdown options for our color scheme dropdown control
         self.theme_color_scheme_options = [
@@ -84,9 +58,9 @@ class Settings(Widget):
         # Called when a dropdown option is selected. Saves our choice, and applies it to the page
         def change_color_scheme_picked(e):
             self.data['theme_color_scheme'] = e.control.value
-            self.theme_color_scheme = e.control.value  # Keep for backward compatibility if used elsewhere
-            self.p.theme = ft.Theme(color_scheme_seed=self.theme_color_scheme)
-            self.p.dark_theme = ft.Theme(color_scheme_seed=self.theme_color_scheme)
+            self.data['theme_color_scheme'] = e.control.value  # Keep for backward compatibility if used elsewhere
+            self.p.theme = ft.Theme(color_scheme_seed=self.data['theme_color_scheme'])
+            self.p.dark_theme = ft.Theme(color_scheme_seed=self.data['theme_color_scheme'])
             
             # Save the updated settings to the JSON file
             self.__save_dict()
@@ -102,14 +76,12 @@ class Settings(Widget):
             on_change=change_color_scheme_picked,
         )
         
-        # Background color of widgets that changes depending if in light theme or dark theme
-        #self.workspace_bgcolor = ft.Colors.ON_SECONDARY #if self.user_theme_mode == ft.ThemeMode.DARK else ft.Colors.GREY_200
-
-        
 
 
         # Runs when the switch toggling the color change of characters names based on morality is clicked
         def change_name_colors_switch(e):
+            self.data['change_name_colors_based_on_morality'] = e.control.value
+            self.__save_dict()  # Save the updated settings to the JSON file
             # runs through all our characters, and updates their name color accordingly
             for char in user.active_story.characters:  
                 char.check_morality()
@@ -130,22 +102,22 @@ class Settings(Widget):
         def toggle_theme(e):
             print("switch_theme called")
             print(self.p.theme_mode)
-            print("datta: ", self.data['user_theme_mode'])
-            if self.data['user_theme_mode'] == "dark":   # Check which theme we're on
-                self.data['user_theme_mode'] = "light"   # change the theme mode so we can save it
+            print("datta: ", self.data['theme_mode'])
+            if self.data['theme_mode'] == "dark":   # Check which theme we're on
+                self.data['theme_mode'] = "light"   # change the theme mode so we can save it
                 self.theme_button.icon = ft.Icons.DARK_MODE # Change the icon of theme button
                 
-            elif self.data['user_theme_mode'] == "light":
-                self.data['user_theme_mode'] = "dark"
+            elif self.data['theme_mode'] == "light":
+                self.data['theme_mode'] = "dark"
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
                
             # Save the updated settings to the JSON file
             self.__save_dict()
 
             #user.workspace.bgcolor = self.workspace_bgcolor
-            self.p.theme_mode = self.data['user_theme_mode']
+            self.p.theme_mode = self.data['theme_mode']
             self.p.update()
-            print(self.data['user_theme_mode'])
+            print(self.data['theme_mode'])
 
         # Icon of the theme button that changes depending on if we're dark or light mode
         self.theme_icon = ft.Icons.DARK_MODE if page.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
@@ -199,8 +171,9 @@ class Settings(Widget):
 
         # Default fallback data
         default_data = {
-            'user_theme_mode': "dark",      
-            'theme_color_scheme': "blue"
+            'theme_mode': "dark",      
+            'theme_color_scheme': "blue",
+            'change_name_colors_based_on_morality': True,
         }
         
         try:
@@ -220,7 +193,7 @@ class Settings(Widget):
                 print("Settings file does not exist, using default values.")
                 
                 # Optionally create the file with default data
-                self.__dict()  # This will save the default data to file
+                self.__save_dict()  # This will save the default data to file
                 
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
             # Handle JSON parsing errors or file access issues
@@ -230,7 +203,7 @@ class Settings(Widget):
             
             # Optionally create/overwrite the file with default data
             try:
-                self.__dict()  # This will save the default data to file
+                self.__save_dict()  # This will save the default data to file
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
 
