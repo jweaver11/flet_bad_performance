@@ -29,6 +29,10 @@ class Settings(Widget):
 
         self.workspace_order = []
 
+
+
+        
+
         # Our dropdown options for our color scheme dropdown control
         self.theme_color_scheme_options = [
             ft.Colors.RED,
@@ -208,8 +212,8 @@ class Settings(Widget):
                 print(f"Could not save default settings: {save_error}")
 
     def change_visibility(self):
-        self.visible = not user.settings.visible
-        self.data['visible'] = user.settings.visible
+        self.visible = not self.visible
+        self.data['visible'] = self.visible
         self.__save_dict()
 
 

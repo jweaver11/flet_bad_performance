@@ -28,6 +28,8 @@ class Character(Widget):
 
         self.__load_from_dict()  # Load our character data from the file, or set default data if creating a new character
 
+        
+
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
         
@@ -53,6 +55,7 @@ class Character(Widget):
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
+            'visible': False,
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': "",
             'Sex': "",
@@ -104,6 +107,7 @@ class Character(Widget):
                 # Start with default data and update with loaded data
                 self.data = default_data.copy()
                 self.data.update(loaded_data)
+                self.visible = self.data.get('visible', False)
                 
                 print(f"Settings loaded successfully from {character_file_path}")
             else:
@@ -190,6 +194,9 @@ class Character(Widget):
         
         # Set our content
         self.content = tab
+
+
+    
 
 
    

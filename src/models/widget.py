@@ -122,11 +122,27 @@ class Widget(ft.Container):
     def hide_widget(self):
         self.visible = False
         user.active_story.master_stack.update()
+        # Update the child object's data and save to file
+        if hasattr(self, 'data'):
+            self.data['visible'] = False
+            # Call the child class's __save_dict method using the proper name mangling
+            class_name = self.__class__.__name__
+            method_name = f"_{class_name}__save_dict"
+            if hasattr(self, method_name):
+                getattr(self, method_name)()
         render_widgets(self.p)
 
     # Shows our widget once again
     def show_widget(self):
         self.visible = True
         user.active_story.master_stack.update()
+        # Update the child object's data and save to file
+        if hasattr(self, 'data'):
+            self.data['visible'] = True
+            # Call the child class's __save_dict method using the proper name mangling
+            class_name = self.__class__.__name__
+            method_name = f"_{class_name}__save_dict"
+            if hasattr(self, method_name):
+                getattr(self, method_name)()
         render_widgets(self.p)
         self.p.update()
