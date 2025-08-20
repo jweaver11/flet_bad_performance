@@ -6,7 +6,7 @@ so they can update themselves dynamically
 
 import flet as ft
 from models.user import user
-from models.settings import Settings
+from models.settings import Settings, New_Settings
 from ui.menu_bar import create_menu_bar
 from ui.workspaces_rail import All_Workspaces_Rail
 from ui.active_rail import create_active_rail
@@ -26,6 +26,10 @@ def main(page: ft.Page):
     if user.settings is None:
         # We create our user settings here because we need the page reference
         user.settings = Settings(page)  
+
+    #if user.settings is None:
+        #user.settings = Settings()
+        #user.settings.save_settings()  # Save our settings to the file
     
    
     # Adds our page title and theme
@@ -33,9 +37,13 @@ def main(page: ft.Page):
 
     # Sets our theme modes, but we start dark
     # If theme mode un-set, set dark...
-    page.theme = ft.Theme(color_scheme_seed=user.settings.theme_color_scheme)
-    page.dark_theme = ft.Theme(color_scheme_seed=user.settings.theme_color_scheme)
-    page.theme_mode = user.settings.user_theme_mode
+    #page.theme = ft.Theme(color_scheme_seed=user.settings.theme_color_scheme)
+    #page.dark_theme = ft.Theme(color_scheme_seed=user.settings.theme_color_scheme)
+    #page.theme_mode = user.settings.user_theme_mode
+
+    page.theme = ft.Theme(color_scheme_seed=ft.Colors.BLUE)
+    #page.theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
+        #self.theme_color_scheme = ft.Colors.BLUE    # Save our color scheme for the theme
 
     page.title = title
     page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)

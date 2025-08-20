@@ -125,16 +125,17 @@ def arrange_widgets():
     def add_object_to_pin(obj):
         print("add object to pin called")
         # check objects pin and that its not already in that pin
-        if obj.pin_location == "top" and obj not in user.active_story.top_pin.controls:
-            user.active_story.top_pin.controls.append(obj)
-        elif obj.pin_location == "left" and obj not in user.active_story.left_pin.controls:
-            user.active_story.left_pin.controls.append(obj)
-        elif obj.pin_location == "main" and obj not in user.active_story.main_pin.controls:
-            user.active_story.main_pin.controls.append(obj)  
-        elif obj.pin_location == "right" and obj not in user.active_story.right_pin.controls:
-            user.active_story.right_pin.controls.append(obj)
-        elif obj.pin_location == "bottom" and obj not in user.active_story.bottom_pin.controls:
-            user.active_story.bottom_pin.controls.append(obj)
+        if hasattr(obj, 'pin_location'):  # If it does not have a pin location, set it to main
+            if obj.pin_location == "top" and obj not in user.active_story.top_pin.controls:
+                user.active_story.top_pin.controls.append(obj)
+            elif obj.pin_location == "left" and obj not in user.active_story.left_pin.controls:
+                user.active_story.left_pin.controls.append(obj)
+            elif obj.pin_location == "main" and obj not in user.active_story.main_pin.controls:
+                user.active_story.main_pin.controls.append(obj)  
+            elif obj.pin_location == "right" and obj not in user.active_story.right_pin.controls:
+                user.active_story.right_pin.controls.append(obj)
+            elif obj.pin_location == "bottom" and obj not in user.active_story.bottom_pin.controls:
+                user.active_story.bottom_pin.controls.append(obj)
 
     
     # Checks all our objects (widgets) to check if they are in a pin or not. If not, add them to their pin location

@@ -250,7 +250,7 @@ def render_widgets(page: ft.Page):
     arrange_widgets()
     
 
-    # Change our cursor when we hover over a resizer (divieder). Either vertical or horizontal
+    # Change our cursor when we hover over a resizer (divider). Either vertical or horizontal
     def show_vertical_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
         e.control.update()

@@ -1,10 +1,36 @@
 import flet as ft
+import os
 from models.user import user
 from models.widget import Widget
+from constants.data_paths import settings_path
+import json
 
 # 
 # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
 #
+
+
+
+class New_Settings:
+    def __init__(self):
+        self.color = "red"
+        self.visible = False
+
+        #self.build_widget()
+
+    def save_settings(self):
+        settings_file_path = os.path.join(settings_path, "settings.json")
+        settings_data = {
+            "color": self.color,
+            "visible": self.visible
+        }
+        with open(settings_file_path, "w") as f:
+            json.dump(settings_data, f, indent=4)
+        
+
+        
+
+
 
 class Settings(Widget):
     def __init__(self, page: ft.Page):
@@ -16,19 +42,19 @@ class Settings(Widget):
             pin_location = "main",  # Start in left pin location
         )
 
+        self.__load_from_dict()
+
+
+
         self.visible = False
 
-        # User defined options
-        self.data = {
-
-        }
 
 
         self.workspace_order = []
 
         # Save theme mode of either light or dark
         self.user_theme_mode = ft.ThemeMode.DARK    # Can't call this theme_mode, since containers have their own theme mode
-        self.theme_color_scheme = ft.Colors.BLUE    # Save our color scheme for the theme
+        #self.theme_color_scheme = self.data    # Save our color scheme for the theme
 
         # Our dropdown options for our color scheme dropdown control
         self.theme_color_scheme_options = [
@@ -57,9 +83,14 @@ class Settings(Widget):
         
         # Called when a dropdown option is selected. Saves our choice, and applies it to the page
         def change_color_scheme_picked(e):
-            self.theme_color_scheme = e.control.value
+            self.data['theme_color_scheme'] = e.control.value
+            self.theme_color_scheme = e.control.value  # Keep for backward compatibility if used elsewhere
             self.p.theme = ft.Theme(color_scheme_seed=self.theme_color_scheme)
             self.p.dark_theme = ft.Theme(color_scheme_seed=self.theme_color_scheme)
+            
+            # Save the updated settings to the JSON file
+            self.__save_dict()
+            
             self.p.update()
 
         # Dropdown so user can change their color scheme
@@ -99,19 +130,22 @@ class Settings(Widget):
         def toggle_theme(e):
             print("switch_theme called")
             print(self.p.theme_mode)
-            if self.user_theme_mode == ft.ThemeMode.DARK:   # Check which theme we're on
-                self.user_theme_mode = ft.ThemeMode.LIGHT   # change the theme mode so we can save it
+            print("datta: ", self.data['user_theme_mode'])
+            if self.data['user_theme_mode'] == "dark":   # Check which theme we're on
+                self.data['user_theme_mode'] = "light"   # change the theme mode so we can save it
                 self.theme_button.icon = ft.Icons.DARK_MODE # Change the icon of theme button
                 
-            elif self.user_theme_mode == ft.ThemeMode.LIGHT:
-                self.user_theme_mode = ft.ThemeMode.DARK
+            elif self.data['user_theme_mode'] == "light":
+                self.data['user_theme_mode'] = "dark"
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
                
+            # Save the updated settings to the JSON file
+            self.__save_dict()
 
             #user.workspace.bgcolor = self.workspace_bgcolor
-            self.p.theme_mode = self.user_theme_mode
+            self.p.theme_mode = self.data['user_theme_mode']
             self.p.update()
-            print(self.user_theme_mode)
+            print(self.data['user_theme_mode'])
 
         # Icon of the theme button that changes depending on if we're dark or light mode
         self.theme_icon = ft.Icons.DARK_MODE if page.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
@@ -150,6 +184,55 @@ class Settings(Widget):
         
         # Set our content
         self.content = tab
+
+    # Save our object as a dictionary for json serialization
+    def __save_dict(self):
+        print("dict called")
+        settings_file_path = os.path.join(settings_path, "settings.json")
+        
+        with open(settings_file_path, "w") as f:
+            json.dump(self.data, f, indent=4)
+
+    def __load_from_dict(self):
+        print("load from dict called")
+        settings_file_path = os.path.join(settings_path, "settings.json")
+
+        # Default fallback data
+        default_data = {
+            'user_theme_mode': "dark",      
+            'theme_color_scheme': "blue"
+        }
+        
+        try:
+            # Try to load existing settings from file
+            if os.path.exists(settings_file_path):
+                with open(settings_file_path, "r") as f:
+                    loaded_data = json.load(f)
+                
+                # Start with default data and update with loaded data
+                self.data = default_data.copy()
+                self.data.update(loaded_data)
+                
+                print(f"Settings loaded successfully from {settings_file_path}")
+            else:
+                # File doesn't exist, use default data
+                self.data = default_data
+                print("Settings file does not exist, using default values.")
+                
+                # Optionally create the file with default data
+                self.__dict()  # This will save the default data to file
+                
+        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
+            # Handle JSON parsing errors or file access issues
+            print(f"Error loading settings: {e}")
+            print("Using default values.")
+            self.data = default_data
+            
+            # Optionally create/overwrite the file with default data
+            try:
+                self.__dict()  # This will save the default data to file
+            except Exception as save_error:
+                print(f"Could not save default settings: {save_error}")
 
 
         

@@ -5,8 +5,6 @@ All other files can import the user variable
 '''
 from models.story import Story
 import flet as ft
-import os
-import pickle
 import flet as ft
 from constants.data_paths import app_data_path, stories_path, settings_path, active_story_path
 
