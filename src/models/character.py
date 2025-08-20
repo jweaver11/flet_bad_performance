@@ -22,7 +22,6 @@ class Character(Widget):
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "left",  # Start in left pin location
-            tab_color = ft.Colors.PRIMARY,
             # path = ""    # This is loaded from from the __load_from_dict function
         )
 
@@ -56,6 +55,7 @@ class Character(Widget):
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'visible': False,
+            'tab_color': self.tab_color.value,  # Initial tab color matches color scheme
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': "",
             'Sex': "",
@@ -134,45 +134,45 @@ class Character(Widget):
     # Reloads/builds our widget. Called after any changes happen to the data in it
     def reload_widget(self):
 
-        #self.controls.append(ft.Image(src=self.image, width=100, height=100))
-
         body = ft.Container(
             expand=True,
             padding=6,
             #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
             content=ft.Column([
                 ft.Text("hi from " + self.title),
-                ft.Row([
-                    ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                        label="Morality",
-                        value=self.data['Morality'],
-                        padding=ft.padding.all(0),
-                        color=self.name_color,
-                        text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                        options=[
-                            ft.DropdownOption(text="Good"),
-                            ft.DropdownOption(text="Evil"),
-                            ft.DropdownOption(text="Neutral"),
-                            ft.DropdownOption(text="N/A"),
-                            ft.DropdownOption(text="None"),
-                        ],
-                        on_change=self.morality_change,
-                    ),
-                    ft.Dropdown(      # Sex of each character
-                        label="Sex",
-                        value=self.data['Sex'],
-                        padding=ft.padding.all(0),
-                        color=self.sex_color,
-                        text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                        options=[
-                            ft.DropdownOption(text="Male"),
-                            ft.DropdownOption(text="Female"),
-                            ft.DropdownOption(text="Other"),
-                            ft.DropdownOption(text="None"),
-                        ],
-                        on_change=self.sex_submit,
-                    ),
-                ]),
+                ft.Row(
+                        wrap=True,
+                       controls=[
+                            ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                                label="Morality",
+                                value=self.data['Morality'],
+                                padding=ft.padding.all(0),
+                                color=self.name_color,
+                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                                options=[
+                                    ft.DropdownOption(text="Good"),
+                                    ft.DropdownOption(text="Evil"),
+                                    ft.DropdownOption(text="Neutral"),
+                                    ft.DropdownOption(text="N/A"),
+                                    ft.DropdownOption(text="None"),
+                                ],
+                                on_change=self.morality_change,
+                            ),
+                            ft.Dropdown(      # Sex of each character
+                                label="Sex",
+                                value=self.data['Sex'],
+                                padding=ft.padding.all(0),
+                                color=self.sex_color,
+                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                                options=[
+                                    ft.DropdownOption(text="Male"),
+                                    ft.DropdownOption(text="Female"),
+                                    ft.DropdownOption(text="Other"),
+                                    ft.DropdownOption(text="None"),
+                                ],
+                                on_change=self.sex_submit,
+                            ),
+                        ]),
             ])
 
         )

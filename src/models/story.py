@@ -88,9 +88,7 @@ class Story:
     def startup(self, page: ft.Page):
         print("startup called")
         self.load_characters(page)
-        # Load all our objects from our story file.
-        # For char in filepath/characters, append to self.characters
-        #...
+
         
 
 

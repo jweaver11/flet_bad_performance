@@ -10,11 +10,6 @@ from models.user import user
 # Function to return our container for our widgets
 def create_workspace(page: ft.Page):   
 
-    story = user.active_story  # Get our story object from the user 
-    
-    page.update()
-
-    
     # Container for 1 or more widgets open on the workspace area right side of screen
     workspace_container = ft.Container(
         expand=True,
@@ -22,7 +17,7 @@ def create_workspace(page: ft.Page):
         #bgcolor=user.settings.workspace_bgcolor,
         #padding=ft.padding.all(4),
         #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-        content=story.master_stack,
+        content=user.active_story.master_stack,
         
     )
     

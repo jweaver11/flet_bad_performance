@@ -19,7 +19,7 @@ class Settings(Widget):
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "main",  # Start in left pin location
-            tab_color = ft.Colors.PRIMARY,
+            
         )
 
         self.__load_from_dict()
@@ -29,9 +29,6 @@ class Settings(Widget):
 
         self.workspace_order = []
 
-
-
-        
 
         # Our dropdown options for our color scheme dropdown control
         self.theme_color_scheme_options = [
@@ -174,6 +171,7 @@ class Settings(Widget):
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'visible': False,
+            'tab_color': "blue",
             'theme_mode': "dark",      
             'theme_color_scheme': "blue",
             'change_name_colors_based_on_morality': True,
