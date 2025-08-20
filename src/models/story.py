@@ -134,7 +134,6 @@ class Story:
     # Deletes an object from the story, and calls function to remove it from file
     def delete_object(self, obj):
         print("Removing object from story: " + obj.title)
-
     
         # Remove from characters list if it is a character
         if hasattr(obj, 'tag') and obj.tag == "character":
@@ -153,6 +152,8 @@ class Story:
             # Remove object from the characters list
             if obj in self.characters:
                 self.characters.remove(obj)
+                # delete from file
+                self.delete_object_file(obj)
 
 
     # Called by tthe save_object method to save the object to file storage
@@ -164,9 +165,25 @@ class Story:
         print("load object from file called")
 
     # Called by the delete object method to permanently remove the object from file storage as well
-    def delete_object_from_file(self, obj, file_path):
+    def delete_object_file(self, obj):
         print("delete object from file called")
+        
+        try:
+            
+            # Check if the file exists before attempting to delete
+            if os.path.exists(obj.path):
+                os.remove(obj.path)
+                print(f"Successfully deleted file: {obj.path}")
+            else:
+                print(f"File not found: {obj.path}")
+                
+        except (OSError, IOError) as e:
+            print(f"Error deleting file {obj.title}.json: {e}")
+        except AttributeError as e:
+            print(f"Object missing required attributes (title or path): {e}")
 
+
+    # Loads all our characsters on program startup. Called in main
     def load_characters(self, page: ft.Page):
         print("load characters called")
         

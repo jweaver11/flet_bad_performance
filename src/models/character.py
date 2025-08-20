@@ -23,9 +23,10 @@ class Character(Widget):
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "left",  # Start in left pin location
             tab_color = ft.Colors.PRIMARY,
+            # path = ""    # This is loaded from from the __load_from_dict function
         )
 
-        self.__load_from_dict()  # Load our character data from the file, or set default data
+        self.__load_from_dict()  # Load our character data from the file, or set default data if creating a new character
 
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
@@ -48,6 +49,7 @@ class Character(Widget):
     def __load_from_dict(self):
         print("load from dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
+
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
@@ -94,6 +96,8 @@ class Character(Widget):
         try:
             # Try to load existing settings from file
             if os.path.exists(character_file_path):
+                self.path = character_file_path  # Set the path to the file
+                print(f"Loading character data from {self.path}")
                 with open(character_file_path, "r") as f:
                     loaded_data = json.load(f)
                 
