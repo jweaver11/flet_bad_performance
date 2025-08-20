@@ -3,12 +3,13 @@ import flet as ft
 from models.user import user
 
 
+all_workspaces_rail = None  # Sets an object here so we can access it from outside the file
+
+
 # Our container that holds our all_workspaces_rail
 # Its an object so we can call methods like reorder and collapse from outside of itself
 class All_Workspaces_Rail(ft.Container):
-
-    # easier sytax, grab out active story
-    story = user.active_story
+    
 
     # When rail is in reorderable mode, handle the reorders
     def handle_reorder(self, e: ft.OnReorderEvent):
@@ -22,7 +23,7 @@ class All_Workspaces_Rail(ft.Container):
 
     # Called by clicking button on bottom right of rail
     # Collapses or expands the rail
-    def collapse_rail(self, e=None):
+    def toggle_collapse_rail(self, e=None):
         print("collapse called") 
 
         # Disable reorder before collapsing. Phasing out later
@@ -45,7 +46,7 @@ class All_Workspaces_Rail(ft.Container):
                 ft.Container(expand=True, width=50),
                 ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED,
-                        on_click=self.collapse_rail,
+                        on_click=self.toggle_collapse_rail,
                     ),
             ]
         else:
@@ -63,7 +64,7 @@ class All_Workspaces_Rail(ft.Container):
                     ft.Container(expand=True),
                     ft.IconButton(
                         icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
-                        on_click=self.collapse_rail,
+                        on_click=self.toggle_collapse_rail,
                     ),
                 ]),
             ]
@@ -75,11 +76,11 @@ class All_Workspaces_Rail(ft.Container):
 
     # Called by clicking button on bottom left of rail. Only available when expanded
     # Set sthe rail to reordeable or not 
-    def make_rail_reorderable(self, e=None):
+    def toggle_rail_reorderable(self, e=None):
 
         # If we're collapsed, expand the rail first
         if self.is_collapsed:
-            self.collapse_rail()
+            self.toggle_collapse_rail()
         
         # Change our variable
         self.is_reorderable = not self.is_reorderable
@@ -129,7 +130,7 @@ class All_Workspaces_Rail(ft.Container):
             elif e.control == self.r5:
                 rail_index = 5
 
-            new_rail = user.active_story.workspace_rails.get(rail_index, user.active_story.default_rail) # Grab our active rail from dict/map
+            new_rail = all_workspaces_rail.get(rail_index, all_workspaces_rail.default_rail) # Grab our active rail from dict/map
             
             deselect_all_other_rails(rail_index)    # De-select all rails icons but selected one
             user.active_story.active_rail.controls = new_rail     # Set our new rail to the active rail
@@ -259,7 +260,7 @@ class All_Workspaces_Rail(ft.Container):
                         ft.Container(expand=True),
                         ft.IconButton(
                             icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED,
-                            on_click=self.collapse_rail,
+                            on_click=self.toggle_collapse_rail,
                         ),
                     ]), 
                 ]

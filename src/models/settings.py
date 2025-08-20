@@ -24,11 +24,6 @@ class Settings(Widget):
 
         self.__load_from_dict()
 
-        #self.visible = False
-
-
-        self.workspace_order = []
-
 
         # Our dropdown options for our color scheme dropdown control
         self.theme_color_scheme_options = [
@@ -130,7 +125,7 @@ class Settings(Widget):
             ft.TextButton(
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
-                on_click=lambda e: user.all_workspaces_rail.make_rail_reorderable()
+                on_click=lambda e: user.all_workspaces_rail.toggle_rail_reorderable()
             ),
             self.change_name_colors,
             self.theme_button,
@@ -149,7 +144,6 @@ class Settings(Widget):
             label_padding=ft.padding.all(0),
             mouse_cursor=ft.MouseCursor.BASIC,
             tabs=[self.tab]    # Gives our tab control here
-                 
         )
           
         
@@ -170,11 +164,21 @@ class Settings(Widget):
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
-            'visible': False,
-            'tab_color': "blue",
-            'theme_mode': "dark",      
-            'theme_color_scheme': "blue",
-            'change_name_colors_based_on_morality': True,
+            'visible': False,   # If our settings widget is visible or not
+            'tab_color': "blue",        # the tab color
+            'theme_mode': "dark",       # the apps theme mode, dark or light
+            'theme_color_scheme': "blue",   # the color scheme of the app
+            'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
+            'workspaces_rail_order': [
+                "content",
+                "characters",
+                "plot_and_timeline",
+                "world_building",
+                "drawing_board",
+                "notes",
+            ],
+            'all_workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
+            'all_workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
         }
         
         try:
@@ -209,6 +213,7 @@ class Settings(Widget):
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
 
+    # Make our settings visible or not
     def change_visibility(self):
         self.visible = not self.visible
         self.data['visible'] = self.visible

@@ -29,9 +29,6 @@ def main(page: ft.Page):
 
     user.active_story.startup(page)
 
-    #if user.settings is None:
-        #user.settings = Settings()
-        #user.settings.save_settings()  # Save our settings to the file
     
    
     # Adds our page title and theme
@@ -56,10 +53,12 @@ def main(page: ft.Page):
     #all_workspaces_rail = create_rails(page)   # all workspaces rail and active rail
     user.all_workspaces_rail = All_Workspaces_Rail(page)
 
+    #all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+
     # Just create it each time
     active_rail = create_active_rail(page)  # Render whichever rail is active
 
-    user.workspace = create_workspace(page)# render our workspace containing our widgets
+    workspace = create_workspace(page)# render our workspace containing our widgets
 
     def show_horizontal_cursor(e: ft.HoverEvent):
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
@@ -96,7 +95,7 @@ def main(page: ft.Page):
             active_rail,    # Rail for the selected workspace
             active_rail_resizer,   # Divider between rail and work area
             
-            user.workspace,    # Work area for pagelets
+            workspace,    # Work area for pagelets
         ],
     )
     

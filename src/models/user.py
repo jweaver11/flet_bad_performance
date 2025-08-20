@@ -10,13 +10,13 @@ from constants.data_paths import app_data_path, stories_path, settings_path, act
 
 class User:
     def __init__(self):
-
-        # initialize the settings, before creating them in main
-        # Also an extended flet container, so it shows up in the pins
         
         # Sets our settings to empty, and we create them in main.py since we need page reference
         self.settings = None 
+
         
+        self.all_workspaces_rail = ft.Container()
+
         # Dict of all our stories. Starts with an 'empty_story'
         self.stories = {
             
@@ -33,7 +33,7 @@ class User:
         # Main builds the actual rail, but it is an extended flet container
         self.all_workspaces_rail = ft.Container()
 
-        self.workspace = ft.Container()
+        #self.workspace = ft.Container()
 
     # Called when user creates a new story
     def create_new_story(self, title: str):

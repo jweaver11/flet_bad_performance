@@ -18,6 +18,7 @@ class Widget(ft.Container):
         self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen...
         # p.update() always works - (self.update() and page.update() sometimes don't work because of outdated references)
+        
         self.pin_location = pin_location  # Pin location of our object upon creation
         self.tab_color =  ft.Colors.PRIMARY  # Users can change the tab color of their widgets for better organization
         self.path = ""  # The path to the json file that stores this widget's data
