@@ -1,5 +1,10 @@
-import flet as ft
+'''
+UI model for our active rail, which is stored at user.active_story.active_rail
+Keeps consistent styling and width between different workspace rails, 
+And gives us the correct rail on startup based on selected workspace
+'''
 
+import flet as ft
 from models.user import user
 from ui.rails.characters_rail import create_characters_rail  
 from ui.rails.content_rail import create_content_rail
@@ -7,13 +12,11 @@ from ui.rails.plot_timeline_rail import create_plot_and_timeline_rail
 from ui.rails.world_building_rail import create_world_building_rail
 from ui.rails.drawing_board_rail import create_drawing_board_rail
 from ui.rails.notes_rail import create_notes_rail
-from handlers.render_widgets import render_widgets
 
 
-# Class for creating our active rail inside of our active_story object.
-# This is freely re-created on program launch, and manages which rail is active
-# Depending on the workspace selection
+# Class is created in main on program startup
 class Active_Rail(ft.Container):
+    # Constructor
     def __init__(self, page: ft.Page):
     
         self.p = page  # Store the page reference

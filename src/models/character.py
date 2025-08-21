@@ -197,9 +197,6 @@ class Character(Widget):
 
 
     
-
-
-   
                             
                        
     

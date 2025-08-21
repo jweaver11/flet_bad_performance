@@ -143,9 +143,7 @@ class Widget(ft.Container):
         if hasattr(self, 'data'):
             self.data['visible'] = True
             # Call the child class's save_dict method using the proper name mangling
-            class_name = self.__class__.__name__
-            method_name = f"_{class_name}save_dict"
-            if hasattr(self, method_name):
-                getattr(self, method_name)()
+            self.save_dict()
+            
         render_widgets(self.p)
         self.p.update()
