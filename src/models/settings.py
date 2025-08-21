@@ -58,7 +58,7 @@ class Settings(Widget):
             self.p.dark_theme = ft.Theme(color_scheme_seed=self.data['theme_color_scheme'])
             
             # Save the updated settings to the JSON file
-            self.__save_dict()
+            self.save_dict()
             
             self.p.update()
 
@@ -76,14 +76,14 @@ class Settings(Widget):
         # Runs when the switch toggling the color change of characters names based on morality is clicked
         def change_name_colors_switch(e):
             self.data['change_name_colors_based_on_morality'] = e.control.value
-            self.__save_dict()  # Save the updated settings to the JSON file
+            self.save_dict()  # Save the updated settings to the JSON file
             # runs through all our characters, and updates their name color accordingly
             for char in user.active_story.characters:  
                 char.check_morality()
                 char.reload_widget()    # Updates their widget accordingly
 
             # Reloads the rail. Its better here than running it twice for no reason in character class    
-            from ui.rails.character_rail import reload_character_rail
+            from ui.rails.characters_rail import reload_character_rail
             reload_character_rail(self.p)
 
         # The switch for toggling if characters names change colors based on morality
@@ -107,7 +107,7 @@ class Settings(Widget):
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
                
             # Save the updated settings to the JSON file
-            self.__save_dict()
+            self.save_dict()
 
             #user.workspace.bgcolor = self.workspace_bgcolor
             self.p.theme_mode = self.data['theme_mode']
@@ -125,7 +125,8 @@ class Settings(Widget):
             ft.TextButton(
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
-                on_click=lambda e: user.all_workspaces_rail.toggle_rail_reorderable()
+                #on_click=lambda e: user.all_workspaces_rail.toggle_rail_reorderable()
+                on_click=lambda e: user.all_workspaces_rail.toggle_reorder_rail()
             ),
             self.change_name_colors,
             self.theme_button,
@@ -151,7 +152,7 @@ class Settings(Widget):
         self.content = tab
 
     # Save our object as a dictionary for json serialization
-    def __save_dict(self):
+    def save_dict(self):
         print("save settings dict called")
         settings_file_path = os.path.join(settings_path, "settings.json")
         
@@ -177,8 +178,9 @@ class Settings(Widget):
                 "drawing_board",
                 "notes",
             ],
-            'all_workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
-            'all_workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
+            'selected_workspace': "characters",
+            'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
+            'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
         }
         
         try:
@@ -199,7 +201,7 @@ class Settings(Widget):
                 print("Settings file does not exist, using default values.")
                 
                 # Optionally create the file with default data
-                self.__save_dict()  # This will save the default data to file
+                self.save_dict()  # This will save the default data to file
                 
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
             # Handle JSON parsing errors or file access issues
@@ -209,7 +211,7 @@ class Settings(Widget):
             
             # Optionally create/overwrite the file with default data
             try:
-                self.__save_dict()  # This will save the default data to file
+                self.save_dict()  # This will save the default data to file
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
 
@@ -217,7 +219,7 @@ class Settings(Widget):
     def change_visibility(self):
         self.visible = not self.visible
         self.data['visible'] = self.visible
-        self.__save_dict()
+        self.save_dict()
 
 
         

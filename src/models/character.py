@@ -40,7 +40,7 @@ class Character(Widget):
 
 
      # Save our object as a dictionary for json serialization
-    def __save_dict(self):
+    def save_dict(self):
         print("save settings dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
         
@@ -116,7 +116,7 @@ class Character(Widget):
                 print("Settings file does not exist, using default values.")
                 
                 # Optionally create the file with default data
-                self.__save_dict()  # This will save the default data to file
+                self.save_dict()  # This will save the default data to file
                 
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
             # Handle JSON parsing errors or file access issues
@@ -126,7 +126,7 @@ class Character(Widget):
             
             # Optionally create/overwrite the file with default data
             try:
-                self.__save_dict()  # This will save the default data to file
+                self.save_dict()  # This will save the default data to file
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
 
@@ -250,7 +250,7 @@ class Character(Widget):
             return
 
         # Reload the rail
-        from ui.rails.character_rail import reload_character_rail
+        from ui.rails.characters_rail import reload_character_rail
         reload_character_rail(self.p)
 
 

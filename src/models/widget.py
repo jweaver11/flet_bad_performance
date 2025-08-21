@@ -126,11 +126,13 @@ class Widget(ft.Container):
         # Update the child object's data and save to file
         if hasattr(self, 'data'):
             self.data['visible'] = False
-            # Call the child class's __save_dict method using the proper name mangling
-            class_name = self.__class__.__name__
-            method_name = f"_{class_name}__save_dict"
-            if hasattr(self, method_name):
-                getattr(self, method_name)()
+
+            self.save_dict()
+            # Call the child class's save_dict method using the proper name mangling
+            #class_name = self.__class__.__name__
+            #method_name = f"_{class_name}save_dict"
+            #if hasattr(self, method_name):
+                #getattr(self, method_name)()
         render_widgets(self.p)
 
     # Shows our widget once again
@@ -140,9 +142,9 @@ class Widget(ft.Container):
         # Update the child object's data and save to file
         if hasattr(self, 'data'):
             self.data['visible'] = True
-            # Call the child class's __save_dict method using the proper name mangling
+            # Call the child class's save_dict method using the proper name mangling
             class_name = self.__class__.__name__
-            method_name = f"_{class_name}__save_dict"
+            method_name = f"_{class_name}save_dict"
             if hasattr(self, method_name):
                 getattr(self, method_name)()
         render_widgets(self.p)
