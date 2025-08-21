@@ -1,5 +1,11 @@
 import flet as ft
 
-drawing_board_rail = [
-    ft.Text("drawing board rail")
-]
+def create_drawing_board_rail(page: ft.Page) -> ft.Control:
+    return ft.Column(
+        controls=[
+            ft.TextButton(  # 'Create Character button'
+                "Drawing Board",  
+            ),
+            ft.Text("This is the drawing board rail")
+        ]
+    )

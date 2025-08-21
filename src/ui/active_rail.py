@@ -2,44 +2,41 @@ import flet as ft
 
 from models.user import user
 from ui.rails.characters_rail import create_characters_rail  
-from ui.rails.content_rail import content_rail
-from ui.rails.plot_timeline_rail import plot_timeline_rail
-from ui.rails.world_building_rail import world_building_rail
-from ui.rails.drawing_board_rail import drawing_board_rail
-from ui.rails.notes_rail import notes_rail
+from ui.rails.content_rail import create_content_rail
+from ui.rails.plot_timeline_rail import create_plot_and_timeline_rail
+from ui.rails.world_building_rail import create_world_building_rail
+from ui.rails.drawing_board_rail import create_drawing_board_rail
+from ui.rails.notes_rail import create_notes_rail
 
 
-
-
-# Creates our 'active_rail', which holds all of our rails, and renderes the selected one
-def create_active_rail(page: ft.Page):
+class Active_Rail(ft.Container):
+    def __init__(self, page: ft.Page):
     
-    # Create our rails
-    #content_rail = content_rail(page)  
-    characters_rail = create_characters_rail(page)
-    #plot_timeline_rail = plot_timeline_rail(page)  
-    #world_building_rail = world_building_rail(page) 
-    #drawing_board_rail = drawing_board_rail(page) 
-    #notes_rail = notes_rail(page)  
+        self.p = page  # Store the page reference
+  
+        # Consistent styling for all our rails
+        super().__init__(
+            alignment=ft.alignment.center,  # Aligns content to the
+            padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
+            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+            width=user.settings.data['active_rail_width'],  # Sets the width
+        )
 
-    # Add our rails to the dict/map
-    user.active_story.workspace_rails.update({
-        0: content_rail,
-        1: characters_rail,
-        2: plot_timeline_rail, 
-        3: world_building_rail,
-        4: drawing_board_rail,
-        5: notes_rail,
-    })
+        # Give us the correct rail on startup based on our selected workspace
+        if user.all_workspaces_rail.selected_workspace == "content":
+            self.content = create_content_rail(page)
+        elif user.all_workspaces_rail.selected_workspace == "characters":
+            self.content = create_characters_rail(page)
+        elif user.all_workspaces_rail.selected_workspace == "plot_and_timeline":
+            self.content = create_plot_and_timeline_rail(page)
+        elif user.all_workspaces_rail.selected_workspace == "world_building":
+            self.content = create_world_building_rail(page)
+        elif user.all_workspaces_rail.selected_workspace == "drawing_board":
+            self.content = create_drawing_board_rail(page)
+        elif user.all_workspaces_rail.selected_workspace == "notes":
+            self.content = create_notes_rail(page)
 
-    # Container for the active workspace rail.
-    active_workspace_rail_container = ft.Container(
-        alignment=ft.alignment.center,  # Aligns content to the
-        padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
-        bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-        width=200,  # Sets the width
-        content=user.active_story.active_rail,  # Sets our active rail column
-    )
+        self.p.update()
 
 
-    return active_workspace_rail_container
+   

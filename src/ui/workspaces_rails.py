@@ -1,7 +1,11 @@
 import flet as ft
 from models.user import user
-#from ui.rails import content_rail, characters_rail, plot_and_timeline_rail, world_building_rail, drawing_board_rail, notes_rail
-
+from ui.rails.characters_rail import create_characters_rail
+from ui.rails.content_rail import create_content_rail
+from ui.rails.plot_timeline_rail import create_plot_and_timeline_rail
+from ui.rails.world_building_rail import create_world_building_rail
+from ui.rails.drawing_board_rail import create_drawing_board_rail
+from ui.rails.notes_rail import create_notes_rail
 
 class All_Workspaces_Rail(ft.Container):
     def __init__(self, page: ft.Page):
@@ -111,10 +115,10 @@ class All_Workspaces_Rail(ft.Container):
         # Reads our selected workspace, and selects the correct workspace icon
         if self.selected_workspace == "content":
             content_workspace.selected_index = 0    # Only one destination per rail, so selected = 0
-            # Set the new correct active_rail 
+            
         elif self.selected_workspace == "characters":
             characters_workspace.selected_index = 0
-            #user.active_story.active_rail = user.active_story.workspace_rails[1]
+            
         elif self.selected_workspace == "plot_and_timeline":
             plot_and_timeline_workspace.selected_index = 0
         elif self.selected_workspace == "world_building":
@@ -123,6 +127,8 @@ class All_Workspaces_Rail(ft.Container):
             drawing_board_workspace.selected_index = 0
         elif self.selected_workspace == "notes":
             notes_workspace.selected_index = 0
+
+        #user.active_story.active_rail.content = create_characters_rail(self.p)  # Set the active rail to the characters rail
 
 
         # Goes through our workspace order, and adds the correct control to our list for the rail
@@ -211,6 +217,20 @@ class All_Workspaces_Rail(ft.Container):
         user.settings.save_dict()
         self.selected_workspace = user.settings.data['selected_workspace']
 
+        # We change the active rail here rather than when we reload it because
+        # The active rail is created after this.
+        if self.selected_workspace == "content":
+            user.active_story.active_rail.content = create_content_rail(self.p)
+        elif self.selected_workspace == "characters":
+            user.active_story.active_rail.content = create_characters_rail(self.p)
+        elif self.selected_workspace == "plot_and_timeline":
+            user.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
+        elif self.selected_workspace == "world_building":
+            user.active_story.active_rail.content = create_world_building_rail(self.p)
+        elif self.selected_workspace == "drawing_board":
+            user.active_story.active_rail.content = create_drawing_board_rail(self.p)
+        elif self.selected_workspace == "notes":
+            user.active_story.active_rail.content = create_notes_rail(self.p)
 
         self.reload_rail()  # Reload the rail to apply the new selection
 
