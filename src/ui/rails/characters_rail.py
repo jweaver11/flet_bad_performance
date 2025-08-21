@@ -510,7 +510,6 @@ def create_characters_rail(page: ft.Page) -> ft.Control:
 
     # Initially load our rail
     reload_character_rail(page)
-    render_widgets(page) 
 
     # Return our created character rail (which is a list of controls)
     return characters_rail

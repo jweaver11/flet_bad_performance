@@ -10,7 +10,7 @@ from models.settings import Settings
 from ui.menu_bar import create_menu_bar
 from ui.workspaces_rails import All_Workspaces_Rail
 from ui.active_rail import Active_Rail
-from ui.rails.characters_rail import create_characters_rail
+from handlers.render_widgets import render_widgets
 from ui.workspace import create_workspace
 
 
@@ -119,6 +119,8 @@ def main(page: ft.Page):
     )
 
     page.add(col)
+    # Loads our widgets page for the program whenever it starts
+    render_widgets(page) 
 
 
 ft.app(main)
