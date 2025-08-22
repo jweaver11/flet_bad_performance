@@ -1,6 +1,6 @@
 ''' 
 Master Story class that contains data and methods for the entire story 
-This is a dead-end model. Imports nothing else from project, or things will ciruclar import
+This is a dead-end model. Imports nothing else from project (other than constants) to avoid ciruclar import
 '''
 
 import flet as ft
@@ -14,14 +14,15 @@ class Story:
        
         self.title = title # Gives our story a title when its created
 
+        # Declare our active rail, but the this will be set in main since it needs a page reference
+        self.active_rail = None     # Is a ft.Container
+
         data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
         
         # Set the file path to the active story path
         self.file_path = data_paths.active_story_path
 
-        #self.load_object_from_file("", "")
-
-        # Create Story object structure folders inside empty_story
+        # Our folder structure for the story
         story_folders = [
             "content",
             "characters",
@@ -31,24 +32,27 @@ class Story:
             "notes",
         ]
         
-        # Creates our folders in the active story path
+        # Actually creates the folders in our story path
         for folder in story_folders:
             folder_path = os.path.join(data_paths.active_story_path, folder)
             os.makedirs(folder_path, exist_ok=True)
 
-
-
         # Metadata for the story
         self.metadata = {
             "title": title,
-            "character_count": int,
+            "top_pin_height": 0,
+            "left_pin_width": 0,
+            "main_pin_height": 0,
+            "right_pin_width": 0,
+            "bottom_pin_height": 0,
             "created_at": None,
             "last_modified": None
         }
+
         # Create story metadata file
         self.metadata_path = os.path.join(data_paths.active_story_path, "story_info.json")
 
-
+        # Creates our 5 pin locations for our widgets. Initially set heights and widths for comparison logic when rendering
         self.top_pin = ft.Row(height=0, spacing=0, controls=[])
         self.left_pin = ft.Column(width=0, spacing=0, controls=[])
         self.main_pin = ft.Row(expand=True, spacing=0, controls=[])
@@ -58,130 +62,129 @@ class Story:
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
 
-        # Master stack that holds our widgets
+        # Master stack that holds our widgets ^ row. We add our drag targets overtop our widgets, so we use a stack here
         # And our drag targets when we start dragging widgets.
-        # We do this so there is a receiver (drag target) for the widget even if a pin is empty and hidden
+        # We use global stack like this so there is always a drag target, even if a pin is empty
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
-
-
-        # Declare our active rail, but the this will be set in main since it needs a page reference
-        self.active_rail = None     # Is a ft.Container
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
         
         
-
-    # Called when a story is loaded. Loads all our objects from files
+    # Called from main when our program starts up. Needs a page reference, thats why not called here
     def startup(self, page: ft.Page):
+        ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
+
         print("startup called")
+
+        # Loads our characters from file storage into our characters list
         self.load_characters(page)
 
         
-
-
-    # Add our created object to story. This will add it to any lists it should be in, pin location, etc.
-    # All our story objects are extended flet containers, and require a title, pin location, tag,...
+    # Called when saving new objects to the story (characters, chapters, etc.)
     def save_object(self, obj):
-        print("Adding object in story: " + obj.title)
+        ''' Handles logic on where to save the new object in our live story object.
+        Whenever a new object is created, it loads its data using its given path.
+        If it has no data, it creates a new file to store data, so we don't need to save the data here.'''
 
-        # Runs to save our character to our story object, and save it to file
+        print("Save object called")
+
+        # Called if we're saving a character object
         def save_character(obj):
-            print("save character called")
- 
-            self.characters.append(obj) # Saves 
+            self.characters.append(obj) # Save to our characters list
 
-        # Is called when the parent f
+        # Called if saving a chapter object
         def save_chapter(obj):
-            print("save chapter called")
-            print(obj)
+            print(obj)  # WIP
 
-
-        # Checks our objects tag, then figures out what to do with it
+        # Handles our logic for saving objects. Checks the tag of the object to route it to correct save function
         if hasattr(obj, 'tag'):
+
             # Characters
             if obj.tag == "character":
                 save_character(obj)
+
             # Chapters
             elif obj.tag == "chapter":
                 save_chapter(obj)
             
             else:
-                print("object does not have a valid tag")
-
+                print("object does not have a valid tag dummy")
 
         # If no tag exists, we do nothing
         else:
-            print("obj has no tag, did not save it")
+            print("object has no tag at all you even bigger dummy")
 
-        from handlers.arrange_widgets import arrange_widgets
-        arrange_widgets()
 
-    # Deletes an object from the story, and calls function to remove it from file
+    # Called when deleting an object from the story (character, chapter, etc.)
     def delete_object(self, obj):
-        print("Removing object from story: " + obj.title)
-    
+        ''' Deletes the object from our live story object and its reference in the pins.
+        We then remove its storage file from our file storage as well. '''
+
+        print("Delete object called")
+
+        # Called inside the delete_object method to remove the file from storage
+        def delete_object_file(obj):
+            ''' Grabs our objects path, and removes the associated file from storage '''
+
+            print("delete object from file called")
+            
+            try:
+                
+                # Check if the file exists before attempting to delete
+                if os.path.exists(obj.path):
+                    os.remove(obj.path)
+                    print(f"Successfully deleted file: {obj.path}")
+                else:
+                    print(f"File not found: {obj.path}")
+                    
+            except (OSError, IOError) as e:
+                print(f"Error deleting file {obj.title}.json: {e}")
+            except AttributeError as e:
+                print(f"Object missing required attributes (title or path): {e}")
+
         # Remove from characters list if it is a character
         if hasattr(obj, 'tag') and obj.tag == "character":
-            # Chck our characters pin location, and remove its reference from there
-            if hasattr(obj, 'pin_location'):
-                if obj.pin_location == "top":
-                    self.top_pin.controls.remove(obj)
-                elif obj.pin_location == "left":
-                    self.left_pin.controls.remove(obj)
-                elif obj.pin_location == "main":
-                    self.main_pin.controls.remove(obj)
-                elif obj.pin_location == "right":
-                    self.right_pin.controls.remove(obj)
-                elif obj.pin_location == "bottom":
-                    self.bottom_pin.controls.remove(obj)
             # Remove object from the characters list
             if obj in self.characters:
                 self.characters.remove(obj)
-                # delete from file
-                self.delete_object_file(obj)
-
-
-    # Called by tthe save_object method to save the object to file storage
-    def save_object_to_file(self, obj, file_path):
-        print("object saved to file called")
-        
-    # Load an object from file
-    def load_object_from_file(self, file_path):
-        print("load object from file called")
-
-    # Called by the delete object method to permanently remove the object from file storage as well
-    def delete_object_file(self, obj):
-        print("delete object from file called")
-        
-        try:
-            
-            # Check if the file exists before attempting to delete
-            if os.path.exists(obj.path):
-                os.remove(obj.path)
-                print(f"Successfully deleted file: {obj.path}")
+    
+        # Find our objects reference in the pins and remove it
+        if hasattr(obj, 'pin_location'):
+            if obj.pin_location == "top" and obj in self.top_pin.controls:
+                self.top_pin.controls.remove(obj)
+            elif obj.pin_location == "left" and obj in self.left_pin.controls:
+                self.left_pin.controls.remove(obj)
+            elif obj.pin_location == "main" and obj in self.main_pin.controls:
+                self.main_pin.controls.remove(obj)
+            elif obj.pin_location == "right" and obj in self.right_pin.controls:
+                self.right_pin.controls.remove(obj)
+            elif obj.pin_location == "bottom" and obj in self.bottom_pin.controls:
+                self.bottom_pin.controls.remove(obj)
             else:
-                print(f"File not found: {obj.path}")
-                
-        except (OSError, IOError) as e:
-            print(f"Error deleting file {obj.title}.json: {e}")
-        except AttributeError as e:
-            print(f"Object missing required attributes (title or path): {e}")
+                print("Object not found in any pin location, cannot delete")
 
+        # Remove the objects storage file as well
+        if hasattr(obj, 'path'):
+            delete_object_file(obj)
 
-    # Loads all our characsters on program startup. Called in main
+    # Called as part of the startup method during program launch
     def load_characters(self, page: ft.Page):
+        ''' Loads all our characters from our characters folder and adds them to the live story object'''
+
         print("load characters called")
         
-        
-        # Check if the characters folder exists
+        # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(data_paths.characters_path):
             print("Characters folder does not exist, creating it.")
             os.makedirs(data_paths.characters_path)
             return
         
         # Iterate through all files in the characters folder
+        # Future needs to scan all sub categories (folders) inside the characters folder for files to load
         for filename in os.listdir(data_paths.characters_path):
+
+            # All our objects are stored as JSON
             if filename.endswith(".json"):
                 file_path = os.path.join(data_paths.characters_path, filename)
                 
@@ -199,11 +202,8 @@ class Story:
                     self.characters.append(character)
                     
                     print(f"Loaded character: {character_title}")
-                    
+                
+                # Handle errors if the path is wrong
                 except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                     print(f"Error loading character from {filename}: {e}")
-                    # Optionally, you could still create a character with just the filename
-                    # character_title = filename.replace(".json", "")
-                    # character = Character(character_title, page)
-                    # self.characters.append(character)
 
