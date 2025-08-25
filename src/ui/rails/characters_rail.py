@@ -260,7 +260,7 @@ def create_character(role_tag, page: ft.Page):
 
 # Called when user drags a character to a new category in the rail
 def make_main_character(e, page: ft.Page):
-    ''' Changes the character role to main when dragged onto rail.'''
+    ''' Changes the character role to main when dragged onto rail. Phasing out.'''
     # Phasing out ^ because moving to folder storage rather than roles
 
     # Load our object that is passed through the event data
@@ -293,9 +293,7 @@ def make_main_character(e, page: ft.Page):
 # Called when user drags a character to the side category in the rail
 def make_side_character(e, page: ft.Page):
     ''' Changes the character role to side when dragged onto rail.'''
-    # Works exactly like make_main_character, but for side characters
 
-    # Load our object that is passed through the event data
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -318,6 +316,8 @@ def make_side_character(e, page: ft.Page):
 
 # Called when user drags a character to the background category in the rail
 def make_background_character(e, page: ft.Page):
+    ''' Changes the character role to background when dragged onto rail '''
+
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -393,14 +393,17 @@ background_characters_drag_target = ft.DragTarget(
 # Characters are organized based on their tag of main, side, or background
 # Have their colors change based on good, evil, neutral. Widget will reflect that
 def reload_character_rail(page: ft.Page):
-    # Clear our controls so they start fresh, doesnt effect our stored characters
+    ''' Rebuilds our character rail from scratch whenever changes are made in data to the rail (add or del character, etc.)
+    Will likely be phased out later when tree view is implemented, and replaces with an object '''
+
+    # Clear our current lists so we can rebuild them
     main_characters.controls.clear()
     side_characters.controls.clear()
     background_characters.controls.clear()
 
     # Run through each character in our story
     for character in user.active_story.characters:
-        # Create a new character widget for the rail
+        # Create a new character tile for the rail
 
         new_char = ft.Draggable(
             content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
@@ -431,6 +434,7 @@ def reload_character_rail(page: ft.Page):
                                     no_wrap=True,
                                 ),
                             ),
+
                             # Space between name of character in the rail and menu button on right
                             ft.Container(expand=True),
 
@@ -466,7 +470,7 @@ def reload_character_rail(page: ft.Page):
 
         
 
-        # Still in for loop, add our character to category based on its tag
+        # Still in the for loop, add our character to category based on its tag (Phased out later)
         if character.data["Role"] == "Main":
             main_characters.controls.append(new_char)
         elif character.data["Role"] == "Side":
@@ -474,6 +478,7 @@ def reload_character_rail(page: ft.Page):
         elif character.data["Role"] == "Background":
             background_characters.controls.append(new_char)
 
+        # Start collapsed if no characters in that category
         if len(main_characters.controls) == 0:
             main_characters.initially_expanded=False
         else:
@@ -514,8 +519,9 @@ def reload_character_rail(page: ft.Page):
     )
     page.update()
 
-
+# Called by main to create our container that will hold our character rail
 def create_characters_rail(page: ft.Page) -> ft.Control:
+    ''' Creates our character rail container that holds our character lists '''
 
     # Set our drag targets on accept methods here so we can pass in our page
     main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
@@ -523,7 +529,6 @@ def create_characters_rail(page: ft.Page) -> ft.Control:
     background_characters_drag_target.on_accept=lambda e: make_background_character(e, page)
 
     # List of controls that we return from our page. 
-    # This is static and should not change
     characters_rail = ft.Column(
         spacing=0, 
         expand=True, 

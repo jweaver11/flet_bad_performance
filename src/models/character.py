@@ -12,29 +12,29 @@ from models.widget import Widget
 from constants.data_paths import characters_path
 
 
+# Sets our Character as an extended Widget object, which is a subclass of a flet Container
+# Widget requires a title, tag, page reference, and a pin location
 class Character(Widget):
+    # Constructor
     def __init__(self, name, page: ft.Page):
 
-        # Sets our Character as an extended Widget object, which is a subclass of a flet Container
-        # Widget requires a title, tag, page reference, and a pin location
+        # Parent class constructor
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             pin_location = "left",  # Start in left pin location
-            # path = ""    # Will need this in future
+            # path = ""    # Will need this in future??
         )
 
-
-        self.__load_from_dict()  # Load our character data from the file, or set default data if creating a new character
-
-        
-
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
-        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
         
-        self.name_color = ft.Colors.PRIMARY     # flet color based on characters status of good, evil, neutral, or N/A
+        self.name_color = ft.Colors.PRIMARY     # Flet color based on characters status of good, evil, neutral, or N/A
         self.sex_color = ft.Colors.PRIMARY     # Color in the control used for the sex dropdown
+
+        # Load our character data from the file, or set default data if creating new character
+        self.__load_from_dict() 
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
@@ -45,10 +45,14 @@ class Character(Widget):
         print("save settings dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
         
+        # Save our data
         with open(character_file_path, "w") as f:
             json.dump(self.data, f, indent=4)
 
+    # Called when new character object is created.
     def __load_from_dict(self):
+        ''' Loads their existing data from file, or sets default data if no file exists '''
+
         print("load from dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
 
@@ -132,9 +136,11 @@ class Character(Widget):
                 print(f"Could not save default settings: {save_error}")
 
 
-    # Reloads/builds our widget. Called after any changes happen to the data in it
+    # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
+        ''' Reloads/Rebuilds our widget based on current data '''
 
+        # Body of the tab, which is the content of flet container
         body = ft.Container(
             expand=True,
             padding=6,
@@ -181,7 +187,7 @@ class Character(Widget):
         self.tab.content=body
 
         # Sets our header
-        tab = ft.Tabs(
+        content = ft.Tabs(
             selected_index=0,
             animation_duration=0,
             #divider_color=ft.Colors.TRANSPARENT,
@@ -194,12 +200,8 @@ class Character(Widget):
           
         
         # Set our content
-        self.content = tab
-
-
-    
-                            
-                       
+        self.content = content
+        
     
     # Change our tab color of widget. Accepts a flet color as parameter
     def change_color(self, color):
