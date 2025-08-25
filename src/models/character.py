@@ -37,6 +37,12 @@ class Character(Widget):
         # Build our widget on start, but just reloads it later
         self.reload_widget()
 
+    # Called when we want to change the file path of our character, usually when adding folders inside characters_path
+    def update_file_path(self, new_path):
+        ''' Updates our file path in our data and saves the dict '''
+
+        self.data['file_path'] = new_path
+        self.save_dict()
 
      # Save our object as a dictionary for json serialization
     def save_dict(self):
@@ -56,6 +62,7 @@ class Character(Widget):
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
+            'file_path': character_file_path,
             'visible': False,
             'pin_location': "left", # New characters start pinned left
 

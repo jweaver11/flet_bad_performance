@@ -37,6 +37,15 @@ class Story:
             folder_path = os.path.join(data_paths.active_story_path, folder)
             os.makedirs(folder_path, exist_ok=True)
 
+        notes_folders = [
+            "themes",
+            "quotes",
+            "research",
+        ]
+        for folder in notes_folders:
+            folder_path = os.path.join(data_paths.notes_path,  folder)
+            os.makedirs(folder_path, exist_ok=True)
+
         # Metadata for the story
         self.metadata = {
             "title": title,
@@ -181,29 +190,31 @@ class Story:
             return
         
         # Iterate through all files in the characters folder
-        # Future needs to scan all sub categories (folders) inside the characters folder for files to load
-        for filename in os.listdir(data_paths.characters_path):
+        #for filename in os.listdir(data_paths.characters_path):
+        for dirpath, dirnames, filenames in os.walk(data_paths.characters_path):
+            for filename in filenames:
 
-            # All our objects are stored as JSON
-            if filename.endswith(".json"):
-                file_path = os.path.join(data_paths.characters_path, filename)
-                
-                try:
-                    # Read the JSON file
-                    with open(file_path, "r") as f:
-                        character_data = json.load(f)
+                # All our objects are stored as JSON
+                if filename.endswith(".json"):
+                    file_path = os.path.join(data_paths.characters_path, filename)
                     
-                    # Extract the title from the data
-                    character_title = character_data.get("title", filename.replace(".json", ""))
+                    try:
+                        # Read the JSON file
+                        with open(file_path, "r") as f:
+                            character_data = json.load(f)
+                        
+                        # Extract the title from the data
+                        character_title = character_data.get("title", filename.replace(".json", ""))
+                        
+                        # Create Character object with the title
+                        from models.character import Character
+                        character = Character(character_title, page)
+                        #character.path = file_path  # Set the path to the loaded file
+                        self.characters.append(character)
+                        
+                        print(f"Loaded character: {character_title}")
                     
-                    # Create Character object with the title
-                    from models.character import Character
-                    character = Character(character_title, page)
-                    self.characters.append(character)
-                    
-                    print(f"Loaded character: {character_title}")
-                
-                # Handle errors if the path is wrong
-                except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                    print(f"Error loading character from {filename}: {e}")
+                    # Handle errors if the path is wrong
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                        print(f"Error loading character from {filename}: {e}")
 
