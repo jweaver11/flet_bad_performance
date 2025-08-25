@@ -12,7 +12,6 @@ import json
 #
 
 
-
 class Settings(Widget):
     # Constructor
     def __init__(self, page: ft.Page):
@@ -22,12 +21,11 @@ class Settings(Widget):
             title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            pin_location = "main",  # Start in left pin location
+            #pin_location = "main",  # Start in left pin location
         )
 
         # Loads our settings data from the JSON file
         self.__load_from_dict()
-
 
         # Called when someone expands the drop down holding the color scheme options
         def get_color_scheme_options():
@@ -181,6 +179,8 @@ class Settings(Widget):
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'visible': False,   # If our settings widget is visible or not
+            'pin_location': "main", 
+            
             'tab_color': "blue",        # the tab color
             'theme_mode': "dark",       # the apps theme mode, dark or light
             'theme_color_scheme': "blue",   # the color scheme of the app

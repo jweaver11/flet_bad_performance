@@ -23,10 +23,11 @@ class Character(Widget):
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            pin_location = "left",  # Start in left pin location
+            #pin_location = "left",  # Start in left pin location
             # path = ""    # Will need this in future??
         )
 
+        # Variables that have to be loaded differently from data
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
@@ -53,13 +54,12 @@ class Character(Widget):
         print("load from dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
 
-
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'visible': False,
-            'pin_location': self.pin_location,
+            'pin_location': "left", # New characters start pinned left
 
-            'tab_color': self.tab_color.value,  # Initial tab color matches color scheme
+            'tab_color': "primary",  # Initial tab color matches color scheme
             'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
             'sex_color': "primary",    # Color of selected option in sex dropdown
 
@@ -117,7 +117,7 @@ class Character(Widget):
 
                 # Set specific attributes form our l
                 self.visible = self.data.get('visible', False)
-                self.pin_location = self.data.get('pin_location', self.pin_location)    # Set pin location
+                #self.pin_location = self.data.get('pin_location', "left")    # Set pin location
                 
                 print(f"Settings loaded successfully from {character_file_path}")
             else:
@@ -184,14 +184,16 @@ class Character(Widget):
                                 ],
                                 on_change=self.sex_submit,
                             ),
-                        ]),
-            ])
+                        ]
+                    ),
+                ]
+            )
 
         )
 
         self.tab.content=body
 
-        # Sets our header
+        # Sets our header and the content of it
         content = ft.Tabs(
             selected_index=0,
             animation_duration=0,

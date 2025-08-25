@@ -12,13 +12,13 @@ from handlers.render_widgets import show_pin_drag_targets
 
 class Widget(ft.Container):
     # Constructor
-    def __init__(self, title: str, tag: str, p: ft.Page, pin_location: str):
+    def __init__(self, title: str, tag: str, p: ft.Page):
     
         # Required parameters: title, tag, page reference, pin location
         self.title = title  # Title of our object
         self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
-        self.pin_location = pin_location  # Pin location for our reference object in the story pins
+        #self.pin_location = pin_location  # Pin location for our reference object in the story pins
 
         self.path = ""  # The path to the json file that stores this widget's data
 
