@@ -427,7 +427,7 @@ def reload_character_rail(page: ft.Page):
                             ft.Container(
                                 content=ft.Text(
                                     value=character.title,
-                                    color=character.name_color,
+                                    color=character.data['name_color'],
                                     max_lines=1,    # Handle too long of names
                                     overflow=ft.TextOverflow.CLIP,  # Handle too long of names
                                     weight=ft.FontWeight.BOLD,  # Make text bold
@@ -443,7 +443,7 @@ def reload_character_rail(page: ft.Page):
                                 opacity=0,
                                 scale=.9,
                                 tooltip="",
-                                icon_color=character.name_color, 
+                                icon_color=character.data['name_color'], 
                                 items=[
                                     # Button to rename a character
                                     ft.PopupMenuItem(

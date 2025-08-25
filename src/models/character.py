@@ -29,9 +29,6 @@ class Character(Widget):
 
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
-        
-        self.name_color = ft.Colors.PRIMARY     # Flet color based on characters status of good, evil, neutral, or N/A
-        self.sex_color = ft.Colors.PRIMARY     # Color in the control used for the sex dropdown
 
         # Load our character data from the file, or set default data if creating new character
         self.__load_from_dict() 
@@ -60,7 +57,12 @@ class Character(Widget):
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'visible': False,
+            'pin_location': self.pin_location,
+
             'tab_color': self.tab_color.value,  # Initial tab color matches color scheme
+            'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
+            'sex_color': "primary",    # Color of selected option in sex dropdown
+
             'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
             'Morality': "",
             'Sex': "",
@@ -112,7 +114,10 @@ class Character(Widget):
                 # Start with default data and update with loaded data
                 self.data = default_data.copy()
                 self.data.update(loaded_data)
+
+                # Set specific attributes form our l
                 self.visible = self.data.get('visible', False)
+                self.pin_location = self.data.get('pin_location', self.pin_location)    # Set pin location
                 
                 print(f"Settings loaded successfully from {character_file_path}")
             else:
@@ -154,7 +159,7 @@ class Character(Widget):
                                 label="Morality",
                                 value=self.data['Morality'],
                                 padding=ft.padding.all(0),
-                                color=self.name_color,
+                                color=self.data['name_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                 options=[
                                     ft.DropdownOption(text="Good"),
@@ -169,7 +174,7 @@ class Character(Widget):
                                 label="Sex",
                                 value=self.data['Sex'],
                                 padding=ft.padding.all(0),
-                                color=self.sex_color,
+                                color=self.data['sex_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                 options=[
                                     ft.DropdownOption(text="Male"),

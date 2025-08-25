@@ -71,6 +71,8 @@ def top_pin_drag_accept(e):
 
     # Set our objects pin location to the correct new location, and then call our arrange_widgets function
     object.pin_location = "top"
+    object.data['pin_location'] = "top"  # Update our object's data dictionary as well
+    object.save_dict()  # Save our object with its new pin location
     arrange_widgets()       # Re-arrange our widgets held in the story object
     render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
     
@@ -96,6 +98,8 @@ def left_pin_drag_accept(e):
         print("src_id not found in event data")
 
     object.pin_location = "left"
+    object.data['pin_location'] = "left"
+    object.save_dict()
     arrange_widgets()       
     render_widgets(e.page)  
     
@@ -121,6 +125,8 @@ def main_pin_drag_accept(e):
         print("src_id not found in event data")
 
     object.pin_location = "main"
+    object.data['pin_location'] = "main"
+    object.save_dict()
     arrange_widgets()       
     render_widgets(e.page)  
     
@@ -146,7 +152,9 @@ def right_pin_drag_accept(e):
         print("src_id not found in event data")
 
     object.pin_location = "right"
+    object.data['pin_location'] = "right"
     print("object moved to ", object.pin_location, " pin")
+    object.save_dict()
     arrange_widgets()       
     render_widgets(e.page)  
     
@@ -171,6 +179,8 @@ def bottom_pin_drag_accept(e):
         print("src_id not found in event data")
 
     object.pin_location = "bottom"
+    object.data['pin_location'] = "bottom"
+    object.save_dict()
     arrange_widgets()       
     render_widgets(e.page)  
     
