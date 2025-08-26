@@ -6,7 +6,7 @@ Initializes the user, settings, page data, and renders our UI onto the page
 import flet as ft
 from models.user import user
 from models.settings import Settings
-from ui.workspaces_rails import All_Workspaces_Rail
+from ui.all_workspaces_rails import All_Workspaces_Rail
 from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
 from handlers.render_widgets import render_widgets

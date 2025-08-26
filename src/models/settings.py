@@ -180,6 +180,7 @@ class Settings(Widget):
         default_data = {
             'visible': False,   # If our settings widget is visible or not
             'pin_location': "main", 
+            'active_story': "default_story",
             
             'tab_color': "blue",        # the tab color
             'theme_mode': "dark",       # the apps theme mode, dark or light

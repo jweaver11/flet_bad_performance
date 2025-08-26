@@ -56,8 +56,9 @@ class All_Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED, color=ft.Colors.PRIMARY), # Icon on the rail
                     selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), # Selected icon on the rail
-                    # Label underneath the icon, padding for spacing, and the data we will use to identify the rail
-                    label="Content", padding=ft.padding.only(top=10, bottom=10), data="content"
+                    padding=ft.padding.only(top=10, bottom=10), # Padding for spacing
+                    # Label underneath the icon and the data we will use to identify the rail
+                    label="Content", data="content"
                 ),
             ],
         )
@@ -71,7 +72,8 @@ class All_Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED, color=ft.Colors.PRIMARY), 
                     selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
-                    label="Characters", padding=ft.padding.only(top=10, bottom=10), data="characters"
+                    padding=ft.padding.only(top=10, bottom=10),
+                    label="Characters", data="characters"
                 ),
             ],
         )
@@ -85,7 +87,8 @@ class All_Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY, scale=1.2), 
                     selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
-                    label="Plot & Timeline", padding=ft.padding.only(top=10, bottom=10), data="plot_and_timeline"
+                    padding=ft.padding.only(top=10, bottom=10),
+                    label="Plot & Timeline", data="plot_and_timeline"
                 ),
             ],
         )
@@ -99,7 +102,8 @@ class All_Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED, color=ft.Colors.PRIMARY), 
                     selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
-                    label="World Building", padding=ft.padding.only(top=10, bottom=10), data="world_building"
+                    padding=ft.padding.only(top=10, bottom=10),
+                    label="World Building", data="world_building"
                 ),
             ],
         )
@@ -113,7 +117,8 @@ class All_Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.DRAW_OUTLINED, color=ft.Colors.PRIMARY), 
                     selected_icon=ft.Icon(ft.Icons.DRAW, color=ft.Colors.PRIMARY),
-                    label="Drawing Board", padding=ft.padding.only(top=10, bottom=10), data="drawing_board"
+                    padding=ft.padding.only(top=10, bottom=10),
+                    label="Drawing Board", data="drawing_board",
                 ),
             ],
         )
@@ -127,7 +132,8 @@ class All_Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED, color=ft.Colors.PRIMARY), 
                     selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2, color=ft.Colors.PRIMARY),
-                    label="Notes", padding=ft.padding.only(top=10, bottom=10), data="notes",
+                    padding=ft.padding.only(top=10, bottom=10),
+                    label="Notes", data="notes",
                 ),
             ],
         )
