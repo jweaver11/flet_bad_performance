@@ -4,6 +4,7 @@ Holds our settings icon, feedback, and account name as well
 '''
 
 import flet as ft
+from constants import data_paths
 from models.user import user
 from handlers.render_widgets import remove_drag_targets
 from handlers.render_widgets import render_widgets
@@ -18,14 +19,81 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
             ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
         )
         page.update()
-    def handle_file_open_click(e):
-        page.update()
+
     def handle_submenu_open(e):
         print(f"{e.control.content.content.value}.on_open")
     def handle_submenu_close(e):
         print(f"{e.control.content.content.value}.on_close")
     def handle_submenu_hover(e):
         print(f"{e.control.content.content.value}.on_hover")
+
+    # Called when file->new is clicked
+    def new_clicked(e):
+        ''' Placeholder for new story click event '''
+        print("New Story Clicked")
+
+        def submit_new_story(title: str):
+            ''' Creates a new story with the given title '''
+            user.create_new_story(title)
+            #user.active_story = new_story
+            print(f"New story created with title: {title}")
+            dlg.open = False
+            render_widgets(page)
+            page.update()
+
+
+        dlg = ft.AlertDialog(
+            title=ft.Text("Create New Story"),
+            content=ft.Text("This will create a new story with default settings. Continue?"),
+            actions=[
+                #ft.TextButton("Cancel", on_click=lambda e: page.dialog.close()),
+                ft.TextButton("OK", on_click=lambda e: submit_new_story("new_story")),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+            on_dismiss=lambda e: print("Dialog dismissed!"),
+        )
+
+        dlg.open = True
+        page.overlay.append(dlg)
+        page.update()
+
+        
+
+
+        title = "new_story"
+        new_story = user.create_new_story(title)
+
+        user.active_story = new_story
+
+    def handle_file_open_click(e):
+        ''' Placeholder for open story click event '''
+        print("Open Story Clicked")
+
+        def get_story_list() -> list[ft.Control]:
+            ''' Returns a list of all story titles available to open '''
+
+            list = []
+
+            for story in user.stories:
+                list.append(ft.Text(story))
+
+            return list
+
+        dlg = ft.AlertDialog(
+            title=ft.Text("What story would you like to open?"),
+            alignment=ft.alignment.center,
+            on_dismiss=lambda e: print("Dialog dismissed!"),
+            title_padding=ft.padding.all(25),
+            content=ft.Column(expand=False, controls=get_story_list()),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: page.close(dlg)),
+                ft.TextButton("Open", on_click=lambda e: page.close(dlg)),
+            ]
+        )
+
+        page.open(dlg)
+
+        
 
 
     # Styling used by lots of menu bar items
@@ -60,7 +128,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                         content=ft.Text("New", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
                         style=menubar_style,
-                        on_click=lambda e: print("New Story Clicked"),
+                        on_click=new_clicked,
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Save", weight=ft.FontWeight.BOLD),

@@ -246,7 +246,6 @@ pin_drag_targets = [
     ),
     
 ]
-print("render_widgets called")
 
 
 # Pin our widgets in here for formatting
@@ -366,7 +365,6 @@ def render_widgets(page: ft.Page):
 
     # Main pin is rendered as a tab control, so we won't use dividers and will use different logic
     visible_main_controls = [control for control in story.main_pin.controls if getattr(control, 'visible', True)]
-    print("visible main controls:", len(visible_main_controls))
     if len(visible_main_controls) > 1:
         # Get the selected tab index from the story object, default to 0
         selected_tab_index = getattr(story, 'selected_main_tab_index', 0)

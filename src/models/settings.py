@@ -161,7 +161,7 @@ class Settings(Widget):
 
     # Save our object as a dictionary for json serialization
     def save_dict(self):
-        print("save settings dict called")
+        #print("save settings dict called")
         settings_file_path = os.path.join(settings_path, "settings.json")
         
         with open(settings_file_path, "w") as f:
@@ -171,7 +171,7 @@ class Settings(Widget):
     def __load_from_dict(self):
         ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
 
-        print("load from dict called")
+        #print("load from dict called")
 
         # Set the path to our settings file
         settings_file_path = os.path.join(settings_path, "settings.json")
@@ -210,12 +210,12 @@ class Settings(Widget):
                 self.data.update(loaded_data)
                 self.visible = self.data.get('visible', False)
                 
-                print(f"Settings loaded successfully from {settings_file_path}")
+                #print(f"Settings loaded successfully from {settings_file_path}")
 
             else:
                 # File doesn't exist, use default data
                 self.data = default_data
-                print("Settings file does not exist, using default values.")
+                #print("Settings file does not exist, using default values.")
                 
                 # Optionally create the file with default data
                 self.save_dict()
@@ -223,8 +223,8 @@ class Settings(Widget):
         # Handle JSON parsing errors or file access issues
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
             # Handle JSON parsing errors or file access issues
-            print(f"Error loading settings: {e}")
-            print("Using default values.")
+            #print(f"Error loading settings: {e}")
+            #print("Using default values.")
             self.data = default_data
             
             # Optionally create/overwrite the file with default data

@@ -46,7 +46,7 @@ class Character(Widget):
 
      # Save our object as a dictionary for json serialization
     def save_dict(self):
-        print("save settings dict called")
+        #print("save settings dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
         
         # Save our data
@@ -57,7 +57,7 @@ class Character(Widget):
     def __load_from_dict(self):
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
-        print("load from dict called")
+        #print("load from dict called")
         character_file_path = os.path.join(characters_path, f"{self.title}.json")
 
         # Data set upon first launch of program, or if file can't be loaded
@@ -114,7 +114,7 @@ class Character(Widget):
             # Try to load existing settings from file
             if os.path.exists(character_file_path):
                 self.path = character_file_path  # Set the path to the file
-                print(f"Loading character data from {self.path}")
+                #print(f"Loading character data from {self.path}")
                 with open(character_file_path, "r") as f:
                     loaded_data = json.load(f)
                 
@@ -126,19 +126,19 @@ class Character(Widget):
                 self.visible = self.data.get('visible', False)
                 #self.pin_location = self.data.get('pin_location', "left")    # Set pin location
                 
-                print(f"Settings loaded successfully from {character_file_path}")
+                #print(f"Settings loaded successfully from {character_file_path}")
             else:
                 # File doesn't exist, use default data
                 self.data = default_data
-                print("Settings file does not exist, using default values.")
+                #print("Settings file does not exist, using default values.")
                 
                 # Optionally create the file with default data
                 self.save_dict()  # This will save the default data to file
                 
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
             # Handle JSON parsing errors or file access issues
-            print(f"Error loading settings: {e}")
-            print("Using default values.")
+            #print(f"Error loading settings: {e}")
+            #print("Using default values.")
             self.data = default_data
             
             # Optionally create/overwrite the file with default data
@@ -271,7 +271,7 @@ class Character(Widget):
     # Called when the textfield for writing in custom sex's is submitted
     # Adds our custom sex to our stories sex_options list
     def sex_submit(self, e):
-        print("sex submit ran")
+        #print("sex submit ran")
 
         self.data['Sex'] = e.control.value
 
@@ -295,20 +295,21 @@ class Character(Widget):
 
     # Called when the age is changed. Changes the age data
     def age_change(self, e):
-        print("Age change ran")
+        #print("Age change ran")
         self.data['Age'].data = e.control.value
         print(self.data['Age'].data)
 
     # Called when the race is changed. Changes the race data
     def race_change(self, e):
-        print("Race change ran")
+        #print("Race change ran")
         self.data['Physical Description'].data['Race'] = e.control.value
-        print(self.data['Physical Description'].data['Race'])
+        #print(self.data['Physical Description'].data['Race'])
         self.p.update()
 
     # Expand the tile to show physical descriptions
     def expand_physical_description(self, e):
-        print("expand physical description ran")
+        #print("expand physical description ran")
+        pass
             
 
 

@@ -14,16 +14,16 @@ class Story:
        
         self.title = title # Gives our story a title when its created
 
+        # Set our path needed to load the rest of our saved story data
+        #self.path = os.path.join(data_paths.story_dicts_path, f"{self.title}.json")
+        
         # Declare our active rail, but the this will be set in main since it needs a page reference
         self.active_rail = None     # Is a ft.Container
 
         data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
-        
-        # Set the file path to the active story path
-        self.file_path = data_paths.active_story_path
 
         # Our folder structure for the story
-        story_folders = [
+        story_structure_folders = [
             "content",
             "characters",
             "plot_and_timeline",
@@ -33,9 +33,9 @@ class Story:
         ]
         
         # Actually creates the folders in our story path
-        for folder in story_folders:
+        for folder in story_structure_folders:
             folder_path = os.path.join(data_paths.active_story_path, folder)
-            os.makedirs(folder_path, exist_ok=True)
+            os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
 
         notes_folders = [
             "themes",
@@ -46,20 +46,11 @@ class Story:
             folder_path = os.path.join(data_paths.notes_path,  folder)
             os.makedirs(folder_path, exist_ok=True)
 
-        # Metadata for the story
-        self.metadata = {
-            "title": title,
-            "top_pin_height": 0,
-            "left_pin_width": 0,
-            "main_pin_height": 0,
-            "right_pin_width": 0,
-            "bottom_pin_height": 0,
-            "created_at": None,
-            "last_modified": None
-        }
+        # Metadata for our story. Set or loaded in the load_dict method
+        self.data = {}
 
         # Create story metadata file
-        self.metadata_path = os.path.join(data_paths.active_story_path, "story_info.json")
+        self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
 
         # Creates our 5 pin locations for our widgets. Initially set heights and widths for comparison logic when rendering
         self.top_pin = ft.Row(height=0, spacing=0, controls=[])
@@ -86,8 +77,69 @@ class Story:
 
         print("startup called")
 
+        self.load_dict()
+
         # Loads our characters from file storage into our characters list
         self.load_characters(page)
+
+    def save_dict(self):
+        print("save story dict called")
+        
+        # Create the path to the story's JSON file
+        story_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
+        
+        try:
+            # Save our data to file
+            with open(story_file_path, "w") as f:
+                json.dump(self.data, f, indent=4)
+            print(f"Story data saved to {story_file_path}")
+            
+        except (PermissionError, OSError) as e:
+            print(f"Error saving story data: {e}")
+
+    def load_dict(self):
+        print("load story dict called")
+
+        # Create the path to the story's JSON file
+        story_data_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
+        
+        # Default data structure
+        default_data = {
+            'title': self.title,
+            'directory_path': os.path.join(data_paths.stories_directory_path, self.title),  # Path to our parent folder
+
+            'top_pin_height': 0,
+            'left_pin_width': 0,
+            'main_pin_height': 0,
+            'right_pin_width': 0,
+            'bottom_pin_height': 0,
+
+            'created_at': None,
+            'last_modified': None
+        }
+
+        try:
+            # Check if the story file exists
+            if os.path.exists(story_data_file_path):
+                # Load existing data from file
+                with open(story_data_file_path, 'r') as f:
+                    loaded_data = json.load(f)
+                
+                # Merge loaded data with default data (in case new fields were added)
+                self.data = {**default_data, **loaded_data}
+                print(f"Loaded story data from {story_data_file_path}")
+            else:
+                # File doesn't exist, use default data
+                self.data = default_data
+                print(f"Story file {story_data_file_path} not found, using default data")
+                
+                # Create the file with default data
+                self.save_dict()
+                
+        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
+            print(f"Error loading story data: {e}")
+            # Fall back to default data on error
+            self.data = default_data
 
         
     # Called when saving new objects to the story (characters, chapters, etc.)

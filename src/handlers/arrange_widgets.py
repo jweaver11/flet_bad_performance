@@ -6,8 +6,8 @@ import flet as ft
 
 # Called at the start of the by the 'render_widgets' function.
 def arrange_widgets():
-
-    print("arrange widgets called")
+    ''' Arranges our widgets to their correct pin locations after a change is made to their pin location.
+    Also adds widgets to their correct pin locations if they are missing from any pin location '''
     
     # Called later in the function when an objects 'pin_location' is not the same as its actual reference location
     def update_pin_location(obj):
@@ -59,7 +59,6 @@ def arrange_widgets():
     def steal_from_other_pins():
         ''' Steals widget one widget from other pin locations and adds it to the main pin location '''
 
-        print("steal from other pins called")
 
         # If pin is NOT empty. Pin's can hold widgets that are not visible, so we check that as well
         # Top
@@ -75,7 +74,6 @@ def arrange_widgets():
                     user.active_story.top_pin.controls.remove(obj)  # Remove from top pin
 
                     # Exit our for loop, so it only does it to one widget, not all of them
-                    print("Stole from top pin")
                     break   
         # Left
         elif len(user.active_story.left_pin.controls) > 0: 
@@ -87,7 +85,6 @@ def arrange_widgets():
 
                     user.active_story.left_pin.controls.remove(obj)
                     
-                    print("Stole from left pin")
                     break
         # Right
         elif len(user.active_story.right_pin.controls) > 0:  # If top and left are empty, check right
@@ -99,7 +96,6 @@ def arrange_widgets():
 
                     user.active_story.right_pin.controls.remove(obj)
                     
-                    print("Stole from right pin")
                     break
         # Bottom
         elif len(user.active_story.bottom_pin.controls) > 0:  # If top, left, and right are empty, check bottom
@@ -110,12 +106,11 @@ def arrange_widgets():
 
                     user.active_story.bottom_pin.controls.remove(obj)
                     
-                    print("Stole from bottom pin")
                     break
 
         # If there are no visible widgets anywhere else either
         else:
-            print('No widgets visible')
+            pass
 
 
     # Steal from other pins if main pin is empty. 
@@ -133,7 +128,6 @@ def arrange_widgets():
 
     # Called when we have an object with no reference in any pin
     def add_object_to_pin(obj):
-        print("add object to pin called")
 
         # Check objects pin and that its not already in that pin
         if hasattr(obj, 'data') and obj.data:  # If it has data
@@ -148,7 +142,6 @@ def arrange_widgets():
             elif obj.data['pin_location'] == "bottom" and obj not in user.active_story.bottom_pin.controls:
                 user.active_story.bottom_pin.controls.append(obj)
         elif hasattr(obj, 'data'):  # If it has data attribute but data is None or missing pin_location
-            print("Object has no pin location data, setting to main")
             if obj.data is None:
                 obj.data = {}  # Initialize data if it's None
             obj.data['pin_location'] = "main"
