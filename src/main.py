@@ -22,11 +22,16 @@ def main(page: ft.Page):
         # We create our user settings here because we need the page reference
         user.settings = Settings(page)  
 
+    user.set_new_active_story()  # Sets our active story based on what is in settings
+
+    print("num stories: ", len(user.stories))
+
     # Grabs our active story, and loads all our data into its objects for the program
-    user.active_story.startup(page)
+    if user.active_story is not None:
+        user.active_story.startup(page)
 
     # Adds our page title
-    title = "StoryBoard -- " + user.active_story.title + " -- Saved status"
+    title = "StoryBoard -- " + "user.active_story.title" + " -- Saved status"
 
     # Sets our theme modes and color schemes based on user settings (first start is dark and blue)
     page.theme = ft.Theme(color_scheme_seed=user.settings.data['theme_color_scheme'])

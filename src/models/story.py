@@ -53,11 +53,11 @@ class Story:
         self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
 
         # Creates our 5 pin locations for our widgets. Initially set heights and widths for comparison logic when rendering
-        self.top_pin = ft.Row(height=0, spacing=0, controls=[])
-        self.left_pin = ft.Column(width=0, spacing=0, controls=[])
+        self.top_pin = ft.Row(spacing=0, controls=[])
+        self.left_pin = ft.Column(spacing=0, controls=[])
         self.main_pin = ft.Row(expand=True, spacing=0, controls=[])
-        self.right_pin = ft.Column(width=0, spacing=0, controls=[])
-        self.bottom_pin = ft.Row(height=0, spacing=0, controls=[])
+        self.right_pin = ft.Column(spacing=0, controls=[])
+        self.bottom_pin = ft.Row(spacing=0, controls=[])
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
@@ -75,15 +75,16 @@ class Story:
     def startup(self, page: ft.Page):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        print("startup called")
+        #print("startup called")
 
+        # Loads our info about our story from its JSON file
         self.load_dict()
 
         # Loads our characters from file storage into our characters list
         self.load_characters(page)
 
     def save_dict(self):
-        print("save story dict called")
+        #print("save story dict called")
         
         # Create the path to the story's JSON file
         story_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
@@ -92,13 +93,13 @@ class Story:
             # Save our data to file
             with open(story_file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
-            print(f"Story data saved to {story_file_path}")
+            #print(f"Story data saved to {story_file_path}")
             
         except (PermissionError, OSError) as e:
             print(f"Error saving story data: {e}")
 
     def load_dict(self):
-        print("load story dict called")
+        #print("load story dict called")
 
         # Create the path to the story's JSON file
         story_data_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
@@ -127,11 +128,17 @@ class Story:
                 
                 # Merge loaded data with default data (in case new fields were added)
                 self.data = {**default_data, **loaded_data}
-                print(f"Loaded story data from {story_data_file_path}")
+                #print(f"Loaded story data from {story_data_file_path}")
+
+                # Set our saved pin sizes
+                self.top_pin.height = self.data.get('top_pin_height', 0)
+                self.left_pin.width = self.data.get('left_pin_width', 0)
+                self.right_pin.width = self.data.get('right_pin_width', 0)
+                self.bottom_pin.height = self.data.get('bottom_pin_height', 0)
             else:
                 # File doesn't exist, use default data
                 self.data = default_data
-                print(f"Story file {story_data_file_path} not found, using default data")
+                #print(f"Story file {story_data_file_path} not found, using default data")
                 
                 # Create the file with default data
                 self.save_dict()
@@ -233,11 +240,11 @@ class Story:
     def load_characters(self, page: ft.Page):
         ''' Loads all our characters from our characters folder and adds them to the live story object'''
 
-        print("load characters called")
+        #print("load characters called")
         
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(data_paths.characters_path):
-            print("Characters folder does not exist, creating it.")
+            #print("Characters folder does not exist, creating it.")
             os.makedirs(data_paths.characters_path)
             return
         
@@ -264,7 +271,7 @@ class Story:
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
-                        print(f"Loaded character: {character_title}")
+                        #print(f"Loaded character: {character_title}")
                     
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:

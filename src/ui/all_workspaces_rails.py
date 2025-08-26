@@ -31,7 +31,7 @@ class All_Workspaces_Rail(ft.Container):
         super().__init__(
             alignment=ft.alignment.center,  # Aligns content to the 
             bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-            padding=ft.padding.only(bottom=10),
+            padding=ft.padding.only(bottom=10, right=2),
         )
 
         # Build our rail on start
@@ -246,18 +246,23 @@ class All_Workspaces_Rail(ft.Container):
         # We change the active rail here rather than when we reload it because...
         # the active rail is created after this object, so if when we reload the rail...
         # on program start, it will break the program.
-        if self.selected_workspace == "content":    # Set the active_rail content to the new selection
-            user.active_story.active_rail.content = create_content_rail(self.p)
-        elif self.selected_workspace == "characters":
-            user.active_story.active_rail.content = create_characters_rail(self.p)
-        elif self.selected_workspace == "plot_and_timeline":
-            user.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
-        elif self.selected_workspace == "world_building":
-            user.active_story.active_rail.content = create_world_building_rail(self.p)
-        elif self.selected_workspace == "drawing_board":
-            user.active_story.active_rail.content = create_drawing_board_rail(self.p)
-        elif self.selected_workspace == "notes":
-            user.active_story.active_rail.content = create_notes_rail(self.p)
+        if user.active_story is not None:
+            if self.selected_workspace == "content":    # Set the active_rail content to the new selection
+                user.active_story.active_rail.content = create_content_rail(self.p)
+            elif self.selected_workspace == "characters":
+                user.active_story.active_rail.content = create_characters_rail(self.p)
+            elif self.selected_workspace == "plot_and_timeline":
+                user.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
+            elif self.selected_workspace == "world_building":
+                user.active_story.active_rail.content = create_world_building_rail(self.p)
+            elif self.selected_workspace == "drawing_board":
+                user.active_story.active_rail.content = create_drawing_board_rail(self.p)
+            elif self.selected_workspace == "notes":
+                user.active_story.active_rail.content = create_notes_rail(self.p)
+
+        # Handle when there is no active story (shouldn't happen)
+        else:
+            user.active_story.active_rail.content = ft.Text("No active story")
 
         self.reload_rail()  # Reload the rail to apply the new selection
 

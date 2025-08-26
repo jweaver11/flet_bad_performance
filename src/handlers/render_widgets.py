@@ -400,6 +400,10 @@ def render_widgets(page: ft.Page):
         formatted_top_pin.update()
         story.widgets.update() # Update the main pin, as it is affected by all pins resizing
         story.master_stack.update()
+    def save_top_pin_height(e: ft.DragEndEvent):
+        user.active_story.data['top_pin_height'] = story.top_pin.height
+        user.active_story.save_dict()
+        
 
     # The control that holds our divider, which we drag to resize the top pin
     top_pin_resizer = ft.GestureDetector(
@@ -410,6 +414,7 @@ def render_widgets(page: ft.Page):
             content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
         on_pan_update=move_top_pin_divider,
+        on_pan_end=save_top_pin_height,
         on_hover=show_vertical_cursor,
     )
 
@@ -420,6 +425,9 @@ def render_widgets(page: ft.Page):
         formatted_left_pin.update()
         story.widgets.update()
         story.master_stack.update()
+    def save_left_pin_width(e: ft.DragEndEvent):
+        user.active_story.data['left_pin_width'] = story.left_pin.width
+        user.active_story.save_dict()
     left_pin_resizer = ft.GestureDetector(
         content=ft.Container(
             width=10,
@@ -428,6 +436,7 @@ def render_widgets(page: ft.Page):
             content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
         on_pan_update=move_left_pin_divider,
+        on_pan_end=save_left_pin_width,
         on_hover=show_horizontal_cursor,
     )
     
@@ -440,6 +449,9 @@ def render_widgets(page: ft.Page):
         formatted_right_pin.update()
         story.widgets.update()
         story.master_stack.update()
+    def save_right_pin_width(e: ft.DragEndEvent):
+        user.active_story.data['right_pin_width'] = story.right_pin.width
+        user.active_story.save_dict()
     right_pin_resizer = ft.GestureDetector(
         content=ft.Container(
             width=10,
@@ -448,6 +460,7 @@ def render_widgets(page: ft.Page):
             content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
         on_pan_update=move_right_pin_divider,
+        on_pan_end=save_right_pin_width,
         on_hover=show_horizontal_cursor,
     )
 
@@ -458,6 +471,9 @@ def render_widgets(page: ft.Page):
         formatted_bottom_pin.update()
         story.widgets.update()
         story.master_stack.update()
+    def save_bottom_pin_height(e: ft.DragEndEvent):
+        user.active_story.data['bottom_pin_height'] = story.bottom_pin.height
+        user.active_story.save_dict()
     bottom_pin_resizer = ft.GestureDetector(
         content=ft.Container(
             height=10,
@@ -466,6 +482,7 @@ def render_widgets(page: ft.Page):
             content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
         ),
         on_pan_update=move_bottom_pin_divider,
+        on_pan_end=save_bottom_pin_height,
         on_hover=show_vertical_cursor,
     )
 

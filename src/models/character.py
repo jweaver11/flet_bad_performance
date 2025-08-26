@@ -165,7 +165,7 @@ class Character(Widget):
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                 label="Morality",
                                 value=self.data['Morality'],
-                                padding=ft.padding.all(0),
+                                #padding=ft.padding.all(0),
                                 color=self.data['name_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                 options=[
@@ -180,7 +180,7 @@ class Character(Widget):
                             ft.Dropdown(      # Sex of each character
                                 label="Sex",
                                 value=self.data['Sex'],
-                                padding=ft.padding.all(0),
+                                #padding=ft.padding.all(0),
                                 color=self.data['sex_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                 options=[

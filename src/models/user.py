@@ -6,6 +6,7 @@ All other files can import this function without issues
 
 from models.story import Story
 import os
+import flet as ft
 
 
 class User:
@@ -19,6 +20,7 @@ class User:
         # Dict of all our stories.
         self.stories = {}
 
+        
         # Load existing stories from the directory
         self.load_stories()
         
@@ -27,8 +29,10 @@ class User:
             print("No existing stories found, creating default story")
             self.create_new_story("default_story")
         
-        
+        # When settings is created, it uses default story if none exists
         self.active_story = self.stories['default_story']
+
+        
         
     # Called on program launch 
     def load_stories(self):
@@ -62,18 +66,13 @@ class User:
                     
         #print(f"Loaded {len(self.stories)} stories total")
 
-          
-
-
 
     # Called when opening a different story, or when new story is created
-    def set_new_active_story(self, title: str):
+    def set_new_active_story(self) -> Story:
         ''' Sets a new active story based on the title given WIP '''
 
-        if title in self.stories:
-            self.active_story = self.stories[title]
-        else:
-            print(f"Story with title {title} does not exist.")
+        # When settings is created, it uses default story if none exists
+        self.active_story = self.stories[self.settings.data['active_story']]
 
 
     # Called when user creates a new story
