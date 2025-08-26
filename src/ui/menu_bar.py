@@ -1,45 +1,42 @@
-''' Menu bar at the top of the page '''
+''' 
+UI element for our Menu bar at the top of the page (file, edit, etc)
+Holds our settings icon, feedback, and account name as well
+'''
+
 import flet as ft
 from models.user import user
 from handlers.render_widgets import remove_drag_targets
 from handlers.render_widgets import render_widgets
 
-def create_menu_bar(page: ft.Page):
+# Called by main on program start to create our menu bar
+def create_menu_bar(page: ft.Page) -> ft.Container:
     
-    # Handler logic for each menu item clicked
+    # Placeholder events for now
     def handle_menu_item_click(e):
         print(f"{e.control.content.value}.on_click")
         page.open(
             ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
         )
         page.update()
-
     def handle_file_open_click(e):
-        page.route = "/welcome"
         page.update()
-
-
-    # Handlers called automatically for submenu events
     def handle_submenu_open(e):
         print(f"{e.control.content.content.value}.on_open")
-
     def handle_submenu_close(e):
         print(f"{e.control.content.content.value}.on_close")
-
     def handle_submenu_hover(e):
         print(f"{e.control.content.content.value}.on_hover")
 
+
+    # Styling used by lots of menu bar items
     menubar_style = ft.ButtonStyle(
         bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
     )
 
-
-
     # Create our menu bar with submenu items
     menubar = ft.MenuBar(
-       # Format menubar
         expand=True,
-        style=ft.MenuStyle(
+        style=ft.MenuStyle(     # Styling our menubar
             alignment=ft.alignment.center,
             bgcolor=ft.Colors.TRANSPARENT,
             shadow_color=ft.Colors.TRANSPARENT,
@@ -48,18 +45,17 @@ def create_menu_bar(page: ft.Page):
                 ft.ControlState.DEFAULT: ft.MouseCursor.ZOOM_OUT,
             },
         ),
-        controls=[
-            # Parent submenu item with child items on hover
-            ft.SubmenuButton(
+        controls=[  # The controls shown in our menu bar from left to right
+            ft.SubmenuButton(   # Button that opens a subment
                 content=ft.Container(
-                    content=ft.Text("File", weight=ft.FontWeight.BOLD),
+                    content=ft.Text("File", weight=ft.FontWeight.BOLD),     # Content of subment button
                     alignment=ft.alignment.center
                 ),
-                style=menubar_style,
-                on_open=handle_submenu_open,
-                on_close=handle_submenu_close,
-                on_hover=handle_submenu_hover,
-                controls=[
+                style=menubar_style,    # styleing for the button
+                on_open=handle_submenu_open,    # Handle when a submenu is opened
+                on_close=handle_submenu_close,  # Handle when a submenu is closed
+                on_hover=handle_submenu_hover,  # Handle when a submenu is hovered
+                controls=[      # The options shown inside of our button
                     ft.MenuItemButton(
                         content=ft.Text("New", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
@@ -131,16 +127,22 @@ def create_menu_bar(page: ft.Page):
         ], 
     )
 
+    # Called when the settings icon on the right side of the menubar is clicked
     def settings_clicked(e):
-        user.settings.visible = not user.settings.visible
-        render_widgets(page)  # Re-render the page to show/hide settings
-        page.update()
+        ''' Toggles the visibility of the settings widget in the menubar '''
 
-    # Create our container for the menu bar
-    menubar_container = ft.Container(
+        user.settings.change_visibility()
+        if user.settings.data['visible']:
+            user.settings.show_widget()
+        else:
+            user.settings.hide_widget()
+
+        render_widgets(page)  # Re-render the page to show/hide settings
+        
+    # Return our formatted menubar
+    return ft.Container(
         border=ft.border.only(bottom=ft.BorderSide(width=1, color=ft.Colors.OUTLINE_VARIANT)),
         bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-        #border_radius=ft.border_radius.all(4),  # 4px radius on all corners
 
         content=ft.Row(
             spacing=None,
@@ -152,8 +154,6 @@ def create_menu_bar(page: ft.Page):
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button
                 ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # users account name
-            ]))
-
-
-
-    return menubar_container
+            ]
+        )
+    )

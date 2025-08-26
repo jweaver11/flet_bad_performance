@@ -12,14 +12,14 @@ class Story:
     # Constructor for when new story is created
     def __init__(self, title: str):
        
-        self.title=title # Gives our story a title when its created
+        self.title = title # Gives our story a title when its created
 
         data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
         
         # Set the file path to the active story path
         self.file_path = data_paths.active_story_path
 
-        self.load_object_from_file("", "")
+        #self.load_object_from_file("", "")
 
         # Create Story object structure folders inside empty_story
         story_folders = [
@@ -64,33 +64,19 @@ class Story:
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
 
 
-        # Default active workspace rail if none selected/on startup rn
-        self.default_rail = [ft.TextButton("Select a workspace")]
-
-        # Map of all the workspace rails - Rails must be a list of flet controls
-        self.workspace_rails = {
-            0: self.default_rail,
-        }  
-
-        # Format our active rail 
-        self.active_rail = ft.Column(  
-            spacing=0,
-            controls=self.workspace_rails[0],    # On startup, set to char rail
-        )  
+        # Declare our active rail, but the this will be set in main since it needs a page reference
+        self.active_rail = None     # Is a ft.Container
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
         
-        # Store page reference for loading objects later
-        self.page_reference = None
+        
 
     # Called when a story is loaded. Loads all our objects from files
     def startup(self, page: ft.Page):
         print("startup called")
         self.load_characters(page)
-        # Load all our objects from our story file.
-        # For char in filepath/characters, append to self.characters
-        #...
+
         
 
 
@@ -161,7 +147,7 @@ class Story:
         print("object saved to file called")
         
     # Load an object from file
-    def load_object_from_file(self, file_path, page_reference):
+    def load_object_from_file(self, file_path):
         print("load object from file called")
 
     # Called by the delete object method to permanently remove the object from file storage as well

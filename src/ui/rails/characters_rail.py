@@ -480,7 +480,7 @@ def reload_character_rail(page: ft.Page):
     page.update()
 
 
-def create_characters_rail(page: ft.Page):
+def create_characters_rail(page: ft.Page) -> ft.Control:
 
     # Initially create some characters to test with
     #user.active_story.add_object_to_story(Character("Bob", page))
@@ -496,24 +496,20 @@ def create_characters_rail(page: ft.Page):
 
     # List of controls that we return from our page. 
     # This is static and should not change
-    characters_rail = [
-        ft.Column(
-            spacing=0, 
-            expand=True, 
-            scroll=ft.ScrollMode.AUTO, 
-            controls=[
-                # Our drag targets that hold each character list for each category
-                main_characters_drag_target,
-                side_characters_drag_target,
-                background_characters_drag_target,
-            ], 
-        )
-
-    ]
+    characters_rail = ft.Column(
+        spacing=0, 
+        expand=True, 
+        #scroll=ft.ScrollMode.AUTO, # Enable scrolling. Rn it formats to middle of rail so its disabled
+        controls=[
+            # Our drag targets that hold each character list for each category
+            main_characters_drag_target,
+            side_characters_drag_target,
+            background_characters_drag_target,
+        ], 
+    )
 
     # Initially load our rail
     reload_character_rail(page)
-    render_widgets(page) 
 
     # Return our created character rail (which is a list of controls)
     return characters_rail

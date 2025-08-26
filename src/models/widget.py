@@ -12,15 +12,26 @@ from handlers.render_widgets import show_pin_drag_targets
 
 
 class Widget(ft.Container):
-    def __init__(self, title: str, tag: str, p: ft.Page, pin_location: str, tab_color: str):
+    def __init__(self, title: str, tag: str, p: ft.Page, pin_location: str):
     
         self.title = title  # Title of our object
         self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen...
         # p.update() always works - (self.update() and page.update() sometimes don't work because of outdated references)
+        
         self.pin_location = pin_location  # Pin location of our object upon creation
-        self.tab_color = tab_color  # Users can change the tab color of their widgets for better organization
+        self.tab_color =  ft.Colors.PRIMARY  # Users can change the tab color of their widgets for better organization
         self.path = ""  # The path to the json file that stores this widget's data
+
+        super().__init__(
+            expand=True, 
+            #padding=6,
+            #border=ft.border.all(1, self.tab_color),  # Gives a border to match the widgets border
+            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
+            #bgcolor=ft.Colors.ON_SECONDARY,
+            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_SECONDARY),
+            bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
+        )
 
 
         self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
@@ -72,15 +83,6 @@ class Widget(ft.Container):
                                 
         )
 
-        super().__init__(
-            expand=True, 
-            #padding=6,
-            #border=ft.border.all(1, self.tab_color),  # Gives a border to match the widgets border
-            #border_radius=ft.border_radius.all(10),  # 10px radius on all corners
-            #bgcolor=ft.Colors.ON_SECONDARY,
-            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_SECONDARY),
-            bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
-        )
 
     def hover_tab(self, e):
         self.hide_tab_icon.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
@@ -121,11 +123,27 @@ class Widget(ft.Container):
     def hide_widget(self):
         self.visible = False
         user.active_story.master_stack.update()
+        # Update the child object's data and save to file
+        if hasattr(self, 'data'):
+            self.data['visible'] = False
+
+            self.save_dict()
+            # Call the child class's save_dict method using the proper name mangling
+            #class_name = self.__class__.__name__
+            #method_name = f"_{class_name}save_dict"
+            #if hasattr(self, method_name):
+                #getattr(self, method_name)()
         render_widgets(self.p)
 
     # Shows our widget once again
     def show_widget(self):
         self.visible = True
         user.active_story.master_stack.update()
+        # Update the child object's data and save to file
+        if hasattr(self, 'data'):
+            self.data['visible'] = True
+            # Call the child class's save_dict method using the proper name mangling
+            self.save_dict()
+            
         render_widgets(self.p)
         self.p.update()
