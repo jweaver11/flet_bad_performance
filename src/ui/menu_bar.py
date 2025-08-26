@@ -6,8 +6,8 @@ Holds our settings icon, feedback, and account name as well
 import flet as ft
 from constants import data_paths
 from models.user import user
-from handlers.render_widgets import remove_drag_targets
-from handlers.render_widgets import render_widgets
+from handlers.reload_workspace import remove_drag_targets
+from handlers.reload_workspace import reload_workspace
 
 # Called by main on program start to create our menu bar
 def create_menu_bar(page: ft.Page) -> ft.Container:
@@ -38,7 +38,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
             #user.active_story = new_story
             print(f"New story created with title: {title}")
             dlg.open = False
-            render_widgets(page)
+            reload_workspace(page)
             page.update()
 
 
@@ -205,7 +205,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         else:
             user.settings.hide_widget()
 
-        render_widgets(page)  # Re-render the page to show/hide settings
+        reload_workspace(page)  # Re-render the page to show/hide settings
         
     # Return our formatted menubar
     return ft.Container(

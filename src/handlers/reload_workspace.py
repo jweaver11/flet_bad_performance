@@ -74,7 +74,7 @@ def top_pin_drag_accept(e):
         object.data['pin_location'] = "top"  # Update our object's data dictionary as well
         object.save_dict()  # Save our object with its new pin location
     arrange_widgets()       # Re-arrange our widgets held in the story object
-    render_widgets(e.page)  # Re-render the widgets to reflect the new pin location
+    reload_workspace(e.page)  # Re-render the widgets to reflect the new pin location
     
     print("top pin accepted")
 
@@ -101,7 +101,7 @@ def left_pin_drag_accept(e):
         object.data['pin_location'] = "left"
         object.save_dict()
     arrange_widgets()       
-    render_widgets(e.page)  
+    reload_workspace(e.page)  
     
     print("left pin accepted")
 
@@ -127,7 +127,7 @@ def main_pin_drag_accept(e):
     object.data['pin_location'] = "main"
     object.save_dict()
     arrange_widgets()       
-    render_widgets(e.page)  
+    reload_workspace(e.page)  
     
     print("main pin accepted")
 
@@ -153,7 +153,7 @@ def right_pin_drag_accept(e):
     object.data['pin_location'] = "right"
     object.save_dict()
     arrange_widgets()       
-    render_widgets(e.page)  
+    reload_workspace(e.page)  
     
     print("right pin accepted")
 
@@ -178,7 +178,7 @@ def bottom_pin_drag_accept(e):
     object.data['pin_location'] = "bottom"
     object.save_dict()
     arrange_widgets()       
-    render_widgets(e.page)  
+    reload_workspace(e.page)  
     
     print("bottom pin accepted")
 
@@ -248,8 +248,9 @@ pin_drag_targets = [
 ]
 
 
-# Pin our widgets in here for formatting
-def render_widgets(page: ft.Page):
+# Called whenever the main workspace area needs to be re-rendered
+def reload_workspace(page: ft.Page):
+    ''' Rebuilds our workspace area with our five pins, formatting, and all logic associated with it '''
 
     # Runs our arrange widgets function to make sure all widgets are in correct locations
     arrange_widgets()

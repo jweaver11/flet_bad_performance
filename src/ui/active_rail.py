@@ -29,6 +29,14 @@ class Active_Rail(ft.Container):
             width=user.settings.data['active_rail_width'],  # Sets the width
         )
 
+        self.reload_rail(page)
+
+        
+    # Called when other stories are selected and we need to reload the rail
+    def reload_rail(self, page: ft.Page):
+        ''' Reloads the active rail based on the selected workspace in all_workspaces_rail '''
+
+
         # Give us the correct rail on program startup based on our selected workspace
         if user.all_workspaces_rail.selected_workspace == "content":
             self.content = create_content_rail(page)
@@ -42,6 +50,9 @@ class Active_Rail(ft.Container):
             self.content = create_drawing_board_rail(page)
         elif user.all_workspaces_rail.selected_workspace == "notes":
             self.content = create_notes_rail(page)
+
+        # Update the page to reflect changes
+        self.p.update()
 
 
 

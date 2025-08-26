@@ -9,13 +9,13 @@ from models.settings import Settings
 from ui.all_workspaces_rails import All_Workspaces_Rail
 from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
-from handlers.render_widgets import render_widgets
+from handlers.reload_workspace import reload_workspace
 from ui.workspace import create_workspace
 
 
 # Main function
 def main(page: ft.Page):
-    
+
     # Checks if our user settings exist. This will only run if the user is newly created
     # Otherwise, when the user loads in, their settings will load as well
     if user.settings is None:
@@ -109,7 +109,6 @@ def main(page: ft.Page):
             workspace,    # Work area for pagelets
         ],
     )
-    
 
     # Format our page. Add our menubar at the top, then then our row built above
     col = ft.Column(
@@ -125,7 +124,7 @@ def main(page: ft.Page):
     page.add(col)
 
     # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-    render_widgets(page) 
+    reload_workspace(page) 
 
 
 # Runs the app

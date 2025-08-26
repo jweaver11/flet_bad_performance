@@ -6,8 +6,8 @@ All objects contain a title, tag, page reference, pin location, tab color, and a
 
 import flet as ft
 from models.user import user
-from handlers.render_widgets import render_widgets
-from handlers.render_widgets import show_pin_drag_targets
+from handlers.reload_workspace import reload_workspace
+from handlers.reload_workspace import show_pin_drag_targets
 
 
 class Widget(ft.Container):
@@ -121,7 +121,7 @@ class Widget(ft.Container):
             self.save_dict()
             
         # Re-render the widgets to apply the changes
-        render_widgets(self.p)
+        reload_workspace(self.p)
 
     # Called when user clicks the widget in the rail
     def show_widget(self):
@@ -133,4 +133,4 @@ class Widget(ft.Container):
             self.data['visible'] = True
             self.save_dict()
             
-        render_widgets(self.p)
+        reload_workspace(self.p)

@@ -7,7 +7,7 @@ the create 'character button' at the bottom.
 import flet as ft
 from models.user import user
 from models.character import Character
-from handlers.render_widgets import render_widgets
+from handlers.reload_workspace import reload_workspace
 import json
 
 
@@ -54,7 +54,7 @@ def rename_character(character, page: ft.Page):
         
         # Reload our character rail and widgets to reflect the changes
         reload_character_rail(page)
-        render_widgets(page)
+        reload_workspace(page)
 
         # Open a snackbar alert to confirm to the user that the char was renamed
         page.open(
@@ -130,7 +130,7 @@ def delete_character(character, page: ft.Page):
 
         # Reloads the character rail and widgets to reflect the changes
         reload_character_rail(page)
-        render_widgets(page)
+        reload_workspace(page)
 
         # Open a snackbar alert to confirm to the user that the char was deleted
         page.open(
@@ -201,7 +201,7 @@ def create_character(role_tag, page: ft.Page):
             # Adds our new character to the story
             user.active_story.save_object(new_character)
             reload_character_rail(page)   
-            render_widgets(page)  
+            reload_workspace(page)  
 
             # Close the dialog
             dlg.open = False
