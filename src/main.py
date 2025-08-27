@@ -22,58 +22,45 @@ def main(page: ft.Page):
     # Declare our global variables
     #global stories
     
-    # Load our stories. If they don't exist, create them
+    # Initializes our settings, stories, and sets our initial route, which manages our views
     init_settings(page)
-
-    print(app.settings.title)
-    #print(settings.tag)
-
-    #settings = get_settings()
-
     init_load_saved_stories(page)
-
-    print(len(app.stories))
-
-    try:
-        #from constants.init import settings
-        #settings = get_settings()
-
-        active_story_name = set.data['active_story']
-        active_story = app.stories.get(active_story_name, None)
-    except Exception as e:
-        print(f"Error loading active story from settings: {e}")
-        active_story = None
-    
-    init_set_route(page, active_story)
-
-
-
+    init_set_route(page)
 
 
     # Load our story view if there is an active story
+    if page.route != "/":
+        page.go(page.route)
+        page.views.clear()
+        
+        page.views.append(app.stories[app.settings.data['active_story']])
+        print("Setting to active story: ", app.settings.data['active_story'])
+        page.update()
+    else:
+        if len(app.stories) == 0:
+            page.add(create_page_if_no_stories_exist())
+            print("No stories exist")
+        else:
+            page.add(create_page_if_no_stories_active())
+            print("Stories exist, but no active story")
+
+
+
     # Otherwise, let main load a blank view with a large button to create first story
 
 
-    # Checks if our app settings exist. This will only run if the app is newly created
-    # Otherwise, when the app loads in, their settings will load as well
-    if app.settings is None:
-        # We create our app settings here because we need the page reference
-        app.settings = Settings(page)  
 
-    app.set_new_active_story()  # Sets our active story based on what is in settings
-
-    
 
     # Grabs our active story, and loads all our data into its objects for the program
-    if app.active_story is not None:
-        app.active_story.startup(page)
+    #if app.active_story is not None:
+        #app.active_story.startup(page)
 
     # Adds our page title
     # If settings.active_story is not None:
     #     page_title = "StoryBoard -- " + settings.active_story.title + " -- Saved status"
     # else:
     #     page_title = "StoryBoard"
-    page_title = "StoryBoard -- " + "app.active_story.title" + " -- Saved status"
+    #page_title = "StoryBoard -- " + app.settings.data['active_story'] + " -- Saved status"
 
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)
     page.theme = ft.Theme(color_scheme_seed=app.settings.data['theme_color_scheme'])
@@ -81,7 +68,6 @@ def main(page: ft.Page):
     page.theme_mode = app.settings.data['theme_mode']
    
     # Sets the title of our app, padding, and maximizes the window
-    page.title = page_title
     page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
     page.window.maximized = True
 
@@ -97,14 +83,59 @@ def main(page: ft.Page):
     # Create our workspace container to hold our widgets
     workspace = create_workspace()  # render our workspace containing our widgets
 
-
+    # Called to create the page view if no stories exist
     def create_page_if_no_stories_exist() -> ft.Control:
-        # Has no large open button
-        pass
+        ''' Gives us the menubar, initial rail, and large buttons to create your first story'''
 
+        page.title = "StoryBoard"
+        page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
+        
+        menubar = create_menu_bar(page)   
+
+
+        # Create our rails inside of app so we can access it as an object and store preferences
+        all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+        active_rail = Active_Rail(page)  # Container stored in story for the active rails
+
+        # Create our workspace container to hold our widgets
+        workspace = create_workspace()  # render our workspace containing our widgets 
+        #workspace.alignment = ft.MainAxisAlignment.CENTER
+
+        # Save our 2 rails, divers, and our workspace container in a row
+        row = ft.Row(
+            spacing=0,  # No space between elements
+            expand=True,  # Makes sure it takes up the entire window/screen
+
+            controls=[
+                all_workspaces_rail,  # Main rail of all available workspaces
+                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
+
+                active_rail,    # Rail for the selected workspace
+                active_rail_resizer,   # Divider between rail and work area
+                
+                workspace,    # Work area for pagelets
+            ],
+        )
+
+        # Format our page. Add our menubar at the top, then then our row built above
+        col = ft.Column(
+            spacing=0, 
+            expand=True, 
+            controls=[
+                menubar, 
+                row,
+            ]
+        )
+        
+        return page.add(col)
+
+    # Called if there is no active story, but stories do exist
     def create_page_if_no_stories_active() -> ft.Control:
-        # Has large open button and create story button
-        # Create our page elements as their own pages so they can update
+        ''' Creates our page view with a menubar, all_workspaces_rail, and two large buttons for create and open story'''
+
+        page.title = "StoryBoard"
+        page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
+        
         menubar = create_menu_bar(page)   
 
         # Create our rails inside of app so we can access it as an object and store preferences
@@ -209,7 +240,7 @@ def main(page: ft.Page):
 
     # Build our page we the column we created
     #page.add(col)
-    create_page_if_no_stories_active()
+    #create_page_if_no_stories_active()
 
     #if app.active_story is not None:
         #page.go(app.active_story.route)  # Goes to our active story route if it exists

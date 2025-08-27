@@ -103,7 +103,6 @@ class Story(ft.View):
             from ui.active_rail import Active_Rail
             from ui.workspace import create_workspace
             from models.app import app
-            from models.settings import Settings
 
             page_title = "StoryBoard -- " + self.title + " -- Saved status"
             page.title = page_title
@@ -218,11 +217,21 @@ class Story(ft.View):
 
         # Create the path to the story's JSON file
         story_data_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
+
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
         
         # Default data structure
         default_data = {
             'title': self.title,
-            'directory_path': os.path.join(data_paths.stories_directory_path, self.title),  # Path to our parent folder
+            'directory_path': directory_path,  # Path to our parent folder
+
+            # Paths to our workspaces
+            'content_path': os.path.join(directory_path, "content"),
+            'characters_path': os.path.join(directory_path, "characters"),
+            'plot_and_timeline_path': os.path.join(directory_path, "plot_and_timeline"),
+            'worldbuilding_path': os.path.join(directory_path, "worldbuilding"),
+            'drawing_board_path': os.path.join(directory_path, "drawing_board"),
+            'notes_path': os.path.join(directory_path, "notes"),
 
             'top_pin_height': 0,
             'left_pin_width': 0,
@@ -233,6 +242,14 @@ class Story(ft.View):
             'created_at': None,
             'last_modified': None
         }
+
+        # OUr paths inside the story object
+        #content_path = os.path.join(active_story_path, "content")
+        #characters_path = os.path.join(active_story_path, "characters")
+        #plot_and_timeline_path = os.path.join(active_story_path, "plot_and_timeline")
+        #worldbuilding_path = os.path.join(active_story_path, "worldbuilding")
+        #drawing_board_path = os.path.join(active_story_path, "drawing_board")
+        #notes_path = os.path.join(active_story_path, "notes")
 
         try:
             # Check if the story file exists

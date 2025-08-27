@@ -22,7 +22,8 @@ def create_workspace(story: Story=None) -> ft.Container:
     
     else:
         return ft.Container(
-            #expand=True,
+            expand=True,
+            alignment=ft.alignment.center,
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
             content=ft.FloatingActionButton(
                 icon=ft.Icons.ADD,
@@ -30,7 +31,6 @@ def create_workspace(story: Story=None) -> ft.Container:
                 #on_click=create_new_story,
                 width=200,
                 height=100,
-                shape=ft.RoundedRectangleBorder(radius=10),
-                
+                shape=ft.RoundedRectangleBorder(radius=10),  
             ),
         )

@@ -220,6 +220,13 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         from handlers.route_change import route_change
 
         route_change(page, app.stories['test_story_1'])
+
+
+    def view3(e):
+        print("View 3")
+        from handlers.route_change import route_change
+
+        route_change(page)
         
     # Return our formatted menubar
     return ft.Container(
@@ -235,6 +242,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
                 ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view1),
                 ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view2),
+                ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view3),
 
 
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),

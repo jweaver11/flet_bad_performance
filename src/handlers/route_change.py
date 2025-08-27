@@ -2,20 +2,31 @@ import flet as ft
 from models.story import Story
 
 # Called whenever a new story is laoded
-def route_change(page: ft.Page, new_story: Story) -> Story:
-    print("Route change:", page.route)
+def route_change(page: ft.Page, new_story: Story=None) -> Story:
 
-    if page.route == new_story.route:
-        return
+    page.views.clear()
+    page.controls.clear()
+    
+    if new_story is not None:
+        
+        #new_story.startup(page)  # Call startup to load story data and UI elements
 
-    page.views.clear()  # Clear existing views 
+        page.views.append(new_story)
 
-    new_story.startup(page)  # Call startup to load story data and UI elements
+        page.route = new_story.route
 
-    page.views.append(new_story)
+        page.update()
 
-    page.route = new_story.route
+        print("Route change:", page.route)
 
-    page.update()
+    else:
+        view = ft.View(
+            "/",
+            [
+                ft.Text("No active story. Please create or load a story from the menu."),
+            ],
+        )
+        page.views.append(view)
+        page.update()
 
     #return new_story
