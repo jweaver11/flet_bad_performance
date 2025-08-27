@@ -1,7 +1,8 @@
 import flet as ft
+from models.story import Story
 
 # Called whenever a new story is laoded
-def route_change(page: ft.Page, new_story: ft.View) -> ft.View:
+def route_change(page: ft.Page, new_story: Story) -> Story:
     print("Route change:", page.route)
 
     if page.route == new_story.route:

@@ -5,7 +5,8 @@ Initializes the app, settings, page data, and renders our UI onto the page
 # this is a test comment love cory
 import flet as ft
 from models.app import app
-from handlers.routes import route_change
+from handlers.route_change import route_change
+from constants.init import init_settings, init_load_saved_stories, init_set_route
 from models.settings import Settings
 from ui.all_workspaces_rails import All_Workspaces_Rail
 from ui.active_rail import Active_Rail
@@ -14,13 +15,44 @@ from handlers.reload_workspace import reload_workspace
 from ui.workspace import create_workspace
 
 
+
 # Main function
 def main(page: ft.Page):
+
+    # Declare our global variables
+    #global stories
     
-    # Program startup pseudocode:
-    # 1. Load or create app/app object
-    # If there is active story, load that as route and view
+    # Load our stories. If they don't exist, create them
+    init_settings(page)
+
+    print(app.settings.title)
+    #print(settings.tag)
+
+    #settings = get_settings()
+
+    init_load_saved_stories(page)
+
+    print(len(app.stories))
+
+    try:
+        #from constants.init import settings
+        #settings = get_settings()
+
+        active_story_name = set.data['active_story']
+        active_story = app.stories.get(active_story_name, None)
+    except Exception as e:
+        print(f"Error loading active story from settings: {e}")
+        active_story = None
+    
+    init_set_route(page, active_story)
+
+
+
+
+
+    # Load our story view if there is an active story
     # Otherwise, let main load a blank view with a large button to create first story
+
 
     # Checks if our app settings exist. This will only run if the app is newly created
     # Otherwise, when the app loads in, their settings will load as well
@@ -30,14 +62,18 @@ def main(page: ft.Page):
 
     app.set_new_active_story()  # Sets our active story based on what is in settings
 
-    print("num stories: ", len(app.stories))
+    
 
     # Grabs our active story, and loads all our data into its objects for the program
     if app.active_story is not None:
         app.active_story.startup(page)
 
     # Adds our page title
-    title = "StoryBoard -- " + "app.active_story.title" + " -- Saved status"
+    # If settings.active_story is not None:
+    #     page_title = "StoryBoard -- " + settings.active_story.title + " -- Saved status"
+    # else:
+    #     page_title = "StoryBoard"
+    page_title = "StoryBoard -- " + "app.active_story.title" + " -- Saved status"
 
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)
     page.theme = ft.Theme(color_scheme_seed=app.settings.data['theme_color_scheme'])
@@ -45,7 +81,7 @@ def main(page: ft.Page):
     page.theme_mode = app.settings.data['theme_mode']
    
     # Sets the title of our app, padding, and maximizes the window
-    page.title = title
+    page.title = page_title
     page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
     page.window.maximized = True
 

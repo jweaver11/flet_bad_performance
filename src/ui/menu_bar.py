@@ -210,14 +210,14 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
     def view1(e):
         print("View 1")
         
-        from handlers.routes import route_change
+        from handlers.route_change import route_change
 
         route_change(page, app.stories['default_story'])
         
 
     def view2(e):
         print("View 2")
-        from handlers.routes import route_change
+        from handlers.route_change import route_change
 
         route_change(page, app.stories['test_story_1'])
         

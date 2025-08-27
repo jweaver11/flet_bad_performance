@@ -2,7 +2,7 @@
 
 import flet as ft
 import os
-from models.app import app
+#from models.app import app
 from models.widget import Widget
 from constants.data_paths import settings_path
 import json
@@ -89,9 +89,9 @@ class Settings(Widget):
             self.save_dict()  
 
             # Runs through all our characters, and updates their name color accordingly and reloads their widget
-            for char in app.active_story.characters:  
-                char.check_morality()
-                char.reload_widget() 
+            #for char in app.active_story.characters:  
+                #char.check_morality()
+                #char.reload_widget() 
 
             # Reloads the rail. Its better here than running it twice for no reason in character class    
             from ui.rails.characters_rail import reload_character_rail
@@ -136,7 +136,7 @@ class Settings(Widget):
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
                 #on_click=lambda e: app.all_workspaces_rail.toggle_rail_reorderable()
-                on_click=lambda e: app.all_workspaces_rail.toggle_reorder_rail()
+                #on_click=lambda e: app.all_workspaces_rail.toggle_reorder_rail()
             ),
             self.change_name_colors,
             self.theme_button,
@@ -180,7 +180,7 @@ class Settings(Widget):
         default_data = {
             'visible': False,   # If our settings widget is visible or not
             'pin_location': "main", 
-            'active_story': "default_story",
+            'active_story': "default_story",    # this works as a route for the correct story as
             
             'tab_color': "blue",        # the tab color
             'theme_mode': "dark",       # the apps theme mode, dark or light

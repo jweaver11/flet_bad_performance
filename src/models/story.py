@@ -8,11 +8,11 @@ import os
 import json
 from constants import data_paths
 
-# == ft.View??????
 
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str):
+    def __init__(self, title: str, page: ft.Page=None):
+        
         # Parent constructor
         super().__init__(
             route=f"/{title}",    # Sets our route for our new story

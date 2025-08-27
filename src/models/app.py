@@ -7,11 +7,14 @@ All other files can import this function without issues
 from models.story import Story
 import os
 import flet as ft
+from constants import data_paths
 
 
 class App:
     # Constructor
-    def __init__(self):
+    def __init__(self, page: ft.Page=None):
+
+        #from models.settings import Settings
 
         # Declares settings and workspace rail here, but we create/load them later in main
         self.settings = None
@@ -35,8 +38,6 @@ class App:
     # Called on program launch 
     def load_stories(self):
         ''' Loads all stories from the stories directory into our story objects  '''
-
-        from constants import data_paths
         
         # Check if stories directory exists
         if not os.path.exists(data_paths.stories_directory_path):
@@ -85,7 +86,6 @@ class App:
 
         return new_story
     
-
+app = App()
 
 # Sets our global app object
-app = App()
