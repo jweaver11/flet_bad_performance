@@ -206,6 +206,20 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
             user.settings.hide_widget()
 
         reload_workspace(page)  # Re-render the page to show/hide settings
+
+    def view1(e):
+        print("View 1")
+        
+        from handlers.routes import route_change
+
+        route_change(page, user.stories['default_story'])
+        
+
+    def view2(e):
+        print("View 2")
+        from handlers.routes import route_change
+
+        route_change(page, user.stories['test_story_1'])
         
     # Return our formatted menubar
     return ft.Container(
@@ -218,6 +232,11 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                 menubar,    # Menubar on left
                 ft.Container(expand=True),  # empty space in middle of menubar
                 # Fix broken widgets button
+
+                ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view1),
+                ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view2),
+
+
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button

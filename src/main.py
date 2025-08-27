@@ -5,6 +5,7 @@ Initializes the user, settings, page data, and renders our UI onto the page
 # this is a test comment love cory
 import flet as ft
 from models.user import user
+from handlers.routes import route_change
 from models.settings import Settings
 from ui.all_workspaces_rails import All_Workspaces_Rail
 from ui.active_rail import Active_Rail
@@ -15,6 +16,8 @@ from ui.workspace import create_workspace
 
 # Main function
 def main(page: ft.Page):
+    
+    #page.on_route_change = route_change
 
     # Checks if our user settings exist. This will only run if the user is newly created
     # Otherwise, when the user loads in, their settings will load as well
@@ -125,6 +128,9 @@ def main(page: ft.Page):
 
     # Loads our widgets for the program whenever it starts. Make sure its called after page is built
     reload_workspace(page) 
+
+    #page.views.pop()
+    #page.views.append(user.active_story)
 
 
 # Runs the app
