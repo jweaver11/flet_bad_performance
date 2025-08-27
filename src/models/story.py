@@ -9,13 +9,14 @@ import json
 from constants import data_paths
 
 # == ft.View??????
+
 class Story(ft.View):
     # Constructor for when new story is created
     def __init__(self, title: str):
         # Parent constructor
         super().__init__(
             route=f"/{title}",    # Sets our route for our new story
-            padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # No padding for the page
+            padding=ft.padding.only(top=0, left=0, right=0, bottom=0)    # No padding for the page
         )  
        
         self.title = title # Gives our story a title when its created
@@ -29,6 +30,7 @@ class Story(ft.View):
         self.active_rail = None     # Is a ft.Container
 
         # Objects for our active rail content
+        # PASS OUR OBJECTS INTO THE OBJECTS OF OUR STORY
         self.content_rail = None  # Is an extended ft.Container
         self.characters_rail = None  # Is an extended ft.Container
         self.plot_and_timeline_rail = None  # Is an extended ft.Container
@@ -86,16 +88,16 @@ class Story(ft.View):
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
-        self.controls = []
+        #self.startup(page)
         
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
     def startup(self, page: ft.Page):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        #print("startup called")
+        # Called when new story object is created, either by program or by being loaded from storage
         def build_view() -> list[ft.Control]:
-            ''' Builds our story view inside the story object. '''
+            ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
             from ui.menu_bar import create_menu_bar
             from ui.all_workspaces_rails import All_Workspaces_Rail
             from ui.active_rail import Active_Rail
@@ -104,17 +106,14 @@ class Story(ft.View):
             from models.settings import Settings
 
             page_title = "StoryBoard -- " + self.title + " -- Saved status"
-
             page.title = page_title
 
-            self.controls.clear()
-
             # Create our page elements as their own pages so they can update
-            menubar = create_menu_bar(page)   
+            menubar = create_menu_bar(page)
 
             # Create our rails inside of user so we can access it as an object and store preferences
-            self.all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
-            self.active_rail = Active_Rail(page)  # Container stored in story for the active rails
+            self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
+            self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
 
             # Create our workspace container to hold our widgets
             workspace = create_workspace()  # render our workspace containing our widgets
@@ -163,10 +162,10 @@ class Story(ft.View):
                 expand=True,  # Makes sure it takes up the entire window/screen
 
                 controls=[
-                    user.all_workspaces_rail,  # Main rail of all available workspaces
+                    self.all_workspaces_rail,  # Main rail of all available workspaces
                     ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
-                    user.active_story.active_rail,    # Rail for the selected workspace
+                    self.active_rail,    # Rail for the selected workspace
                     active_rail_resizer,   # Divider between rail and work area
                     
                     workspace,    # Work area for pagelets

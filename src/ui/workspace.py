@@ -7,13 +7,30 @@ Overtop that, we append our drag targets when we start dragging a widget (tab). 
 
 import flet as ft
 from models.user import user
+from models.story import Story
 
 # Function to return our container for our widgets
-def create_workspace() -> ft.Container:   
+def create_workspace(story: Story=None) -> ft.Container:   
 
-    # Container for 1 or more widgets open on the workspace area right side of screen
-    return ft.Container(
-        expand=True,
-        bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
-        content=user.active_story.master_stack,   
-    )
+    if story is not None:
+        # Container for 1 or more widgets open on the workspace area right side of screen
+        return ft.Container(
+            expand=True,
+            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+            content=user.active_story.master_stack,   
+        )
+    
+    else:
+        return ft.Container(
+            #expand=True,
+            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+            content=ft.FloatingActionButton(
+                icon=ft.Icons.ADD,
+                text="No Active Story\nClick to Create New Story",
+                #on_click=create_new_story,
+                width=200,
+                height=100,
+                shape=ft.RoundedRectangleBorder(radius=10),
+                
+            ),
+        )

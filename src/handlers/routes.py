@@ -13,8 +13,6 @@ def route_change(page: ft.Page, new_story: ft.View) -> ft.View:
 
     page.views.append(new_story)
 
-    page.update()
-
     page.route = new_story.route
 
     page.update()

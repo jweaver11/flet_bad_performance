@@ -17,7 +17,10 @@ from ui.workspace import create_workspace
 # Main function
 def main(page: ft.Page):
     
-    #page.on_route_change = route_change
+    # Program startup pseudocode:
+    # 1. Load or create user/app object
+    # If there is active story, load that as route and view
+    # Otherwise, let main load a blank view with a large button to create first story
 
     # Checks if our user settings exist. This will only run if the user is newly created
     # Otherwise, when the user loads in, their settings will load as well
@@ -51,12 +54,57 @@ def main(page: ft.Page):
     menubar = create_menu_bar(page)   
 
     # Create our rails inside of user so we can access it as an object and store preferences
-    user.all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
-    user.active_story.active_rail = Active_Rail(page)  # Container stored in story for the active rails
+    all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+    #user.active_story.active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
 
     # Create our workspace container to hold our widgets
     workspace = create_workspace()  # render our workspace containing our widgets
+
+
+    def create_page_if_no_stories_exist() -> ft.Control:
+        # Has no large open button
+        pass
+
+    def create_page_if_no_stories_active() -> ft.Control:
+        # Has large open button and create story button
+        # Create our page elements as their own pages so they can update
+        menubar = create_menu_bar(page)   
+
+        # Create our rails inside of user so we can access it as an object and store preferences
+        all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+        active_rail = Active_Rail(page)  # Container stored in story for the active rails
+
+        # Create our workspace container to hold our widgets
+        workspace = create_workspace()  # render our workspace containing our widgets
+
+        # Save our 2 rails, divers, and our workspace container in a row
+        row = ft.Row(
+            spacing=0,  # No space between elements
+            expand=True,  # Makes sure it takes up the entire window/screen
+
+            controls=[
+                all_workspaces_rail,  # Main rail of all available workspaces
+                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
+
+                active_rail,    # Rail for the selected workspace
+                active_rail_resizer,   # Divider between rail and work area
+                
+                workspace,    # Work area for pagelets
+            ],
+        )
+
+        # Format our page. Add our menubar at the top, then then our row built above
+        col = ft.Column(
+            spacing=0, 
+            expand=True, 
+            controls=[
+                menubar, 
+                row,
+            ]
+        )
+        
+        return page.add(col)
 
 
     # Called when hovering over resizer to right of the active rail
@@ -103,7 +151,7 @@ def main(page: ft.Page):
         expand=True,  # Makes sure it takes up the entire window/screen
 
         controls=[
-            user.all_workspaces_rail,  # Main rail of all available workspaces
+            all_workspaces_rail,  # Main rail of all available workspaces
             ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
             user.active_story.active_rail,    # Rail for the selected workspace
@@ -124,7 +172,14 @@ def main(page: ft.Page):
     )
 
     # Build our page we the column we created
-    page.add(col)
+    #page.add(col)
+    create_page_if_no_stories_active()
+
+    #if user.active_story is not None:
+        #page.go(user.active_story.route)  # Goes to our active story route if it exists
+        #page.views.append(user.active_story)  # Adds our active story as a view so we can go back to it
+    #else:
+        #page.add(col)
 
     # Loads our widgets for the program whenever it starts. Make sure its called after page is built
     reload_workspace(page) 

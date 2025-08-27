@@ -1,9 +1,8 @@
 import os
 
 
-# Set our data path for the app
+# Set our data path for the app, and our path to our settings file
 app_data_path = os.getenv("FLET_APP_STORAGE_DATA")
-# Set our settings path for the app
 settings_path = os.path.join(app_data_path, "settings")
 
 # Set our path for all stories, and our active story

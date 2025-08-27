@@ -4,6 +4,7 @@ Handles new workspace selections, re-ordering, collapsing, and expanding the rai
 
 import flet as ft
 from models.user import user
+from models.story import Story
 import os
 from ui.rails.characters_rail import create_characters_rail
 from ui.rails.content_rail import create_content_rail
@@ -17,7 +18,7 @@ class All_Workspaces_Rail(ft.Container):
 
     
     # Constructor for our all_workspaces_rail object. Needs a page reference passed in
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, story: Story=None):
 
         #from models.user import user    # Always grabs updated reference when creating
 

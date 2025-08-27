@@ -15,11 +15,10 @@ class User:
 
         # Declares settings and workspace rail here, but we create/load them later in main
         self.settings = None
-        self.all_workspaces_rail = None   # All workspaces rail
+        #self.all_workspaces_rail = None   # All workspaces rail
         
         # Dict of all our stories.
         self.stories = {}
-
         
         # Load existing stories from the directory
         self.load_stories()
@@ -32,7 +31,6 @@ class User:
         # When settings is created, it uses default story if none exists
         self.active_story = self.stories['default_story']
 
-        
         
     # Called on program launch 
     def load_stories(self):
