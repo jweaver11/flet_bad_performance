@@ -1,6 +1,5 @@
 ''' Handler function for arranging our story object (widgets) to their correct pin locations '''
 
-from models.user import user
 import flet as ft
 
 
@@ -8,6 +7,8 @@ import flet as ft
 def arrange_widgets():
     ''' Arranges our widgets to their correct pin locations after a change is made to their pin location.
     Also adds widgets to their correct pin locations if they are missing from any pin location '''
+
+    from models.user import user    # Needs to import here for updated reference each time
     
     # Called later in the function when an objects 'pin_location' is not the same as its actual reference location
     def update_pin_location(obj):

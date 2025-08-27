@@ -4,6 +4,7 @@ Handles new workspace selections, re-ordering, collapsing, and expanding the rai
 
 import flet as ft
 from models.user import user
+import os
 from ui.rails.characters_rail import create_characters_rail
 from ui.rails.content_rail import create_content_rail
 from ui.rails.plot_timeline_rail import create_plot_and_timeline_rail
@@ -13,9 +14,12 @@ from ui.rails.notes_rail import create_notes_rail
 
 # Class so we can store our all workspaces rail as an object inside of user
 class All_Workspaces_Rail(ft.Container):
+
     
     # Constructor for our all_workspaces_rail object. Needs a page reference passed in
     def __init__(self, page: ft.Page):
+
+        #from models.user import user    # Always grabs updated reference when creating
 
         self.p = page   # Page reference
 
@@ -38,7 +42,7 @@ class All_Workspaces_Rail(ft.Container):
         self.reload_rail()
 
     # Called mostly when re-ordering or collapsing the rail. Also called on start
-    def reload_rail(self):
+    def reload_rail(self) -> ft.Control:
         ''' Reloads our rail, and applies the correct styles and controls based on the state of the rail '''
 
         # Holds our list of controls that we will add in the rail later
@@ -237,6 +241,7 @@ class All_Workspaces_Rail(ft.Container):
     def on_workspace_change(self, e):
         ''' Changes our selected workspace in settings and for our object.
         Applies the correct active rail to match the selection '''
+        from models.user import user    # Always grabs updated reference when changing workspace
         
         # Save our newly selected workspace in the settings, and save it for our object
         user.settings.data['selected_workspace'] = e.control.destinations[0].data
@@ -253,6 +258,7 @@ class All_Workspaces_Rail(ft.Container):
                 user.active_story.active_rail.content = create_characters_rail(self.p)
             elif self.selected_workspace == "plot_and_timeline":
                 user.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
+                user.active_story.active_rail.content = user.active_story.plot_and_timeline_rail
             elif self.selected_workspace == "world_building":
                 user.active_story.active_rail.content = create_world_building_rail(self.p)
             elif self.selected_workspace == "drawing_board":
@@ -269,6 +275,7 @@ class All_Workspaces_Rail(ft.Container):
     # Called by clicking button on bottom right of rail
     def toggle_collapse_rail(self, e=None):
         ''' Collapses or expands the rail, and saves the state in settings '''
+        from models.user import user    # Always grabs updated reference when collapsing/expanding
 
         # Disable reorder before collapsing if reorder is enabled
         if self.is_reorderable:
@@ -287,6 +294,7 @@ class All_Workspaces_Rail(ft.Container):
     # Called by clicking re-order rail button in the settings.
     def toggle_reorder_rail(self):
         ''' Toggles the reorderable state of the rail, and saves the state in settings '''
+        from models.user import user    # Always grabs updated reference when re-ordering
 
         # If we're collapsed, expand the rail first
         if self.is_collapsed:
@@ -304,6 +312,7 @@ class All_Workspaces_Rail(ft.Container):
     # Called whenever the rail is reordered
     def handle_rail_reorder(self, e: ft.OnReorderEvent):
         ''' Reorders our list based on the drag and drop, saves the new order in settings '''
+        from models.user import user    # Always grabs updated reference when re-ordering
 
         # Reorders our list based on the drag and drop
         item = self.workspaces_order.pop(e.old_index)

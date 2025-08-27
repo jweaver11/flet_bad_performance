@@ -14,8 +14,8 @@ class Story(ft.View):
     def __init__(self, title: str):
         # Parent constructor
         super().__init__(
-            route=f"/story/{title}",
-            padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
+            route=f"/{title}",    # Sets our route for our new story
+            padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # No padding for the page
         )  
        
         self.title = title # Gives our story a title when its created
@@ -24,8 +24,17 @@ class Story(ft.View):
         # Set our path needed to load the rest of our saved story data
         #self.path = os.path.join(data_paths.story_dicts_path, f"{self.title}.json")
         
-        # Declare our active rail, but the this will be set in main since it needs a page reference
+        # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
+        self.all_workspaces_rail = None  # Is a ft.Container
         self.active_rail = None     # Is a ft.Container
+
+        # Objects for our active rail content
+        self.content_rail = None  # Is an extended ft.Container
+        self.characters_rail = None  # Is an extended ft.Container
+        self.plot_and_timeline_rail = None  # Is an extended ft.Container
+        self.world_building_rail = None  # Is an extended ft.Container
+        self.drawing_board_rail = None  # Is an extended ft.Container
+        self.notes_rail = None  # Is an extended ft.Container
 
         data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
 
@@ -92,6 +101,7 @@ class Story(ft.View):
             from ui.active_rail import Active_Rail
             from ui.workspace import create_workspace
             from models.user import user
+            from models.settings import Settings
 
             page_title = "StoryBoard -- " + self.title + " -- Saved status"
 
@@ -103,9 +113,8 @@ class Story(ft.View):
             menubar = create_menu_bar(page)   
 
             # Create our rails inside of user so we can access it as an object and store preferences
-            user.all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
-            user.active_story.active_rail = Active_Rail(page)  # Container stored in story for the active rails
-
+            self.all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+            self.active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
             # Create our workspace container to hold our widgets
             workspace = create_workspace()  # render our workspace containing our widgets

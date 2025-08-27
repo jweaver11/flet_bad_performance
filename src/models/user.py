@@ -36,11 +36,9 @@ class User:
         
     # Called on program launch 
     def load_stories(self):
-        ''' Loads all stories from the stories directory into our user object '''
+        ''' Loads all stories from the stories directory into our story objects  '''
 
         from constants import data_paths
-
-        #print("Loading stories from directory...")
         
         # Check if stories directory exists
         if not os.path.exists(data_paths.stories_directory_path):

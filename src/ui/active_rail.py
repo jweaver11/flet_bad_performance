@@ -36,6 +36,12 @@ class Active_Rail(ft.Container):
     def reload_rail(self, page: ft.Page):
         ''' Reloads the active rail based on the selected workspace in all_workspaces_rail '''
 
+        # Check if all_workspaces_rail is initialized yet
+        if user.all_workspaces_rail is None:
+            # Default to content rail if all_workspaces_rail is not yet initialized
+            self.content = create_characters_rail(page)
+            print("Warning: all_workspaces_rail is None, defaulting to characters rail.")
+            return
 
         # Give us the correct rail on program startup based on our selected workspace
         if user.all_workspaces_rail.selected_workspace == "content":

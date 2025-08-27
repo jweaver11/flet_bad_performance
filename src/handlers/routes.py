@@ -9,7 +9,6 @@ def route_change(page: ft.Page, new_story: ft.View) -> ft.View:
 
     page.views.clear()  # Clear existing views 
 
-
     new_story.startup(page)  # Call startup to load story data and UI elements
 
     page.views.append(new_story)
