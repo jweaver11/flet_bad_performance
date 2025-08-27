@@ -2,7 +2,7 @@
 The main file to run the application.
 Initializes the user, settings, page data, and renders our UI onto the page
 '''
-# this is a test comment love cory
+
 import flet as ft
 from models.user import user
 from models.settings import Settings
