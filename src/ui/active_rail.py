@@ -1,11 +1,11 @@
 '''
-UI model for our active rail, which is stored at user.active_story.active_rail
+UI model for our active rail, which is stored at app.active_story.active_rail
 Keeps consistent styling and width between different workspace rails, 
 And gives us the correct rail on startup based on selected workspace
 '''
 
 import flet as ft
-from models.user import user
+from models.app import app
 from models.story import Story
 from ui.rails.characters_rail import create_characters_rail  
 from ui.rails.content_rail import create_content_rail
@@ -27,7 +27,7 @@ class Active_Rail(ft.Container):
             alignment=ft.alignment.center,  # Aligns content to the
             padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
             bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-            width=user.settings.data['active_rail_width'],  # Sets the width
+            width=app.settings.data['active_rail_width'],  # Sets the width
         )
 
         self.reload_rail(page, story)

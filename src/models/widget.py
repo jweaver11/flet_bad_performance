@@ -5,7 +5,7 @@ All objects contain a title, tag, page reference, pin location, tab color, and a
 '''
 
 import flet as ft
-from models.user import user
+from models.app import app
 from handlers.reload_workspace import reload_workspace
 from handlers.reload_workspace import show_pin_drag_targets
 
@@ -108,7 +108,7 @@ class Widget(ft.Container):
         self.hide_tab_icon.icon_color = ft.Colors.OUTLINE
         self.p.update()
 
-    # Called when user clicks the hide icon in the tab
+    # Called when app clicks the hide icon in the tab
     def hide_widget(self):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
@@ -123,7 +123,7 @@ class Widget(ft.Container):
         # Re-render the widgets to apply the changes
         reload_workspace(self.p)
 
-    # Called when user clicks the widget in the rail
+    # Called when app clicks the widget in the rail
     def show_widget(self):
         ''' Makes our widget visible for our workspace and updates the json to reflect the change '''
 

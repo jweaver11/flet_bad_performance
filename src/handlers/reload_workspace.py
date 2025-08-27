@@ -3,11 +3,11 @@ Render our widgets on the screen based on their pins.
 This also handles logic for dragging widgets into different pins and relocating them.
 '''
 import flet as ft
-from models.user import user
+from models.app import app
 import json
 from handlers.arrange_widgets import arrange_widgets
 
-story = user.active_story # Get our story object from the user
+story = app.active_story # Get our story object from the app
 
 # When a draggable starts dragging, we add our drag targets to the master stack
 def show_pin_drag_targets(e):
@@ -30,7 +30,7 @@ def remove_drag_targets():
     story.master_stack.update()
 
 # Called when a draggable hovers over a drag target before dropping
-# Makes the drag target visible to notify users they can drop here
+# Makes the drag target visible to notify apps they can drop here
 def on_hover_pin_drag_target(e):
     # e.control = whichever drag target is calling this method
     e.control.content.opacity = .5
@@ -402,8 +402,8 @@ def reload_workspace(page: ft.Page):
         story.widgets.update() # Update the main pin, as it is affected by all pins resizing
         story.master_stack.update()
     def save_top_pin_height(e: ft.DragEndEvent):
-        user.active_story.data['top_pin_height'] = story.top_pin.height
-        user.active_story.save_dict()
+        app.active_story.data['top_pin_height'] = story.top_pin.height
+        app.active_story.save_dict()
         
 
     # The control that holds our divider, which we drag to resize the top pin
@@ -427,8 +427,8 @@ def reload_workspace(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     def save_left_pin_width(e: ft.DragEndEvent):
-        user.active_story.data['left_pin_width'] = story.left_pin.width
-        user.active_story.save_dict()
+        app.active_story.data['left_pin_width'] = story.left_pin.width
+        app.active_story.save_dict()
     left_pin_resizer = ft.GestureDetector(
         content=ft.Container(
             width=10,
@@ -451,8 +451,8 @@ def reload_workspace(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     def save_right_pin_width(e: ft.DragEndEvent):
-        user.active_story.data['right_pin_width'] = story.right_pin.width
-        user.active_story.save_dict()
+        app.active_story.data['right_pin_width'] = story.right_pin.width
+        app.active_story.save_dict()
     right_pin_resizer = ft.GestureDetector(
         content=ft.Container(
             width=10,
@@ -473,8 +473,8 @@ def reload_workspace(page: ft.Page):
         story.widgets.update()
         story.master_stack.update()
     def save_bottom_pin_height(e: ft.DragEndEvent):
-        user.active_story.data['bottom_pin_height'] = story.bottom_pin.height
-        user.active_story.save_dict()
+        app.active_story.data['bottom_pin_height'] = story.bottom_pin.height
+        app.active_story.save_dict()
     bottom_pin_resizer = ft.GestureDetector(
         content=ft.Container(
             height=10,

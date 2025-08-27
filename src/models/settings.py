@@ -2,7 +2,7 @@
 
 import flet as ft
 import os
-from models.user import user
+from models.app import app
 from models.widget import Widget
 from constants.data_paths import settings_path
 import json
@@ -72,7 +72,7 @@ class Settings(Widget):
             self.save_dict()
             self.p.update()
 
-        # Dropdown so user can change their color scheme
+        # Dropdown so app can change their color scheme
         self.color_scheme_dropdown = ft.Dropdown(
             label="Theme Color",
             capitalization= ft.TextCapitalization.SENTENCES,    # Capitalize our options
@@ -89,7 +89,7 @@ class Settings(Widget):
             self.save_dict()  
 
             # Runs through all our characters, and updates their name color accordingly and reloads their widget
-            for char in user.active_story.characters:  
+            for char in app.active_story.characters:  
                 char.check_morality()
                 char.reload_widget() 
 
@@ -135,8 +135,8 @@ class Settings(Widget):
             ft.TextButton(
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
-                #on_click=lambda e: user.all_workspaces_rail.toggle_rail_reorderable()
-                on_click=lambda e: user.all_workspaces_rail.toggle_reorder_rail()
+                #on_click=lambda e: app.all_workspaces_rail.toggle_rail_reorderable()
+                on_click=lambda e: app.all_workspaces_rail.toggle_reorder_rail()
             ),
             self.change_name_colors,
             self.theme_button,

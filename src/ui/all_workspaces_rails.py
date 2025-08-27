@@ -1,9 +1,9 @@
 ''' UI model file to create our all_workspaces_rail on the left side of the screen.
-This object is stored in user.all_workspaces_rail.
+This object is stored in app.all_workspaces_rail.
 Handles new workspace selections, re-ordering, collapsing, and expanding the rail. '''
 
 import flet as ft
-from models.user import user
+from models.app import app
 from models.story import Story
 import os
 from ui.rails.characters_rail import create_characters_rail
@@ -13,24 +13,24 @@ from ui.rails.world_building_rail import create_world_building_rail
 from ui.rails.drawing_board_rail import create_drawing_board_rail
 from ui.rails.notes_rail import create_notes_rail
 
-# Class so we can store our all workspaces rail as an object inside of user
+# Class so we can store our all workspaces rail as an object inside of app
 class All_Workspaces_Rail(ft.Container):
 
     
     # Constructor for our all_workspaces_rail object. Needs a page reference passed in
     def __init__(self, page: ft.Page, story: Story=None):
 
-        #from models.user import user    # Always grabs updated reference when creating
+        #from models.app import app    # Always grabs updated reference when creating
 
         self.p = page   # Page reference
 
         # Our variables we store in the rail object so we are not constantly reading from settings
-        self.is_collapsed = user.settings.data['workspaces_rail_is_collapsed']
-        self.is_reorderable = user.settings.data['workspaces_rail_is_reorderable']
-        self.selected_workspace = user.settings.data['selected_workspace']
+        self.is_collapsed = app.settings.data['workspaces_rail_is_collapsed']
+        self.is_reorderable = app.settings.data['workspaces_rail_is_reorderable']
+        self.selected_workspace = app.settings.data['selected_workspace']
 
         # Saves our workspaces order, and the list we will add the controls too
-        self.workspaces_order = user.settings.data['workspaces_rail_order']
+        self.workspaces_order = app.settings.data['workspaces_rail_order']
 
         # Style our rail (container)
         super().__init__(
@@ -159,7 +159,7 @@ class All_Workspaces_Rail(ft.Container):
 
 
         # Goes through our workspace order, and adds the correct control to our list for the rail
-        # We do it this way so when the user re-orders the rail, it will save their changes
+        # We do it this way so when the app re-orders the rail, it will save their changes
         for workspace in self.workspaces_order:     # Just a list of strings
             if workspace == "content":
                 workspaces_rail.append(content_workspace)   # Add our corresponding workspace selector rail to the list
@@ -242,52 +242,52 @@ class All_Workspaces_Rail(ft.Container):
     def on_workspace_change(self, e):
         ''' Changes our selected workspace in settings and for our object.
         Applies the correct active rail to match the selection '''
-        from models.user import user    # Always grabs updated reference when changing workspace
+        from models.app import app    # Always grabs updated reference when changing workspace
         
         # Save our newly selected workspace in the settings, and save it for our object
-        user.settings.data['selected_workspace'] = e.control.destinations[0].data
-        user.settings.save_dict()
-        self.selected_workspace = user.settings.data['selected_workspace']
+        app.settings.data['selected_workspace'] = e.control.destinations[0].data
+        app.settings.save_dict()
+        self.selected_workspace = app.settings.data['selected_workspace']
 
         # We change the active rail here rather than when we reload it because...
         # the active rail is created after this object, so if when we reload the rail...
         # on program start, it will break the program.
-        if user.active_story is not None:
+        if app.active_story is not None:
             if self.selected_workspace == "content":    # Set the active_rail content to the new selection
-                user.active_story.active_rail.content = create_content_rail(self.p)
+                app.active_story.active_rail.content = create_content_rail(self.p)
             elif self.selected_workspace == "characters":
-                user.active_story.active_rail.content = create_characters_rail(self.p)
+                app.active_story.active_rail.content = create_characters_rail(self.p)
             elif self.selected_workspace == "plot_and_timeline":
-                user.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
-                user.active_story.active_rail.content = user.active_story.plot_and_timeline_rail
+                app.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
+                app.active_story.active_rail.content = app.active_story.plot_and_timeline_rail
             elif self.selected_workspace == "world_building":
-                user.active_story.active_rail.content = create_world_building_rail(self.p)
+                app.active_story.active_rail.content = create_world_building_rail(self.p)
             elif self.selected_workspace == "drawing_board":
-                user.active_story.active_rail.content = create_drawing_board_rail(self.p)
+                app.active_story.active_rail.content = create_drawing_board_rail(self.p)
             elif self.selected_workspace == "notes":
-                user.active_story.active_rail.content = create_notes_rail(self.p)
+                app.active_story.active_rail.content = create_notes_rail(self.p)
 
         # Handle when there is no active story (shouldn't happen)
         else:
-            user.active_story.active_rail.content = ft.Text("No active story")
+            app.active_story.active_rail.content = ft.Text("No active story")
 
         self.reload_rail()  # Reload the rail to apply the new selection
 
     # Called by clicking button on bottom right of rail
     def toggle_collapse_rail(self, e=None):
         ''' Collapses or expands the rail, and saves the state in settings '''
-        from models.user import user    # Always grabs updated reference when collapsing/expanding
+        from models.app import app    # Always grabs updated reference when collapsing/expanding
 
         # Disable reorder before collapsing if reorder is enabled
         if self.is_reorderable:
             self.is_reorderable = False
-            user.settings.data['workspaces_rail_is_reorderable'] = self.is_reorderable
-            user.settings.save_dict()
+            app.settings.data['workspaces_rail_is_reorderable'] = self.is_reorderable
+            app.settings.save_dict()
 
         # Toggle our collapsed state
         self.is_collapsed = not self.is_collapsed
-        user.settings.data['workspaces_rail_is_collapsed'] = self.is_collapsed
-        user.settings.save_dict()
+        app.settings.data['workspaces_rail_is_collapsed'] = self.is_collapsed
+        app.settings.save_dict()
         
         self.reload_rail()  # Reload the rail to apply changes
 
@@ -295,33 +295,33 @@ class All_Workspaces_Rail(ft.Container):
     # Called by clicking re-order rail button in the settings.
     def toggle_reorder_rail(self):
         ''' Toggles the reorderable state of the rail, and saves the state in settings '''
-        from models.user import user    # Always grabs updated reference when re-ordering
+        from models.app import app    # Always grabs updated reference when re-ordering
 
         # If we're collapsed, expand the rail first
         if self.is_collapsed:
             self.is_collapsed = False
-            user.settings.data['workspaces_rail_is_collapsed'] = self.is_collapsed
-            user.settings.save_dict()
+            app.settings.data['workspaces_rail_is_collapsed'] = self.is_collapsed
+            app.settings.save_dict()
 
         # Toggle our reorderable state, and save it in settings
         self.is_reorderable = not self.is_reorderable
-        user.settings.data['workspaces_rail_is_reorderable'] = self.is_reorderable
-        user.settings.save_dict()
+        app.settings.data['workspaces_rail_is_reorderable'] = self.is_reorderable
+        app.settings.save_dict()
 
         self.reload_rail()  # Reload the rail to apply changes
 
     # Called whenever the rail is reordered
     def handle_rail_reorder(self, e: ft.OnReorderEvent):
         ''' Reorders our list based on the drag and drop, saves the new order in settings '''
-        from models.user import user    # Always grabs updated reference when re-ordering
+        from models.app import app    # Always grabs updated reference when re-ordering
 
         # Reorders our list based on the drag and drop
         item = self.workspaces_order.pop(e.old_index)
         self.workspaces_order.insert(e.new_index, item)
         
         # Save the new order to settings
-        user.settings.data['workspaces_rail_order'] = self.workspaces_order
-        user.settings.save_dict()
+        app.settings.data['workspaces_rail_order'] = self.workspaces_order
+        app.settings.save_dict()
 
         self.reload_rail()  # Reload the rail to apply changes
         

@@ -5,7 +5,7 @@ the create 'character button' at the bottom.
 '''
 
 import flet as ft
-from models.user import user
+from models.app import app
 from models.character import Character
 from handlers.reload_workspace import reload_workspace
 import json
@@ -27,7 +27,7 @@ def hide_options(e):
     e.control.content.controls[2].update()
     
 
-# Called when user clicks rename button on the character on the rail
+# Called when app clicks rename button on the character on the rail
 def rename_character(character, page: ft.Page):
     ''' Opens a dialog to rename the character object '''
 
@@ -56,7 +56,7 @@ def rename_character(character, page: ft.Page):
         reload_character_rail(page)
         reload_workspace(page)
 
-        # Open a snackbar alert to confirm to the user that the char was renamed
+        # Open a snackbar alert to confirm to the app that the char was renamed
         page.open(
             ft.SnackBar(
                 bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
@@ -111,13 +111,13 @@ def change_character_color(character: Character, color, page: ft.Page):
     page.update()
 
 
-# Called when user clicks the delete button on the character on the rail
+# Called when app clicks the delete button on the character on the rail
 def delete_character(character, page: ft.Page):
     ''' Opens a dialog to confirm the deletion of the character object '''
 
     print("delete character called")
 
-    # Called when user confirms the deletion of the character
+    # Called when app confirms the deletion of the character
     def del_char(character):
         ''' Handles the logic for deleting a character '''
 
@@ -126,13 +126,13 @@ def delete_character(character, page: ft.Page):
         page.update()
 
         # Deletes the object from our live story object
-        user.active_story.delete_object(character)
+        app.active_story.delete_object(character)
 
         # Reloads the character rail and widgets to reflect the changes
         reload_character_rail(page)
         reload_workspace(page)
 
-        # Open a snackbar alert to confirm to the user that the char was deleted
+        # Open a snackbar alert to confirm to the app that the char was deleted
         page.open(
             ft.SnackBar(
                 bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
@@ -167,7 +167,7 @@ def delete_character(character, page: ft.Page):
     page.update()
 
 
-# Called when the user clicks the 'plus' buttons under either main, side, or background characters
+# Called when the app clicks the 'plus' buttons under either main, side, or background characters
 def create_character(role_tag, page: ft.Page):
     ''' Opens a dialog to submit the name our the new character. 
     Accepts a role_tag depending on which category was clicked, and adds character to that category. '''
@@ -199,7 +199,7 @@ def create_character(role_tag, page: ft.Page):
                 new_character.data["Role"] = "Background"
 
             # Adds our new character to the story
-            user.active_story.save_object(new_character)
+            app.active_story.save_object(new_character)
             reload_character_rail(page)   
             reload_workspace(page)  
 
@@ -233,7 +233,7 @@ def create_character(role_tag, page: ft.Page):
     def check_character(name) -> bool:
         ''' Checks all our characters names and makes sure the name is unique '''
 
-        for character in user.active_story.characters:
+        for character in app.active_story.characters:
             if character.title.lower() == name.lower():
                 page.open(
                     ft.SnackBar(
@@ -258,7 +258,7 @@ def create_character(role_tag, page: ft.Page):
     page.update()
 
 
-# Called when user drags a character to a new category in the rail
+# Called when app drags a character to a new category in the rail
 def make_main_character(e, page: ft.Page):
     ''' Changes the character role to main when dragged onto rail. Phasing out.'''
     # Phasing out ^ because moving to folder storage rather than roles
@@ -290,7 +290,7 @@ def make_main_character(e, page: ft.Page):
     # Reload our character rail to reflect the changes
     reload_character_rail(page) 
 
-# Called when user drags a character to the side category in the rail
+# Called when app drags a character to the side category in the rail
 def make_side_character(e, page: ft.Page):
     ''' Changes the character role to side when dragged onto rail.'''
 
@@ -314,7 +314,7 @@ def make_side_character(e, page: ft.Page):
 
     reload_character_rail(page)
 
-# Called when user drags a character to the background category in the rail
+# Called when app drags a character to the background category in the rail
 def make_background_character(e, page: ft.Page):
     ''' Changes the character role to background when dragged onto rail '''
 
@@ -402,7 +402,7 @@ def reload_character_rail(page: ft.Page):
     background_characters.controls.clear()
 
     # Run through each character in our story
-    for character in user.active_story.characters:
+    for character in app.active_story.characters:
         # Create a new character tile for the rail
 
         new_char = ft.Draggable(

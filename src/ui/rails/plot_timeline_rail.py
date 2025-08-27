@@ -4,7 +4,7 @@ import flet as ft
 
 
 def create_plot_and_timeline_rail(page: ft.Page) -> ft.Control:
-    from models.user import user  # Needs to import here for updated reference each time
+    from models.app import app  # Needs to import here for updated reference each time
  
     return ft.Column(
         spacing=0,
@@ -12,7 +12,7 @@ def create_plot_and_timeline_rail(page: ft.Page) -> ft.Control:
         controls=[
             ft.Text("Plot and Timeline Rail"),
             ft.Text("From the story: "),
-            ft.Text(user.active_story.title)
+            ft.Text(app.active_story.title)
             # Add more controls here as needed
         ]
     )

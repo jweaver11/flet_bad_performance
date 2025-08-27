@@ -5,7 +5,7 @@ Holds our settings icon, feedback, and account name as well
 
 import flet as ft
 from constants import data_paths
-from models.user import user
+from models.app import app
 from handlers.reload_workspace import remove_drag_targets
 from handlers.reload_workspace import reload_workspace
 
@@ -34,8 +34,8 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
         def submit_new_story(title: str):
             ''' Creates a new story with the given title '''
-            user.create_new_story(title)
-            #user.active_story = new_story
+            app.create_new_story(title)
+            #app.active_story = new_story
             print(f"New story created with title: {title}")
             dlg.open = False
             reload_workspace(page)
@@ -61,9 +61,9 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
 
         title = "new_story"
-        new_story = user.create_new_story(title)
+        new_story = app.create_new_story(title)
 
-        user.active_story = new_story
+        app.active_story = new_story
 
     def handle_file_open_click(e):
         ''' Placeholder for open story click event '''
@@ -74,7 +74,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
             list = []
 
-            for story in user.stories:
+            for story in app.stories:
                 list.append(ft.Text(story))
 
             return list
@@ -199,11 +199,11 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
     def settings_clicked(e):
         ''' Toggles the visibility of the settings widget in the menubar '''
 
-        user.settings.change_visibility()
-        if user.settings.data['visible']:
-            user.settings.show_widget()
+        app.settings.change_visibility()
+        if app.settings.data['visible']:
+            app.settings.show_widget()
         else:
-            user.settings.hide_widget()
+            app.settings.hide_widget()
 
         reload_workspace(page)  # Re-render the page to show/hide settings
 
@@ -212,14 +212,14 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         
         from handlers.routes import route_change
 
-        route_change(page, user.stories['default_story'])
+        route_change(page, app.stories['default_story'])
         
 
     def view2(e):
         print("View 2")
         from handlers.routes import route_change
 
-        route_change(page, user.stories['test_story_1'])
+        route_change(page, app.stories['test_story_1'])
         
     # Return our formatted menubar
     return ft.Container(
@@ -240,7 +240,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button
-                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # users account name
+                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
             ]
         )
     )

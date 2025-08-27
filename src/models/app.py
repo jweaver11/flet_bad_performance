@@ -1,5 +1,5 @@
 '''
-Our user of the application. This model stores their info and certain UI elements,
+Our app of the application. This model stores their info and certain UI elements,
 and their stories. It is a dead end file, that only imports the story model meaning...
 All other files can import this function without issues
 '''
@@ -9,7 +9,7 @@ import os
 import flet as ft
 
 
-class User:
+class App:
     # Constructor
     def __init__(self):
 
@@ -71,7 +71,7 @@ class User:
         self.active_story = self.stories[self.settings.data['active_story']]
 
 
-    # Called when user creates a new story
+    # Called when app creates a new story
     def create_new_story(self, title: str) -> Story:
         ''' Creates the new story object, then saves it to a new folder WIP '''
         
@@ -87,5 +87,5 @@ class User:
     
 
 
-# Sets our global user object
-user = User()
+# Sets our global app object
+app = App()

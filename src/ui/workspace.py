@@ -6,7 +6,7 @@ Overtop that, we append our drag targets when we start dragging a widget (tab). 
 '''
 
 import flet as ft
-from models.user import user
+from models.app import app
 from models.story import Story
 
 # Function to return our container for our widgets
@@ -17,7 +17,7 @@ def create_workspace(story: Story=None) -> ft.Container:
         return ft.Container(
             expand=True,
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
-            content=user.active_story.master_stack,   
+            content=app.active_story.master_stack,   
         )
     
     else:

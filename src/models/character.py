@@ -1,13 +1,13 @@
 '''
 Most model classes really container 2 models: the character model itself and the associated widget model.
 Inside of the 'data' dict, we store our characters model for the manipulative data...
-the user will change. Everything else is built upon program launch so we can display it in the UI.
+the app will change. Everything else is built upon program launch so we can display it in the UI.
 '''
 
 import flet as ft
 import json
 import os
-from models.user import user
+from models.app import app
 from models.widget import Widget
 from constants.data_paths import characters_path
 
@@ -70,7 +70,7 @@ class Character(Widget):
             'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
             'sex_color': "primary",    # Color of selected option in sex dropdown
 
-            'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but user can still change it  
+            'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but app can still change it  
             'Morality': "",
             'Sex': "",
             'Age': "",   # Text field
@@ -238,7 +238,7 @@ class Character(Widget):
     # Called by the changes in characters morality. Changes the name_color property to reflect those changes
     def check_morality(self, e=None):
         # If we have the setting turned on to change char name colors, change them
-        if user.settings.change_name_colors.value == True:
+        if app.settings.change_name_colors.value == True:
             print("color changing is true, we running the logic")
             # Check the morality and change color accordingly
             if self.data['Morality'] == "Good":
@@ -257,7 +257,7 @@ class Character(Widget):
         # If setting is turned off for char name colors, make all characters name_color the primary color scheme
         else:
             print("Color changing disabled, turning off all their colors")
-            for character in user.active_story.characters:
+            for character in app.active_story.characters:
                 character.name_color = ft.Colors.PRIMARY
             # Apply our changes
             self.p.update()
@@ -328,7 +328,7 @@ class Character(Widget):
     # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
     def check_morality(self):
         # If we have the setting turned on to change char name colors, change them
-        if user.settings.change_name_colors.value == True:
+        if app.settings.change_name_colors.value == True:
             print("color changing is true, we running the logic")
             # Check the morality and change color accordingly
             if self.data['Morality'].data == "Good":
@@ -349,7 +349,7 @@ class Character(Widget):
         # If setting is turned off for char name colors, make all characters name_color the primary color scheme
         else:
             print("Color changing disabled, turning off all their colors")
-            for character in user.active_story.characters:
+            for character in app.active_story.characters:
                 character.name_color = ft.Colors.PRIMARY
             # Apply our changes
             self.p.update()

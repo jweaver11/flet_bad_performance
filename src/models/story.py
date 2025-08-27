@@ -102,7 +102,7 @@ class Story(ft.View):
             from ui.all_workspaces_rails import All_Workspaces_Rail
             from ui.active_rail import Active_Rail
             from ui.workspace import create_workspace
-            from models.user import user
+            from models.app import app
             from models.settings import Settings
 
             page_title = "StoryBoard -- " + self.title + " -- Saved status"
@@ -111,7 +111,7 @@ class Story(ft.View):
             # Create our page elements as their own pages so they can update
             menubar = create_menu_bar(page)
 
-            # Create our rails inside of user so we can access it as an object and store preferences
+            # Create our rails inside of app so we can access it as an object and store preferences
             self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
             self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
 
@@ -129,31 +129,31 @@ class Story(ft.View):
             def move_active_rail_divider(e: ft.DragUpdateEvent):
                 ''' Responsible for altering the width of the active rail '''
 
-                if (e.delta_x > 0 and user.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and user.active_story.active_rail.width > 100):
-                    user.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
+                if (e.delta_x > 0 and app.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and app.active_story.active_rail.width > 100):
+                    app.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
                     
                 page.update()   # Apply our changes to the rest of the page
 
-            # Called when user stops dragging the resizer to resize the active rail
+            # Called when app stops dragging the resizer to resize the active rail
             def save_active_rail_width(e: ft.DragEndEvent):
-                ''' Saves our new width that will be loaded next time user opens the app '''
+                ''' Saves our new width that will be loaded next time app opens the app '''
 
-                user.settings.data['active_rail_width'] = user.active_story.active_rail.width
-                user.settings.save_dict()
-                print("Active rail width: " + str(user.active_story.active_rail.width))
+                app.settings.data['active_rail_width'] = app.active_story.active_rail.width
+                app.settings.save_dict()
+                print("Active rail width: " + str(app.active_story.active_rail.width))
 
             # The actual resizer for the active rail (gesture detector)
             active_rail_resizer = ft.GestureDetector(
                 content=ft.Container(
                     width=10,   # Total width of the GD, so its easier to find with mouse
                     bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
-                    # Thin vertical divider, which is what the user will actually drag
+                    # Thin vertical divider, which is what the app will actually drag
                     content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
                     padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
                 ),
                 on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
-                on_pan_update=move_active_rail_divider, # Resize the active rail as user is dragging
-                on_pan_end=save_active_rail_width,  # Save the resize when user is done dragging
+                on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
+                on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
             )
 
             # Save our 2 rails, divers, and our workspace container in a row
