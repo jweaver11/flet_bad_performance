@@ -11,7 +11,7 @@ from constants import data_paths
 
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str, page: ft.Page=None):
+    def __init__(self, title: str, page: ft.Page):
         
         # Parent constructor
         super().__init__(

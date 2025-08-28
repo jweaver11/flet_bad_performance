@@ -8,7 +8,7 @@ from models.app import app
 from handlers.route_change import route_change
 from constants.init import init_settings, init_load_saved_stories
 from models.settings import Settings
-from ui.all_workspaces_rails import All_Workspaces_Rail
+from ui.all_workspaces_rails import All_Workspaces_Rail, No_Story_Rail
 from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
 from handlers.reload_workspace import reload_workspace
@@ -19,12 +19,15 @@ from ui.workspace import create_workspace
 # Main function
 def main(page: ft.Page):
 
-    # Set our route change function to be called on route changes
+    # Set initial route and our route change function to be called on route changes
+    page.route = "/"
     page.on_route_change = route_change 
+
+
     
     # Initializes our settings, stories
     init_settings(page)
-    init_load_saved_stories(page)   # Loads our active story as well
+    init_load_saved_stories(page)   # Changes route to active story if there is one
 
     # Otherwise, let main load a blank view with a large button to create first story
 
@@ -43,25 +46,14 @@ def main(page: ft.Page):
     #page_title = "StoryBoard -- " + app.settings.data['active_story'] + " -- Saved status"
 
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)
-    page.theme = ft.Theme(color_scheme_seed=app.settings.data['theme_color_scheme'])
-    page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data['theme_color_scheme'])
-    page.theme_mode = app.settings.data['theme_mode']
+    page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))
+    page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))
+    page.theme_mode = app.settings.data.get('theme_mode', 'dark')
    
     # Sets the title of our app, padding, and maximizes the window
     page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
-    page.window.maximized = True
+    page.window.maximized = app.settings.data.get('window_maximized', True)
 
-
-    # Create our page elements as their own pages so they can update
-    menubar = create_menu_bar(page)   
-
-    # Create our rails inside of app so we can access it as an object and store preferences
-    all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
-    #app.active_story.active_rail = Active_Rail(page)  # Container stored in story for the active rails
-
-
-    # Create our workspace container to hold our widgets
-    workspace = create_workspace()  # render our workspace containing our widgets
 
     # Called to create the page view if no stories exist
     def create_page_if_no_stories_exist() -> ft.Control:
@@ -74,7 +66,7 @@ def main(page: ft.Page):
 
 
         # Create our rails inside of app so we can access it as an object and store preferences
-        all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+        all_workspaces_rail = No_Story_Rail(page)  # Create our all workspaces rail
         active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
         # Create our workspace container to hold our widgets
@@ -98,16 +90,16 @@ def main(page: ft.Page):
         )
 
         # Format our page. Add our menubar at the top, then then our row built above
-        col = ft.Column(
+        view = ft.View(
             spacing=0, 
-            expand=True, 
+            padding=ft.padding.only(top=0, left=0, right=0, bottom=0),
             controls=[
                 menubar, 
                 row,
             ]
         )
         
-        return page.add(col)
+        return view
 
     # Called if there is no active story, but stories do exist
     def create_page_if_no_stories_active() -> ft.Control:
@@ -119,7 +111,7 @@ def main(page: ft.Page):
         menubar = create_menu_bar(page)   
 
         # Create our rails inside of app so we can access it as an object and store preferences
-        all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
+        all_workspaces_rail = No_Story_Rail(page)  # Create our all workspaces rail
         active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
         # Create our workspace container to hold our widgets
@@ -142,16 +134,16 @@ def main(page: ft.Page):
         )
 
         # Format our page. Add our menubar at the top, then then our row built above
-        col = ft.Column(
+        view = ft.View(
             spacing=0, 
-            expand=True, 
+            padding=ft.padding.only(top=0, left=0, right=0, bottom=0),
             controls=[
                 menubar, 
                 row,
             ]
         )
         
-        return page.add(col)
+        return view
 
 
     # Called when hovering over resizer to right of the active rail
@@ -210,20 +202,20 @@ def main(page: ft.Page):
 
 
     # Load our story view if there is an active story
-    if page.route != "/":
-        page.go(page.route)
-        page.views.clear()
+
+    # Set our route when no active story exists
+    if page.route == "/":
         
-        page.views.append(app.stories[app.settings.data['active_story']])
-        #print("Setting to active story: ", app.settings.data['active_story'])
-        page.update()
-    else:
+        page.views.clear()
+
         if len(app.stories) == 0:
             page.views.append((create_page_if_no_stories_exist()))
             print("No stories exist")
         else:
-            page.add(create_page_if_no_stories_active())
+            page.views.append((create_page_if_no_stories_active()))
             print("Stories exist, but no active story")
+        
+    page.update()
 
 
 # Runs the app

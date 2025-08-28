@@ -34,11 +34,12 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
         def submit_new_story(title: str):
             ''' Creates a new story with the given title '''
-            app.create_new_story(title)
-            #app.active_story = new_story
+
+            app.create_new_story(title, page) # Needs the story object
+            
             print(f"New story created with title: {title}")
+
             dlg.open = False
-            reload_workspace(page)
             page.update()
 
 
@@ -57,11 +58,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         page.overlay.append(dlg)
         page.update()
 
-        
-        title = "new_story"
-        new_story = app.create_new_story(title)
 
-        app.active_story = new_story
 
     def handle_file_open_click(e):
         ''' Placeholder for open story click event '''

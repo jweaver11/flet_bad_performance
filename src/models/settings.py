@@ -181,6 +181,7 @@ class Settings(Widget):
             'visible': False,   # If our settings widget is visible or not
             'pin_location': "main", 
             'active_story': "/",    # this works as a route for the correct story
+            'is_maximized': True,   # If the window is maximized or not
             
             'tab_color': "blue",        # the tab color
             'theme_mode': "dark",       # the apps theme mode, dark or light
