@@ -256,7 +256,7 @@ def reload_workspace(page: ft.Page, story: Story):
     ''' Rebuilds our workspace area with our five pins, formatting, and all logic associated with it '''
 
     # Runs our arrange widgets function to make sure all widgets are in correct locations
-    arrange_widgets(story)
+    #arrange_widgets(story)
     
 
     # Change our cursor when we hover over a resizer (divider). Either vertical or horizontal

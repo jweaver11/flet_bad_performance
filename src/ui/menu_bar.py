@@ -141,7 +141,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
             nonlocal selected_story
             selected_story = e.control.text
-            print("Selected story: ", selected_story)
+            #print("Selected story: ", selected_story)
 
         # Returns a list of all story titles available to open
         def get_stories_list() -> list[ft.Control]:
@@ -160,7 +160,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         def open_selected_story(e):
             ''' Changes the route to the selected story '''
 
-            print("Open button clicked, selected story is: ", selected_story)
+            #print("Open button clicked, selected story is: ", selected_story)
 
             if selected_story is not None:
                 print("Opening story: ", selected_story)
@@ -300,17 +300,6 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
         reload_workspace(page)  # Re-render the page to show/hide settings
 
-    def view1(e):
-
-        page.route = app.stories['default_story'].route
-        page.update()
-        
-
-    def view2(e):
-
-        page.route = app.stories['test_story_1'].route
-        page.update()
-
         
     # Return our formatted menubar
     return ft.Container(
@@ -323,9 +312,6 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                 menubar,    # Menubar on left
                 ft.Container(expand=True),  # empty space in middle of menubar
                 # Fix broken widgets button
-
-                ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view1),
-                ft.IconButton(icon=ft.Icons.BUNGALOW, on_click=view2),
 
 
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),

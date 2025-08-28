@@ -20,18 +20,14 @@ class Story(ft.View):
         )  
        
         self.title = title # Gives our story a title when its created
-        self.p = page  # Reference to our page object for updating UI elements
-
-
-        # Set our path needed to load the rest of our saved story data
-        #self.path = os.path.join(data_paths.story_dicts_path, f"{self.title}.json")
+        self.p = page  # Reference to our page object for updating UI elements. Sometimes we need it, sometimes not
         
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
-        self.all_workspaces_rail = None  # Is a ft.Container
-        self.active_rail = None     # Is a ft.Container
+        self.all_workspaces_rail = None  # Is a extended ft.Container
+        self.active_rail = None     # Is a extended ft.Container
+        self.workspace = None   # Is a extended ft.Container
 
         # Objects for our active rail content
-        # PASS OUR OBJECTS INTO THE OBJECTS OF OUR STORY
         self.content_rail = None  # Is an extended ft.Container
         self.characters_rail = None  # Is an extended ft.Container
         self.plot_and_timeline_rail = None  # Is an extended ft.Container
@@ -65,25 +61,8 @@ class Story(ft.View):
             folder_path = os.path.join(data_paths.notes_path,  folder)
             os.makedirs(folder_path, exist_ok=True)
 
-        # Metadata for our story. Set or loaded in the load_dict method
-
         # Create story metadata file
         self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
-
-        # Creates our 5 pin locations for our widgets. Initially set heights and widths for comparison logic when rendering
-        self.top_pin = ft.Row(spacing=0, controls=[])
-        self.left_pin = ft.Column(spacing=0, controls=[])
-        self.main_pin = ft.Row(expand=True, spacing=0, controls=[])
-        self.right_pin = ft.Column(spacing=0, controls=[])
-        self.bottom_pin = ft.Row(spacing=0, controls=[])
-
-        # Our master row that holds all our widgets
-        self.widgets = ft.Row(spacing=0, expand=True, controls=[])
-
-        # Master stack that holds our widgets ^ row. We add our drag targets overtop our widgets, so we use a stack here
-        # And our drag targets when we start dragging widgets.
-        # We use global stack like this so there is always a drag target, even if a pin is empty
-        self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
 
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
@@ -181,10 +160,10 @@ class Story(ft.View):
                 self.title = self.data.get('title', self.title)  # Update title in case it was changed
 
                 # Set our saved pin sizes
-                self.top_pin.height = self.data.get('top_pin_height', 0)
-                self.left_pin.width = self.data.get('left_pin_width', 0)
-                self.right_pin.width = self.data.get('right_pin_width', 0)
-                self.bottom_pin.height = self.data.get('bottom_pin_height', 0)
+                #self.top_pin.height = self.data.get('top_pin_height', 0)
+                #self.left_pin.width = self.data.get('left_pin_width', 0)
+                #self.right_pin.width = self.data.get('right_pin_width', 0)
+                #self.bottom_pin.height = self.data.get('bottom_pin_height', 0)
             else:
                 # File doesn't exist, use default data
                 self.data = default_data
@@ -204,7 +183,7 @@ class Story(ft.View):
         from ui.menu_bar import create_menu_bar
         from ui.all_workspaces_rails import All_Workspaces_Rail
         from ui.active_rail import Active_Rail
-        from ui.workspace import create_workspace
+        from ui.workspace import create_workspace, Workspace
         from models.app import app
 
         # Clear our controls in our view before building it
@@ -213,12 +192,10 @@ class Story(ft.View):
         # Create our page elements as their own pages so they can update
         menubar = create_menu_bar(page)
 
-        # Create our rails inside of app so we can access it as an object and store preferences
+        # Create our rails and workspace objects
         self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
-
-        # Create our workspace container to hold our widgets
-        workspace = create_workspace(page, self)  # render our workspace containing our widgets
+        self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
 
         # Called when hovering over resizer to right of the active rail
         def show_horizontal_cursor(e: ft.HoverEvent):
@@ -270,7 +247,7 @@ class Story(ft.View):
                 self.active_rail,    # Rail for the selected workspace
                 active_rail_resizer,   # Divider between rail and work area
                 
-                workspace,    # Work area for pagelets
+                self.workspace,    # Work area for pagelets
             ],
         )
 
@@ -284,7 +261,7 @@ class Story(ft.View):
             ]
         )
 
-        self.controls.append(col)
+        self.controls = [menubar, row]
 
         
     # Called when saving new objects to the story (characters, chapters, etc.)

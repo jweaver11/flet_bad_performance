@@ -15,7 +15,6 @@ from ui.rails.notes_rail import create_notes_rail
 
 # Class so we can store our all workspaces rail as an object inside of app
 class All_Workspaces_Rail(ft.Container):
-
     
     # Constructor for our all_workspaces_rail object. Needs a page reference passed in
     def __init__(self, page: ft.Page, story: Story):
