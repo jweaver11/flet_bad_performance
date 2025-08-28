@@ -20,30 +20,15 @@ from ui.workspace import create_workspace
 def main(page: ft.Page):
 
     # Set initial route and our route change function to be called on route changes
-    page.route = "/"
+    page.route = "/"    # This is changed by any the active story if there is one inside of init_load_saved_stories
     page.on_route_change = route_change 
-
 
     
     # Initializes our settings, stories
     init_settings(page)
     init_load_saved_stories(page)   # Changes route to active story if there is one
 
-    # Otherwise, let main load a blank view with a large button to create first story
 
-
-
-
-    # Grabs our active story, and loads all our data into its objects for the program
-    #if app.active_story is not None:
-        #app.active_story.startup(page)
-
-    # Adds our page title
-    # If settings.active_story is not None:
-    #     page_title = "StoryBoard -- " + settings.active_story.title + " -- Saved status"
-    # else:
-    #     page_title = "StoryBoard"
-    #page_title = "StoryBoard -- " + app.settings.data['active_story'] + " -- Saved status"
 
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)
     page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))
@@ -184,33 +169,16 @@ def main(page: ft.Page):
         on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
     )
 
-    # Build our page we the column we created
-    #page.add(col)
-    #create_page_if_no_stories_active()
-
-    #if app.active_story is not None:
-        #page.go(app.active_story.route)  # Goes to our active story route if it exists
-        #page.views.append(app.active_story)  # Adds our active story as a view so we can go back to it
-    #else:
-        #page.add(col)
-
-    # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-    #reload_workspace(page) 
-
-    #page.views.pop()
-    #page.views.append(app.active_story)
-
-
-    # Load our story view if there is an active story
-
-    # Set our route when no active story exists
+    # If we loaded our stories, and there is no active story, we load 1 of 2 views
     if page.route == "/":
-        
+
         page.views.clear()
 
+        # If no stories exist, load this view
         if len(app.stories) == 0:
             page.views.append((create_page_if_no_stories_exist()))
             print("No stories exist")
+        # If stories exist, but no active story, load this view
         else:
             page.views.append((create_page_if_no_stories_active()))
             print("Stories exist, but no active story")

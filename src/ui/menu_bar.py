@@ -35,6 +35,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         def submit_new_story(title: str):
             ''' Creates a new story with the given title '''
 
+            # Needs to check if title is unique
             app.create_new_story(title, page) # Needs the story object
             
             print(f"New story created with title: {title}")

@@ -46,6 +46,7 @@ class App:
         
         # Create a new story object and add it to our stories dict
         self.stories[title] = Story(title, page)
+        self.stories[title].startup()
 
         page.route = self.stories[title].route
 
