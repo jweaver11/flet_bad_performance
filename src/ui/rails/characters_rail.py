@@ -174,15 +174,21 @@ def create_character(role_tag, page: ft.Page):
 
     print("create character clicked")
 
-    # Create a reference for the dialog text field
-    dialog_textfield_ref = ft.Ref[ft.TextField]()
+
+    textfield = ft.TextField(
+        label="Character Name",
+        hint_text="Enter character name",
+        on_submit=create_new_character,  # When enter is pressed
+        autofocus=True,  # Focus on this text field when dialog opens
+    )
     
     # Called upon submission of the new name in the dialog to create the new character
     def create_new_character(e):
         ''' Handles the logic for creating a new character '''
+        from models.story import Story
 
-        # Grab our name from the dialog
-        name = dialog_textfield_ref.current.value 
+        # Grab our name from the textfield
+        name = textfield.value 
         if name and name.strip() and check_character(name):   
             name = name.strip()
             name = name.capitalize()  # Auto capitalize names
@@ -214,13 +220,7 @@ def create_character(role_tag, page: ft.Page):
     # Our actual dialog that pops up when the add character button is clicked
     dlg = ft.AlertDialog(
         title=ft.Text("Enter Character Name"), 
-        content=ft.TextField(
-            ref=dialog_textfield_ref,
-            label="Character Name",
-            hint_text="Enter character name",
-            on_submit=create_new_character,  # When enter is pressed
-            autofocus=True,  # Focus on this text field when dialog opens
-        ),
+        content=textfield,
         # Our two action buttons in the dialog
         actions=[
             ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),

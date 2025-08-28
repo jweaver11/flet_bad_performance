@@ -394,3 +394,26 @@ class Story(ft.View):
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
 
+
+    # Called to create a character object
+    def create_character(self, title: str):
+        ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
+
+        from models.character import Character
+
+        # Create the character object
+        character = Character(title, self.p)
+
+        # Save it to our live story object
+        self.save_object(character)
+
+        # Save its data to storage
+        #character.save_dict()
+
+        # Update the page to show the new character in the characters rail if its active
+        self.p.update()
+
+        #self.workspace.reload_workspace(self.p, self)
+
+        return character
+

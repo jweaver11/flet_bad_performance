@@ -13,7 +13,11 @@ def create_plot_and_timeline_rail(page: ft.Page, story: Story) -> ft.Control:
         controls=[
             ft.Text("Plot and Timeline Rail"),
             ft.Text("From the story: "),
-            ft.Text(story.title)
+            ft.Text(story.title),
+            ft.TextButton(
+                "create character",
+                on_click=story.create_character("John Doe")
+            )
             # Add more controls here as needed
         ]
     )

@@ -133,4 +133,5 @@ class Widget(ft.Container):
             self.data['visible'] = True
             self.save_dict()
             
-        reload_workspace(self.p)
+        self.p.update()
+        #reload_workspace(self.p)

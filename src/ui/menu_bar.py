@@ -298,7 +298,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         else:
             app.settings.hide_widget()
 
-        reload_workspace(page)  # Re-render the page to show/hide settings
+        #reload_workspace(page)  # Re-render the page to show/hide settings
 
         
     # Return our formatted menubar
