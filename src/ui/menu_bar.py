@@ -31,20 +31,13 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         pass
 
 
-    # Called when file->new is clicked
-    def create_new_story_clicked(e):
-        ''' Placeholder for new story click event '''
+    # Called when file -> new is clicked
+    def handle_create_new_story_clicked(e):
+        ''' Opens a dialog to create a new story. Checks story is unique or not '''
         #print("New Story Clicked")
 
         # Variable to track if the title is unique
         is_unique = True
-
-        
-        # Called by clicking off the dialog or cancel button
-        def close_dialog(e):
-            ''' Closes the dialog '''
-            dlg.open = False
-            page.update()
 
         def submit_new_story(e):
             ''' Creates a new story with the given title '''
@@ -120,7 +113,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
             # Our two action buttons at the bottom of the dialog
             actions=[
-                ft.TextButton("Cancel", on_click=close_dialog, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("Cancel", on_click=page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
                 ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field)),
             ],
         )
@@ -131,30 +124,64 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         page.update()
 
 
-
+    # Called when file -> open is clicked
     def handle_file_open_click(e):
-        ''' Placeholder for open story click event '''
-        print("Open Story Clicked")
+        ''' Opens a dialog to open an existing story '''
 
-        def get_story_list() -> list[ft.Control]:
+        #print("Open Story Clicked")
+        # list that holds our story title buttons, and string of our selected story title
+        story_choices = []
+        selected_story = None
+
+        # Called when a new story text button is clicked
+        def change_selected_story(e):
+            ''' Changes our selected story variable '''
+
+            nonlocal selected_story
+            selected_story = e.control.text
+            print("Selected story: ", selected_story)
+
+
+        def get_stories_list() -> list[ft.Control]:
             ''' Returns a list of all story titles available to open '''
 
-            list = []
+            # Use something better than radio in future, but for now this works
+            for story in app.stories.values():
+                story_choices.append(
+                    ft.TextButton(story.title, on_click=change_selected_story)
+                )
 
-            for story in app.stories:
-                list.append(ft.Text(story))
+            return story_choices
 
-            return list
+
+        # Called when the 'open' button is clicked in the bottom right of the dialog
+        def open_selected_story(e):
+            ''' Changes the route to the selected story '''
+            print("Open button clicked, selected story is: ", selected_story)
+
+            if selected_story is not None:
+                print("Opening story: ", selected_story)
+                page.route = app.stories[selected_story].route
+                page.close(dlg)
+                page.update()
+            else:
+                print("No story selected")
+
+            page.close(dlg)
+            page.update()
+
+        
+        # Change the route, thats
 
         dlg = ft.AlertDialog(
             title=ft.Text("What story would you like to open?"),
             alignment=ft.alignment.center,
             on_dismiss=lambda e: print("Dialog dismissed!"),
             title_padding=ft.padding.all(25),
-            content=ft.Column(expand=False, controls=get_story_list()),
+            content=ft.Column(expand=False, controls=get_stories_list()),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: page.close(dlg)),
-                ft.TextButton("Open", on_click=lambda e: page.close(dlg)),
+                ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("Open", on_click=open_selected_story),
             ]
         )
 
@@ -193,7 +220,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                         content=ft.Text("New", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
                         style=menubar_style,
-                        on_click=create_new_story_clicked,
+                        on_click=handle_create_new_story_clicked,
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Save", weight=ft.FontWeight.BOLD),

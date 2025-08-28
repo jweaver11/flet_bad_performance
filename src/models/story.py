@@ -218,7 +218,7 @@ class Story(ft.View):
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
 
         # Create our workspace container to hold our widgets
-        workspace = create_workspace()  # render our workspace containing our widgets
+        workspace = create_workspace(page, self)  # render our workspace containing our widgets
 
         # Called when hovering over resizer to right of the active rail
         def show_horizontal_cursor(e: ft.HoverEvent):
@@ -231,8 +231,8 @@ class Story(ft.View):
         def move_active_rail_divider(e: ft.DragUpdateEvent):
             ''' Responsible for altering the width of the active rail '''
 
-            if (e.delta_x > 0 and app.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and app.active_story.active_rail.width > 100):
-                app.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
+            if (e.delta_x > 0 and self.active_rail.width < page.width/2) or (e.delta_x < 0 and self.active_rail.width > 100):
+                self.active_rail.width += e.delta_x    # Apply the change to our rail
                 
             page.update()   # Apply our changes to the rest of the page
 
@@ -240,9 +240,9 @@ class Story(ft.View):
         def save_active_rail_width(e: ft.DragEndEvent):
             ''' Saves our new width that will be loaded next time app opens the app '''
 
-            app.settings.data['active_rail_width'] = app.active_story.active_rail.width
+            app.settings.data['active_rail_width'] = self.active_rail.width
             app.settings.save_dict()
-            print("Active rail width: " + str(app.active_story.active_rail.width))
+            print("Active rail width: " + str(self.active_rail.width))
 
         # The actual resizer for the active rail (gesture detector)
         active_rail_resizer = ft.GestureDetector(

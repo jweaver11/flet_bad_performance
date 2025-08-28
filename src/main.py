@@ -52,7 +52,7 @@ def main(page: ft.Page):
         active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
         # Create our workspace container to hold our widgets
-        workspace = create_workspace()  # render our workspace containing our widgets 
+        workspace = create_workspace(page)  # render our workspace containing our widgets 
         #workspace.alignment = ft.MainAxisAlignment.CENTER
 
         # Save our 2 rails, divers, and our workspace container in a row
@@ -97,7 +97,7 @@ def main(page: ft.Page):
         active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
         # Create our workspace container to hold our widgets
-        workspace = create_workspace()  # render our workspace containing our widgets 
+        workspace = create_workspace(page)  # render our workspace containing our widgets 
 
         # Save our 2 rails, divers, and our workspace container in a row
         row = ft.Row(
