@@ -66,7 +66,6 @@ class Story(ft.View):
             os.makedirs(folder_path, exist_ok=True)
 
         # Metadata for our story. Set or loaded in the load_dict method
-        self.data = {}
 
         # Create story metadata file
         self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
@@ -138,9 +137,9 @@ class Story(ft.View):
         # Default data structure
         default_data = {
             'title': self.title,
-            'directory_path': directory_path,  # Path to our parent folder
+            'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
 
-            # Paths to our workspaces
+            # Paths to our workspaces for easier reference later
             'content_path': os.path.join(directory_path, "content"),
             'characters_path': os.path.join(directory_path, "characters"),
             'plot_and_timeline_path': os.path.join(directory_path, "plot_and_timeline"),
@@ -204,11 +203,8 @@ class Story(ft.View):
         from ui.workspace import create_workspace
         from models.app import app
 
-        page.title = ""
+        # Clear our controls in our view before building it
         self.controls.clear()
-
-        page_title = "StoryBoard -- " + self.title + " -- Saved status"
-        page.title = page_title
 
         # Create our page elements as their own pages so they can update
         menubar = create_menu_bar(page)

@@ -1,9 +1,10 @@
 """ WIP """
 
 import flet as ft
+from models.story import Story
 
 
-def create_plot_and_timeline_rail(page: ft.Page) -> ft.Control:
+def create_plot_and_timeline_rail(page: ft.Page, story: Story=None) -> ft.Control:
     from models.app import app  # Needs to import here for updated reference each time
  
     return ft.Column(
@@ -12,7 +13,7 @@ def create_plot_and_timeline_rail(page: ft.Page) -> ft.Control:
         controls=[
             ft.Text("Plot and Timeline Rail"),
             ft.Text("From the story: "),
-            ft.Text(app.active_story.title)
+            ft.Text(story.title)
             # Add more controls here as needed
         ]
     )
