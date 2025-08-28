@@ -8,24 +8,36 @@ import os
 import json
 from constants import data_paths
 
-# == ft.View??????
+
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str):
+    def __init__(self, title: str, page: ft.Page):
+        
         # Parent constructor
         super().__init__(
-            route=f"/story/{title}",
-            padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
+            route=f"/{title}",    # Sets our route for our new story
+            padding=ft.padding.only(top=0, left=0, right=0, bottom=0)    # No padding for the page
         )  
        
         self.title = title # Gives our story a title when its created
+        self.p = page  # Reference to our page object for updating UI elements
 
 
         # Set our path needed to load the rest of our saved story data
         #self.path = os.path.join(data_paths.story_dicts_path, f"{self.title}.json")
         
-        # Declare our active rail, but the this will be set in main since it needs a page reference
+        # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
+        self.all_workspaces_rail = None  # Is a ft.Container
         self.active_rail = None     # Is a ft.Container
+
+        # Objects for our active rail content
+        # PASS OUR OBJECTS INTO THE OBJECTS OF OUR STORY
+        self.content_rail = None  # Is an extended ft.Container
+        self.characters_rail = None  # Is an extended ft.Container
+        self.plot_and_timeline_rail = None  # Is an extended ft.Container
+        self.world_building_rail = None  # Is an extended ft.Container
+        self.drawing_board_rail = None  # Is an extended ft.Container
+        self.notes_rail = None  # Is an extended ft.Container
 
         data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
 
@@ -54,7 +66,6 @@ class Story(ft.View):
             os.makedirs(folder_path, exist_ok=True)
 
         # Metadata for our story. Set or loaded in the load_dict method
-        self.data = {}
 
         # Create story metadata file
         self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
@@ -77,128 +88,37 @@ class Story(ft.View):
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
-        self.controls = []
+        #self.startup()
         
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
-    def startup(self, page: ft.Page):
+    def startup(self):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        #print("startup called")
-        def build_view() -> list[ft.Control]:
-            ''' Builds our story view inside the story object. '''
-            from ui.menu_bar import create_menu_bar
-            from ui.all_workspaces_rails import All_Workspaces_Rail
-            from ui.active_rail import Active_Rail
-            from ui.workspace import create_workspace
-            from models.user import user
-
-            page_title = "StoryBoard -- " + self.title + " -- Saved status"
-
-            page.title = page_title
-
-            self.controls.clear()
-
-            # Create our page elements as their own pages so they can update
-            menubar = create_menu_bar(page)   
-
-            # Create our rails inside of user so we can access it as an object and store preferences
-            user.all_workspaces_rail = All_Workspaces_Rail(page)  # Create our all workspaces rail
-            user.active_story.active_rail = Active_Rail(page)  # Container stored in story for the active rails
-
-
-            # Create our workspace container to hold our widgets
-            workspace = create_workspace()  # render our workspace containing our widgets
-
-            # Called when hovering over resizer to right of the active rail
-            def show_horizontal_cursor(e: ft.HoverEvent):
-                ''' Changes the cursor to horizontal when hovering over the resizer '''
-
-                e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-                e.control.update()
-
-            # Called when resizing the active rail by dragging the resizer
-            def move_active_rail_divider(e: ft.DragUpdateEvent):
-                ''' Responsible for altering the width of the active rail '''
-
-                if (e.delta_x > 0 and user.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and user.active_story.active_rail.width > 100):
-                    user.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
-                    
-                page.update()   # Apply our changes to the rest of the page
-
-            # Called when user stops dragging the resizer to resize the active rail
-            def save_active_rail_width(e: ft.DragEndEvent):
-                ''' Saves our new width that will be loaded next time user opens the app '''
-
-                user.settings.data['active_rail_width'] = user.active_story.active_rail.width
-                user.settings.save_dict()
-                print("Active rail width: " + str(user.active_story.active_rail.width))
-
-            # The actual resizer for the active rail (gesture detector)
-            active_rail_resizer = ft.GestureDetector(
-                content=ft.Container(
-                    width=10,   # Total width of the GD, so its easier to find with mouse
-                    bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
-                    # Thin vertical divider, which is what the user will actually drag
-                    content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
-                    padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
-                ),
-                on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
-                on_pan_update=move_active_rail_divider, # Resize the active rail as user is dragging
-                on_pan_end=save_active_rail_width,  # Save the resize when user is done dragging
-            )
-
-            # Save our 2 rails, divers, and our workspace container in a row
-            row = ft.Row(
-                spacing=0,  # No space between elements
-                expand=True,  # Makes sure it takes up the entire window/screen
-
-                controls=[
-                    user.all_workspaces_rail,  # Main rail of all available workspaces
-                    ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
-                    user.active_story.active_rail,    # Rail for the selected workspace
-                    active_rail_resizer,   # Divider between rail and work area
-                    
-                    workspace,    # Work area for pagelets
-                ],
-            )
-
-            # Format our page. Add our menubar at the top, then then our row built above
-            col = ft.Column(
-                spacing=0, 
-                expand=True, 
-                controls=[
-                    menubar, 
-                    row,
-                ]
-            )
-
-            self.controls.append(col)
-
         # Loads our info about our story from its JSON file
-        self.load_dict()
+        self.load_dict()    # This function creates one if story object was created not loaded
 
         # Loads our characters from file storage into our characters list
-        self.load_characters(page)
+        self.load_characters(self.p)
 
-        build_view()
+        self.build_view(self.p)
 
         from handlers.reload_workspace import reload_workspace
 
         # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-        reload_workspace(page) 
+        reload_workspace(self.p, self) 
     
 
     def save_dict(self):
         #print("save story dict called")
         
         # Create the path to the story's JSON file
-        story_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
         
         try:
             # Save our data to file
-            with open(story_file_path, "w") as f:
+            with open(story_data_file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Story data saved to {story_file_path}")
             
@@ -208,13 +128,26 @@ class Story(ft.View):
     def load_dict(self):
         #print("load story dict called")
 
-        # Create the path to the story's JSON file
-        story_data_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
+        # Create the path to the story's directory and data JSON file
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
+
         
         # Default data structure
         default_data = {
             'title': self.title,
-            'directory_path': os.path.join(data_paths.stories_directory_path, self.title),  # Path to our parent folder
+            'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
+            'story_data_file_paht' : story_data_file_path,  # Path to our main story json file
+
+            'selected_workspace': 'characters',
+
+            # Paths to our workspaces for easier reference later
+            'content_directory_path': os.path.join(directory_path, "content"),
+            'characters_directory_path': os.path.join(directory_path, "characters"),
+            'plot_and_timeline_directory_path': os.path.join(directory_path, "plot_and_timeline"),
+            'worldbuilding_directory_path': os.path.join(directory_path, "worldbuilding"),
+            'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
+            'notes_directory_path': os.path.join(directory_path, "notes"),
 
             'top_pin_height': 0,
             'left_pin_width': 0,
@@ -226,6 +159,14 @@ class Story(ft.View):
             'last_modified': None
         }
 
+        # OUr paths inside the story object
+        #content_path = os.path.join(active_story_path, "content")
+        #characters_path = os.path.join(active_story_path, "characters")
+        #plot_and_timeline_path = os.path.join(active_story_path, "plot_and_timeline")
+        #worldbuilding_path = os.path.join(active_story_path, "worldbuilding")
+        #drawing_board_path = os.path.join(active_story_path, "drawing_board")
+        #notes_path = os.path.join(active_story_path, "notes")
+
         try:
             # Check if the story file exists
             if os.path.exists(story_data_file_path):
@@ -236,6 +177,8 @@ class Story(ft.View):
                 # Merge loaded data with default data (in case new fields were added)
                 self.data = {**default_data, **loaded_data}
                 #print(f"Loaded story data from {story_data_file_path}")
+
+                self.title = self.data.get('title', self.title)  # Update title in case it was changed
 
                 # Set our saved pin sizes
                 self.top_pin.height = self.data.get('top_pin_height', 0)
@@ -254,6 +197,94 @@ class Story(ft.View):
             print(f"Error loading story data: {e}")
             # Fall back to default data on error
             self.data = default_data
+
+    # Called when new story object is created, either by program or by being loaded from storage
+    def build_view(self, page: ft.Page) -> list[ft.Control]:
+        ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
+        from ui.menu_bar import create_menu_bar
+        from ui.all_workspaces_rails import All_Workspaces_Rail
+        from ui.active_rail import Active_Rail
+        from ui.workspace import create_workspace
+        from models.app import app
+
+        # Clear our controls in our view before building it
+        self.controls.clear()
+
+        # Create our page elements as their own pages so they can update
+        menubar = create_menu_bar(page)
+
+        # Create our rails inside of app so we can access it as an object and store preferences
+        self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
+        self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
+
+        # Create our workspace container to hold our widgets
+        workspace = create_workspace()  # render our workspace containing our widgets
+
+        # Called when hovering over resizer to right of the active rail
+        def show_horizontal_cursor(e: ft.HoverEvent):
+            ''' Changes the cursor to horizontal when hovering over the resizer '''
+
+            e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+            e.control.update()
+
+        # Called when resizing the active rail by dragging the resizer
+        def move_active_rail_divider(e: ft.DragUpdateEvent):
+            ''' Responsible for altering the width of the active rail '''
+
+            if (e.delta_x > 0 and app.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and app.active_story.active_rail.width > 100):
+                app.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
+                
+            page.update()   # Apply our changes to the rest of the page
+
+        # Called when app stops dragging the resizer to resize the active rail
+        def save_active_rail_width(e: ft.DragEndEvent):
+            ''' Saves our new width that will be loaded next time app opens the app '''
+
+            app.settings.data['active_rail_width'] = app.active_story.active_rail.width
+            app.settings.save_dict()
+            print("Active rail width: " + str(app.active_story.active_rail.width))
+
+        # The actual resizer for the active rail (gesture detector)
+        active_rail_resizer = ft.GestureDetector(
+            content=ft.Container(
+                width=10,   # Total width of the GD, so its easier to find with mouse
+                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                # Thin vertical divider, which is what the app will actually drag
+                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
+                padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
+            ),
+            on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
+            on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
+            on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
+        )
+
+        # Save our 2 rails, divers, and our workspace container in a row
+        row = ft.Row(
+            spacing=0,  # No space between elements
+            expand=True,  # Makes sure it takes up the entire window/screen
+
+            controls=[
+                self.all_workspaces_rail,  # Main rail of all available workspaces
+                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
+
+                self.active_rail,    # Rail for the selected workspace
+                active_rail_resizer,   # Divider between rail and work area
+                
+                workspace,    # Work area for pagelets
+            ],
+        )
+
+        # Format our page. Add our menubar at the top, then then our row built above
+        col = ft.Column(
+            spacing=0, 
+            expand=True, 
+            controls=[
+                menubar, 
+                row,
+            ]
+        )
+
+        self.controls.append(col)
 
         
     # Called when saving new objects to the story (characters, chapters, etc.)
@@ -379,6 +410,7 @@ class Story(ft.View):
                         self.characters.append(character)
                         
                         #print(f"Loaded character: {character_title}")
+                        #print(f"Number of characters loaded: {len(self.characters)}")
                     
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:

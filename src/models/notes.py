@@ -3,7 +3,7 @@
 import flet as ft
 import json
 import os
-from models.user import user
+from models.app import app
 from models.widget import Widget
 from constants.data_paths import characters_path
 

@@ -5,7 +5,7 @@ Holds our settings icon, feedback, and account name as well
 
 import flet as ft
 from constants import data_paths
-from models.user import user
+from models.app import app
 from handlers.reload_workspace import remove_drag_targets
 from handlers.reload_workspace import reload_workspace
 
@@ -14,56 +14,123 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
     
     # Placeholder events for now
     def handle_menu_item_click(e):
-        print(f"{e.control.content.value}.on_click")
+        #print(f"{e.control.content.value}.on_click")
         page.open(
             ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
         )
         page.update()
 
     def handle_submenu_open(e):
-        print(f"{e.control.content.content.value}.on_open")
+        #print(f"{e.control.content.content.value}.on_open")
+        pass
     def handle_submenu_close(e):
-        print(f"{e.control.content.content.value}.on_close")
+        #print(f"{e.control.content.content.value}.on_close")
+        pass
     def handle_submenu_hover(e):
-        print(f"{e.control.content.content.value}.on_hover")
+        #print(f"{e.control.content.content.value}.on_hover")
+        pass
+
 
     # Called when file->new is clicked
-    def new_clicked(e):
+    def create_new_story_clicked(e):
         ''' Placeholder for new story click event '''
-        print("New Story Clicked")
+        #print("New Story Clicked")
 
-        def submit_new_story(title: str):
-            ''' Creates a new story with the given title '''
-            user.create_new_story(title)
-            #user.active_story = new_story
-            print(f"New story created with title: {title}")
+        # Variable to track if the title is unique
+        is_unique = True
+
+        
+        # Called by clicking off the dialog or cancel button
+        def close_dialog(e):
+            ''' Closes the dialog '''
             dlg.open = False
-            reload_workspace(page)
             page.update()
 
+        def submit_new_story(e):
+            ''' Creates a new story with the given title '''
 
+            # Import our variable if it is unique or nah
+            nonlocal is_unique
+
+            if isinstance(e, ft.TextField):
+                print("Received the text field. title is e.value")
+                title = e.value
+            else:
+                print("received the event, title is e.control.value")
+                title = e.control.value
+
+            print(title)
+
+            for story in app.stories.values():
+                if story.title == title:
+                    is_unique = False
+                    break
+
+            # Check if the title is unique
+            if is_unique:
+                #print("title is unique, story being created: ", title)
+                app.create_new_story(title, page) # Needs the story object
+                dlg.open = False
+                page.update()
+            else:
+                #print("Title not unique, no story created")
+                story_title_field.error_text = "Title must be unique"
+                story_title_field.focus()   # refocus the text field since the title was not unique
+                page.update()
+
+
+        # Called everytime the user enters a new letter in the text box
+        def textbox_value_changed(e):
+            ''' Called when the text in the text box changes '''
+
+            nonlocal is_unique
+
+            # Checks if the title sitting in the text box is unique for submitting
+            title = e.control.value
+            for story in app.stories.values():
+                if story.title == title:
+                    e.control.error_text = "Title must be unique"
+                    is_unique = False
+                    page.update()
+                    return
+                else:
+                    e.control.error_text = None
+                    is_unique = True
+                    page.update()
+
+            
+            #print(f"New story created with title: {title}")
+
+        # Create a reference to the text field so we can access its value
+        story_title_field = ft.TextField(
+            label="Story Title",
+            autofocus=True,
+            on_submit=submit_new_story,
+            on_change=textbox_value_changed,
+        )
+            
+        # The dialog that will pop up whenever the new story button is clicked
         dlg = ft.AlertDialog(
+
+            # Title of our dialog
             title=ft.Text("Create New Story"),
-            content=ft.Text("This will create a new story with default settings. Continue?"),
+
+            # Main content is text box for user to input story title
+            content=story_title_field,
+
+            # Our two action buttons at the bottom of the dialog
             actions=[
-                #ft.TextButton("Cancel", on_click=lambda e: page.dialog.close()),
-                ft.TextButton("OK", on_click=lambda e: submit_new_story("new_story")),
+                ft.TextButton("Cancel", on_click=close_dialog, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field)),
             ],
-            actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss=lambda e: print("Dialog dismissed!"),
         )
 
+        # Open our dialog in the overlay
         dlg.open = True
         page.overlay.append(dlg)
         page.update()
 
-        
 
-
-        title = "new_story"
-        new_story = user.create_new_story(title)
-
-        user.active_story = new_story
 
     def handle_file_open_click(e):
         ''' Placeholder for open story click event '''
@@ -74,7 +141,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
             list = []
 
-            for story in user.stories:
+            for story in app.stories:
                 list.append(ft.Text(story))
 
             return list
@@ -92,8 +159,6 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         )
 
         page.open(dlg)
-
-        
 
 
     # Styling used by lots of menu bar items
@@ -128,7 +193,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                         content=ft.Text("New", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
                         style=menubar_style,
-                        on_click=new_clicked,
+                        on_click=create_new_story_clicked,
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Save", weight=ft.FontWeight.BOLD),
@@ -199,27 +264,25 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
     def settings_clicked(e):
         ''' Toggles the visibility of the settings widget in the menubar '''
 
-        user.settings.change_visibility()
-        if user.settings.data['visible']:
-            user.settings.show_widget()
+        app.settings.change_visibility()
+        if app.settings.data['visible']:
+            app.settings.show_widget()
         else:
-            user.settings.hide_widget()
+            app.settings.hide_widget()
 
         reload_workspace(page)  # Re-render the page to show/hide settings
 
     def view1(e):
-        print("View 1")
-        
-        from handlers.routes import route_change
 
-        route_change(page, user.stories['default_story'])
+        page.route = app.stories['default_story'].route
+        page.update()
         
 
     def view2(e):
-        print("View 2")
-        from handlers.routes import route_change
 
-        route_change(page, user.stories['test_story_1'])
+        page.route = app.stories['test_story_1'].route
+        page.update()
+
         
     # Return our formatted menubar
     return ft.Container(
@@ -240,7 +303,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button
-                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # users account name
+                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
             ]
         )
     )

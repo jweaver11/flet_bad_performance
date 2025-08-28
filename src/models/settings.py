@@ -2,7 +2,7 @@
 
 import flet as ft
 import os
-from models.user import user
+#from models.app import app
 from models.widget import Widget
 from constants.data_paths import settings_path
 import json
@@ -21,7 +21,7 @@ class Settings(Widget):
             title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            #pin_location = "main",  # Start in left pin location
+            #pin_location = "main",  # Start in main pin location
         )
 
         # Loads our settings data from the JSON file
@@ -72,7 +72,7 @@ class Settings(Widget):
             self.save_dict()
             self.p.update()
 
-        # Dropdown so user can change their color scheme
+        # Dropdown so app can change their color scheme
         self.color_scheme_dropdown = ft.Dropdown(
             label="Theme Color",
             capitalization= ft.TextCapitalization.SENTENCES,    # Capitalize our options
@@ -89,9 +89,9 @@ class Settings(Widget):
             self.save_dict()  
 
             # Runs through all our characters, and updates their name color accordingly and reloads their widget
-            for char in user.active_story.characters:  
-                char.check_morality()
-                char.reload_widget() 
+            #for char in app.active_story.characters:  
+                #char.check_morality()
+                #char.reload_widget() 
 
             # Reloads the rail. Its better here than running it twice for no reason in character class    
             from ui.rails.characters_rail import reload_character_rail
@@ -135,8 +135,8 @@ class Settings(Widget):
             ft.TextButton(
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
-                #on_click=lambda e: user.all_workspaces_rail.toggle_rail_reorderable()
-                on_click=lambda e: user.all_workspaces_rail.toggle_reorder_rail()
+                #on_click=lambda e: app.all_workspaces_rail.toggle_rail_reorderable()
+                #on_click=lambda e: app.all_workspaces_rail.toggle_reorder_rail()
             ),
             self.change_name_colors,
             self.theme_button,
@@ -180,7 +180,8 @@ class Settings(Widget):
         default_data = {
             'visible': False,   # If our settings widget is visible or not
             'pin_location': "main", 
-            'active_story': "default_story",
+            'active_story': "/",    # this works as a route for the correct story
+            'is_maximized': True,   # If the window is maximized or not
             
             'tab_color': "blue",        # the tab color
             'theme_mode': "dark",       # the apps theme mode, dark or light
@@ -194,7 +195,6 @@ class Settings(Widget):
                 "drawing_board",
                 "notes",
             ],
-            'selected_workspace': "characters",     # Whichever workspace is selected
             'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
             'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
             'active_rail_width': 200,   # Width of our active rail that we can resize
