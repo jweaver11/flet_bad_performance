@@ -7,11 +7,9 @@ import flet as ft
 from models.app import app
 from handlers.route_change import route_change
 from constants.init import init_settings, init_load_saved_stories
-from models.settings import Settings
-from ui.all_workspaces_rails import All_Workspaces_Rail, No_Story_Rail
+from ui.all_workspaces_rails import No_Story_Rail
 from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
-from handlers.reload_workspace import reload_workspace
 from ui.workspace import create_workspace
 
 
@@ -27,7 +25,6 @@ def main(page: ft.Page):
     # Initializes our settings, stories
     init_settings(page)
     init_load_saved_stories(page)   # Changes route to active story if there is one
-
 
 
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)

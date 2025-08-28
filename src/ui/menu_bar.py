@@ -14,47 +14,118 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
     
     # Placeholder events for now
     def handle_menu_item_click(e):
-        print(f"{e.control.content.value}.on_click")
+        #print(f"{e.control.content.value}.on_click")
         page.open(
             ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
         )
         page.update()
 
     def handle_submenu_open(e):
-        print(f"{e.control.content.content.value}.on_open")
+        #print(f"{e.control.content.content.value}.on_open")
+        pass
     def handle_submenu_close(e):
-        print(f"{e.control.content.content.value}.on_close")
+        #print(f"{e.control.content.content.value}.on_close")
+        pass
     def handle_submenu_hover(e):
-        print(f"{e.control.content.content.value}.on_hover")
+        #print(f"{e.control.content.content.value}.on_hover")
+        pass
+
 
     # Called when file->new is clicked
-    def new_clicked(e):
+    def create_new_story_clicked(e):
         ''' Placeholder for new story click event '''
-        print("New Story Clicked")
+        #print("New Story Clicked")
 
-        def submit_new_story(title: str):
-            ''' Creates a new story with the given title '''
+        # Variable to track if the title is unique
+        is_unique = True
 
-            # Needs to check if title is unique
-            app.create_new_story(title, page) # Needs the story object
-            
-            print(f"New story created with title: {title}")
-
+        
+        # Called by clicking off the dialog or cancel button
+        def close_dialog(e):
+            ''' Closes the dialog '''
             dlg.open = False
             page.update()
 
+        def submit_new_story(e):
+            ''' Creates a new story with the given title '''
 
+            # Import our variable if it is unique or nah
+            nonlocal is_unique
+
+            if isinstance(e, ft.TextField):
+                print("Received the text field. title is e.value")
+                title = e.value
+            else:
+                print("received the event, title is e.control.value")
+                title = e.control.value
+
+            print(title)
+
+            for story in app.stories.values():
+                if story.title == title:
+                    is_unique = False
+                    break
+
+            # Check if the title is unique
+            if is_unique:
+                #print("title is unique, story being created: ", title)
+                app.create_new_story(title, page) # Needs the story object
+                dlg.open = False
+                page.update()
+            else:
+                #print("Title not unique, no story created")
+                story_title_field.error_text = "Title must be unique"
+                story_title_field.focus()   # refocus the text field since the title was not unique
+                page.update()
+
+
+        # Called everytime the user enters a new letter in the text box
+        def textbox_value_changed(e):
+            ''' Called when the text in the text box changes '''
+
+            nonlocal is_unique
+
+            # Checks if the title sitting in the text box is unique for submitting
+            title = e.control.value
+            for story in app.stories.values():
+                if story.title == title:
+                    e.control.error_text = "Title must be unique"
+                    is_unique = False
+                    page.update()
+                    return
+                else:
+                    e.control.error_text = None
+                    is_unique = True
+                    page.update()
+
+            
+            #print(f"New story created with title: {title}")
+
+        # Create a reference to the text field so we can access its value
+        story_title_field = ft.TextField(
+            label="Story Title",
+            autofocus=True,
+            on_submit=submit_new_story,
+            on_change=textbox_value_changed,
+        )
+            
+        # The dialog that will pop up whenever the new story button is clicked
         dlg = ft.AlertDialog(
+
+            # Title of our dialog
             title=ft.Text("Create New Story"),
-            content=ft.Text("This will create a new story with default settings. Continue?"),
+
+            # Main content is text box for user to input story title
+            content=story_title_field,
+
+            # Our two action buttons at the bottom of the dialog
             actions=[
-                #ft.TextButton("Cancel", on_click=lambda e: page.dialog.close()),
-                ft.TextButton("OK", on_click=lambda e: submit_new_story("new_story")),
+                ft.TextButton("Cancel", on_click=close_dialog, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field)),
             ],
-            actions_alignment=ft.MainAxisAlignment.END,
-            on_dismiss=lambda e: print("Dialog dismissed!"),
         )
 
+        # Open our dialog in the overlay
         dlg.open = True
         page.overlay.append(dlg)
         page.update()
@@ -122,7 +193,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
                         content=ft.Text("New", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
                         style=menubar_style,
-                        on_click=new_clicked,
+                        on_click=create_new_story_clicked,
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Save", weight=ft.FontWeight.BOLD),

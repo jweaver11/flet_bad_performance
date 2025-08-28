@@ -178,6 +178,8 @@ class Story(ft.View):
                 self.data = {**default_data, **loaded_data}
                 #print(f"Loaded story data from {story_data_file_path}")
 
+                self.title = self.data.get('title', self.title)  # Update title in case it was changed
+
                 # Set our saved pin sizes
                 self.top_pin.height = self.data.get('top_pin_height', 0)
                 self.left_pin.width = self.data.get('left_pin_width', 0)

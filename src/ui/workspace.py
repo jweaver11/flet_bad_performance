@@ -12,12 +12,22 @@ from models.story import Story
 # Function to return our container for our widgets
 def create_workspace(story: Story=None) -> ft.Container:   
 
+    def create_new_story_button_clicked(e):
+        ''' Placeholder for new story click event '''
+        print("New Story Clicked")
+
+        def submit_new_story(title: str):
+            ''' Creates a new story with the given title '''
+
+            # Needs to check if title is unique
+            app.create_new_story(title, e.page)
+
     if story is not None:
         # Container for 1 or more widgets open on the workspace area right side of screen
         return ft.Container(
             expand=True,
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
-            content=app.active_story.master_stack,   
+            content=story.master_stack,   
         )
     
     else:
@@ -28,7 +38,7 @@ def create_workspace(story: Story=None) -> ft.Container:
             content=ft.FloatingActionButton(
                 icon=ft.Icons.ADD,
                 text="No Active Story\nClick to Create New Story",
-                #on_click=create_new_story,
+                on_click=create_new_story_button_clicked,
                 width=200,
                 height=100,
                 shape=ft.RoundedRectangleBorder(radius=10),  
