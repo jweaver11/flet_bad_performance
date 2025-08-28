@@ -16,7 +16,8 @@ class Story(ft.View):
         # Parent constructor
         super().__init__(
             route=f"/{title}",    # Sets our route for our new story
-            padding=ft.padding.only(top=0, left=0, right=0, bottom=0)    # No padding for the page
+            padding=ft.padding.only(top=0, left=0, right=0, bottom=0),    # No padding for the page
+            spacing=0,      # No spacing between menubar and rest of page
         )  
        
         self.title = title # Gives our story a title when its created
@@ -118,7 +119,7 @@ class Story(ft.View):
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
             'story_data_file_paht' : story_data_file_path,  # Path to our main story json file
 
-            'selected_workspace': 'characters',
+            'selected_rail': 'characters',
 
             # Paths to our workspaces for easier reference later
             'content_directory_path': os.path.join(directory_path, "content"),

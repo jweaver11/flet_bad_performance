@@ -47,17 +47,17 @@ class Active_Rail(ft.Container):
                 return
 
             # Give us the correct rail on program startup based on our selected workspace
-            if story.all_workspaces_rail.selected_workspace == "content":
+            if story.all_workspaces_rail.selected_rail == "content":
                 self.content = create_content_rail(page)
-            elif story.all_workspaces_rail.selected_workspace == "characters":
+            elif story.all_workspaces_rail.selected_rail == "characters":
                 self.content = create_characters_rail(page)
-            elif story.all_workspaces_rail.selected_workspace == "plot_and_timeline":
+            elif story.all_workspaces_rail.selected_rail == "plot_and_timeline":
                 self.content = create_plot_and_timeline_rail(page, story)
-            elif story.all_workspaces_rail.selected_workspace == "world_building":
+            elif story.all_workspaces_rail.selected_rail == "world_building":
                 self.content = create_world_building_rail(page)
-            elif story.all_workspaces_rail.selected_workspace == "drawing_board":
+            elif story.all_workspaces_rail.selected_rail == "drawing_board":
                 self.content = create_drawing_board_rail(page)
-            elif story.all_workspaces_rail.selected_workspace == "notes":
+            elif story.all_workspaces_rail.selected_rail == "notes":
                 self.content = create_notes_rail(page)
             else:
                 self.content = create_characters_rail(page)

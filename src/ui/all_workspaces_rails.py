@@ -24,7 +24,7 @@ class All_Workspaces_Rail(ft.Container):
         self.p = page   # Page reference
 
         # Selected workspace is story dependent, so read from the story instead
-        self.selected_workspace = story.data['selected_workspace']
+        self.selected_rail = story.data['selected_rail']
 
         # Style our rail (container)
         super().__init__(
@@ -138,17 +138,17 @@ class All_Workspaces_Rail(ft.Container):
         )
 
         # Reads our selected workspace from ourself, and toggles the correct workspace selection icon
-        if self.selected_workspace == "content":
+        if self.selected_rail == "content":
             content_rail.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
-        elif self.selected_workspace == "characters":
+        elif self.selected_rail == "characters":
             characters_rail.selected_index = 0
-        elif self.selected_workspace == "plot_and_timeline":
+        elif self.selected_rail == "plot_and_timeline":
             plot_and_timeline_rail.selected_index = 0
-        elif self.selected_workspace == "world_building":
+        elif self.selected_rail == "world_building":
             world_building_rail.selected_index = 0
-        elif self.selected_workspace == "drawing_board":
+        elif self.selected_rail == "drawing_board":
             drawing_board_rail.selected_index = 0
-        elif self.selected_workspace == "notes":
+        elif self.selected_rail == "notes":
             notes_rail.selected_index = 0
 
 
@@ -239,29 +239,29 @@ class All_Workspaces_Rail(ft.Container):
         
         # Save our newly selected workspace in the settings, and save it for our object
         if story is not None:   # Make objects later, rather than return functions
-            story.data['selected_workspace'] = e.control.destinations[0].data
+            story.data['selected_rail'] = e.control.destinations[0].data
             story.save_dict()
-            self.selected_workspace = story.data['selected_workspace']
+            self.selected_rail = story.data['selected_rail']
 
         # We change the active rail here rather than when we reload it because...
         # the active rail is created after this object, so if when we reload the rail...
         # on program start, it will break the program.
-            if self.selected_workspace == "content":    # Set the active_rail content to the new selection
+            if self.selected_rail == "content":    # Set the active_rail content to the new selection
                 story.content_rail = create_content_rail(self.p)
                 story.active_rail.content = story.content_rail
-            elif self.selected_workspace == "characters":
+            elif self.selected_rail == "characters":
                 story.characters_rail = create_characters_rail(self.p)
                 story.active_rail.content = story.characters_rail
-            elif self.selected_workspace == "plot_and_timeline":
+            elif self.selected_rail == "plot_and_timeline":
                 story.plot_and_timeline_rail = create_plot_and_timeline_rail(self.p, story)
                 story.active_rail.content = story.plot_and_timeline_rail
-            elif self.selected_workspace == "world_building":
+            elif self.selected_rail == "world_building":
                 story.world_building_rail = create_world_building_rail(self.p)
                 story.active_rail.content = story.world_building_rail
-            elif self.selected_workspace == "drawing_board":
+            elif self.selected_rail == "drawing_board":
                 story.drawing_board_rail = create_drawing_board_rail(self.p)
                 story.active_rail.content = story.drawing_board_rail
-            elif self.selected_workspace == "notes":
+            elif self.selected_rail == "notes":
                 story.notes_rail = create_notes_rail(self.p)
                 story.active_rail.content = story.notes_rail
 
@@ -339,7 +339,7 @@ class No_Story_Rail(ft.Container):
 
         self.p = page   # Page reference
 
-        self.selected_workspace = ""
+        self.selected_rail = ""
 
         # Style our rail (container)
         super().__init__(
@@ -452,17 +452,17 @@ class No_Story_Rail(ft.Container):
             ],
         )
 
-        if self.selected_workspace == "content":
+        if self.selected_rail == "content":
             content_rail.selected_index = 0
-        elif self.selected_workspace == "characters":
+        elif self.selected_rail == "characters":
             characters_rail.selected_index = 0
-        elif self.selected_workspace == "plot_and_timeline":
+        elif self.selected_rail == "plot_and_timeline":
             plot_and_timeline_rail.selected_index = 0
-        elif self.selected_workspace == "world_building":
+        elif self.selected_rail == "world_building":
             world_building_rail.selected_index = 0
-        elif self.selected_workspace == "drawing_board":
+        elif self.selected_rail == "drawing_board":
             drawing_board_rail.selected_index = 0
-        elif self.selected_workspace == "notes":
+        elif self.selected_rail == "notes":
             notes_rail.selected_index = 0
 
         # Goes through our workspace order, and adds the correct control to our list for the rail
@@ -551,7 +551,7 @@ class No_Story_Rail(ft.Container):
         Applies the correct active rail to match the selection '''
         
         
-        self.selected_workspace = e.control.destinations[0].data
+        self.selected_rail = e.control.destinations[0].data
 
         # We change the active rail here rather than when we reload it because...
         # the active rail is created after this object, so if when we reload the rail...
