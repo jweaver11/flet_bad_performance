@@ -40,34 +40,19 @@ def init_load_saved_stories(page: ft.Page):
                 # Create story object - this will load its data automatically
                 story = Story(story_title, page)
                 app.stories[story_title] = story
-                #print(f"Loaded story: {story_title}")
+                print(f"Loaded story: {story_title}")
                 
             except Exception as e:
                 print(f"Error loading story {story_title}: {e}")
 
     # Initialize each story's UI componenets
     for story in app.stories.values():
-        story.startup(page)
+        story.startup()
+        print(f"Initialized story: {story.title}")
+        if story.title == app.settings.data.get('active_story', None):
+            page.route = story.route    # This will call our route change function and set our story view
 
-
-# Called on app startup in main
-def init_set_route(page: ft.Page):
-    ''' Sets our initial route based on the active_story in settings. If none exist, set to default route '''
-    from handlers.route_change import route_change
-    from models.app import app
-
-    # Gets our active story from settings if there is one, then grabs that corresponding story object
-    story_name = app.settings.data.get('active_story', None)
-    story = app.stories.get(story_name, None)
-
-    # If we have passed in an active story, meaning there is one to load, set the route to that story
-    if story is not None:
-        route_change(page, story)
-    # Otherwise, set the route to the default route
-    else:
-        page.route = "/"
-
-    print("Initial route set to:", page.route)
+    page.update()
 
     
     

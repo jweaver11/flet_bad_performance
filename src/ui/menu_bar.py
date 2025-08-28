@@ -208,25 +208,22 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         reload_workspace(page)  # Re-render the page to show/hide settings
 
     def view1(e):
-        print("View 1")
-        
-        from handlers.route_change import route_change
 
-        route_change(page, app.stories['default_story'])
+        page.route = app.stories['default_story'].route
+        page.update()
         
 
     def view2(e):
-        print("View 2")
-        from handlers.route_change import route_change
 
-        route_change(page, app.stories['test_story_1'])
+        page.route = app.stories['test_story_1'].route
+        page.update()
 
 
     def view3(e):
         print("View 3")
-        from handlers.route_change import route_change
+        #from handlers.route_change import route_change
 
-        route_change(page)
+        #route_change(page)
         
     # Return our formatted menubar
     return ft.Container(

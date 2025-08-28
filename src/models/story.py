@@ -20,6 +20,7 @@ class Story(ft.View):
         )  
        
         self.title = title # Gives our story a title when its created
+        self.p = page  # Reference to our page object for updating UI elements
 
 
         # Set our path needed to load the rest of our saved story data
@@ -88,113 +89,27 @@ class Story(ft.View):
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
-        #self.startup(page)
+        #self.startup()
         
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
-    def startup(self, page: ft.Page):
+    def startup(self):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        # Called when new story object is created, either by program or by being loaded from storage
-        def build_view() -> list[ft.Control]:
-            ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
-            from ui.menu_bar import create_menu_bar
-            from ui.all_workspaces_rails import All_Workspaces_Rail
-            from ui.active_rail import Active_Rail
-            from ui.workspace import create_workspace
-            from models.app import app
-
-            page_title = "StoryBoard -- " + self.title + " -- Saved status"
-            page.title = page_title
-
-            # Create our page elements as their own pages so they can update
-            menubar = create_menu_bar(page)
-
-            # Create our rails inside of app so we can access it as an object and store preferences
-            self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
-            self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
-
-            # Create our workspace container to hold our widgets
-            workspace = create_workspace()  # render our workspace containing our widgets
-
-            # Called when hovering over resizer to right of the active rail
-            def show_horizontal_cursor(e: ft.HoverEvent):
-                ''' Changes the cursor to horizontal when hovering over the resizer '''
-
-                e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-                e.control.update()
-
-            # Called when resizing the active rail by dragging the resizer
-            def move_active_rail_divider(e: ft.DragUpdateEvent):
-                ''' Responsible for altering the width of the active rail '''
-
-                if (e.delta_x > 0 and app.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and app.active_story.active_rail.width > 100):
-                    app.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
-                    
-                page.update()   # Apply our changes to the rest of the page
-
-            # Called when app stops dragging the resizer to resize the active rail
-            def save_active_rail_width(e: ft.DragEndEvent):
-                ''' Saves our new width that will be loaded next time app opens the app '''
-
-                app.settings.data['active_rail_width'] = app.active_story.active_rail.width
-                app.settings.save_dict()
-                print("Active rail width: " + str(app.active_story.active_rail.width))
-
-            # The actual resizer for the active rail (gesture detector)
-            active_rail_resizer = ft.GestureDetector(
-                content=ft.Container(
-                    width=10,   # Total width of the GD, so its easier to find with mouse
-                    bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
-                    # Thin vertical divider, which is what the app will actually drag
-                    content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
-                    padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
-                ),
-                on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
-                on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
-                on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
-            )
-
-            # Save our 2 rails, divers, and our workspace container in a row
-            row = ft.Row(
-                spacing=0,  # No space between elements
-                expand=True,  # Makes sure it takes up the entire window/screen
-
-                controls=[
-                    self.all_workspaces_rail,  # Main rail of all available workspaces
-                    ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
-                    self.active_rail,    # Rail for the selected workspace
-                    active_rail_resizer,   # Divider between rail and work area
-                    
-                    workspace,    # Work area for pagelets
-                ],
-            )
-
-            # Format our page. Add our menubar at the top, then then our row built above
-            col = ft.Column(
-                spacing=0, 
-                expand=True, 
-                controls=[
-                    menubar, 
-                    row,
-                ]
-            )
-
-            self.controls.append(col)
+        
 
         # Loads our info about our story from its JSON file
         self.load_dict()
 
         # Loads our characters from file storage into our characters list
-        self.load_characters(page)
+        self.load_characters(self.p)
 
-        build_view()
+        self.build_view(self.p)
 
         from handlers.reload_workspace import reload_workspace
 
         # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-        reload_workspace(page) 
+        reload_workspace(self.p) 
     
 
     def save_dict(self):
@@ -279,6 +194,97 @@ class Story(ft.View):
             print(f"Error loading story data: {e}")
             # Fall back to default data on error
             self.data = default_data
+
+    # Called when new story object is created, either by program or by being loaded from storage
+    def build_view(self, page: ft.Page) -> list[ft.Control]:
+        ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
+        from ui.menu_bar import create_menu_bar
+        from ui.all_workspaces_rails import All_Workspaces_Rail
+        from ui.active_rail import Active_Rail
+        from ui.workspace import create_workspace
+        from models.app import app
+
+        page.title = ""
+        self.controls.clear()
+
+        page_title = "StoryBoard -- " + self.title + " -- Saved status"
+        page.title = page_title
+
+        # Create our page elements as their own pages so they can update
+        menubar = create_menu_bar(page)
+
+        # Create our rails inside of app so we can access it as an object and store preferences
+        self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
+        self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
+
+        # Create our workspace container to hold our widgets
+        workspace = create_workspace()  # render our workspace containing our widgets
+
+        # Called when hovering over resizer to right of the active rail
+        def show_horizontal_cursor(e: ft.HoverEvent):
+            ''' Changes the cursor to horizontal when hovering over the resizer '''
+
+            e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+            e.control.update()
+
+        # Called when resizing the active rail by dragging the resizer
+        def move_active_rail_divider(e: ft.DragUpdateEvent):
+            ''' Responsible for altering the width of the active rail '''
+
+            if (e.delta_x > 0 and app.active_story.active_rail.width < page.width/2) or (e.delta_x < 0 and app.active_story.active_rail.width > 100):
+                app.active_story.active_rail.width += e.delta_x    # Apply the change to our rail
+                
+            page.update()   # Apply our changes to the rest of the page
+
+        # Called when app stops dragging the resizer to resize the active rail
+        def save_active_rail_width(e: ft.DragEndEvent):
+            ''' Saves our new width that will be loaded next time app opens the app '''
+
+            app.settings.data['active_rail_width'] = app.active_story.active_rail.width
+            app.settings.save_dict()
+            print("Active rail width: " + str(app.active_story.active_rail.width))
+
+        # The actual resizer for the active rail (gesture detector)
+        active_rail_resizer = ft.GestureDetector(
+            content=ft.Container(
+                width=10,   # Total width of the GD, so its easier to find with mouse
+                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                # Thin vertical divider, which is what the app will actually drag
+                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
+                padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
+            ),
+            on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
+            on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
+            on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
+        )
+
+        # Save our 2 rails, divers, and our workspace container in a row
+        row = ft.Row(
+            spacing=0,  # No space between elements
+            expand=True,  # Makes sure it takes up the entire window/screen
+
+            controls=[
+                self.all_workspaces_rail,  # Main rail of all available workspaces
+                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
+
+                self.active_rail,    # Rail for the selected workspace
+                active_rail_resizer,   # Divider between rail and work area
+                
+                workspace,    # Work area for pagelets
+            ],
+        )
+
+        # Format our page. Add our menubar at the top, then then our row built above
+        col = ft.Column(
+            spacing=0, 
+            expand=True, 
+            controls=[
+                menubar, 
+                row,
+            ]
+        )
+
+        self.controls.append(col)
 
         
     # Called when saving new objects to the story (characters, chapters, etc.)

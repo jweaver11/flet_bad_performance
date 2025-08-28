@@ -6,7 +6,7 @@ Initializes the app, settings, page data, and renders our UI onto the page
 import flet as ft
 from models.app import app
 from handlers.route_change import route_change
-from constants.init import init_settings, init_load_saved_stories, init_set_route
+from constants.init import init_settings, init_load_saved_stories
 from models.settings import Settings
 from ui.all_workspaces_rails import All_Workspaces_Rail
 from ui.active_rail import Active_Rail
@@ -19,13 +19,12 @@ from ui.workspace import create_workspace
 # Main function
 def main(page: ft.Page):
 
-    # Declare our global variables
-    #global stories
+    # Set our route change function to be called on route changes
+    page.on_route_change = route_change 
     
-    # Initializes our settings, stories, and sets our initial route, which manages our views
+    # Initializes our settings, stories
     init_settings(page)
-    init_load_saved_stories(page)
-    init_set_route(page)
+    init_load_saved_stories(page)   # Loads our active story as well
 
 
     # Load our story view if there is an active story
@@ -212,32 +211,6 @@ def main(page: ft.Page):
         on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
     )
 
-    # Save our 2 rails, divers, and our workspace container in a row
-    row = ft.Row(
-        spacing=0,  # No space between elements
-        expand=True,  # Makes sure it takes up the entire window/screen
-
-        controls=[
-            all_workspaces_rail,  # Main rail of all available workspaces
-            ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
-            app.active_story.active_rail,    # Rail for the selected workspace
-            active_rail_resizer,   # Divider between rail and work area
-            
-            workspace,    # Work area for pagelets
-        ],
-    )
-
-    # Format our page. Add our menubar at the top, then then our row built above
-    col = ft.Column(
-        spacing=0, 
-        expand=True, 
-        controls=[
-            menubar, 
-            row,
-        ]
-    )
-
     # Build our page we the column we created
     #page.add(col)
     #create_page_if_no_stories_active()
@@ -249,7 +222,7 @@ def main(page: ft.Page):
         #page.add(col)
 
     # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-    reload_workspace(page) 
+    #reload_workspace(page) 
 
     #page.views.pop()
     #page.views.append(app.active_story)
