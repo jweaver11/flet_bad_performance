@@ -113,15 +113,16 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
             # Our two action buttons at the bottom of the dialog
             actions=[
-                ft.TextButton("Cancel", on_click=page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                #ft.TextButton("Cancel", on_click=page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
                 ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field)),
             ],
         )
+        
+        # Add cancel button. Sometimes adding it ^^ first breaks and idk y
+        dlg.actions.insert(0, ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)))
 
         # Open our dialog in the overlay
-        dlg.open = True
-        page.overlay.append(dlg)
-        page.update()
+        page.open(dlg)
 
 
     # Called when file -> open is clicked
@@ -129,6 +130,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         ''' Opens a dialog to open an existing story '''
 
         #print("Open Story Clicked")
+
         # list that holds our story title buttons, and string of our selected story title
         story_choices = []
         selected_story = None
@@ -141,7 +143,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
             selected_story = e.control.text
             print("Selected story: ", selected_story)
 
-
+        # Returns a list of all story titles available to open
         def get_stories_list() -> list[ft.Control]:
             ''' Returns a list of all story titles available to open '''
 
@@ -157,6 +159,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
         # Called when the 'open' button is clicked in the bottom right of the dialog
         def open_selected_story(e):
             ''' Changes the route to the selected story '''
+
             print("Open button clicked, selected story is: ", selected_story)
 
             if selected_story is not None:
@@ -170,13 +173,10 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
             page.close(dlg)
             page.update()
 
-        
-        # Change the route, thats
-
+        # Our alert dialog that pops up when file -> open is clicked
         dlg = ft.AlertDialog(
             title=ft.Text("What story would you like to open?"),
             alignment=ft.alignment.center,
-            on_dismiss=lambda e: print("Dialog dismissed!"),
             title_padding=ft.padding.all(25),
             content=ft.Column(expand=False, controls=get_stories_list()),
             actions=[
@@ -185,6 +185,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
             ]
         )
 
+        # Opens our dialog
         page.open(dlg)
 
 
