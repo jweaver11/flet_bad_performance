@@ -24,13 +24,13 @@ class All_Workspaces_Rail(ft.Container):
 
         self.p = page   # Page reference
 
-        # Our variables we store in the rail object so we are not constantly reading from settings
+        # Our variables that we read from settings
         self.is_collapsed = app.settings.data['workspaces_rail_is_collapsed']
         self.is_reorderable = app.settings.data['workspaces_rail_is_reorderable']
-        self.selected_workspace = app.settings.data['selected_workspace']
-
-        # Saves our workspaces order, and the list we will add the controls too
         self.workspaces_order = app.settings.data['workspaces_rail_order']
+
+        # Selected workspace is story dependent, so read from the story instead
+        self.selected_workspace = story.data['selected_workspace'] if story is not None else ""
 
         # Style our rail (container)
         super().__init__(
@@ -40,21 +40,21 @@ class All_Workspaces_Rail(ft.Container):
         )
 
         # Build our rail on start
-        self.reload_rail()
+        self.reload_rail(story)
 
     # Called mostly when re-ordering or collapsing the rail. Also called on start
-    def reload_rail(self) -> ft.Control:
+    def reload_rail(self, story) -> ft.Control:
         ''' Reloads our rail, and applies the correct styles and controls based on the state of the rail '''
 
         # Holds our list of controls that we will add in the rail later
         workspaces_rail = []
 
-        # Creates our workspace selections (rails), that get added to the workspaces_rail list
-        content_workspace = ft.NavigationRail(
+        # Creates our rails for each workspace selection, that get added to the workspaces_rail list
+        content_rail = ft.NavigationRail(
             height=70,  # Set height of each rail
             bgcolor=ft.Colors.TRANSPARENT,  # Make rail background transparent
             selected_index=None,    # All rails start unselected, we set the right one later
-            on_change=self.on_workspace_change,  # When the rail is clicked
+            on_change=lambda e: self.on_workspace_change(e, story),    # When the rail is clicked
 
             destinations=[  # Each rail only has one destination
                 # We do it this way so we can change the order when re-ordering the rail
@@ -68,11 +68,11 @@ class All_Workspaces_Rail(ft.Container):
             ],
         )
         # Characters workspace rail
-        characters_workspace = ft.NavigationRail(
+        characters_rail = ft.NavigationRail(
             height=70,
             bgcolor=ft.Colors.TRANSPARENT,
             selected_index=None,
-            on_change=self.on_workspace_change,  
+            on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED, color=ft.Colors.PRIMARY), 
@@ -83,11 +83,11 @@ class All_Workspaces_Rail(ft.Container):
             ],
         )
         # Plot and timeline workspace rail
-        plot_and_timeline_workspace = ft.NavigationRail(
+        plot_and_timeline_rail = ft.NavigationRail(
             height=70,  
             bgcolor=ft.Colors.TRANSPARENT,
             selected_index=None,
-            on_change=self.on_workspace_change,  
+            on_change=lambda e: self.on_workspace_change(e, story),   
             destinations=[
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY, scale=1.2), 
@@ -98,11 +98,11 @@ class All_Workspaces_Rail(ft.Container):
             ],
         )
         # World building workspace rail
-        world_building_workspace = ft.NavigationRail(
+        world_building_rail = ft.NavigationRail(
             height=70,  
             bgcolor=ft.Colors.TRANSPARENT,
             selected_index=None,
-            on_change=self.on_workspace_change,  
+            on_change=lambda e: self.on_workspace_change(e, story),    
             destinations=[
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED, color=ft.Colors.PRIMARY), 
@@ -113,11 +113,11 @@ class All_Workspaces_Rail(ft.Container):
             ],
         )
         # Drawing board workspace rail
-        drawing_board_workspace = ft.NavigationRail(
+        drawing_board_rail = ft.NavigationRail(
             height=70,  
             bgcolor=ft.Colors.TRANSPARENT,
             selected_index=None,
-            on_change=self.on_workspace_change,  
+            on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.DRAW_OUTLINED, color=ft.Colors.PRIMARY), 
@@ -128,11 +128,11 @@ class All_Workspaces_Rail(ft.Container):
             ],
         )
         # Notes workspace rail
-        notes_workspace = ft.NavigationRail(
+        notes_rail = ft.NavigationRail(
             height=70,  
             bgcolor=ft.Colors.TRANSPARENT,
             selected_index=None,
-            on_change=self.on_workspace_change,  
+            on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED, color=ft.Colors.PRIMARY), 
@@ -145,34 +145,34 @@ class All_Workspaces_Rail(ft.Container):
 
         # Reads our selected workspace from ourself, and toggles the correct workspace selection icon
         if self.selected_workspace == "content":
-            content_workspace.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
+            content_rail.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
         elif self.selected_workspace == "characters":
-            characters_workspace.selected_index = 0
+            characters_rail.selected_index = 0
         elif self.selected_workspace == "plot_and_timeline":
-            plot_and_timeline_workspace.selected_index = 0
+            plot_and_timeline_rail.selected_index = 0
         elif self.selected_workspace == "world_building":
-            world_building_workspace.selected_index = 0
+            world_building_rail.selected_index = 0
         elif self.selected_workspace == "drawing_board":
-            drawing_board_workspace.selected_index = 0
+            drawing_board_rail.selected_index = 0
         elif self.selected_workspace == "notes":
-            notes_workspace.selected_index = 0
+            notes_rail.selected_index = 0
 
 
         # Goes through our workspace order, and adds the correct control to our list for the rail
         # We do it this way so when the app re-orders the rail, it will save their changes
         for workspace in self.workspaces_order:     # Just a list of strings
             if workspace == "content":
-                workspaces_rail.append(content_workspace)   # Add our corresponding workspace selector rail to the list
+                workspaces_rail.append(content_rail)   # Add our corresponding workspace selector rail to the list
             elif workspace == "characters":
-                workspaces_rail.append(characters_workspace)    
+                workspaces_rail.append(characters_rail)    
             elif workspace == "plot_and_timeline":
-                workspaces_rail.append(plot_and_timeline_workspace)
+                workspaces_rail.append(plot_and_timeline_rail)
             elif workspace == "world_building":
-                workspaces_rail.append(world_building_workspace)
+                workspaces_rail.append(world_building_rail)
             elif workspace == "drawing_board":
-                workspaces_rail.append(drawing_board_workspace)
+                workspaces_rail.append(drawing_board_rail)
             elif workspace == "notes":
-                workspaces_rail.append(notes_workspace)
+                workspaces_rail.append(notes_rail)
 
 
         # If we're collapsed...
@@ -181,12 +181,12 @@ class All_Workspaces_Rail(ft.Container):
             self.width = 50     # Make the rail less wide
             
             # Remove our labels below the icons
-            content_workspace.destinations[0].label = None 
-            characters_workspace.destinations[0].label = None
-            plot_and_timeline_workspace.destinations[0].label = None
-            world_building_workspace.destinations[0].label = None
-            drawing_board_workspace.destinations[0].label = None
-            notes_workspace.destinations[0].label = None
+            content_rail.destinations[0].label = None 
+            characters_rail.destinations[0].label = None
+            plot_and_timeline_rail.destinations[0].label = None
+            world_building_rail.destinations[0].label = None
+            drawing_board_rail.destinations[0].label = None
+            notes_rail.destinations[0].label = None
 
             # Set our collapsed icon buttons icon depending on collapsed state
             collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED
@@ -239,39 +239,43 @@ class All_Workspaces_Rail(ft.Container):
         self.p.update() # Update the page to show our changes
 
     # Called whenever we select a new workspace selector rail
-    def on_workspace_change(self, e):
+    def on_workspace_change(self, e, story: Story):
         ''' Changes our selected workspace in settings and for our object.
         Applies the correct active rail to match the selection '''
         from models.app import app    # Always grabs updated reference when changing workspace
         
         # Save our newly selected workspace in the settings, and save it for our object
-        app.settings.data['selected_workspace'] = e.control.destinations[0].data
-        app.settings.save_dict()
-        self.selected_workspace = app.settings.data['selected_workspace']
+        story.data['selected_workspace'] = e.control.destinations[0].data
+        story.save_dict()
+        self.selected_workspace = story.data['selected_workspace']
+
+        print(e.control.destinations[0].data)   # Debug print of which rail was clicked
+
+        print(self.selected_workspace)   # Debug print of which rail is now selected
 
         # We change the active rail here rather than when we reload it because...
         # the active rail is created after this object, so if when we reload the rail...
         # on program start, it will break the program.
-        if app.active_story is not None:
+        if story is not None:
             if self.selected_workspace == "content":    # Set the active_rail content to the new selection
-                app.active_story.active_rail.content = create_content_rail(self.p)
+                story.active_rail.content = create_content_rail(self.p)
             elif self.selected_workspace == "characters":
-                app.active_story.active_rail.content = create_characters_rail(self.p)
+                story.active_rail.content = create_characters_rail(self.p)
             elif self.selected_workspace == "plot_and_timeline":
-                app.active_story.active_rail.content = create_plot_and_timeline_rail(self.p)
-                app.active_story.active_rail.content = app.active_story.plot_and_timeline_rail
+                story.plot_and_timeline_rail = create_plot_and_timeline_rail(self.p, story)
+                story.active_rail.content = story.plot_and_timeline_rail
             elif self.selected_workspace == "world_building":
-                app.active_story.active_rail.content = create_world_building_rail(self.p)
+                story.active_rail.content = create_world_building_rail(self.p)
             elif self.selected_workspace == "drawing_board":
-                app.active_story.active_rail.content = create_drawing_board_rail(self.p)
+                story.active_rail.content = create_drawing_board_rail(self.p)
             elif self.selected_workspace == "notes":
-                app.active_story.active_rail.content = create_notes_rail(self.p)
+                story.active_rail.content = create_notes_rail(self.p)
 
         # Handle when there is no active story (shouldn't happen)
         else:
-            app.active_story.active_rail.content = ft.Text("No active story")
+            story.active_rail.content = ft.Text("No active rail")
 
-        self.reload_rail()  # Reload the rail to apply the new selection
+        self.reload_rail(story)  # Reload the rail to apply the new selection
 
     # Called by clicking button on bottom right of rail
     def toggle_collapse_rail(self, e=None):

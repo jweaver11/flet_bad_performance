@@ -194,7 +194,6 @@ class Settings(Widget):
                 "drawing_board",
                 "notes",
             ],
-            'selected_workspace': "characters",     # Whichever workspace is selected
             'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
             'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
             'active_rail_width': 200,   # Width of our active rail that we can resize

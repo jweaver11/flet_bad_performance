@@ -4,7 +4,7 @@ import flet as ft
 from models.story import Story
 
 
-def create_plot_and_timeline_rail(page: ft.Page, story: Story=None) -> ft.Control:
+def create_plot_and_timeline_rail(page: ft.Page, story: Story) -> ft.Control:
     from models.app import app  # Needs to import here for updated reference each time
  
     return ft.Column(

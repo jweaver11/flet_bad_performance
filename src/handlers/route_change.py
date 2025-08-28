@@ -3,6 +3,7 @@ from models.story import Story
 
 # Called whenever a new story is laoded
 def route_change(e: ft.RouteChangeEvent) -> Story:
+    ''' Handles changing our page view based on the new route '''
 
     # Grabs our page from the event
     page = e.page
@@ -19,6 +20,8 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
         # If it matches, set our new story 
         if story.route == page.route:
             new_story = story
+            app.settings.data['active_story'] = story.title
+            app.settings.save_dict()
             break
         
     

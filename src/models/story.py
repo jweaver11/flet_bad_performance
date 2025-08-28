@@ -138,6 +138,7 @@ class Story(ft.View):
         default_data = {
             'title': self.title,
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
+            'selected_workspace': 'characters',
 
             # Paths to our workspaces for easier reference later
             'content_path': os.path.join(directory_path, "content"),
