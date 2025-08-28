@@ -249,10 +249,6 @@ class All_Workspaces_Rail(ft.Container):
         story.save_dict()
         self.selected_workspace = story.data['selected_workspace']
 
-        print(e.control.destinations[0].data)   # Debug print of which rail was clicked
-
-        print(self.selected_workspace)   # Debug print of which rail is now selected
-
         # We change the active rail here rather than when we reload it because...
         # the active rail is created after this object, so if when we reload the rail...
         # on program start, it will break the program.

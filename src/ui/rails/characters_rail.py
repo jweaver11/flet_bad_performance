@@ -126,7 +126,7 @@ def delete_character(character, page: ft.Page):
         page.update()
 
         # Deletes the object from our live story object
-        app.active_story.delete_object(character)
+        #app.active_story.delete_object(character)
 
         # Reloads the character rail and widgets to reflect the changes
         reload_character_rail(page)
@@ -199,7 +199,7 @@ def create_character(role_tag, page: ft.Page):
                 new_character.data["Role"] = "Background"
 
             # Adds our new character to the story
-            app.active_story.save_object(new_character)
+            #app.active_story.save_object(new_character)
             reload_character_rail(page)   
             reload_workspace(page)  
 
@@ -232,7 +232,7 @@ def create_character(role_tag, page: ft.Page):
     # Called by out logic to check our characters name for uniqueness
     def check_character(name) -> bool:
         ''' Checks all our characters names and makes sure the name is unique '''
-
+        '''
         for character in app.active_story.characters:
             if character.title.lower() == name.lower():
                 page.open(
@@ -249,7 +249,7 @@ def create_character(role_tag, page: ft.Page):
                 )
                 page.update()
                 return False
-    
+        '''
         return True
 
     # Add our dialog to the page and apply the changes
@@ -401,6 +401,7 @@ def reload_character_rail(page: ft.Page):
     side_characters.controls.clear()
     background_characters.controls.clear()
 
+    '''
     # Run through each character in our story
     for character in app.active_story.characters:
         # Create a new character tile for the rail
@@ -466,10 +467,11 @@ def reload_character_rail(page: ft.Page):
             )
 
         )
+    '''
 
 
         
-
+    '''
         # Still in the for loop, add our character to category based on its tag (Phased out later)
         if character.data["Role"] == "Main":
             main_characters.controls.append(new_char)
@@ -491,6 +493,7 @@ def reload_character_rail(page: ft.Page):
             background_characters.initially_expanded=False
         else:
             background_characters.initially_expanded=True
+    '''
 
     # Add our 'create character' button at bottom of each category
     main_characters.controls.append(

@@ -95,10 +95,8 @@ class Story(ft.View):
     def startup(self):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        
-
         # Loads our info about our story from its JSON file
-        self.load_dict()
+        self.load_dict()    # This function creates one if story object was created not loaded
 
         # Loads our characters from file storage into our characters list
         self.load_characters(self.p)
@@ -108,18 +106,19 @@ class Story(ft.View):
         from handlers.reload_workspace import reload_workspace
 
         # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-        reload_workspace(self.p) 
+        reload_workspace(self.p, self) 
     
 
     def save_dict(self):
         #print("save story dict called")
         
         # Create the path to the story's JSON file
-        story_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
         
         try:
             # Save our data to file
-            with open(story_file_path, "w") as f:
+            with open(story_data_file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Story data saved to {story_file_path}")
             
@@ -129,24 +128,26 @@ class Story(ft.View):
     def load_dict(self):
         #print("load story dict called")
 
-        # Create the path to the story's JSON file
-        story_data_file_path = os.path.join(data_paths.stories_directory_path, f"{self.title}.json")
-
+        # Create the path to the story's directory and data JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
+
         
         # Default data structure
         default_data = {
             'title': self.title,
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
+            'story_data_file_paht' : story_data_file_path,  # Path to our main story json file
+
             'selected_workspace': 'characters',
 
             # Paths to our workspaces for easier reference later
-            'content_path': os.path.join(directory_path, "content"),
-            'characters_path': os.path.join(directory_path, "characters"),
-            'plot_and_timeline_path': os.path.join(directory_path, "plot_and_timeline"),
-            'worldbuilding_path': os.path.join(directory_path, "worldbuilding"),
-            'drawing_board_path': os.path.join(directory_path, "drawing_board"),
-            'notes_path': os.path.join(directory_path, "notes"),
+            'content_directory_path': os.path.join(directory_path, "content"),
+            'characters_directory_path': os.path.join(directory_path, "characters"),
+            'plot_and_timeline_directory_path': os.path.join(directory_path, "plot_and_timeline"),
+            'worldbuilding_directory_path': os.path.join(directory_path, "worldbuilding"),
+            'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
+            'notes_directory_path': os.path.join(directory_path, "notes"),
 
             'top_pin_height': 0,
             'left_pin_width': 0,
@@ -407,6 +408,7 @@ class Story(ft.View):
                         self.characters.append(character)
                         
                         #print(f"Loaded character: {character_title}")
+                        #print(f"Number of characters loaded: {len(self.characters)}")
                     
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:

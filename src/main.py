@@ -26,25 +26,6 @@ def main(page: ft.Page):
     init_settings(page)
     init_load_saved_stories(page)   # Loads our active story as well
 
-
-    # Load our story view if there is an active story
-    if page.route != "/":
-        page.go(page.route)
-        page.views.clear()
-        
-        page.views.append(app.stories[app.settings.data['active_story']])
-        print("Setting to active story: ", app.settings.data['active_story'])
-        page.update()
-    else:
-        if len(app.stories) == 0:
-            page.add(create_page_if_no_stories_exist())
-            print("No stories exist")
-        else:
-            page.add(create_page_if_no_stories_active())
-            print("Stories exist, but no active story")
-
-
-
     # Otherwise, let main load a blank view with a large button to create first story
 
 
@@ -226,6 +207,23 @@ def main(page: ft.Page):
 
     #page.views.pop()
     #page.views.append(app.active_story)
+
+
+    # Load our story view if there is an active story
+    if page.route != "/":
+        page.go(page.route)
+        page.views.clear()
+        
+        page.views.append(app.stories[app.settings.data['active_story']])
+        #print("Setting to active story: ", app.settings.data['active_story'])
+        page.update()
+    else:
+        if len(app.stories) == 0:
+            page.views.append((create_page_if_no_stories_exist()))
+            print("No stories exist")
+        else:
+            page.add(create_page_if_no_stories_active())
+            print("Stories exist, but no active story")
 
 
 # Runs the app
