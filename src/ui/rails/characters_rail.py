@@ -5,39 +5,45 @@ the create 'character button' at the bottom.
 '''
 
 import flet as ft
-from models.user import user
+from models.app import app
 from models.character import Character
-from handlers.render_widgets import render_widgets
+from handlers.reload_workspace import reload_workspace
 import json
 
 
 # Called when hovered over a character on the rail
-# Shows our two buttons rename and delete
 def show_options(e):
+    ''' Shows our button that has the rename and delete options '''
+
     e.control.content.controls[2].opacity = 1
     e.control.content.controls[2].update()
     
 
 # Called when mouse leaves a character on the rail
-# Hides our two buttons rename and delete
 def hide_options(e):
+    ''' Hides our button that shows rename and delete options '''
+
     e.control.content.controls[2].opacity = 0
     e.control.content.controls[2].update()
     
 
-# Called when user clicks rename button on the character on the rail
-# Opens an alert dialog to change the characters name
+# Called when app clicks rename button on the character on the rail
 def rename_character(character, page: ft.Page):
+    ''' Opens a dialog to rename the character object '''
+
     print("rename character called")
 
+    # Called by submitting the new name in the dialog
     def rename_char(e=None):
+        ''' Handles the logic for renaming a character '''
         
+        # Make sure we have a new name from the dialog, then close the dialog
         if e is not None:
             new_name = e.control.value
         else:
             new_name = dialog_textfield_ref.current.value
         dlg.open = False
-        page.update()
+        page.update()   # apply closed dialog state
 
         # Old name for snackbar alert
         old_name = character.title
@@ -46,8 +52,11 @@ def rename_character(character, page: ft.Page):
         character.title = new_name
         character.reload_widget()
         
+        # Reload our character rail and widgets to reflect the changes
         reload_character_rail(page)
-        render_widgets(page)
+        reload_workspace(page)
+
+        # Open a snackbar alert to confirm to the app that the char was renamed
         page.open(
             ft.SnackBar(
                 bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
@@ -62,11 +71,10 @@ def rename_character(character, page: ft.Page):
         )
         page.update()
 
-        for char in user.active_story.characters:
-            print (char.title)
-
+    # Create a reference for our dialog text field
     dialog_textfield_ref = ft.Ref[ft.TextField]()
 
+    # Define our actual alert dialog that pops up when renaming a character
     dlg = ft.AlertDialog(
         content=ft.TextField(
             ref=dialog_textfield_ref,
@@ -76,6 +84,7 @@ def rename_character(character, page: ft.Page):
             on_submit=rename_char,  # When enter is pressed
             autofocus=True,  # Focus on this text field when dialog opens
         ),
+        # Two action buttons in the dialog
         actions=[
             ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
             ft.TextButton("Rename", on_click=lambda e: rename_char()),
@@ -83,35 +92,47 @@ def rename_character(character, page: ft.Page):
         on_dismiss=lambda e: print("Dialog dismissed!")
     )
 
+    # Adds our dialog to the page and applys the changes
     page.overlay.append(dlg)
     dlg.open = True
     page.update()
 
 # Called when the 'color' button next to character on the rail is clicked
-# Changed the charactesr 'color' of the background of widget and bg of rail tile
 def change_character_color(character: Character, color, page: ft.Page):
-    print(character.title)
-    print(color)
+    ''' Changes the characters tab color (not finished) '''
 
-    character.color = color
+    #print(character.title)
+    #print(color)
+
+    #character.color = color
 
     reload_character_rail(page)
     character.reload_widget()
     page.update()
 
 
-# Called when user clicks the delete button on the character on the rail
-# Delete our character object from the story, and its reference in its pin
+# Called when app clicks the delete button on the character on the rail
 def delete_character(character, page: ft.Page):
+    ''' Opens a dialog to confirm the deletion of the character object '''
+
     print("delete character called")
 
-    # Mini function to handle closing our confirmation dialog, UI updates, and deleting the character
+    # Called when app confirms the deletion of the character
     def del_char(character):
+        ''' Handles the logic for deleting a character '''
+
+        # Closes the dialog 
         dlg.open = False
         page.update()
-        user.active_story.delete_object(character)
+
+        # Deletes the object from our live story object
+        #app.active_story.delete_object(character)
+
+        # Reloads the character rail and widgets to reflect the changes
         reload_character_rail(page)
-        render_widgets(page)
+        reload_workspace(page)
+
+        # Open a snackbar alert to confirm to the app that the char was deleted
         page.open(
             ft.SnackBar(
                 bgcolor=ft.Colors.TRANSPARENT,  # Make SnackBar bg transparent
@@ -128,6 +149,7 @@ def delete_character(character, page: ft.Page):
 
     # Sets our title for our alert dialog
     title=f"Are you sure you want to delete {character.title} forever?"
+
     # Our alert dialog that pops up on screen to confirm the delete or cancel
     dlg=ft.AlertDialog(
         title=ft.Text(title), 
@@ -145,39 +167,47 @@ def delete_character(character, page: ft.Page):
     page.update()
 
 
-# Create a new character
-# Accepts a 'tag' passed through depending on which category the user is creating...
-# The character from (main, side, or background)
-def create_character(tag, page: ft.Page):
+# Called when the app clicks the 'plus' buttons under either main, side, or background characters
+def create_character(role_tag, page: ft.Page):
+    ''' Opens a dialog to submit the name our the new character. 
+    Accepts a role_tag depending on which category was clicked, and adds character to that category. '''
+
     print("create character clicked")
 
-    # Create a reference for the dialog text field
-    dialog_textfield_ref = ft.Ref[ft.TextField]()
+
+    textfield = ft.TextField(
+        label="Character Name",
+        hint_text="Enter character name",
+        on_submit=create_new_character,  # When enter is pressed
+        autofocus=True,  # Focus on this text field when dialog opens
+    )
     
-    # Create a new character object when one of the three 'plus' buttons is clicked
+    # Called upon submission of the new name in the dialog to create the new character
     def create_new_character(e):
-        name = dialog_textfield_ref.current.value  # Get name from dialog text field
+        ''' Handles the logic for creating a new character '''
+        from models.story import Story
+
+        # Grab our name from the textfield
+        name = textfield.value 
         if name and name.strip() and check_character(name):   
             name = name.strip()
             name = name.capitalize()  # Auto capitalize names
             
-            # temporary character object so we can check tags
+            # Create the temporary character object so we can check tags for logic
             new_character = Character(name, page)
 
             # Set the appropriate tag based on the category
-            if tag == "main":
+            if role_tag == "main":
                 new_character.data["Role"] = "Main"
-            elif tag == "side":
+            elif role_tag == "side":
                 new_character.data["Role"] = "Side"
-
-            elif tag == "background":
+            elif role_tag == "background":
                 new_character.data["Role"] = "Background"
 
-            # Add our object (in this case character) to the story.
-            # This story function handles pinning it and adding it to any lists
-            user.active_story.save_object(new_character)
+            # Adds our new character to the story
+            #app.active_story.save_object(new_character)
             reload_character_rail(page)   
-            render_widgets(page)  
+            reload_workspace(page)  
 
             # Close the dialog
             dlg.open = False
@@ -187,15 +217,11 @@ def create_character(tag, page: ft.Page):
             page.update()
             print("Character name is empty")
     
+    # Our actual dialog that pops up when the add character button is clicked
     dlg = ft.AlertDialog(
         title=ft.Text("Enter Character Name"), 
-        content=ft.TextField(
-            ref=dialog_textfield_ref,
-            label="Character Name",
-            hint_text="Enter character name",
-            on_submit=create_new_character,  # When enter is pressed
-            autofocus=True,  # Focus on this text field when dialog opens
-        ),
+        content=textfield,
+        # Our two action buttons in the dialog
         actions=[
             ft.TextButton("Cancel", on_click=lambda e: setattr(dlg, 'open', False) or page.update()),
             ft.TextButton("Create", on_click=create_new_character),
@@ -203,9 +229,11 @@ def create_character(tag, page: ft.Page):
         on_dismiss=lambda e: print("Dialog dismissed!")
     )
 
-    # checks if our character name is unique
-    def check_character(name):
-        for character in user.active_story.characters:
+    # Called by out logic to check our characters name for uniqueness
+    def check_character(name) -> bool:
+        ''' Checks all our characters names and makes sure the name is unique '''
+        '''
+        for character in app.active_story.characters:
             if character.title.lower() == name.lower():
                 page.open(
                     ft.SnackBar(
@@ -221,17 +249,21 @@ def create_character(tag, page: ft.Page):
                 )
                 page.update()
                 return False
-    
+        '''
         return True
 
+    # Add our dialog to the page and apply the changes
     page.overlay.append(dlg)
     dlg.open = True
     page.update()
 
 
-# Feature to change a character to main, side, or background by dragging them on the rail.
+# Called when app drags a character to a new category in the rail
 def make_main_character(e, page: ft.Page):
-    # Load our object
+    ''' Changes the character role to main when dragged onto rail. Phasing out.'''
+    # Phasing out ^ because moving to folder storage rather than roles
+
+    # Load our object that is passed through the event data
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -248,17 +280,20 @@ def make_main_character(e, page: ft.Page):
     else:
         print("src_id not found in event data")
         
-    # Change our character tags to reflect its new category    
-    if hasattr(object, 'character_data'):
-        object.character_data["Role"] = "Main"
-        # Save the updated character data to pickle file
+    # Change our character tags to reflect its new category and save the changes
+    if hasattr(object, 'data'):
+        object.data["Role"] = "Main"
+        object.save_dict()
     else:
         print("Object does not have tags attribute, cannot change character type")
 
-    reload_character_rail(page)  # Reload our character rail to show new character
-    print("Character added to main characters")
-# Side character
+    # Reload our character rail to reflect the changes
+    reload_character_rail(page) 
+
+# Called when app drags a character to the side category in the rail
 def make_side_character(e, page: ft.Page):
+    ''' Changes the character role to side when dragged onto rail.'''
+
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -266,22 +301,23 @@ def make_side_character(e, page: ft.Page):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            #print("object:\n", object) 
         else:
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
         
-    if hasattr(object, 'character_data'):
-        object.character_data["Role"] = "Side"
-        # Save the updated character data to pickle file
-        object.save_to_file()
+    if hasattr(object, 'data'):
+        object.data["Role"] = "Side"
+        object.save_dict()
     else:
         print("Object does not have tags attribute, cannot change character type")
+
     reload_character_rail(page)
 
-# Background character
+# Called when app drags a character to the background category in the rail
 def make_background_character(e, page: ft.Page):
+    ''' Changes the character role to background when dragged onto rail '''
+
     event_data = json.loads(e.data)
     src_id = event_data.get("src_id")
     
@@ -289,25 +325,24 @@ def make_background_character(e, page: ft.Page):
         draggable = e.page.get_control(src_id)
         if draggable:
             object = draggable.data
-            #print("object:\n", object) 
         else:
             print("Could not find control with src_id:", src_id)
     else:
         print("src_id not found in event data")
         
-    if hasattr(object, 'character_data'):
-        object.character_data["Role"] = "Background"
-        print(object.character_data["Role"])
-        # Save the updated character data to pickle file
-        object.save_to_file()
+    if hasattr(object, 'data'):
+        object.data["Role"] = "Background"
+        object.save_dict()
     else:
         print("Object does not have tags attribute, cannot change character type")
+
     reload_character_rail(page)
 
 
 
 # The 3 main categories of characters and how they will be rendered on the screen
 # There list of controls are populated from our character list in the story
+# (Phased out later for tree view, but for now this categorizes the characters)
 main_characters = ft.ExpansionTile(
     title=ft.Text("Main"),
     collapsed_icon_color=ft.Colors.PRIMARY,  # Trailing icon color when collapsed
@@ -358,14 +393,18 @@ background_characters_drag_target = ft.DragTarget(
 # Characters are organized based on their tag of main, side, or background
 # Have their colors change based on good, evil, neutral. Widget will reflect that
 def reload_character_rail(page: ft.Page):
-    # Clear our controls so they start fresh, doesnt effect our stored characters
+    ''' Rebuilds our character rail from scratch whenever changes are made in data to the rail (add or del character, etc.)
+    Will likely be phased out later when tree view is implemented, and replaces with an object '''
+
+    # Clear our current lists so we can rebuild them
     main_characters.controls.clear()
     side_characters.controls.clear()
     background_characters.controls.clear()
 
+    '''
     # Run through each character in our story
-    for character in user.active_story.characters:
-        # Create a new character widget for the rail
+    for character in app.active_story.characters:
+        # Create a new character tile for the rail
 
         new_char = ft.Draggable(
             content_feedback=ft.TextButton(text=character.title),   # Feedback when dragging
@@ -389,13 +428,14 @@ def reload_character_rail(page: ft.Page):
                             ft.Container(
                                 content=ft.Text(
                                     value=character.title,
-                                    color=character.name_color,
+                                    color=character.data['name_color'],
                                     max_lines=1,    # Handle too long of names
                                     overflow=ft.TextOverflow.CLIP,  # Handle too long of names
                                     weight=ft.FontWeight.BOLD,  # Make text bold
                                     no_wrap=True,
                                 ),
                             ),
+
                             # Space between name of character in the rail and menu button on right
                             ft.Container(expand=True),
 
@@ -404,7 +444,7 @@ def reload_character_rail(page: ft.Page):
                                 opacity=0,
                                 scale=.9,
                                 tooltip="",
-                                icon_color=character.name_color, 
+                                icon_color=character.data['name_color'], 
                                 items=[
                                     # Button to rename a character
                                     ft.PopupMenuItem(
@@ -427,11 +467,12 @@ def reload_character_rail(page: ft.Page):
             )
 
         )
+    '''
 
 
         
-
-        # Still in for loop, add our character to category based on its tag
+    '''
+        # Still in the for loop, add our character to category based on its tag (Phased out later)
         if character.data["Role"] == "Main":
             main_characters.controls.append(new_char)
         elif character.data["Role"] == "Side":
@@ -439,6 +480,7 @@ def reload_character_rail(page: ft.Page):
         elif character.data["Role"] == "Background":
             background_characters.controls.append(new_char)
 
+        # Start collapsed if no characters in that category
         if len(main_characters.controls) == 0:
             main_characters.initially_expanded=False
         else:
@@ -451,6 +493,7 @@ def reload_character_rail(page: ft.Page):
             background_characters.initially_expanded=False
         else:
             background_characters.initially_expanded=True
+    '''
 
     # Add our 'create character' button at bottom of each category
     main_characters.controls.append(
@@ -479,15 +522,9 @@ def reload_character_rail(page: ft.Page):
     )
     page.update()
 
-
+# Called by main to create our container that will hold our character rail
 def create_characters_rail(page: ft.Page) -> ft.Control:
-
-    # Initially create some characters to test with
-    #user.active_story.add_object_to_story(Character("Bob", page))
-    #user.active_story.add_object_to_story(Character("Alice", page))
-    #user.active_story.add_object_to_story(Character("Joe", page))
-    # Characters are now loaded automatically during story initialization in main.py
-    # user.active_story.load_all_characters(page_reference=page)  # Removed - causes duplicates
+    ''' Creates our character rail container that holds our character lists '''
 
     # Set our drag targets on accept methods here so we can pass in our page
     main_characters_drag_target.on_accept=lambda e: make_main_character(e, page)
@@ -495,7 +532,6 @@ def create_characters_rail(page: ft.Page) -> ft.Control:
     background_characters_drag_target.on_accept=lambda e: make_background_character(e, page)
 
     # List of controls that we return from our page. 
-    # This is static and should not change
     characters_rail = ft.Column(
         spacing=0, 
         expand=True, 

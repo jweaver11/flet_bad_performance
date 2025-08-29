@@ -1,7 +1,10 @@
+""" WIP """
+
 import flet as ft
+from models.story import Story
 
 
-def create_content_rail(page: ft.Page) -> ft.Control:
+def create_content_rail(page: ft.Page, story: Story=None) -> ft.Control:
     
     return ft.Column(
         controls=[
