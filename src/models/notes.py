@@ -6,7 +6,7 @@ import os
 from models.app import app
 from models.widget import Widget
 from constants.data_paths import characters_path
-
+#from constants.data_paths import notes_path
 #
 class Notes(Widget):
     # Constructor 
@@ -16,14 +16,7 @@ class Notes(Widget):
         self.p = page
 
 
-import flet as ft
-import json
-import os
-#import data_paths
-from models.user import user
-from models.widget import Widget
-from constants.data_paths import notes_path
-
+'''    
 class Notes(Widget):
     def __init__(self, title: str):
         #might remove title
@@ -47,3 +40,4 @@ class Notes(Widget):
             "last_modified": None
         }
         
+        '''
