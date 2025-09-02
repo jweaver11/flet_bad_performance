@@ -47,7 +47,7 @@ def init_load_saved_stories(page: ft.Page):
                     # Only process JSON files (not subdirectories)
                     if os.path.isfile(file_path) and file.endswith(".json"):
                         # Create story object - this will load its data automatically
-                        story = Story(story_title, page)
+                        story = Story(story_title, page, "none")
                         app.stories[story_title] = story
                         #print(f"Loading story: {story_title} from {file_path}")
                         

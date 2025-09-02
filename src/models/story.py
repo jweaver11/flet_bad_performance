@@ -11,7 +11,7 @@ from constants import data_paths
 
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str, page: ft.Page):
+    def __init__(self, title: str, page: ft.Page, template: str):      # Add is_from_template later
         
         # Parent constructor
         super().__init__(
@@ -19,7 +19,10 @@ class Story(ft.View):
             padding=ft.padding.only(top=0, left=0, right=0, bottom=0),    # No padding for the page
             spacing=0,      # No spacing between menubar and rest of page
         )  
-       
+
+        # Determine if story is from template and we should load template content when it is created, not loaded
+        self.template = template
+
         self.title = title # Gives our story a title when its created
         self.p = page  # Reference to our page object for updating UI elements. Sometimes we need it, sometimes not
         
@@ -39,6 +42,7 @@ class Story(ft.View):
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
+        # Called outside of constructor to avoid circular import issues
         #self.startup()
         
         
@@ -46,9 +50,8 @@ class Story(ft.View):
     def startup(self):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        '''
-
-        # Our folder structure for the story
+        # Sets our path to our story folder, and creates the folder structure if it doesn't exist
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
         story_structure_folders = [
             "content",
             "characters",
@@ -60,22 +63,25 @@ class Story(ft.View):
         
         # Actually creates the folders in our story path
         for folder in story_structure_folders:
-            folder_path = os.path.join(data_paths.active_story_path, folder)
+            folder_path = os.path.join(directory_path, folder)
             os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
 
-        notes_folders = [
-            "themes",
-            "quotes",
-            "research",
-        ]
-        for folder in notes_folders:
-            folder_path = os.path.join(data_paths.notes_path,  folder)
-            os.makedirs(folder_path, exist_ok=True)
+        # Load stuff from templates we create. For now, new stories default to this so we can play with folders
+        if self.template == "default":
+            # sub template folders inside of notes
+            notes_folders = [
+                "themes",
+                "quotes",
+                "research",
+            ]
+            for folder in notes_folders:
+                folder_path = os.path.join(directory_path,  "notes", folder)
+                os.makedirs(folder_path, exist_ok=True)
 
         # Create story metadata file
-        self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
+        self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
 
-        '''
+        self.is_from_template = "none"  # Reset this so we don't load template content again if story is loaded from storage
 
         # Loads our info about our story from its JSON file
         self.load_dict()    # This function creates one if story object was created not loaded
