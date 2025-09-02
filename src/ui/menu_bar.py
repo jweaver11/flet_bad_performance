@@ -11,7 +11,7 @@ from handlers.reload_workspace import remove_drag_targets
 from handlers.reload_workspace import reload_workspace
 
 # Called by main on program start to create our menu bar
-def create_menu_bar(page: ft.Page, story: Story) -> ft.Container:
+def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     
     # Placeholder events for now
     def handle_menu_item_click(e):
@@ -300,7 +300,6 @@ def create_menu_bar(page: ft.Page, story: Story) -> ft.Container:
         else:
             app.settings.hide_widget(story)
 
-        #reload_workspace(page)  # Re-render the page to show/hide settings
 
         
     # Return our formatted menubar

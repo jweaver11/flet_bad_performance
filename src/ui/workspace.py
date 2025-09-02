@@ -22,6 +22,9 @@ class Workspace(ft.Container):
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
         )
 
+        self.p = page
+        self.story = story
+
         self.minimum_pin_height = 200
         self.minimum_pin_width = 230
 
@@ -47,30 +50,61 @@ class Workspace(ft.Container):
         self.top_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.top_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_leave_pin,
+            on_accept=self.top_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.left_pin_drag_target = ft.DragTarget(
             group="widgets",
             content=ft.Container(expand=True, width=self.minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.left_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_leave_pin,
+            on_accept=self.left_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.main_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, height=self.minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.main_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_leave_pin,
+            on_accept=self.main_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.right_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, width=self.minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.right_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_leave_pin,
+            on_accept=self.right_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.bottom_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, height=self.minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0),
-            on_accept=self.bottom_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_leave_pin,
+            on_accept=self.bottom_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
 
-        self.reload_workspace(page, story)
+        self.pin_drag_targets = [
+            ft.Container(
+                expand=True,
+                content=self.main_pin_drag_target,
+                top=200, left=200, right=200, bottom=200, 
+            ),
+            ft.Container(
+                content=self.top_pin_drag_target,
+                height=200,
+                top=0, left=0, right=0, 
+            ),
+            ft.Container(
+                content=self.bottom_pin_drag_target,
+                height=200,
+                bottom=0, left=0, right=0,
+            ),
+            ft.Container(
+                content=self.left_pin_drag_target,
+                width=220,
+                left=0, top=0, bottom=0,
+            ),
+            ft.Container(
+                content=self.right_pin_drag_target,
+                width=220,
+                right=0, top=0, bottom=0, 
+            ),
+            
+]
+
+
+        # We call this in the story build_view, since it errors out here if the object is not fully built yet
+        #self.reload_workspace(page, story) 
 
     # Called when we need to reload our workspace content, especially after pin drags
     def reload_workspace(self, page: ft.Page, story: Story):
@@ -78,7 +112,7 @@ class Workspace(ft.Container):
 
         from handlers.arrange_widgets import arrange_widgets
 
-        #arrange_widgets(story)
+        arrange_widgets(story)
 
         # Change our cursor when we hover over a resizer (divider). Either vertical or horizontal
         def show_vertical_cursor(e: ft.HoverEvent):
@@ -88,8 +122,6 @@ class Workspace(ft.Container):
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
             e.control.update()
 
-        def do_nothing(e: ft.HoverEvent):
-            pass
 
         # Rendering adds dividers between each widget. So if we remove old ones here
         self.top_pin.controls = [control for control in self.top_pin.controls if type(control) != ft.GestureDetector]
@@ -113,8 +145,7 @@ class Workspace(ft.Container):
                         padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
                         content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
                     ),
-                    #on_hover=show_horizontal_cursor,
-                    on_hover=do_nothing,  # No hover effect for left pin
+                    on_hover=show_horizontal_cursor,
                     #on_pan_update=resize the left pin controls
                 )
                 self.top_pin.controls.insert(insert_position, gd)
@@ -133,8 +164,7 @@ class Workspace(ft.Container):
                         padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
                         content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
                     ),
-                    #on_hover=show_vertical_cursor,
-                    on_hover=do_nothing,  # No hover effect for left pin
+                    on_hover=show_vertical_cursor,
                     #on_pan_update=resize the left pin controls
                 )
                 self.left_pin.controls.insert(insert_position, gd)
@@ -154,8 +184,8 @@ class Workspace(ft.Container):
                         padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
                         content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
                     ),
-                    #on_hover=show_vertical_cursor,
-                    on_hover=do_nothing,  # No hover effect for left pin
+                    on_hover=show_vertical_cursor,
+                    #on_hover=do_nothing,  # No hover effect for left pin
                 )
                 self.right_pin.controls.insert(insert_position, gd)
 
@@ -173,8 +203,8 @@ class Workspace(ft.Container):
                         padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
                         content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
                     ),
-                    #on_hover=show_horizontal_cursor,
-                    on_hover=do_nothing,  # No hover effect for left pin
+                    on_hover=show_horizontal_cursor,
+                    #on_hover=do_nothing,  # No hover effect for left pin
                 )
                 self.bottom_pin.controls.insert(insert_position, gd)
 
@@ -394,26 +424,28 @@ class Workspace(ft.Container):
         page.update()
 
     # When a draggable starts dragging, we add our drag targets to the master stack
-    def show_pin_drag_targets(self, e):
+    def show_pin_drag_targets(self):
+        #print("show_pin_drag_targets called")
         
         # Only add drag targets if they're not already in the stack
-        #if pin_drag_targets not in story.master_stack.controls:
-            #story.master_stack.controls.extend(pin_drag_targets)
-            #story.master_stack.update()
-        #else:
-            #print("drag targets already in master stack. This is an error")
+        if self.pin_drag_targets not in self.master_stack.controls:
+            self.master_stack.controls.extend(self.pin_drag_targets)
+            self.master_stack.update()
+        else:
+            print("drag targets already in master stack. This is an error")
 
-        print("show_pin_drag_targets called")
+        self.p.update()
+
 
     # Called whenever a drag target accepts a draggable
     # Removes our drag targets from the stack, otherwise they sit overtop our widgets and break the program
     def remove_drag_targets(self):
-        print("remove drag_targets called")
+        #print("remove drag_targets called")
         # Remove all our drag targets when a drag is complete
-        #for target in pin_drag_targets:
-            #if target in story.master_stack.controls:
-                #story.master_stack.controls.remove(target)
-        #story.master_stack.update()
+        for target in self.pin_drag_targets:
+            if target in self.master_stack.controls:
+                self.master_stack.controls.remove(target)
+        self.master_stack.update()
 
     # Called when a draggable hovers over a drag target before dropping
     # Makes the drag target visible to notify apps they can drop here
@@ -421,14 +453,14 @@ class Workspace(ft.Container):
         # e.control = whichever drag target is calling this method
         e.control.content.opacity = .5
         e.control.content.update()
-        print("Hovered over a drag target")
+        #print("Hovered over a drag target")
         
     # Called when a draggable leaves a drag target
     # Makes the drag target invisible again
-    def on_leave_pin(e):
+    def on_stop_hover_drag_target(self, e):
         e.control.content.opacity = 0
         e.control.content.update()
-        print("Left a drag target")
+        #print("Left a drag target")
 
 
     # Accepting drags for our five pin locations
@@ -459,8 +491,10 @@ class Workspace(ft.Container):
         if hasattr(object, 'data') and object.data:
             object.data['pin_location'] = "top"  # Update our object's data dictionary as well
             object.save_dict()  # Save our object with its new pin location
-        #arrange_widgets()       # Re-arrange our widgets held in the story object
-        #reload_workspace(e.page, self)  # Re-render the widgets to reflect the new pin location
+
+        from handlers.arrange_widgets import arrange_widgets
+        arrange_widgets(self.story)       # Re-arrange our widgets held in the story object
+        self.reload_workspace(self.p, self.story)  # Re-render the widgets to reflect the new pin location
         
         print("top pin accepted")
 
@@ -486,8 +520,10 @@ class Workspace(ft.Container):
         if hasattr(object, 'data') and object.data:
             object.data['pin_location'] = "left"
             object.save_dict()
-        #arrange_widgets()       
-        #reload_workspace(e.page)  
+
+        from handlers.arrange_widgets import arrange_widgets
+        arrange_widgets(self.story)       
+        self.reload_workspace(self.p, self.story) 
         
         print("left pin accepted")
 
@@ -512,8 +548,10 @@ class Workspace(ft.Container):
 
         object.data['pin_location'] = "main"
         object.save_dict()
-        #arrange_widgets()       
-        #reload_workspace(e.page)  
+        
+        from handlers.arrange_widgets import arrange_widgets
+        arrange_widgets(self.story)       
+        self.reload_workspace(self.p, self.story) 
         
         print("main pin accepted")
 
@@ -538,8 +576,10 @@ class Workspace(ft.Container):
 
         object.data['pin_location'] = "right"
         object.save_dict()
-        #arrange_widgets()       
-        #reload_workspace(e.page)  
+
+        from handlers.arrange_widgets import arrange_widgets
+        arrange_widgets(self.story)       
+        self.reload_workspace(self.p, self.story)  
         
         print("right pin accepted")
 
@@ -563,8 +603,10 @@ class Workspace(ft.Container):
 
         object.data['pin_location'] = "bottom"
         object.save_dict()
-        #arrange_widgets()       
-        #reload_workspace(e.page)  
+
+        from handlers.arrange_widgets import arrange_widgets
+        arrange_widgets(self.story)       
+        self.reload_workspace(self.p, self.story)  
         
         print("bottom pin accepted")
         
@@ -572,8 +614,8 @@ class Workspace(ft.Container):
 
 
 
-# Function to return our container for our widgets
-def create_workspace(page: ft.Page, story: Story=None) -> ft.Container:   
+# Called to create our workspace whenever there is NO active story or no stories at all
+def create_workspace(page: ft.Page) -> ft.Container:   
 
     # Called when giant new story button is clicked
     def create_new_story_button_clicked(e):
@@ -674,27 +716,17 @@ def create_workspace(page: ft.Page, story: Story=None) -> ft.Container:
         page.update()
 
 
-    # When we passed a story through, we show its master stack
-    if story is not None:
-        # Container for 1 or more widgets open on the workspace area right side of screen
-        return ft.Container(
-            expand=True,
-            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
-            #content=story.master_stack,   
-        )
     
-    # Otherwise, there is no active story, so we show a big button to create a new story
-    else:
-        return ft.Container(
-            expand=True,
-            alignment=ft.alignment.center,
-            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
-            content=ft.FloatingActionButton(
-                icon=ft.Icons.ADD,
-                text="No Active Story\nClick to Create New Story",
-                on_click=create_new_story_button_clicked,
-                width=200,
-                height=100,
-                shape=ft.RoundedRectangleBorder(radius=10),  
-            ),
-        )
+    return ft.Container(
+        expand=True,
+        alignment=ft.alignment.center,
+        bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+        content=ft.FloatingActionButton(
+            icon=ft.Icons.ADD,
+            text="No Active Story\nClick to Create New Story",
+            on_click=create_new_story_button_clicked,
+            width=200,
+            height=100,
+            shape=ft.RoundedRectangleBorder(radius=10),  
+        ),
+    )

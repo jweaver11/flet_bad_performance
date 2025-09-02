@@ -3,6 +3,7 @@
 import flet as ft
 import os
 #from models.app import app
+from models.story import Story
 from models.widget import Widget
 from constants.data_paths import settings_path
 import json
@@ -14,14 +15,14 @@ import json
 
 class Settings(Widget):
     # Constructor
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, story: Story=None):
         
         # Constructor the parent widget class
         super().__init__(
             title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            #pin_location = "main",  # Start in main pin location
+            story = story,
         )
 
         # Loads our settings data from the JSON file

@@ -9,7 +9,6 @@ import json
 import os
 from models.app import app
 from models.widget import Widget
-from constants.data_paths import characters_path
 from models.story import Story
 
 
@@ -24,16 +23,16 @@ class Character(Widget):
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            #pin_location = "left",  # Start in left pin location
-            # path = ""    # Will need this in future??
+            story = story   # Grabs our story reference so we can access story data and save our character in the right folder
         )
+        
 
         # Variables that have to be loaded differently from data
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Load our character data from the file, or set default data if creating new character
-        self.__load_from_dict(story) 
+        self.__load_from_dict() 
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
@@ -46,27 +45,27 @@ class Character(Widget):
         self.save_dict()
 
      # Save our object as a dictionary for json serialization
-    def save_dict(self, story: Story):
+    def save_dict(self):
         #print("save settings dict called")
 
-        character_file_path = os.path.join(story.data['characters_directory_path'], f"{self.title}.json")
+        character_file_path = os.path.join(self.story.data['characters_directory_path'], f"{self.title}.json")
         
         # Save our data
         with open(character_file_path, "w") as f:
             json.dump(self.data, f, indent=4)
 
     # Called when new character object is created.
-    def __load_from_dict(self, story: Story):
+    def __load_from_dict(self):
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
 
         #print("load from dict called")
-        character_file_path = os.path.join(story.data['characters_directory_path'], f"{self.title}.json")
+        character_file_path = os.path.join(self.story.data['characters_directory_path'], f"{self.title}.json")
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
             'file_path': character_file_path,
-            'visible': False,
+            'visible': True,
             'pin_location': "left", # New characters start pinned left
 
             'tab_color': "primary",  # Initial tab color matches color scheme
@@ -126,7 +125,7 @@ class Character(Widget):
                 self.data.update(loaded_data)
 
                 # Set specific attributes form our l
-                self.visible = self.data.get('visible', False)
+                self.visible = self.data.get('visible', True)
                 #self.pin_location = self.data.get('pin_location', "left")    # Set pin location
                 
                 #print(f"Settings loaded successfully from {character_file_path}")
@@ -136,7 +135,7 @@ class Character(Widget):
                 #print("Settings file does not exist, using default values.")
                 
                 # Optionally create the file with default data
-                self.save_dict(story)  # This will save the default data to file
+                self.save_dict()  # This will save the default data to file
                 
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
             # Handle JSON parsing errors or file access issues
@@ -146,7 +145,7 @@ class Character(Widget):
             
             # Optionally create/overwrite the file with default data
             try:
-                self.save_dict(story)  # This will save the default data to file
+                self.save_dict()  # This will save the default data to file
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
 

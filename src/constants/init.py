@@ -21,6 +21,8 @@ def init_load_saved_stories(page: ft.Page):
     
     from constants import data_paths
     from models.app import app
+
+    print(data_paths.stories_directory_path)
     
     
     # Check if stories directory exists
