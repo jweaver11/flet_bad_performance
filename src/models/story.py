@@ -36,7 +36,17 @@ class Story(ft.View):
         self.drawing_board_rail = None  # Is an extended ft.Container
         self.notes_rail = None  # Is an extended ft.Container
 
-        #data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
+        # Make a list for positional indexing
+        self.characters = []    # Dict of character object. Used for storing/deleting characters
+
+        #self.startup()
+        
+        
+    # Called from main when our program starts up. Needs a page reference, thats why not called here
+    def startup(self):
+        ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
+
+        '''
 
         # Our folder structure for the story
         story_structure_folders = [
@@ -65,15 +75,7 @@ class Story(ft.View):
         # Create story metadata file
         self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
 
-        # Make a list for positional indexing
-        self.characters = []    # Dict of character object. Used for storing/deleting characters
-
-        #self.startup()
-        
-        
-    # Called from main when our program starts up. Needs a page reference, thats why not called here
-    def startup(self):
-        ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
+        '''
 
         # Loads our info about our story from its JSON file
         self.load_dict()    # This function creates one if story object was created not loaded
@@ -83,10 +85,10 @@ class Story(ft.View):
 
         self.build_view(self.p)
 
-        from handlers.reload_workspace import reload_workspace
+        #from handlers.reload_workspace import reload_workspace
 
         # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-        reload_workspace(self.p, self) 
+        self.workspace.reload_workspace(self.p, self) 
     
 
     def save_dict(self):
@@ -139,13 +141,6 @@ class Story(ft.View):
             'last_modified': None
         }
 
-        # OUr paths inside the story object
-        #content_path = os.path.join(active_story_path, "content")
-        #characters_path = os.path.join(active_story_path, "characters")
-        #plot_and_timeline_path = os.path.join(active_story_path, "plot_and_timeline")
-        #worldbuilding_path = os.path.join(active_story_path, "worldbuilding")
-        #drawing_board_path = os.path.join(active_story_path, "drawing_board")
-        #notes_path = os.path.join(active_story_path, "notes")
 
         try:
             # Check if the story file exists
@@ -160,11 +155,6 @@ class Story(ft.View):
 
                 self.title = self.data.get('title', self.title)  # Update title in case it was changed
 
-                # Set our saved pin sizes
-                #self.top_pin.height = self.data.get('top_pin_height', 0)
-                #self.left_pin.width = self.data.get('left_pin_width', 0)
-                #self.right_pin.width = self.data.get('right_pin_width', 0)
-                #self.bottom_pin.height = self.data.get('bottom_pin_height', 0)
             else:
                 # File doesn't exist, use default data
                 self.data = default_data
@@ -197,6 +187,8 @@ class Story(ft.View):
         self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
         self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
+        self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
+
 
         # Called when hovering over resizer to right of the active rail
         def show_horizontal_cursor(e: ft.HoverEvent):
@@ -352,7 +344,7 @@ class Story(ft.View):
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['characters_directory_path']):
             #print("Characters folder does not exist, creating it.")
-            os.makedirs(data_paths.characters_path)
+            #os.makedirs(data_paths.characters_path)    Outdated
             return
         
         # Iterate through all files in the characters folder
@@ -378,12 +370,15 @@ class Story(ft.View):
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
-                        #print(f"Loaded character: {character_title}")
-                        #print(f"Number of characters loaded: {len(self.characters)}")
+                        
                     
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
+
+        print(f"Total characters loaded for {self.title}: {len(self.characters)}")
+        for char in self.characters:
+            print(f"- {char.title} is visible: {char.visible}")
 
 
     # Called to create a character object

@@ -8,20 +8,18 @@ import flet as ft
 from models.app import app
 #from handlers.reload_workspace import reload_workspace
 from models.story import Story
-from handlers.reload_workspace import show_pin_drag_targets
+#from handlers.reload_workspace import show_pin_drag_targets
 
 
 class Widget(ft.Container):
     # Constructor
-    def __init__(self, title: str, tag: str, p: ft.Page):
+    def __init__(self, title: str, tag: str, p: ft.Page, story: Story):
     
         # Required parameters: title, tag, page reference, pin location
         self.title = title  # Title of our object
         self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
-        #self.pin_location = pin_location  # Pin location for our reference object in the story pins
-
-        self.path = ""  # The path to the json file that stores this widget's data
+        self.story = story
 
         # set uniformity for all widgets
         super().__init__(
@@ -53,7 +51,7 @@ class Widget(ft.Container):
                 data=self,  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
 
                 # Drag event handlers
-                on_drag_start=show_pin_drag_targets,    # Shows our pin targets when we start dragging
+                on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging
                 #on_drag_complete = Do nothing. The accepted drag targets handle logic and removing pin drag targets
                 #on_drag_cancel=impliment when we have custom draggables. Remove the pin drag targets
 
@@ -94,6 +92,17 @@ class Widget(ft.Container):
                 ),
             ),                       
         )
+
+    # Called when a draggable starts dragging.
+    def start_drag(self, e: ft.DragStartEvent):
+        ''' Shows our pin drag targets '''
+
+        # For now, settings don't drag and give the exception error instead
+        try:
+            self.story.workspace.show_pin_drag_targets()
+        except Exception as e:
+            print(f"Error showing pin drag targets: {e}")
+
 
     # Called when mouse hovers over the tab part of the widget
     def hover_tab(self, e):
