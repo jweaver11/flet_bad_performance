@@ -89,12 +89,9 @@ class Story(ft.View):
         # Loads our characters from file storage into our characters list
         self.load_characters(self.p)
 
+        # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view(self.p)
 
-        #from handlers.reload_workspace import reload_workspace
-
-        # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-        self.workspace.reload_workspace(self.p, self) 
     
 
     def save_dict(self):
@@ -382,9 +379,7 @@ class Story(ft.View):
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
 
-        print(f"Total characters loaded for {self.title}: {len(self.characters)}")
-        for char in self.characters:
-            print(f"- {char.title} is visible: {char.visible}")
+        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
 
     # Called to create a character object
@@ -393,22 +388,12 @@ class Story(ft.View):
 
         from models.character import Character
 
-        print("Create character called")
+        #print("Create character called")
 
-        # Create the character object
-        character = Character(title, self.p, self)
+        self.characters.append(Character(title, self.p, self))
 
-        print("Character created: " + character.title)
-
-        # Save it to our live story object
-        #self.save_object(character)
-
-        self.characters.append(character)
-
-        # Update the page to show the new character in the characters rail if its active
-        #self.p.update()
+        #print("Character created: " + character.title)
 
         self.workspace.reload_workspace(self.p, self)
 
-        return character
 

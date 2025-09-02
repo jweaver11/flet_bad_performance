@@ -32,7 +32,7 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Load our character data from the file, or set default data if creating new character
-        self.__load_from_dict() 
+        self.load_from_dict() 
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
@@ -55,7 +55,7 @@ class Character(Widget):
             json.dump(self.data, f, indent=4)
 
     # Called when new character object is created.
-    def __load_from_dict(self):
+    def load_from_dict(self):
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
 
