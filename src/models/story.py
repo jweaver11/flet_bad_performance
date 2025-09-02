@@ -184,14 +184,14 @@ class Story(ft.View):
         from ui.menu_bar import create_menu_bar
         from ui.all_workspaces_rails import All_Workspaces_Rail
         from ui.active_rail import Active_Rail
-        from ui.workspace import create_workspace, Workspace
+        from ui.workspace import Workspace
         from models.app import app
 
         # Clear our controls in our view before building it
         self.controls.clear()
 
         # Create our page elements as their own pages so they can update
-        menubar = create_menu_bar(page)
+        menubar = create_menu_bar(page, self)
 
         # Create our rails and workspace objects
         self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail

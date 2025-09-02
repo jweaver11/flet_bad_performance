@@ -6,7 +6,8 @@ All objects contain a title, tag, page reference, pin location, tab color, and a
 
 import flet as ft
 from models.app import app
-from handlers.reload_workspace import reload_workspace
+#from handlers.reload_workspace import reload_workspace
+from models.story import Story
 from handlers.reload_workspace import show_pin_drag_targets
 
 
@@ -109,9 +110,10 @@ class Widget(ft.Container):
         self.p.update()
 
     # Called when app clicks the hide icon in the tab
-    def hide_widget(self):
+    def hide_widget(self, story: Story):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
+        print(f"Hiding widget {self.title}")
         # Set our container object to invisible - won't be rendered anywhere
         self.visible = False
 
@@ -121,17 +123,19 @@ class Widget(ft.Container):
             self.save_dict()
             
         # Re-render the widgets to apply the changes
-        reload_workspace(self.p)
+        story.workspace.reload_workspace(self.p, story)
+        self.p.update()
 
     # Called when app clicks the widget in the rail
-    def show_widget(self):
+    def show_widget(self, story: Story):
         ''' Makes our widget visible for our workspace and updates the json to reflect the change '''
 
+        print(f"Showing widget {self.title}")
         self.visible = True
         
         if hasattr(self, 'data'):
             self.data['visible'] = True
             self.save_dict()
             
+        story.workspace.reload_workspace(self.p, story)
         self.p.update()
-        #reload_workspace(self.p)

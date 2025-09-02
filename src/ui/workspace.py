@@ -26,11 +26,14 @@ class Workspace(ft.Container):
         self.minimum_pin_width = 230
 
         # Creates our 5 pin locations for our widgets inside our workspace
-        self.top_pin = ft.Row(spacing=0, controls=[])
-        self.left_pin = ft.Column(spacing=0, controls=[])
+        self.top_pin = ft.Row(spacing=0, height=story.data['top_pin_height'], controls=[])
+        self.left_pin = ft.Column(spacing=0, width=story.data['left_pin_width'], controls=[])
         self.main_pin = ft.Row(expand=True, spacing=0, controls=[])
-        self.right_pin = ft.Column(spacing=0, controls=[])
-        self.bottom_pin = ft.Row(spacing=0, controls=[])
+        self.right_pin = ft.Column(spacing=0, width=story.data['right_pin_width'], controls=[])
+        self.bottom_pin = ft.Row(spacing=0, height=story.data['bottom_pin_height'], controls=[])
+
+        # Add our settings to the main pin whenver a new story is loaded or created
+        self.main_pin.controls.append(app.settings)
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
@@ -384,6 +387,9 @@ class Workspace(ft.Container):
             ]),
             formatted_right_pin,    # formatted right pin
         ]
+
+        # Set the master_stack as the content of this container
+        self.content = self.master_stack
         
         page.update()
 
