@@ -357,7 +357,7 @@ class Story(ft.View):
 
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
-                    file_path = os.path.join(self.data['characters_directory_path'], filename)
+                    file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
                     
                     try:
                         # Read the JSON file
@@ -390,7 +390,7 @@ class Story(ft.View):
         from models.character import Character
 
         # If no path is passed in, construct the full file path for the character JSON file
-        if file_path is None:
+        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
             character_filename = f"{title}.json"
             file_path = os.path.join(self.data['characters_directory_path'], character_filename)
         
