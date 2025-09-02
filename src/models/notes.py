@@ -27,7 +27,7 @@ class Notes(Widget):
         )
         
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
-        self.load_from_dict()
+        self.load_from_dict(file_path)
 
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
