@@ -10,16 +10,13 @@ from models.widget import Widget
 
 class Notes(Widget):
     def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
-        #might remove title
-        self.title = title
-        self.p = page
         self.content = ""  # Content of the notes
         self.created_at = ft.datetime.now()  # Creation timestamp
         self.updated_at = ft.datetime.now()  # Last updated timestamp
 
         # Initialize from our parent class 'Widget'. 
         super().__init__(
-            title = self.title,  # Title of the widget that will show up on its tab
+            title = title,  # Title of the widget that will show up on its tab
             tag = "notes",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             file_path = file_path,  # Path to our notes json file
