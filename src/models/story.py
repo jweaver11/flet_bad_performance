@@ -11,7 +11,7 @@ from constants import data_paths
 
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str, page: ft.Page):
+    def __init__(self, title: str, page: ft.Page, template: str):      # Add is_from_template later
         
         # Parent constructor
         super().__init__(
@@ -19,7 +19,10 @@ class Story(ft.View):
             padding=ft.padding.only(top=0, left=0, right=0, bottom=0),    # No padding for the page
             spacing=0,      # No spacing between menubar and rest of page
         )  
-       
+
+        # Determine if story is from template and we should load template content when it is created, not loaded
+        self.template = template
+
         self.title = title # Gives our story a title when its created
         self.p = page  # Reference to our page object for updating UI elements. Sometimes we need it, sometimes not
         
@@ -39,6 +42,7 @@ class Story(ft.View):
         # Make a list for positional indexing
         self.characters = []    # Dict of character object. Used for storing/deleting characters
 
+        # Called outside of constructor to avoid circular import issues
         #self.startup()
         
         
@@ -46,9 +50,8 @@ class Story(ft.View):
     def startup(self):
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        '''
-
-        # Our folder structure for the story
+        # Sets our path to our story folder, and creates the folder structure if it doesn't exist
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
         story_structure_folders = [
             "content",
             "characters",
@@ -60,22 +63,25 @@ class Story(ft.View):
         
         # Actually creates the folders in our story path
         for folder in story_structure_folders:
-            folder_path = os.path.join(data_paths.active_story_path, folder)
+            folder_path = os.path.join(directory_path, folder)
             os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
 
-        notes_folders = [
-            "themes",
-            "quotes",
-            "research",
-        ]
-        for folder in notes_folders:
-            folder_path = os.path.join(data_paths.notes_path,  folder)
-            os.makedirs(folder_path, exist_ok=True)
+        # Load stuff from templates we create. For now, new stories default to this so we can play with folders
+        if self.template == "default":
+            # sub template folders inside of notes
+            notes_folders = [
+                "themes",
+                "quotes",
+                "research",
+            ]
+            for folder in notes_folders:
+                folder_path = os.path.join(directory_path,  "notes", folder)
+                os.makedirs(folder_path, exist_ok=True)
 
         # Create story metadata file
-        self.data_file_path = os.path.join(data_paths.active_story_path, f"{self.title}.json")
+        self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
 
-        '''
+        self.is_from_template = "none"  # Reset this so we don't load template content again if story is loaded from storage
 
         # Loads our info about our story from its JSON file
         self.load_dict()    # This function creates one if story object was created not loaded
@@ -83,12 +89,9 @@ class Story(ft.View):
         # Loads our characters from file storage into our characters list
         self.load_characters(self.p)
 
+        # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view(self.p)
 
-        #from handlers.reload_workspace import reload_workspace
-
-        # Loads our widgets for the program whenever it starts. Make sure its called after page is built
-        self.workspace.reload_workspace(self.p, self) 
     
 
     def save_dict(self):
@@ -366,7 +369,7 @@ class Story(ft.View):
                         
                         # Create Character object with the title
                         from models.character import Character
-                        character = Character(character_title, page, self)
+                        character = Character(character_title, page, file_path, self)
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
@@ -376,33 +379,25 @@ class Story(ft.View):
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
 
-        print(f"Total characters loaded for {self.title}: {len(self.characters)}")
-        for char in self.characters:
-            print(f"- {char.title} is visible: {char.visible}")
+        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
 
     # Called to create a character object
-    def create_character(self, title: str):
+    def create_character(self, title: str, file_path: str=None):
         ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
+        #print("Create character called")
 
         from models.character import Character
 
-        print("Create character called")
+        # If no path is passed in, construct the full file path for the character JSON file
+        if file_path is None:
+            character_filename = f"{title}.json"
+            file_path = os.path.join(self.data['characters_directory_path'], character_filename)
+        
+        self.characters.append(Character(title, self.p, file_path, self))
 
-        # Create the character object
-        character = Character(title, self.p, self)
-
-        print("Character created: " + character.title)
-
-        # Save it to our live story object
-        #self.save_object(character)
-
-        self.characters.append(character)
-
-        # Update the page to show the new character in the characters rail if its active
-        #self.p.update()
+        #print("Character created: " + character.title)
 
         self.workspace.reload_workspace(self.p, self)
 
-        return character
 

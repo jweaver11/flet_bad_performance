@@ -10,10 +10,11 @@ def init_settings(page: ft.Page):
     ''' Loads our settings from a JSON file into our rendered settings control. If none exist, creates default settings '''
     from models.settings import Settings
     from models.app import app
+    from constants import data_paths
 
     # Sets our settings for our app. This will load the existing settings if they exist, otherwise create default settings
     if app.settings is None:
-        app.settings = Settings(page)
+        app.settings = Settings(page, data_paths.settings_path)
 
 # Called on app startup in main
 def init_load_saved_stories(page: ft.Page):
@@ -47,7 +48,7 @@ def init_load_saved_stories(page: ft.Page):
                     # Only process JSON files (not subdirectories)
                     if os.path.isfile(file_path) and file.endswith(".json"):
                         # Create story object - this will load its data automatically
-                        story = Story(story_title, page)
+                        story = Story(story_title, page, "none")
                         app.stories[story_title] = story
                         #print(f"Loading story: {story_title} from {file_path}")
                         

@@ -63,7 +63,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             # Check if the title is unique
             if is_unique:
                 #print("title is unique, story being created: ", title)
-                app.create_new_story(title, page) # Needs the story object
+                app.create_new_story(title, page, "default") # Needs the story object
                 dlg.open = False
                 page.update()
             else:

@@ -16,14 +16,15 @@ from models.story import Story
 # Widget requires a title, tag, page reference, and a pin location
 class Character(Widget):
     # Constructor
-    def __init__(self, name: str, page: ft.Page, story: Story):
+    def __init__(self, name: str, page: ft.Page, file_path: str, story: Story):
 
         # Parent class constructor
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             tag = "character",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            story = story   # Grabs our story reference so we can access story data and save our character in the right folder
+            file_path = file_path,    # Path to our json file for our data of our object
+            story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
         )
         
 
@@ -32,39 +33,34 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Load our character data from the file, or set default data if creating new character
-        self.__load_from_dict() 
+        self.load_from_dict(file_path) 
+
+        # If a path is passed in, use it. Otherwise use existing/default path we set in load_from_dict()
+        self.data['file_path'] = file_path if file_path is not None else self.data['file_path'] 
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
 
-    # Called when we want to change the file path of our character, usually when adding folders inside characters_path
-    def update_file_path(self, new_path):
-        ''' Updates our file path in our data and saves the dict '''
-
-        self.data['file_path'] = new_path
-        self.save_dict()
-
      # Save our object as a dictionary for json serialization
     def save_dict(self):
         #print("save settings dict called")
-
-        character_file_path = os.path.join(self.story.data['characters_directory_path'], f"{self.title}.json")
         
         # Save our data
-        with open(character_file_path, "w") as f:
+        with open(self.data['file_path'], "w") as f:
             json.dump(self.data, f, indent=4)
 
     # Called when new character object is created.
-    def __load_from_dict(self):
+    def load_from_dict(self, file_path: str):
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
-
         #print("load from dict called")
-        character_file_path = os.path.join(self.story.data['characters_directory_path'], f"{self.title}.json")
+
+        # Sets a default file path inside characters directory if none was passed in
+        character_file_path = file_path
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
-            'file_path': character_file_path,
+            'file_path': file_path,
             'visible': True,
             'pin_location': "left", # New characters start pinned left
 
@@ -115,7 +111,7 @@ class Character(Widget):
         try:
             # Try to load existing settings from file
             if os.path.exists(character_file_path):
-                self.path = character_file_path  # Set the path to the file
+                #self.path = character_file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
                 with open(character_file_path, "r") as f:
                     loaded_data = json.load(f)
@@ -126,7 +122,6 @@ class Character(Widget):
 
                 # Set specific attributes form our l
                 self.visible = self.data.get('visible', True)
-                #self.pin_location = self.data.get('pin_location', "left")    # Set pin location
                 
                 #print(f"Settings loaded successfully from {character_file_path}")
             else:

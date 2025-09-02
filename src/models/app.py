@@ -40,12 +40,12 @@ class App:
 
 
     # Called when app creates a new story
-    def create_new_story(self, title: str, page: ft.Page) -> Story:
+    def create_new_story(self, title: str, page: ft.Page, template: str) -> Story:
         ''' Creates the new story object, then saves it to a new folder WIP '''
         #from handlers.reload_workspace import reload_workspace
         
         # Create a new story object and add it to our stories dict
-        self.stories[title] = Story(title, page)
+        self.stories[title] = Story(title, page, template)
         self.stories[title].startup()
 
         page.route = self.stories[title].route
