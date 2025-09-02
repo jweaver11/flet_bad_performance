@@ -20,7 +20,6 @@ import flet as ft
 import json
 import os
 #import data_paths
-from models.user import user
 from models.widget import Widget
 from constants.data_paths import notes_path
 
