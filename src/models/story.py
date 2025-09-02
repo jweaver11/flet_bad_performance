@@ -369,7 +369,7 @@ class Story(ft.View):
                         
                         # Create Character object with the title
                         from models.character import Character
-                        character = Character(character_title, page, self)
+                        character = Character(character_title, page, file_path, self)
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
@@ -383,14 +383,18 @@ class Story(ft.View):
 
 
     # Called to create a character object
-    def create_character(self, title: str):
+    def create_character(self, title: str, file_path: str=None):
         ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
+        #print("Create character called")
 
         from models.character import Character
 
-        #print("Create character called")
-
-        self.characters.append(Character(title, self.p, self))
+        # If no path is passed in, construct the full file path for the character JSON file
+        if file_path is None:
+            character_filename = f"{title}.json"
+            file_path = os.path.join(self.data['characters_directory_path'], character_filename)
+        
+        self.characters.append(Character(title, self.p, file_path, self))
 
         #print("Character created: " + character.title)
 

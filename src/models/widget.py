@@ -13,24 +13,27 @@ from models.story import Story
 
 class Widget(ft.Container):
     # Constructor
-    def __init__(self, title: str, tag: str, p: ft.Page, story: Story):
-    
-        # Required parameters: title, tag, page reference, pin location
-        self.title = title  # Title of our object
-        self.tag = tag  # Tag for logic routing and identification
-        self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
-        self.story = story
+    def __init__(self, title: str, tag: str, p: ft.Page, file_path: str, story: Story):
 
         # set uniformity for all widgets
         super().__init__(
             expand=True, 
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
         )
+    
+        # Required parameters: title, tag, page reference, pin location
+        self.title = title  # Title of our object
+        self.tag = tag  # Tag for logic routing and identification
+        self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
+        self.file_path = file_path
+        self.story = story
+        
+
 
         # Our icon button that will hide the widget when clicked in the workspace
         self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
-            on_click=lambda e: self.hide_widget(),
+            on_click=lambda e: self.hide_widget(story),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
         )

@@ -9,7 +9,7 @@ from models.widget import Widget
     
 
 class Notes(Widget):
-    def __init__(self, title: str, page: ft.Page, story: Story):
+    def __init__(self, title: str, page: ft.Page, story: Story, path: str):
         #might remove title
         self.title = title
         self.p = page
@@ -22,7 +22,8 @@ class Notes(Widget):
             title = self.title,  # Title of the widget that will show up on its tab
             tag = "notes",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
-            story = story       # Saves our story object that this widget belongs to, so we can access it later
+            story = story,       # Saves our story object that this widget belongs to, so we can access it later
+            path = path
         )
         
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
