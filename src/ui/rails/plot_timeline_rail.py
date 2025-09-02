@@ -4,27 +4,48 @@ import flet as ft
 from models.story import Story
 
 
-def create_plot_and_timeline_rail(page: ft.Page, story: Story) -> ft.Control:
-    from models.app import app  # Needs to import here for updated reference each time
- 
-    return ft.Column(
-        spacing=0,
-        expand=True,
-        controls=[
-            ft.Text("Plot and Timeline Rail"),
-            ft.Text("From the story: "),
-            ft.Text(story.title),
-            ft.TextButton(
-                "create character",
-                on_click=story.create_character("John Doe")
-            )
-            # Add more controls here as needed
-        ]
-    )
+# Class is created in main on program startup
+class Plot_And_Timeline_Rail(ft.Container):
+    # Constructor
+    def __init__(self, page: ft.Page, story: Story=None):
+        
+        # Initialize the parent Container class first
+        super().__init__()
+            
+        self.p = page
 
-def reload_plot_and_timeline_rail(page: ft.Page):
-    ''' Reloads the plot and timeline rail, useful when switching stories '''
-    pass
+        self.reload_rail(story)
+
+
+    def reload_rail(self, story: Story) -> ft.Control:
+        ''' Reloads the plot and timeline rail, useful when switching stories '''
+
+        if story is not None:
+
+            self.content = ft.Column(
+                spacing=0,
+                expand=True,
+                controls=[
+                    ft.Text("Plot and Timeline Rail"),
+                    ft.Text("From the story: "),
+                    ft.Text(story.title),
+                    ft.TextButton(
+                        "create character",
+                        on_click=lambda e: story.create_character("John Doe")
+                    )
+                    # Add more controls here as needed
+                ]
+            )
+
+            self.p.update()
+
+        else:
+
+            print("Warning: Story is None, cannot load plot and timeline rail.")
+            self.content = ft.Text("Create a story to get started!")
+            self.p.update()
+
+
 
 
 # Add multiple timelines

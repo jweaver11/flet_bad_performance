@@ -6,11 +6,12 @@ Holds our settings icon, feedback, and account name as well
 import flet as ft
 from constants import data_paths
 from models.app import app
+from models.story import Story
 from handlers.reload_workspace import remove_drag_targets
 from handlers.reload_workspace import reload_workspace
 
 # Called by main on program start to create our menu bar
-def create_menu_bar(page: ft.Page) -> ft.Container:
+def create_menu_bar(page: ft.Page, story: Story) -> ft.Container:
     
     # Placeholder events for now
     def handle_menu_item_click(e):
@@ -289,14 +290,15 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
     )
 
     # Called when the settings icon on the right side of the menubar is clicked
-    def settings_clicked(e):
+    def settings_clicked(story: Story):
         ''' Toggles the visibility of the settings widget in the menubar '''
+        print("Settings clicked")
 
         app.settings.change_visibility()
         if app.settings.data['visible']:
-            app.settings.show_widget()
+            app.settings.show_widget(story)
         else:
-            app.settings.hide_widget()
+            app.settings.hide_widget(story)
 
         #reload_workspace(page)  # Re-render the page to show/hide settings
 
@@ -316,7 +318,7 @@ def create_menu_bar(page: ft.Page) -> ft.Container:
 
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
-                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button
+                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: settings_clicked(story)),   # Settings button
                 ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
             ]
         )

@@ -9,7 +9,7 @@ from models.app import app
 from models.story import Story
 from ui.rails.characters_rail import create_characters_rail  
 from ui.rails.content_rail import create_content_rail
-from ui.rails.plot_timeline_rail import create_plot_and_timeline_rail
+from ui.rails.plot_timeline_rail import Plot_And_Timeline_Rail
 from ui.rails.world_building_rail import create_world_building_rail
 from ui.rails.drawing_board_rail import create_drawing_board_rail
 from ui.rails.notes_rail import create_notes_rail
@@ -52,7 +52,8 @@ class Active_Rail(ft.Container):
             elif story.all_workspaces_rail.selected_rail == "characters":
                 self.content = create_characters_rail(page)
             elif story.all_workspaces_rail.selected_rail == "plot_and_timeline":
-                self.content = create_plot_and_timeline_rail(page, story)
+                story.plot_and_timeline_rail = Plot_And_Timeline_Rail(page, story)
+                self.content = story.plot_and_timeline_rail
             elif story.all_workspaces_rail.selected_rail == "world_building":
                 self.content = create_world_building_rail(page)
             elif story.all_workspaces_rail.selected_rail == "drawing_board":
@@ -63,6 +64,11 @@ class Active_Rail(ft.Container):
                 self.content = create_characters_rail(page)
 
             # Update the page to reflect changes
+            self.p.update()
+
+        else:
+            print("Warning: Story is None, cannot load active rail.")
+            self.content = ft.Text("Create a story to get started!")
             self.p.update()
 
 
