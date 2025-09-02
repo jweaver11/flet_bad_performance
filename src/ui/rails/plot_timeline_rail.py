@@ -31,7 +31,7 @@ class Plot_And_Timeline_Rail(ft.Container):
                     ft.Text(story.title),
                     ft.TextButton(
                         "create character",
-                        on_click=story.create_character("John Doe")
+                        on_click=lambda e: story.create_character("John Doe")
                     )
                     # Add more controls here as needed
                 ]

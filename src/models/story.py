@@ -36,7 +36,7 @@ class Story(ft.View):
         self.drawing_board_rail = None  # Is an extended ft.Container
         self.notes_rail = None  # Is an extended ft.Container
 
-        data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
+        #data_paths.set_active_story_path(title)  # Set our active story path to the newly created story
 
         # Our folder structure for the story
         story_structure_folders = [
@@ -117,7 +117,7 @@ class Story(ft.View):
         default_data = {
             'title': self.title,
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
-            'story_data_file_paht' : story_data_file_path,  # Path to our main story json file
+            'story_data_file_path' : story_data_file_path,  # Path to our main story json file
 
             'selected_rail': 'characters',
 
@@ -252,16 +252,7 @@ class Story(ft.View):
             ],
         )
 
-        # Format our page. Add our menubar at the top, then then our row built above
-        col = ft.Column(
-            spacing=0, 
-            expand=True, 
-            controls=[
-                menubar, 
-                row,
-            ]
-        )
-
+        # Views render like columns, so we add elements top-down
         self.controls = [menubar, row]
 
         
@@ -359,19 +350,19 @@ class Story(ft.View):
         #print("load characters called")
         
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
-        if not os.path.exists(data_paths.characters_path):
+        if not os.path.exists(self.data['characters_directory_path']):
             #print("Characters folder does not exist, creating it.")
             os.makedirs(data_paths.characters_path)
             return
         
         # Iterate through all files in the characters folder
         #for filename in os.listdir(data_paths.characters_path):
-        for dirpath, dirnames, filenames in os.walk(data_paths.characters_path):
+        for dirpath, dirnames, filenames in os.walk(self.data['characters_directory_path']):
             for filename in filenames:
 
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
-                    file_path = os.path.join(data_paths.characters_path, filename)
+                    file_path = os.path.join(self.data['characters_directory_path'], filename)
                     
                     try:
                         # Read the JSON file
@@ -383,7 +374,7 @@ class Story(ft.View):
                         
                         # Create Character object with the title
                         from models.character import Character
-                        character = Character(character_title, page)
+                        character = Character(character_title, page, self)
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
@@ -401,19 +392,22 @@ class Story(ft.View):
 
         from models.character import Character
 
+        print("Create character called")
+
         # Create the character object
-        character = Character(title, self.p)
+        character = Character(title, self.p, self)
+
+        print("Character created: " + character.title)
 
         # Save it to our live story object
-        self.save_object(character)
+        #self.save_object(character)
 
-        # Save its data to storage
-        #character.save_dict()
+        self.characters.append(character)
 
         # Update the page to show the new character in the characters rail if its active
-        self.p.update()
+        #self.p.update()
 
-        #self.workspace.reload_workspace(self.p, self)
+        self.workspace.reload_workspace(self.p, self)
 
         return character
 
