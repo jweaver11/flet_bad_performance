@@ -9,7 +9,7 @@ from models.widget import Widget
     
 
 class Notes(Widget):
-    def __init__(self, title: str, page: ft.Page, story: Story, path: str):
+    def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
         #might remove title
         self.title = title
         self.p = page
@@ -22,8 +22,8 @@ class Notes(Widget):
             title = self.title,  # Title of the widget that will show up on its tab
             tag = "notes",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
+            file_path = file_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            path = path
         )
         
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
@@ -41,11 +41,11 @@ class Notes(Widget):
             print(f"Error saving notes to {self.path}: {e}")
 
     # Called at end of constructor
-    def load_from_dict(self):
+    def load_from_dict(self, file_path: str):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        note_file_path = os.path.join(self.story.data['notes_directory_path'], f"{self.title}.json")
+        note_file_path = file_path
 
         ## IN THE FUTURE, WE WILL ITERATE THROUGH ALL THE FILES IN ALL THE SUBFOLDERS...
         ## OF THE story.data['notes_directory_path'] TO LOAD ALL OUR NOTES, AND PASS IN THE PATH FROM THERE.

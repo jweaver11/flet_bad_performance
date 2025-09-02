@@ -50,17 +50,17 @@ class Character(Widget):
             json.dump(self.data, f, indent=4)
 
     # Called when new character object is created.
-    def load_from_dict(self, path: str):
+    def load_from_dict(self, file_path: str):
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
         #print("load from dict called")
 
         # Sets a default file path inside characters directory if none was passed in
-        character_file_path = path
+        character_file_path = file_path
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
-            'file_path': path,
+            'file_path': file_path,
             'visible': True,
             'pin_location': "left", # New characters start pinned left
 
