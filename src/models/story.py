@@ -97,7 +97,7 @@ class Story(ft.View):
         self.load_plotlines()
 
         # Loads our notes from file storage
-        #self.load_notes()
+        self.load_notes()
 
         # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view()
@@ -472,7 +472,7 @@ class Story(ft.View):
         
         self.plotlines[title] = Plotline(title, self.p, file_path, self)
 
-        print(self.plotlines[title])
+        #print(self.plotlines[title])
 
         #print("Character created: " + character.title)
 
@@ -482,7 +482,46 @@ class Story(ft.View):
     # Called on story startup to load all our notes objects
     def load_notes(self):
         ''' Loads all our note objects stored in the notes directory path'''
-        pass
+
+        # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
+        if not os.path.exists(self.data['notes_directory_path']):
+            #print("Characters folder does not exist, creating it.")
+            #os.makedirs(data_paths.characters_path)    Outdated
+            return
+        
+        page = self.p
+        
+        # Iterate through all files in the characters folder
+        #for filename in os.listdir(data_paths.characters_path):
+        for dirpath, dirnames, filenames in os.walk(self.data['notes_directory_path']):
+            for filename in filenames:
+
+                # All our objects are stored as JSON
+                if filename.endswith(".json"):
+                    file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
+                    print("dirpath = ", dirpath)
+                    try:
+                        # Read the JSON file
+                        with open(file_path, "r") as f:
+                            note_data = json.load(f)
+                        
+                        # Extract the title from the data
+                        note_title = note_data.get("title", filename.replace(".json", ""))
+
+                        # Create Note object with the title
+                        from models.notes import Notes
+                        note = Notes(note_title, page, file_path, self)
+                        #character.path = file_path  # Set the path to the loaded file
+
+                        self.notes[note_title] = note
+                        print(self.notes[note_title].title)      
+                    
+                    # Handle errors if the path is wrong
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                        print(f"Error loading notes from {filename}: {e}")
+
+        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
+
 
     # Called to create a note object
     def create_note(self, title: str, file_path: str=None):
