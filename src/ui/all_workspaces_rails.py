@@ -77,7 +77,7 @@ class All_Workspaces_Rail(ft.Container):
             ],
         )
         # Plot and timeline workspace rail
-        plot_and_timeline_rail = ft.NavigationRail(
+        plotline_rail = ft.NavigationRail(
             height=70,  
             bgcolor=ft.Colors.TRANSPARENT,
             selected_index=None,
@@ -87,7 +87,7 @@ class All_Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY, scale=1.2), 
                     selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
                     padding=ft.padding.only(top=10, bottom=10),
-                    label="Plot & Timeline", data="plot_and_timeline"
+                    label="Plotline", data="plotline"
                 ),
             ],
         )
@@ -142,8 +142,8 @@ class All_Workspaces_Rail(ft.Container):
             content_rail.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
         elif self.selected_rail == "characters":
             characters_rail.selected_index = 0
-        elif self.selected_rail == "plot_and_timeline":
-            plot_and_timeline_rail.selected_index = 0
+        elif self.selected_rail == "plotline":
+            plotline_rail.selected_index = 0
         elif self.selected_rail == "world_building":
             world_building_rail.selected_index = 0
         elif self.selected_rail == "drawing_board":
@@ -160,7 +160,7 @@ class All_Workspaces_Rail(ft.Container):
             elif workspace == "characters":
                 workspaces_rail.append(characters_rail)    
             elif workspace == "plot_and_timeline":
-                workspaces_rail.append(plot_and_timeline_rail)
+                workspaces_rail.append(plotline_rail)
             elif workspace == "world_building":
                 workspaces_rail.append(world_building_rail)
             elif workspace == "drawing_board":
@@ -177,7 +177,7 @@ class All_Workspaces_Rail(ft.Container):
             # Remove our labels below the icons
             content_rail.destinations[0].label = None 
             characters_rail.destinations[0].label = None
-            plot_and_timeline_rail.destinations[0].label = None
+            plotline_rail.destinations[0].label = None
             world_building_rail.destinations[0].label = None
             drawing_board_rail.destinations[0].label = None
             notes_rail.destinations[0].label = None
@@ -253,8 +253,8 @@ class All_Workspaces_Rail(ft.Container):
                 story.characters_rail = create_characters_rail(self.p)
                 story.active_rail.content = story.characters_rail
             elif self.selected_rail == "plotline":
-                story.plot_and_timeline_rail = Plotline_Rail(self.p, story)
-                story.active_rail.content = story.plot_and_timeline_rail
+                story.plotline_rail = Plotline_Rail(self.p, story)
+                story.active_rail.content = story.plotline_rail
             elif self.selected_rail == "world_building":
                 story.world_building_rail = create_world_building_rail(self.p)
                 story.active_rail.content = story.world_building_rail

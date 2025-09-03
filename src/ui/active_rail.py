@@ -51,9 +51,9 @@ class Active_Rail(ft.Container):
                 self.content = create_content_rail(page)
             elif story.all_workspaces_rail.selected_rail == "characters":
                 self.content = create_characters_rail(page)
-            elif story.all_workspaces_rail.selected_rail == "plot_and_timeline":
-                story.plot_and_timeline_rail = Plotline_Rail(page, story)
-                self.content = story.plot_and_timeline_rail
+            elif story.all_workspaces_rail.selected_rail == "plotline":
+                story.plotline_rail = Plotline_Rail(page, story)
+                self.content = story.plotline_rail
             elif story.all_workspaces_rail.selected_rail == "world_building":
                 self.content = create_world_building_rail(page)
             elif story.all_workspaces_rail.selected_rail == "drawing_board":

@@ -34,7 +34,7 @@ class Story(ft.View):
         # Objects for our active rail content
         self.content_rail = None  # Is an extended ft.Container
         self.characters_rail = None  # Is an extended ft.Container
-        self.plot_and_timeline_rail = None  # Is an extended ft.Container
+        self.plotline_rail = None  # Is an extended ft.Container
         self.world_building_rail = None  # Is an extended ft.Container
         self.drawing_board_rail = None  # Is an extended ft.Container
         self.notes_rail = None  # Is an extended ft.Container
@@ -129,7 +129,7 @@ class Story(ft.View):
             # Paths to our workspaces for easier reference later
             'content_directory_path': os.path.join(directory_path, "content"),
             'characters_directory_path': os.path.join(directory_path, "characters"),
-            'plot_and_timeline_directory_path': os.path.join(directory_path, "plot_and_timeline"),
+            'plotline_directory_path': os.path.join(directory_path, "plotline"),
             'worldbuilding_directory_path': os.path.join(directory_path, "worldbuilding"),
             'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
             'notes_directory_path': os.path.join(directory_path, "notes"),

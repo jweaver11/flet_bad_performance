@@ -22,6 +22,9 @@ class Plotline(Widget):
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
         self.load_from_dict(file_path)
 
+        # Load our widget UI on start after we have loaded our data
+        self.reload_widget()
+
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
         ''' Saves our data to our notes json file. '''
@@ -46,13 +49,33 @@ class Plotline(Widget):
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
-            "title": self.title,
+            'title': self.title,
             'file_path': timeline_file_path,
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            "content": "",
-            "character_count": int,
-            "created_at": None,
-            "last_modified": None
+            'branches': {
+                'title': "branch_title",
+                'main_story_start_date': None,
+                'main_story_end_date': None,
+                'timeline_begin_date': None,
+                'timeline_end_date': None,
+                'timeskips': {'title': "timeskip_title", 'start_date': None, 'end_date': None},
+                'plot_points': {
+                    'event_title': "Event Title",
+                    'event_description': "Event Description",
+                    'event_date': None,
+                    'event_time': None,
+                    'involved_characters': [],
+                    'related_locations': [],
+                    'related_items': [],
+                },
+                'arcs': {
+                    'arc_title': "Arc Title",
+                    'arc_description': "Arc Description",
+                    'start_date': None,
+                    'end_date': None,
+                    'involved_characters': [],
+                },
+            },
         }
 
         try:
@@ -81,3 +104,34 @@ class Plotline(Widget):
             print(f"Error loading story data: {e}")
             # Fall back to default data on error
             self.data = default_data
+
+    # Called after any changes happen to the data that need to be reflected in the UI
+    def reload_widget(self):
+        ''' Reloads/Rebuilds our widget based on current data '''
+
+        # Body of the tab, which is the content of flet container
+        body = ft.Container(
+            expand=True,
+            padding=6,
+            #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
+            content=ft.Column([
+                ft.Text("hi from " + self.title),
+            ])
+        )
+
+        # our tab.content is the body of our widget that we build above.
+        self.tab.content=body   # We add this in combo with our 'tabs' later
+
+        # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
+        content = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            #divider_color=ft.Colors.TRANSPARENT,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+            tabs=[self.tab]    # Gives our tab control here
+        )
+        
+        # Content of our widget (ft.Container) is our created tabs content
+        self.content = content
