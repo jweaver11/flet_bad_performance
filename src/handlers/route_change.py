@@ -5,7 +5,7 @@ from models.story import Story
 def route_change(e: ft.RouteChangeEvent) -> Story:
     ''' Handles changing our page view based on the new route '''
 
-    # Grabs our page from the event
+    # Grabs our page from the event for easier reference
     page = e.page
 
     # Clear our views and any existing controls
@@ -13,7 +13,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     page.controls.clear()
 
     from models.app import app
-    new_story = None    # Set new story to non intially to handle routes that don't match any stories
+    new_story = None    # Set new story to none intially to handle routes that don't match any stories
 
     # Run through our stories and see which ones route matches our new route
     for story in app.stories.values():
@@ -29,7 +29,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     if new_story is not None:
         # Rebuild our view each switch. This is only called to ensure things like rails being collapsed and workspace
         # orders are properly loaded each time we switch stories
-        new_story.build_view(page)  
+        new_story.build_view()  
         page.views.append(new_story)
         # Set our new title to reflect this new loaded story
         page_title = "StoryBoard -- " + new_story.title + " -- Saved status"

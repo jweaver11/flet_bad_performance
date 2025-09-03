@@ -154,4 +154,6 @@ def arrange_widgets(story: Story):
         add_object_to_pin(char)
     if app.settings is not None: 
         add_object_to_pin(app.settings)
+    for title, plotline in story.plotlines.items():
+        add_object_to_pin(plotline)
 
