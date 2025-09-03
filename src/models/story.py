@@ -87,7 +87,7 @@ class Story(ft.View):
         self.template = "none"  # Reset this so we don't load template content again if story is loaded from storage
 
         # Loads our info about our story from its JSON file
-        self.load_dict()    # This function creates one if story object was created not loaded
+        self.load_from_dict()    # This function creates one if story object was created not loaded
 
         # Loads our characters from file storage into our characters list
         self.load_characters()
@@ -118,7 +118,7 @@ class Story(ft.View):
             print(f"Error saving story data: {e}")
 
     # Called when loading a story from storage or when creating a new story
-    def load_dict(self):
+    def load_from_dict(self):
         ''' Loads our story data from its JSON file. If no file exists, we create one with default data '''
         #print("load story dict called")
 

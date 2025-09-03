@@ -13,13 +13,14 @@ def create_notes_rail(page: ft.Page, story: Story=None) -> ft.Control:
             ft.TextButton(
                 "Add Note",
                 icon=ft.Icons.ADD,
-                on_click=lambda e: story.create_note() if story else None
-                #url_target="",
+                title="Note Title",
+                on_click=lambda e: story.create_note("note_title") if story else None
+                
             ),
             ft.TextButton(
                 "View Notes",
                 icon=ft.Icons.VIEW_LIST,
-                #on_click=lambda e: story.load_from_dict() if story else None
+                
             ),
             ft.Text("This is where you can manage your notes.")
         ]
