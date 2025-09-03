@@ -473,7 +473,21 @@ class Story(ft.View):
         #print("Character created: " + character.title)
 
         self.workspace.reload_workspace(self.p, self)
+    '''WIP'''
+    # Called to create a note object
+    def create_note(self, title: str, file_path: str=None):
+        ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
+        from models.notes import Notes 
 
+        # If no path is passed in, construct the full file path for the note JSON file
+        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            note_filename = f"{title}.json"
+            file_path = os.path.join(self.data['notes_directory_path'], note_filename)
 
+        self.notes.append(Notes(title, self.p, file_path, self))
+
+        #print("Note created: " + notes.title)
+
+        self.workspace.reload_workspace(self.p, self)
 
 
