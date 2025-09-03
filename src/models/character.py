@@ -159,6 +159,7 @@ class Character(Widget):
                 ft.Row(
                         wrap=True,
                        controls=[
+                           #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                 label="Morality",
                                 value=self.data['Morality'],
@@ -166,14 +167,16 @@ class Character(Widget):
                                 color=self.data['name_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                 options=[
+                                    ft.DropdownOption(text="Undecided"),
                                     ft.DropdownOption(text="Good"),
-                                    ft.DropdownOption(text="Evil"),
                                     ft.DropdownOption(text="Neutral"),
-                                    ft.DropdownOption(text="N/A"),
+                                    ft.DropdownOption(text="Evil"),
                                     ft.DropdownOption(text="None"),
+                                    
                                 ],
                                 on_change=self.morality_change,
                             ),
+                               
                             ft.Dropdown(      # Sex of each character
                                 label="Sex",
                                 value=self.data['Sex'],
@@ -238,13 +241,14 @@ class Character(Widget):
         if app.settings.change_name_colors.value == True:
             print("color changing is true, we running the logic")
             # Check the morality and change color accordingly
+            #TODO figure out color association & logic for assignment with morality alignments
             if self.data['Morality'] == "Good":
                 self.name_color = ft.Colors.GREEN_200
             elif self.data['Morality'] == "Evil":
                 self.name_color = ft.Colors.RED_200
             elif self.data['Morality'] == "Neutral":
                 self.name_color = ft.Colors.GREY_300
-            elif self.data['Morality'] == "N/A":
+            elif self.data['Morality'] == "Undecided":
                 self.name_color = ft.Colors.GREY_300
             elif self.data['Morality'] == "None":    # Deselect all choices
                 self.name_color = ft.Colors.PRIMARY

@@ -32,6 +32,7 @@ class Plotline_Rail(ft.Container):
                     ft.TextButton(
                         "create character",
                         on_click=lambda e: story.create_character("John Doe")
+                        #TODO create text box for user input of char name & save
                     )
                     # Add more controls here as needed
                 ]

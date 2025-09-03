@@ -93,7 +93,7 @@ class Notes(Widget):
     # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
-
+        
         # Body of the tab, which is the content of flet container
         body = ft.Container(
             expand=True,
@@ -103,6 +103,7 @@ class Notes(Widget):
                 ft.Text("hi from " + self.title),
             ])
         )
+        
 
         # our tab.content is the body of our widget that we build above.
         self.tab.content=body   # We add this in combo with our 'tabs' later
