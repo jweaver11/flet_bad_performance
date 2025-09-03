@@ -43,6 +43,7 @@ class Story(ft.View):
         self.content = {}
         self.characters = []    # Make into dict later?
         self.plotlines = {}      # Dict of plotline object. Used for storing/deleting plotlines
+        self.notes = {}
 
         # Called outside of constructor to avoid circular import issues
         #self.startup()
@@ -474,6 +475,7 @@ class Story(ft.View):
 
         self.workspace.reload_workspace(self.p, self)
     '''WIP'''
+    
     # Called to create a note object
     def create_note(self, title: str, file_path: str=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
@@ -484,7 +486,7 @@ class Story(ft.View):
             note_filename = f"{title}.json"
             file_path = os.path.join(self.data['notes_directory_path'], note_filename)
 
-        self.notes.append(Notes(title, self.p, file_path, self))
+        self.notes[title] = Notes(title, self.p, file_path, self)
 
         #print("Note created: " + notes.title)
 

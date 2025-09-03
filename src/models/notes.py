@@ -11,8 +11,8 @@ from models.widget import Widget
 class Notes(Widget):
     def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
         self.content = ""  # Content of the notes
-        self.created_at = ft.datetime.now()  # Creation timestamp
-        self.updated_at = ft.datetime.now()  # Last updated timestamp
+        #self.created_at = ft.datetime.now()  # Creation timestamp
+        #self.updated_at = ft.datetime.now()  # Last updated timestamp
 
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -57,7 +57,7 @@ class Notes(Widget):
             'file_path': note_file_path,
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             "content": "",
-            "character_count": int,
+            "character_count": 0,
             "created_at": None,
             "last_modified": None
         }
@@ -71,8 +71,7 @@ class Notes(Widget):
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
-                self.data = default_data.copy()
-                self.data.update(loaded_data)
+                self.data = {**default_data, **loaded_data}
 
                 # Set specific attributes form our data
                 self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error

@@ -59,7 +59,7 @@ class Active_Rail(ft.Container):
             elif story.all_workspaces_rail.selected_rail == "drawing_board":
                 self.content = create_drawing_board_rail(page)
             elif story.all_workspaces_rail.selected_rail == "notes":
-                self.content = create_notes_rail(page)
+                self.content = create_notes_rail(page, story)
             else:
                 self.content = create_characters_rail(page)
 

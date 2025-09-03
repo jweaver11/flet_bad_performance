@@ -262,7 +262,7 @@ class All_Workspaces_Rail(ft.Container):
                 story.drawing_board_rail = create_drawing_board_rail(self.p)
                 story.active_rail.content = story.drawing_board_rail
             elif self.selected_rail == "notes":
-                story.notes_rail = create_notes_rail(self.p)
+                story.notes_rail = create_notes_rail(self.p, story)
                 story.active_rail.content = story.notes_rail
 
             self.reload_rail(story)  # Reload the rail to apply the new selection
