@@ -93,8 +93,11 @@ class Story(ft.View):
         # Loads our characters from file storage into our characters list
         self.load_characters()
 
-        # Loads our plotline from file storage, or creates our plotline if none exists
+        # Loads our plotline from file storage
         self.load_plotlines()
+
+        # Loads our notes from file storage
+        #self.load_notes()
 
         # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view()
@@ -475,7 +478,10 @@ class Story(ft.View):
 
         self.workspace.reload_workspace(self.p, self)
     '''WIP'''
-    
+
+    def load_notes(self):
+        pass
+
     # Called to create a note object
     def create_note(self, title: str, file_path: str=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''

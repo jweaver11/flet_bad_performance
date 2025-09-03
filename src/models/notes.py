@@ -55,7 +55,10 @@ class Notes(Widget):
         default_data = {
             "title": self.title,
             'file_path': note_file_path,
+
+            'pin_location': "right",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+
             "content": "",
             "character_count": 0,
             "created_at": None,
