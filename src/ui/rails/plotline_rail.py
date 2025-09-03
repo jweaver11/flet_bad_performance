@@ -5,7 +5,7 @@ from models.story import Story
 
 
 # Class is created in main on program startup
-class Plot_And_Timeline_Rail(ft.Container):
+class Plotline_Rail(ft.Container):
     # Constructor
     def __init__(self, page: ft.Page, story: Story=None):
         

@@ -1,18 +1,14 @@
-''' Notes Model for the story object only. Displays in its own widget'''
-
 import flet as ft
 import json
 import os
 from models.story import Story
 from models.widget import Widget
 
-    
 
-class Notes(Widget):
+# Class that holds our timeline
+class Plotline(Widget):
     def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
-        self.content = ""  # Content of the notes
-        self.created_at = ft.datetime.now()  # Creation timestamp
-        self.updated_at = ft.datetime.now()  # Last updated timestamp
+        
 
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -22,7 +18,7 @@ class Notes(Widget):
             file_path = file_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
-        
+
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
         self.load_from_dict(file_path)
 
@@ -42,7 +38,7 @@ class Notes(Widget):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        note_file_path = file_path
+        timeline_file_path = file_path
 
         ## IN THE FUTURE, WE WILL ITERATE THROUGH ALL THE FILES IN ALL THE SUBFOLDERS...
         ## OF THE story.data['notes_directory_path'] TO LOAD ALL OUR NOTES, AND PASS IN THE PATH FROM THERE.
@@ -51,7 +47,7 @@ class Notes(Widget):
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             "title": self.title,
-            'file_path': note_file_path,
+            'file_path': timeline_file_path,
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             "content": "",
             "character_count": int,
@@ -61,10 +57,10 @@ class Notes(Widget):
 
         try:
             # Try to load existing settings from file
-            if os.path.exists(note_file_path):
-                self.path = note_file_path  # Set the path to the file
+            if os.path.exists(timeline_file_path):
+                self.path = timeline_file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
-                with open(note_file_path, "r") as f:
+                with open(timeline_file_path, "r") as f:
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
@@ -85,5 +81,3 @@ class Notes(Widget):
             print(f"Error loading story data: {e}")
             # Fall back to default data on error
             self.data = default_data
-        
-        

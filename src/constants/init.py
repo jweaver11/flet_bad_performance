@@ -16,6 +16,7 @@ def init_settings(page: ft.Page):
     if app.settings is None:
         app.settings = Settings(page, data_paths.settings_path)
 
+
 # Called on app startup in main
 def init_load_saved_stories(page: ft.Page):
     ''' Loads our saved stories from the json files in story folders within the stories directory. If none exist, do nothing '''
@@ -24,7 +25,6 @@ def init_load_saved_stories(page: ft.Page):
     from models.app import app
 
     print(data_paths.stories_directory_path)
-    
     
     # Check if stories directory exists
     if not os.path.exists(data_paths.stories_directory_path):
