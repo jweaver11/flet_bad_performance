@@ -479,7 +479,9 @@ class Story(ft.View):
         self.workspace.reload_workspace(self.p, self)
     '''WIP'''
 
+    # Called on story startup to load all our notes objects
     def load_notes(self):
+        ''' Loads all our note objects stored in the notes directory path'''
         pass
 
     # Called to create a note object
