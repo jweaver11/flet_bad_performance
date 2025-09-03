@@ -135,14 +135,14 @@ class Widget(ft.Container):
             self.save_dict()
             
         # Re-render the widgets to apply the changes
-        story.workspace.reload_workspace(self.p, story)
+        #story.workspace.reload_workspace(self.p, story)
         self.p.update()
 
     # Called when app clicks the widget in the rail
     def show_widget(self, story: Story):
         ''' Makes our widget visible for our workspace and updates the json to reflect the change '''
 
-        print(f"Showing widget {self.title}")
+        #print(f"Showing widget {self.title}")
         self.visible = True
         
         if hasattr(self, 'data'):

@@ -5,11 +5,12 @@ from models.story import Story
 from models.widget import Widget
 
 
-# Class that holds our timeline
+# Class that holds our plotline (timeline)
+# Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
 class Plotline(Widget):
+    # Constructor
     def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
         
-
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
@@ -18,6 +19,8 @@ class Plotline(Widget):
             file_path = file_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
+
+        self.visible = True
 
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
         self.load_from_dict(file_path)
@@ -41,56 +44,72 @@ class Plotline(Widget):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        timeline_file_path = file_path
-
-        ## IN THE FUTURE, WE WILL ITERATE THROUGH ALL THE FILES IN ALL THE SUBFOLDERS...
-        ## OF THE story.data['notes_directory_path'] TO LOAD ALL OUR NOTES, AND PASS IN THE PATH FROM THERE.
-        ## FOR NOW, ALL NOTES JUST STORED INSIDE THE NOTES DIRECTORY, SO IT DOESNT MATTER
-
+        plotline_file_path = file_path
+        
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             'title': self.title,
-            'file_path': timeline_file_path,
+            'file_path': plotline_file_path,
+
+            'pin_location': "main",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            'branches': {
-                'title': "branch_title",
-                'main_story_start_date': None,
-                'main_story_end_date': None,
-                'timeline_begin_date': None,
-                'timeline_end_date': None,
-                'timeskips': {'title': "timeskip_title", 'start_date': None, 'end_date': None},
-                'plot_points': {
-                    'event_title': "Event Title",
-                    'event_description': "Event Description",
-                    'event_date': None,
-                    'event_time': None,
-                    'involved_characters': [],
-                    'related_locations': [],
-                    'related_items': [],
-                },
-                'arcs': {
-                    'arc_title': "Arc Title",
-                    'arc_description': "Arc Description",
-                    'start_date': None,
-                    'end_date': None,
-                    'involved_characters': [],
-                },
+
+            'plotline_begin_date': None,    # Start and end date of this particular plotline
+            'plotline_end_date': None,
+            
+            'main_story_start_date': None,  # Start and end date of the main story
+            'main_story_end_date': None,
+
+            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
+            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out
+            'timeskips': {      
+                'title': "timeskip_title", 
+                'start_date': None, 
+                'end_date': None
             },
+
+            # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
+            'plot_points': {
+                'title': "Event Title",
+                'description': "Event Description",
+                'date': None,   # These are 'points' on the timeline, so they just get a date, not a start/end range
+                'time': None,   # time during that day
+                'involved_characters': [],
+                'related_locations': [],
+                'related_items': [],
+                #...
+            },
+
+            # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
+            'arcs': {
+                'arc_title': "Arc Title",
+                'arc_description': "Arc Description",
+                'start_date': None,
+                'end_date': None,
+                'involved_characters': [],
+            },
+
+            'filters': {    # Filters we can apply to change the view of our plotline, while keeping the data intact
+                'show_timeskips': True,
+                'show_plot_points': True,
+                'show_arcs': True,
+            }
         }
+        
 
         try:
             # Try to load existing settings from file
-            if os.path.exists(timeline_file_path):
-                self.path = timeline_file_path  # Set the path to the file
+            if os.path.exists(plotline_file_path):
+                self.path = plotline_file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
-                with open(timeline_file_path, "r") as f:
+                with open(plotline_file_path, "r") as f:
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
-                self.data = default_data.copy()
-                self.data.update(loaded_data)
+                self.data = {**default_data, **loaded_data}
 
                 # Set specific attributes form our data
+                self.title = self.data.get('title', self.title)  # live title = data title, default to current title if error
                 self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error
                 
             else:

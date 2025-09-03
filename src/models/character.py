@@ -60,6 +60,7 @@ class Character(Widget):
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
+            'title': self.title,
             'file_path': file_path,
             'visible': True,
             'pin_location': "left", # New characters start pinned left
@@ -104,8 +105,8 @@ class Character(Widget):
             'Personality': "",  # expandable ft.TextField
             'Backstory': "",    # expandable ft.TextField
             'Abilities': "",    # Some sort of list
-            'Dead': [False, {'death_date': "when they died"}],
-            'Notes' : [],   # Category that says Notes on the left, then lists the expandable ft.TextField?
+            'Dead': False,
+            'Notes' : {},   # Category that says Notes on the left, then lists the expandable ft.TextField?
         }
         
         try:

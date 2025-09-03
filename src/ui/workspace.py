@@ -240,7 +240,7 @@ class Workspace(ft.Container):
         # Method called when our divider (inside a gesture detector) is dragged
         # Updates the size of our pin in the story object
         def move_top_pin_divider(e: ft.DragUpdateEvent):
-            print("move top pin divider called")
+            #print("move top pin divider called")
             if (e.delta_y > 0 and self.top_pin.height < page.height/2) or (e.delta_y < 0 and self.top_pin.height > 200):
                 self.top_pin.height += e.delta_y
                 self.top_pin_drag_target.content.height = self.top_pin.height  # Update the drag target height to match the pin height
@@ -268,7 +268,7 @@ class Workspace(ft.Container):
 
         # Left pin reisizer method and variable
         def move_left_pin_divider(e: ft.DragUpdateEvent):
-            print("move left pin divider called")
+            #print("move left pin divider called")
             if (e.delta_x > 0 and self.left_pin.width < page.width/2) or (e.delta_x < 0 and self.left_pin.width > 200):
                 self.left_pin.width += e.delta_x
             formatted_left_pin.update()
