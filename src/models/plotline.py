@@ -1,18 +1,14 @@
-''' Notes Model for the story object only. Displays in its own widget'''
-
 import flet as ft
 import json
 import os
 from models.story import Story
 from models.widget import Widget
 
-    
 
-class Notes(Widget):
+# Class that holds our timeline
+class Plotline(Widget):
     def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
-        self.content = ""  # Content of the notes
-        self.created_at = ft.datetime.now()  # Creation timestamp
-        self.updated_at = ft.datetime.now()  # Last updated timestamp
+        
 
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -22,7 +18,7 @@ class Notes(Widget):
             file_path = file_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
-        
+
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
         self.load_from_dict(file_path)
 
@@ -45,7 +41,7 @@ class Notes(Widget):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        note_file_path = file_path
+        timeline_file_path = file_path
 
         ## IN THE FUTURE, WE WILL ITERATE THROUGH ALL THE FILES IN ALL THE SUBFOLDERS...
         ## OF THE story.data['notes_directory_path'] TO LOAD ALL OUR NOTES, AND PASS IN THE PATH FROM THERE.
@@ -53,21 +49,41 @@ class Notes(Widget):
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
-            "title": self.title,
-            'file_path': note_file_path,
+            'title': self.title,
+            'file_path': timeline_file_path,
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            "content": "",
-            "character_count": int,
-            "created_at": None,
-            "last_modified": None
+            'branches': {
+                'title': "branch_title",
+                'main_story_start_date': None,
+                'main_story_end_date': None,
+                'timeline_begin_date': None,
+                'timeline_end_date': None,
+                'timeskips': {'title': "timeskip_title", 'start_date': None, 'end_date': None},
+                'plot_points': {
+                    'event_title': "Event Title",
+                    'event_description': "Event Description",
+                    'event_date': None,
+                    'event_time': None,
+                    'involved_characters': [],
+                    'related_locations': [],
+                    'related_items': [],
+                },
+                'arcs': {
+                    'arc_title': "Arc Title",
+                    'arc_description': "Arc Description",
+                    'start_date': None,
+                    'end_date': None,
+                    'involved_characters': [],
+                },
+            },
         }
 
         try:
             # Try to load existing settings from file
-            if os.path.exists(note_file_path):
-                self.path = note_file_path  # Set the path to the file
+            if os.path.exists(timeline_file_path):
+                self.path = timeline_file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
-                with open(note_file_path, "r") as f:
+                with open(timeline_file_path, "r") as f:
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
@@ -88,9 +104,8 @@ class Notes(Widget):
             print(f"Error loading story data: {e}")
             # Fall back to default data on error
             self.data = default_data
-        
 
-    # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild
+    # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
@@ -109,15 +124,14 @@ class Notes(Widget):
 
         # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
         content = ft.Tabs(
-            selected_index=0,       # Since we only have one tab, we make sure it is selected
-            animation_duration=0,   # Gets rid of transition animation between tabs
+            selected_index=0,
+            animation_duration=0,
             #divider_color=ft.Colors.TRANSPARENT,
-            padding=ft.padding.all(0),  # No padding so it fills the entire container
-            label_padding=ft.padding.all(0),    # No padding around the label either
-            mouse_cursor=ft.MouseCursor.BASIC,  # Basic mouse cursor when hovering over tabs
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
             tabs=[self.tab]    # Gives our tab control here
         )
         
         # Content of our widget (ft.Container) is our created tabs content
         self.content = content
-        
