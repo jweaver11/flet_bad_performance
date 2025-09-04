@@ -35,7 +35,7 @@ class Plotline(Widget):
         try:
             with open(self.file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
-            print(f"Notes saved successfully to {self.file_path}")
+            #print(f"Plotline saved successfully to {self.file_path}")
         except Exception as e:
             print(f"Error saving notes to {self.file_path}: {e}")
 

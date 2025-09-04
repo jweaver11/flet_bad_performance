@@ -134,9 +134,16 @@ class Widget(ft.Container):
             self.data['visible'] = False
             self.save_dict()
             
-        # Re-render the widgets to apply the changes
-        #story.workspace.reload_workspace(self.p, story)
-        self.p.update()
+        # Settings doesn't have a story, so we reload all the stories workspaces instead of just the one for our widget
+        if self.title == "Settings":
+            from models.app import app
+            for key, story in app.stories.items():
+                story.workspace.reload_workspace(self.p, story)
+            self.p.update()
+
+        # Otherwise, our widget will have a story, so we just reload that one
+        else:
+            story.workspace.reload_workspace(self.p, story)
 
     # Called when app clicks the widget in the rail
     def show_widget(self, story: Story):
@@ -148,6 +155,5 @@ class Widget(ft.Container):
         if hasattr(self, 'data'):
             self.data['visible'] = True
             self.save_dict()
-            
+        
         story.workspace.reload_workspace(self.p, story)
-        self.p.update()

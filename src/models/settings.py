@@ -236,13 +236,6 @@ class Settings(Widget):
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
 
-    # Make our settings visible or not
-    def change_visibility(self):
-        self.visible = not self.visible
-        self.data['visible'] = self.visible
-        self.save_dict()
-        self.p.update()
-
 
         
     
