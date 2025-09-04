@@ -458,7 +458,7 @@ class Story(ft.View):
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
                     file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
-                    print("dirpath = ", dirpath)
+                    #print("dirpath = ", dirpath)
                     try:
                         # Read the JSON file
                         with open(file_path, "r") as f:

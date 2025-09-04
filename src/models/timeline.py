@@ -62,8 +62,6 @@ class Timeline(Widget):
                 'show_plot_points': True,
                 'show_arcs': True,
             },
-
-            'plotlines': {}
         }
         
 
@@ -95,17 +93,74 @@ class Timeline(Widget):
             # Fall back to default data on error
             self.data = default_data
 
+        # Load our plotlines from the plotlines directory
+        plotlines_directory_path = os.path.join(os.path.dirname(timeline_file_path), "plotlines")
+        
+        try: 
+            # Go through all the saved files in the plotlines
+            if os.path.exists(plotlines_directory_path):
+                for dirpath, dirnames, filenames in os.walk(plotlines_directory_path):
+                    for filename in filenames:
+
+                        # All our objects are stored as JSON
+                        if filename.endswith(".json"):
+                            file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
+                            try:
+                                # Read the JSON file
+                                with open(file_path, "r") as f:
+                                    plotline_data = json.load(f)
+                                
+                                # Extract the title from the data
+                                plotline_title = plotline_data.get("title", filename.replace(".json", ""))
+
+                                # Create Note object with the title
+                                #from models.notes import Notes
+                                #plotline = Notes(note_title, page, file_path, self)
+
+                                #self.plotlines[plotline_title] = plotline
+                                #print(self.notes[note_title].title) 
+
+                            # Handle errors if the path is wrong
+                            except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                                print(f"Error loading plotline from {filename}: {e}")     
+                            
+        # Handle errors if the path is wrong
+        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+            print(f"Error loading any plotlines from {filename}: {e}")
+                
+
+
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
+
+        timeline = ft.Container(
+            top=0,
+            left=0,
+            right=0,
+            bottom=0,
+            expand=True,
+            content=ft.Divider(color=ft.Colors.RED),
+        )
+
+        top = ft.Container(
+            #top=200,
+            #left=200,
+            content=ft.Text("hi from " + self.title),
+        )
 
         # Body of the tab, which is the content of flet container
         body = ft.Container(
             expand=True,
             padding=6,
+            #alignment=ft.alignment.center,
             #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
-            content=ft.Column([
-                ft.Text("hi from " + self.title),
+            content=ft.Stack(
+                expand=True,
+                controls=[
+                #ft.Text("hi from " + self.title),
+                timeline,
+                top
             ])
         )
 
