@@ -24,7 +24,7 @@ class Story(ft.View):
         self.template = template
 
         self.title = title # Gives our story a title when its created
-        self.p = page  # Reference to our page object for updating UI elements. Sometimes we need it, sometimes not
+        self.p = page  # Reference to our page object for updating UI elements
         
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.all_workspaces_rail = None  # Is a extended ft.Container
@@ -43,50 +43,14 @@ class Story(ft.View):
         self.content = {}
         self.characters = []    # Make into dict later?
         self.timeline = None    # Singular timeline widget object, that holds our plotlines
-        #self.plotlines = {}      # Dict of plotline object. Used for storing/deleting plotlines
         self.notes = {}
 
-        # Called outside of constructor to avoid circular import issues
+        # Called outside of constructor to avoid circular import issues, or it would be called here
         #self.startup()
         
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
     def startup(self):
-        ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
-
-        # Sets our path to our story folder, and creates the folder structure if it doesn't exist
-        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
-        story_structure_folders = [
-            "content",
-            "characters",
-            "timeline",
-            "worldbuilding",
-            "drawing_board",
-            "notes",
-        ]
-        
-        # Actually creates the folders in our story path
-        for folder in story_structure_folders:
-            folder_path = os.path.join(directory_path, folder)
-            os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
-
-        # Load stuff from templates we create. For now, new stories default to this so we can play with folders
-        # In the future, only newly created stories get templates
-        if self.template == "default":
-            # sub template folders inside of notes
-            notes_folders = [
-                "themes",
-                "quotes",
-                "research",
-            ]
-            for folder in notes_folders:
-                folder_path = os.path.join(directory_path,  "notes", folder)
-                os.makedirs(folder_path, exist_ok=True)
-
-        # Create story metadata file
-        self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
-
-        self.template = "none"  # Reset this so we don't load template content again if story is loaded from storage
 
         # Loads our info about our story from its JSON file
         self.load_from_dict()    # This function creates one if story object was created not loaded
@@ -105,9 +69,55 @@ class Story(ft.View):
 
     
     # Called whenever there are changes in our data that need to be saved
-    def save_dict(self):
+    def save_dict(self, template: str=None):
         ''' Saves the data of our story to its JSON File '''
         #print("save story dict called")
+
+        ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
+
+        # Sets our path to our story folder, and creates the folder structure if it doesn't exist
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        story_structure_folders = [
+            "content",
+            "characters",
+            "timeline",
+            "worldbuilding",
+            "drawing_board",
+            "notes",
+        ]
+        
+        # Actually creates the folders in our story path
+        for folder in story_structure_folders:
+            folder_path = os.path.join(directory_path, folder)
+            os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
+
+        # Create our sub folders inside of timeline
+        timeline_folders = ["plotlines"]
+        for folder in timeline_folders:
+            folder_path = os.path.join(directory_path, "timeline", folder)
+            os.makedirs(folder_path, exist_ok=True)
+
+        self.template = template
+        self.template = "default"
+        # Load stuff from templates we create. For now, new stories default to this so we can play with folders
+        # In the future, only newly created stories get templates
+        if self.template == "default":
+            # sub template folders inside of notes
+            notes_folders = [
+                "themes",
+                "quotes",
+                "research",
+            ]
+            for folder in notes_folders:
+                folder_path = os.path.join(directory_path,  "notes", folder)
+                os.makedirs(folder_path, exist_ok=True)
+
+        
+
+        # Create story metadata file
+        self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
+
+        self.template = "none"  # Reset this so we don't load template content again if story is loaded from storage
         
         # Create the path to the story's JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
@@ -425,7 +435,7 @@ class Story(ft.View):
         # Only one timeline object per story (even if multiverse/regression), so we don't need a create function for timelines
 
         from models.timeline import Timeline
-        self.timeline = Timeline("Timeline", "timeline", self.data['timeline_directory_path'], self)
+        self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
 
 
     # Called on story startup to load all our notes objects

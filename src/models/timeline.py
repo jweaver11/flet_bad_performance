@@ -3,10 +3,9 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from dataclasses import dataclass
 
 
-# Class that holds our plotline (timeline)
+# Class that holds our timeline object, that holds our plotlines
 # Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
 class Timeline(Widget):
     # Constructor
@@ -17,11 +16,10 @@ class Timeline(Widget):
             title = title,  # Title of the widget that will show up on its tab
             tag = "timeline",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
-            file_path = file_path,  # Path to our notes json file
+            file_path = file_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 
-        self.visible = True
         self.plotlines = {}
 
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
@@ -35,74 +33,44 @@ class Timeline(Widget):
         ''' Saves our data to our timeline json file. '''
 
         try:
-            with open(self.file_path, "w") as f:
+            with open(self.data['file_path'], "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Plotline saved successfully to {self.file_path}")
         except Exception as e:
-            print(f"Error saving notes to {self.file_path}: {e}")
+            print(f"Error saving timeline to {self.file_path}: {e}")
 
     # Called at end of constructor
     def load_from_dict(self, file_path: str):
-        ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
+        ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        timeline_file_path = file_path
+        timeline_file_path = os.path.join(file_path, "timeline.json")
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             'title': self.title,
             'file_path': timeline_file_path,
 
-            'pin_location': "main",
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-
-            'plotline_begin_date': None,    # Start and end date of this particular plotline
-            'plotline_end_date': None,
+            'pin_location': "bottom",
+            'visible': False,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             
-            'main_story_start_date': None,  # Start and end date of the main story
-            'main_story_end_date': None,
-
-            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
-            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out
-            'timeskips': {      
-                'title': "timeskip_title", 
-                'start_date': None, 
-                'end_date': None
-            },
-
-            # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
-            'plot_points': {
-                'title': "Event Title",
-                'description': "Event Description",
-                'date': None,   # These are 'points' on the timeline, so they just get a date, not a start/end range
-                'time': None,   # time during that day
-                'involved_characters': [],
-                'related_locations': [],
-                'related_items': [],
-                #...
-            },
-
-            # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
-            'arcs': {
-                'arc_title': "Arc Title",
-                'arc_description': "Arc Description",
-                'start_date': None,
-                'end_date': None,
-                'involved_characters': [],
-            },
+            'story_start_date': None,  # Start and end date of the main story
+            'story_end_date': None,
 
             'filters': {    # Filters we can apply to change the view of our plotline, while keeping the data intact
                 'show_timeskips': True,
                 'show_plot_points': True,
                 'show_arcs': True,
-            }
+            },
+
+            'plotlines': {}
         }
         
 
         try:
             # Try to load existing settings from file
             if os.path.exists(timeline_file_path):
-                self.path = timeline_file_path  # Set the path to the file
+                self.file_path = timeline_file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
                 with open(timeline_file_path, "r") as f:
                     loaded_data = json.load(f)
@@ -113,6 +81,7 @@ class Timeline(Widget):
                 # Set specific attributes form our data
                 self.title = self.data.get('title', self.title)  # live title = data title, default to current title if error
                 self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error
+                self.file_path = self.data.get('file_path', timeline_file_path)  # live file path = data file path, default to constructed path if error
                 
             else:
                
@@ -122,7 +91,7 @@ class Timeline(Widget):
 
         # Our error for our try statement. Uses our default error if there is an error loading the file/doesn't exist
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            print(f"Error loading story data: {e}")
+            print(f"Error loading timeline data: {e}")
             # Fall back to default data on error
             self.data = default_data
 
@@ -160,7 +129,81 @@ class Timeline(Widget):
 
 
 # Called to load our plotlines in story startup
-    def load_timeline(self):
+    def load_plotlines(self):
+
+
+        data = {
+            'title': self.title,
+            'file_path': str,   # was timeline_file_path
+
+            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+
+            'plotline_begin_date': None,    # Start and end date of this particular plotline
+            'plotline_end_date': None,
+
+            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
+            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out
+            'timeskips': {      
+                'title': "timeskip_title", 
+                'start_date': None, 
+                'end_date': None
+            },
+
+            # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
+            'plot_points': {
+                'title': "Event Title",
+                'description': "Event Description",
+                'date': None,   # These are 'points' on the timeline, so they just get a date, not a start/end range
+                'time': None,   # time during that day
+                'involved_characters': [],
+                'related_locations': [],
+                'related_items': [],
+                #...
+            },
+
+            # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
+            'arcs': {
+                'arc_title': "Arc Title",
+                'arc_description': "Arc Description",
+                'start_date': None,
+                'end_date': None,
+                'involved_characters': [],
+            },
+
+            
+        }
+        
+        '''
+        try:
+            # Try to load existing settings from file
+            if os.path.exists(timeline_file_path):
+                self.path = timeline_file_path  # Set the path to the file
+                #print(f"Loading character data from {self.path}")
+                with open(timeline_file_path, "r") as f:
+                    loaded_data = json.load(f)
+                
+                # Start with default data and update with loaded data
+                self.data = {**default_data, **loaded_data}
+
+                # Set specific attributes form our data
+                self.title = self.data.get('title', self.title)  # live title = data title, default to current title if error
+                self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error
+                
+            else:
+               
+                self.data = default_data    # Set our live object data to our default data
+                
+                self.save_dict()  # Create the file (or write to it) that saves our live object data
+
+        # Our error for our try statement. Uses our default error if there is an error loading the file/doesn't exist
+        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
+            print(f"Error loading story data: {e}")
+            # Fall back to default data on error
+            self.data = default_data
+        '''
+        
+
+        
 
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['timeline_directory_path']):
