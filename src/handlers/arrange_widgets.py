@@ -150,12 +150,16 @@ def arrange_widgets(story: Story):
 
     
     # Checks all our objects (widgets) to check if they are in a pin or not. If not, add them to their pin location
-    for char in story.characters:
-        add_object_to_pin(char)
+    # Settings
     if app.settings is not None: 
         add_object_to_pin(app.settings)
-    for title, plotline in story.plotlines.items():
-        add_object_to_pin(plotline)
+    # Characters
+    for char in story.characters:
+        add_object_to_pin(char)
+    # Timeline
+    if story.timeline is not None:
+        add_object_to_pin(story.timeline)
+    # Notes
     for title, note in story.notes.items():
         add_object_to_pin(note)
 

@@ -5,7 +5,6 @@ All objects contain a title, tag, page reference, pin location, tab color, and a
 '''
 
 import flet as ft
-from models.app import app
 #from handlers.reload_workspace import reload_workspace
 from models.story import Story
 #from handlers.reload_workspace import show_pin_drag_targets

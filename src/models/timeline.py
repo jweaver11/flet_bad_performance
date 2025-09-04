@@ -3,24 +3,26 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
+from dataclasses import dataclass
 
 
 # Class that holds our plotline (timeline)
 # Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
-class Plotline(Widget):
+class Timeline(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "notes",  # Tag for logic, might be phasing out later so ignore this
+            tag = "timeline",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             file_path = file_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 
         self.visible = True
+        self.plotlines = {}
 
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
         self.load_from_dict(file_path)
@@ -30,7 +32,7 @@ class Plotline(Widget):
 
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
-        ''' Saves our data to our notes json file. '''
+        ''' Saves our data to our timeline json file. '''
 
         try:
             with open(self.file_path, "w") as f:
@@ -44,12 +46,12 @@ class Plotline(Widget):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        plotline_file_path = file_path
+        timeline_file_path = file_path
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             'title': self.title,
-            'file_path': plotline_file_path,
+            'file_path': timeline_file_path,
 
             'pin_location': "main",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
@@ -99,10 +101,10 @@ class Plotline(Widget):
 
         try:
             # Try to load existing settings from file
-            if os.path.exists(plotline_file_path):
-                self.path = plotline_file_path  # Set the path to the file
+            if os.path.exists(timeline_file_path):
+                self.path = timeline_file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
-                with open(plotline_file_path, "r") as f:
+                with open(timeline_file_path, "r") as f:
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
@@ -154,3 +156,69 @@ class Plotline(Widget):
         
         # Content of our widget (ft.Container) is our created tabs content
         self.content = content
+
+
+
+# Called to load our plotlines in story startup
+    def load_timeline(self):
+
+        # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
+        if not os.path.exists(self.data['timeline_directory_path']):
+            #print("Characters folder does not exist, creating it.")
+            #os.makedirs(data_paths.characters_path)    Outdated
+            return
+        
+        page = self.p
+        
+        # Iterate through all files in the characters folder
+        #for filename in os.listdir(data_paths.characters_path):
+        for dirpath, dirnames, filenames in os.walk(self.data['timeline_directory_path']):
+            for filename in filenames:
+
+                # All our objects are stored as JSON
+                if filename.endswith(".json"):
+                    file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
+                    print("dirpath = ", dirpath)
+                    try:
+                        # Read the JSON file
+                        with open(file_path, "r") as f:
+                            plotline_data = json.load(f)
+                        
+                        # Extract the title from the data
+                        plotline_title = plotline_data.get("title", filename.replace(".json", ""))
+                        
+                        # Create Plotline object with the title
+                        from models.timeline import Timeline
+                        plotline = Timeline(plotline_title, page, file_path, self)
+                        #character.path = file_path  # Set the path to the loaded file
+
+                        self.plotlines[plotline_title] = plotline
+                        
+                        
+                    
+                    # Handle errors if the path is wrong
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                        print(f"Error loading plotlines from {filename}: {e}")
+
+        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
+
+
+def create_plotline(self, title: str, file_path: str=None):
+    ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
+
+    # WIP - add check that plotline title is not == timeline
+    from models.timeline import Timeline
+
+    # If no path is passed in, construct the full file path for the plotline JSON file
+    if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+        plotline_filename = f"{title}.json"
+        file_path = os.path.join(self.data['plotlines_directory_path'], plotline_filename)
+    
+    #self.timeline.plotlines[title] = Timeline(title, self.p, file_path, self)
+
+    #print(self.plotlines[title])
+
+    #print("Character created: " + character.title)
+
+    #self.workspace.reload_workspace(self.p, self)
+    '''WIP'''

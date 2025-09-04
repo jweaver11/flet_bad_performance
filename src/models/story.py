@@ -42,7 +42,8 @@ class Story(ft.View):
         # Make a list for positional indexing
         self.content = {}
         self.characters = []    # Make into dict later?
-        self.plotlines = {}      # Dict of plotline object. Used for storing/deleting plotlines
+        self.timeline = None    # Singular timeline widget object, that holds our plotlines
+        #self.plotlines = {}      # Dict of plotline object. Used for storing/deleting plotlines
         self.notes = {}
 
         # Called outside of constructor to avoid circular import issues
@@ -58,7 +59,7 @@ class Story(ft.View):
         story_structure_folders = [
             "content",
             "characters",
-            "plotlines",
+            "timeline",
             "worldbuilding",
             "drawing_board",
             "notes",
@@ -93,8 +94,8 @@ class Story(ft.View):
         # Loads our characters from file storage into our characters list
         self.load_characters()
 
-        # Loads our plotline from file storage
-        self.load_plotlines()
+        # Loads our timeline from file storage, which holds our plotlines
+        self.load_timeline()
 
         # Loads our notes from file storage
         self.load_notes()
@@ -142,7 +143,7 @@ class Story(ft.View):
             # Paths to our workspaces for easier reference later
             'content_directory_path': os.path.join(directory_path, "content"),
             'characters_directory_path': os.path.join(directory_path, "characters"),
-            'plotlines_directory_path': os.path.join(directory_path, "plotlines"),
+            'timeline_directory_path': os.path.join(directory_path, "timeline"),
             'worldbuilding_directory_path': os.path.join(directory_path, "worldbuilding"),
             'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
             'notes_directory_path': os.path.join(directory_path, "notes"),
@@ -418,66 +419,14 @@ class Story(ft.View):
 
         self.workspace.reload_workspace(self.p, self)
 
-    # Called to load our plotlines in story startup
-    def load_plotlines(self):
+    # Called on story startup to create our timeline object.
+    def load_timeline(self):
+        ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
+        # Only one timeline object per story (even if multiverse/regression), so we don't need a create function for timelines
 
-        # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
-        if not os.path.exists(self.data['plotlines_directory_path']):
-            #print("Characters folder does not exist, creating it.")
-            #os.makedirs(data_paths.characters_path)    Outdated
-            return
-        
-        page = self.p
-        
-        # Iterate through all files in the characters folder
-        #for filename in os.listdir(data_paths.characters_path):
-        for dirpath, dirnames, filenames in os.walk(self.data['plotlines_directory_path']):
-            for filename in filenames:
+        from models.timeline import Timeline
+        self.timeline = Timeline("Timeline", "timeline", self.data['timeline_directory_path'], self)
 
-                # All our objects are stored as JSON
-                if filename.endswith(".json"):
-                    file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
-                    print("dirpath = ", dirpath)
-                    try:
-                        # Read the JSON file
-                        with open(file_path, "r") as f:
-                            plotline_data = json.load(f)
-                        
-                        # Extract the title from the data
-                        plotline_title = plotline_data.get("title", filename.replace(".json", ""))
-                        
-                        # Create Plotline object with the title
-                        from models.plotline import Plotline
-                        plotline = Plotline(plotline_title, page, file_path, self)
-                        #character.path = file_path  # Set the path to the loaded file
-
-                        self.plotlines[plotline_title] = plotline
-                        
-                        
-                    
-                    # Handle errors if the path is wrong
-                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                        print(f"Error loading plotlines from {filename}: {e}")
-
-        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
-
-    def create_plotline(self, title: str, file_path: str=None):
-        ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
-        from models.plotline import Plotline
-
-        # If no path is passed in, construct the full file path for the plotline JSON file
-        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            plotline_filename = f"{title}.json"
-            file_path = os.path.join(self.data['plotlines_directory_path'], plotline_filename)
-        
-        self.plotlines[title] = Plotline(title, self.p, file_path, self)
-
-        #print(self.plotlines[title])
-
-        #print("Character created: " + character.title)
-
-        self.workspace.reload_workspace(self.p, self)
-    '''WIP'''
 
     # Called on story startup to load all our notes objects
     def load_notes(self):
