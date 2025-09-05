@@ -4,7 +4,8 @@ import os
 # Live objects that are stored in our timeline object
 class Plotline:
 
-    def __init__(self, title: str, file_path: str, data: dict):
+    # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
+    def __init__(self, title: str, file_path: str, data: dict = None):
 
         self.title = title  # Set our title
 
@@ -12,16 +13,15 @@ class Plotline:
 
         self.data = data    # Set our data
 
-        self.save_dict()
+        self.save_dict()    # Saves our data. 
 
 
      # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
         ''' Saves our data to our plotline json file. '''
 
-        # If no data is passed in (creating new plotline), set default data
-        if self.data == {}:
-
+        # Our data dict. If no data was passed in, we create default data
+        if self.data is None:
             self.data = {
                 'title': self.title,
                 'file_path': self.file_path,   # was timeline_file_path
@@ -60,7 +60,8 @@ class Plotline:
                     'involved_characters': [],
                 },
             }
-            
+
+        # Open our file and save our data to it
         try:
             with open(self.file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
