@@ -157,16 +157,16 @@ class Timeline(Widget):
         plotline_filters = []
 
         # Header that shows our filter options, as well as what plotlines are visible
+        # Add reset zoom button later
         header = ft.Row(
-            #expand=True,
-            #height=20,
-            #wrap=True,
+            #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[self.plot_points, self.arcs],
         )
 
+        # Run through our plotlines and create a checkbox for each one for filtering
         for key, plotline in self.plotlines.items():
-            print(plotline.title, " is being shown")
+            #print(plotline.title, " is being shown")
             plotline_filters.append(
                 ft.Checkbox(
                     label=plotline.title, 
@@ -179,7 +179,8 @@ class Timeline(Widget):
         # Add our plotlines as filters to our header
         header.controls.extend(plotline_filters)
 
-        #MAKE THE TIMELINE DASHED, AND THE PLOTLINES SOLID. TIMESKIPS WILL SHOW UP THEN
+        # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
+        # The timeline shown under our plotlines that that will display timeskips, etc. 
         timeline = ft.Container(
             top=0,
             left=0,
@@ -189,19 +190,24 @@ class Timeline(Widget):
             content=ft.Divider(color=ft.Colors.RED),
         )
 
-
-        # Body of the tab, which is the content of flet container
-        body = ft.Container(
+        # Stack that holds our timeline and any plotlines that sit overtop it (may not use in future)
+        stack = ft.Stack(
             expand=True,
-            padding=6,
-            #alignment=ft.alignment.center,
-            #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
-            content=ft.Stack(
-                expand=True,
-                controls=[
-                #ft.Text("hi from " + self.title),
-                timeline,
-            ])
+            controls=[
+                timeline
+            ]
+        )
+
+        # The body that is our interactive viewer, allowing zoom in and out and moving around
+        body = ft.InteractiveViewer(
+            min_scale=0.1,
+            max_scale=15,
+            expand=True,
+            boundary_margin=ft.margin.all(20),
+            #on_interaction_start=lambda e: print(e),
+            #on_interaction_end=lambda e: print(e),
+            #on_interaction_update=lambda e: print(e),
+            content=stack,
         )
 
         # Our column that will display our header filters and body of our widget
