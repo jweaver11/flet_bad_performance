@@ -119,7 +119,7 @@ class Timeline(Widget):
                                 # Extract the title from the data
                                 plotline_title = plotline_data.get("title", filename.replace(".json", ""))
 
-                                # Create Plotline object with the title
+                                # Create Plotline object with the title, filepath, and data
                                 from models.plotline import Plotline
                                 plotline = Plotline(plotline_title, file_path, plotline_data)
 
