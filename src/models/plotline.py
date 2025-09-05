@@ -28,8 +28,8 @@ class Plotline:
 
                 'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
 
-                'plotline_begin_date': None,    # Start and end date of this particular plotline
-                'plotline_end_date': None,
+                'start_date': None,    # Start and end date of this particular plotline
+                'end_date': None,
 
                 # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
                 # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
