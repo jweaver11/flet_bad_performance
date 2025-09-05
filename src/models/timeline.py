@@ -23,6 +23,13 @@ class Timeline(Widget):
 
         self.plotlines = {}
 
+        # Plotpoints
+        self.plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.plot_points.value))
+        self.arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.arcs.value))
+
+        # The UI element that will display our filters
+        self.filters = ft.Row()
+
         # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
         self.load_from_dict(file_path)
 
@@ -55,7 +62,7 @@ class Timeline(Widget):
             'file_path': timeline_file_path,
 
             'pin_location': "bottom",
-            'visible': False,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             
             'story_start_date': None,  # Start and end date of the main story
             'story_end_date': None,
@@ -67,7 +74,7 @@ class Timeline(Widget):
             },
         }
         
-
+        # Loads our TIMELINE object only
         try:
             # Try to load existing settings from file
             if os.path.exists(timeline_file_path):
@@ -97,8 +104,8 @@ class Timeline(Widget):
             self.data = default_data
 
 
-
-        # Load our plotlines from the plotlines directory
+        # ---------------------------------------------------------
+        # Load our PLOTLINES from the plotlines directory
         plotlines_directory_path = os.path.join(os.path.dirname(timeline_file_path), "plotlines")
         
         try: 
@@ -147,6 +154,14 @@ class Timeline(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
+        # Header that shows our filter options, as well as what plotlines are visible
+        header = ft.Row(
+            #expand=True,
+            #height=20,
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[self.plot_points, self.arcs],
+        )
+
         #MAKE THE TIMELINE DASHED, AND THE PLOTLINES SOLID. TIMESKIPS WILL SHOW UP THEN
         timeline = ft.Container(
             top=0,
@@ -155,12 +170,6 @@ class Timeline(Widget):
             bottom=0,
             expand=True,
             content=ft.Divider(color=ft.Colors.RED),
-        )
-
-        top = ft.Container(
-            #top=200,
-            #left=200,
-            content=ft.Text("hi from " + self.title),
         )
 
         # Body of the tab, which is the content of flet container
@@ -174,12 +183,18 @@ class Timeline(Widget):
                 controls=[
                 #ft.Text("hi from " + self.title),
                 timeline,
-                top
             ])
         )
 
-        # our tab.content is the body of our widget that we build above.
-        self.tab.content=body   # We add this in combo with our 'tabs' later
+        # Our column that will display our header filters and body of our widget
+        column = ft.Column(
+            expand=True,
+            #alignment=ft.MainAxisAlignment.CENTER,
+            controls=[header, body]
+        )
+
+        # our tab.content is the column we build above.
+        self.tab.content=column   # We add this in combo with our 'tabs' later
 
         # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
         content = ft.Tabs(
@@ -196,7 +211,7 @@ class Timeline(Widget):
         self.content = content
 
 
-
+    # Called when we want to create a new plotline
     def create_plotline(self, title: str):  # -> PLotline
         ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
 
