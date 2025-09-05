@@ -36,7 +36,6 @@ class Timeline(Widget):
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
-        print(len(self.plotlines), self.story.title)
 
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
@@ -143,6 +142,7 @@ class Timeline(Widget):
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading any plotlines from {filename}: {e}")
 
+        # If no plotlines exist, we create a default one to get started
         if len(self.plotlines) == 0:
             print("No plotlines found for this timeline, creatting one to get started")
             self.create_plotline("Main Plotline")
@@ -172,6 +172,7 @@ class Timeline(Widget):
             content=ft.Divider(color=ft.Colors.RED),
         )
 
+
         # Body of the tab, which is the content of flet container
         body = ft.Container(
             expand=True,
@@ -192,6 +193,7 @@ class Timeline(Widget):
             #alignment=ft.MainAxisAlignment.CENTER,
             controls=[header, body]
         )
+
 
         # our tab.content is the column we build above.
         self.tab.content=column   # We add this in combo with our 'tabs' later
