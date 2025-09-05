@@ -154,13 +154,30 @@ class Timeline(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
+        plotline_filters = []
+
         # Header that shows our filter options, as well as what plotlines are visible
         header = ft.Row(
             #expand=True,
             #height=20,
+            #wrap=True,
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[self.plot_points, self.arcs],
         )
+
+        for key, plotline in self.plotlines.items():
+            print(plotline.title, " is being shown")
+            plotline_filters.append(
+                ft.Checkbox(
+                    label=plotline.title, 
+                    value=True, 
+                    data=plotline.title,
+                    on_change=lambda e: print(plotline.title + " is now " + str(plotline.data['visible']))
+                )
+            )
+            
+        # Add our plotlines as filters to our header
+        header.controls.extend(plotline_filters)
 
         #MAKE THE TIMELINE DASHED, AND THE PLOTLINES SOLID. TIMESKIPS WILL SHOW UP THEN
         timeline = ft.Container(
