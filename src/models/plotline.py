@@ -4,13 +4,13 @@ import os
 # Live objects that are stored in our timeline object
 class Plotline:
 
-    def __init__(self, title: str, file_path: str, data: dict = None):
+    def __init__(self, title: str, file_path: str, data: dict):
 
         self.title = title  # Set our title
 
         self.file_path = file_path  # Path to our plotline json file
 
-        self.data = data if data is not None else {}    # Set our data
+        self.data = data    # Set our data
 
         self.save_dict()
 
@@ -20,11 +20,11 @@ class Plotline:
         ''' Saves our data to our plotline json file. '''
 
         # If no data is passed in (creating new plotline), set default data
-        if self.data is None:
+        if self.data == {}:
 
             self.data = {
                 'title': self.title,
-                'file_path': str,   # was timeline_file_path
+                'file_path': self.file_path,   # was timeline_file_path
 
                 'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
 

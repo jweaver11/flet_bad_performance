@@ -96,9 +96,10 @@ class Timeline(Widget):
             # Fall back to default data on error
             self.data = default_data
 
+
+
         # Load our plotlines from the plotlines directory
         plotlines_directory_path = os.path.join(os.path.dirname(timeline_file_path), "plotlines")
-        
         
         try: 
             # Go through all the saved files in the plotlines
@@ -106,7 +107,6 @@ class Timeline(Widget):
                 for dirpath, dirnames, filenames in os.walk(plotlines_directory_path):
                     for filename in filenames:
                         
-
                         # All our objects are stored as JSON
                         if filename.endswith(".json"):
                             file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
@@ -114,6 +114,7 @@ class Timeline(Widget):
                                 # Read the JSON file
                                 with open(file_path, "r") as f:
                                     plotline_data = json.load(f)
+                                    print(plotline_data)
                                 
                                 # Extract the title from the data
                                 plotline_title = plotline_data.get("title", filename.replace(".json", ""))
@@ -199,24 +200,64 @@ class Timeline(Widget):
     def create_plotline(self, title: str):  # -> PLotline
         ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
 
-        # WIP - add check that plotline title is not == timeline
-
         # Check for invalid names
         if title == "timeline":
             print("Cannot name plotline timeline")
             return
         
+        # Check plotline name doesn't already exist
+        for key, plotline in self.plotlines.items():
+            if plotline.title == title:
+                print("Plotline with that title already exists")
+                return
         
-        else:
-            # Check for different named plotlines
-            for key, plotline in self.plotlines.items():
-                if plotline.title == title:
-                    print("Plotline with that title already exists")
-                    return
 
-            # Passes all checks, create our new plotline
-            file_path = os.path.join(self.story.data['plotlines_directory_path'], f"{title}.json")
-            self.plotlines[title] = Plotline(title, file_path, None)
-            return
+        # Set file path for our plotline
+        file_path = os.path.join(self.story.data['plotlines_directory_path'], f"{title}.json")
+
+        # Set default data for our plotline
+        data = {
+            'title': title, # Save the title of our plotline
+            'file_path': file_path,   # was timeline_file_path
+
+            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+
+            'plotline_begin_date': None,    # Start and end date of this particular plotline
+            'plotline_end_date': None,
+
+            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
+            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
+            'timeskips': {      
+                'title': "timeskip_title", 
+                'start_date': None, 
+                'end_date': None
+            },
+
+            # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
+            'plot_points': {
+                'title': "Event Title",
+                'description': "Event Description",
+                'date': None,   # These are 'points' on the timeline, so they just get a date, not a start/end range
+                'time': None,   # time during that day
+                'involved_characters': [],
+                'related_locations': [],
+                'related_items': [],
+                #...
+            },
+
+            # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
+            'arcs': {
+                'arc_title': "Arc Title",
+                'arc_description': "Arc Description",
+                'start_date': None,
+                'end_date': None,
+                'involved_characters': [],
+            },
+        }
+
+        # Passes all checks, create our new plotline
+        self.plotlines[title] = Plotline(title, file_path, data)
+        
+        return
         
         
