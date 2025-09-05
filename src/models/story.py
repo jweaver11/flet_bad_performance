@@ -158,6 +158,8 @@ class Story(ft.View):
             'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
             'notes_directory_path': os.path.join(directory_path, "notes"),
 
+            'plotlines_directory_path': os.path.join(directory_path, "timeline", "plotlines"),
+
             'top_pin_height': 0,
             'left_pin_width': 0,
             'main_pin_height': 0,
@@ -167,6 +169,7 @@ class Story(ft.View):
             'created_at': None,
             'last_modified': None
         }
+
 
 
         try:
