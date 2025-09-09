@@ -175,12 +175,7 @@ def create_character(role_tag, page: ft.Page):
     print("create character clicked")
 
 
-    textfield = ft.TextField(
-        label="Character Name",
-        hint_text="Enter character name",
-        on_submit=create_new_character,  # When enter is pressed
-        autofocus=True,  # Focus on this text field when dialog opens
-    )
+   
     
     # Called upon submission of the new name in the dialog to create the new character
     def create_new_character(e):
@@ -194,7 +189,7 @@ def create_character(role_tag, page: ft.Page):
             name = name.capitalize()  # Auto capitalize names
             
             # Create the temporary character object so we can check tags for logic
-            new_character = Character(name, page)
+            new_character = Character(name, page) #TODO NEED TO PASS FILE PATH HERE
 
             # Set the appropriate tag based on the category
             if role_tag == "main":
@@ -216,7 +211,14 @@ def create_character(role_tag, page: ft.Page):
             dlg.open = False
             page.update()
             print("Character name is empty")
-    
+
+    textfield = ft.TextField(
+        label="Character Name",
+        hint_text="Enter character name",
+        on_submit=create_new_character,  # When enter is pressed
+        autofocus=True,  # Focus on this text field when dialog opens
+    )
+
     # Our actual dialog that pops up when the add character button is clicked
     dlg = ft.AlertDialog(
         title=ft.Text("Enter Character Name"), 
