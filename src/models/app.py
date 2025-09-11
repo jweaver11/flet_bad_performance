@@ -5,14 +5,12 @@ All other files can import this function without issues
 '''
 
 from models.story import Story
-import os
 import flet as ft
-from constants import data_paths
 
 
 class App:
     # Constructor
-    def __init__(self, page: ft.Page=None):
+    def __init__(self):
 
         #from models.settings import Settings
 
@@ -42,6 +40,6 @@ class App:
 
         
     
+# Sets our global app object
 app = App()
 
-# Sets our global app object

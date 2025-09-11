@@ -137,8 +137,8 @@ class Settings(Widget):
             ft.TextButton(
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
-                #on_click=lambda e: app.all_workspaces_rail.toggle_rail_reorderable()
-                #on_click=lambda e: app.all_workspaces_rail.toggle_reorder_rail()
+                #on_click=lambda e: story.all_workspaces_rail.toggle_rail_reorderable(),
+                on_click=lambda e: self.toggle_rail_reorderable()
             ),
             self.change_name_colors,
             self.theme_button,
@@ -235,6 +235,15 @@ class Settings(Widget):
                 self.save_dict()  # This will save the default data to file
             except Exception as save_error:
                 print(f"Could not save default settings: {save_error}")
+
+    # Called when the button to reorder the workspaces is clicked
+    def toggle_rail_reorderable(self):
+        ''' Toggles if the all workspaces rail is reorderable or not '''
+
+        # Grabs our active story from the view on page, and toggles its reorder logic
+        story = self.p.views[0]
+        story.all_workspaces_rail.toggle_reorder_rail(story)
+
 
 
         
