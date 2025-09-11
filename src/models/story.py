@@ -41,6 +41,10 @@ class Story(ft.View):
 
         # Make a list for positional indexing
         self.content = {}
+
+        self.chapters = {}
+        self.manuscripts = {}
+        self.images = {}    # title, path
         self.characters = []    # Make into dict later?
         self.timeline = None    # Singular timeline widget object, that holds our plotlines
         self.notes = {}
@@ -54,6 +58,8 @@ class Story(ft.View):
 
         # Loads our info about our story from its JSON file
         self.load_from_dict()    # This function creates one if story object was created not loaded
+
+        self.load_content()
 
         # Loads our characters from file storage into our characters list
         self.load_characters()
@@ -367,6 +373,57 @@ class Story(ft.View):
         if hasattr(obj, 'path'):
             delete_object_file(obj)
 
+
+    def load_content(self):
+        ''' Loads our content from our content folder inside of our story folder '''
+
+        # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
+        if not os.path.exists(self.data['content_directory_path']):
+            #print("Characters folder does not exist, creating it.")
+            os.makedirs(self.data['content_directory_path'])   
+            return
+        
+        page = self.p
+        
+        # Iterate through all files in the characters folder
+        #for filename in os.listdir(data_paths.characters_path):
+        for dirpath, dirnames, filenames in os.walk(self.data['notes_directory_path']):
+            for filename in filenames:
+
+                # All our objects are stored as JSON
+                if filename.endswith(".json"):
+                    file_path = os.path.join(dirpath, filename)   
+                    #print("dirpath = ", dirpath)
+                    try:
+                        # Read the JSON file
+                        with open(file_path, "r") as f:
+                            content_data = json.load(f)
+                        
+                        # Extract the title from the data
+                        content_title = content_data.get("title", filename.replace(".json", ""))
+
+
+                        # Check our tag to see what type of content it is
+                        if content_data.get("tag", "") == "chapter":
+                            print("yo mommma")
+                            from models.chapter import Chapter
+                            chapter = Chapter(content_title, page, file_path, self)
+                            self.chapters[content_title] = chapter
+
+                        elif content_data.get("tag", "") == "manuscript":
+                            print("manuscript tag found, skipping for now")
+                            
+                        else:
+                            print("content tag not valid, skipping")
+                            return
+
+                        print(self.notes[content_title].title)      
+                    
+                    # Handle errors if the path is wrong
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                        print(f"Error loading notes from {filename}: {e}")
+                        
+
     # Called as part of the startup method during program launch
     def load_characters(self):
         ''' Loads all our characters from our characters folder and adds them to the live story object'''
@@ -376,7 +433,7 @@ class Story(ft.View):
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['characters_directory_path']):
             #print("Characters folder does not exist, creating it.")
-            #os.makedirs(data_paths.characters_path)    Outdated
+            os.makedirs(self.data['.characters_path'])    
             return
         
         page = self.p
@@ -388,7 +445,7 @@ class Story(ft.View):
 
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
-                    file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
+                    file_path = os.path.join(dirpath, filename)   
                     print("dirpath = ", dirpath)
                     
                     try:
@@ -414,29 +471,11 @@ class Story(ft.View):
         #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
 
-    # Called to create a character object
-    def create_character(self, title: str, file_path: str=None):
-        ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
-        #print("Create character called")
-
-        from models.character import Character
-
-        # If no path is passed in, construct the full file path for the character JSON file
-        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            character_filename = f"{title}.json"
-            file_path = os.path.join(self.data['characters_directory_path'], character_filename)
-        
-        self.characters.append(Character(title, self.p, file_path, self))
-
-        #print("Character created: " + character.title)
-
-        self.workspace.reload_workspace(self.p, self)
-
     # Called on story startup to create our timeline object.
     def load_timeline(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
         # Only one timeline object per story (even if multiverse/regression), so we don't need a create function for timelines
-
+        # Creating out timeline will load the data if it exists, so we just create a new one on launch
         from models.timeline import Timeline
         self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
 
@@ -448,7 +487,7 @@ class Story(ft.View):
         # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['notes_directory_path']):
             #print("Characters folder does not exist, creating it.")
-            #os.makedirs(data_paths.characters_path)    Outdated
+            os.makedirs(self.data['notes_directory_path'])    
             return
         
         page = self.p
@@ -483,6 +522,26 @@ class Story(ft.View):
                         print(f"Error loading notes from {filename}: {e}")
 
         #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
+
+
+
+    # Called to create a character object
+    def create_character(self, title: str, file_path: str=None):
+        ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
+        #print("Create character called")
+
+        from models.character import Character
+
+        # If no path is passed in, construct the full file path for the character JSON file
+        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            character_filename = f"{title}.json"
+            file_path = os.path.join(self.data['characters_directory_path'], character_filename)
+        
+        self.characters.append(Character(title, self.p, file_path, self))
+
+        #print("Character created: " + character.title)
+
+        self.workspace.reload_workspace(self.p, self)
 
 
     # Called to create a note object
