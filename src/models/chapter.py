@@ -32,19 +32,21 @@ class Chapter(Widget):
     def save_dict(self):
         ''' Saves our data to our timeline json file. '''
 
+        #print(f"Saving chapter data to {self.data['file_path']}")
+
         try:
             with open(self.data['file_path'], "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Plotline saved successfully to {self.file_path}")
         except Exception as e:
-            print(f"Error saving chapter to {self.file_path}: {e}")
+            print(f"Error saving chapter to {self.data['file_path']}: {e}")
 
     # Called at end of constructor
     def load_from_dict(self, file_path: str):
         ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
 
         # Sets the path to our file based on our title inside of the timeline directory
-        chapter_file_path = os.path.join(file_path, f"{self.title}.json")
+        chapter_file_path = file_path
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {

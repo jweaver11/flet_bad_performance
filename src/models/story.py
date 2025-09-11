@@ -423,8 +423,7 @@ class Story(ft.View):
                             print("content tag not valid, skipping")
                             return
 
-                             
-                    
+                            
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading content from {filename}: {e}")
