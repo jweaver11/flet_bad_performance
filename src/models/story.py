@@ -405,16 +405,16 @@ class Story(ft.View):
                         # Extract the title from the data
                         content_title = content_data.get("title", filename.replace(".json", ""))
 
-                        print(content_data)
+                        #print(content_data)
 
 
                         # Check our tag to see what type of content it is
                         if content_data.get("tag", "") == "chapter":
-                            print("yo mommma")
+                            #print("yo mommma")
                             from models.chapter import Chapter
                             chapter = Chapter(content_title, page, dirpath, self)
                             self.chapters[content_title] = chapter
-                            print("Chapter loaded")
+                            #print("Chapter loaded")
 
                         elif content_data.get("tag", "") == "image":
                             print("image tag found, skipping for now")
@@ -530,18 +530,17 @@ class Story(ft.View):
 
 
     # Called when the button to create a new chapter is clicked
-    def create_chapter(self, title: str, file_path: str=None):
+    def create_chapter(self, title: str, directory_path: str=None):
         ''' Creates a new chapter object, saves it to our live story object, and saves it to storage'''
         print("Create chapter called")
 
         from models.chapter import Chapter
 
         # If no path is passed in, construct the full file path for the chapter JSON file
-        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            chapter_filename = f"{title}.json"
-            file_path = os.path.join(self.data['content_directory_path'], chapter_filename)
+        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            directory_path = self.data['characters_directory_path']
 
-        self.chapters[title] = Chapter(title, self.p, file_path, self)
+        self.chapters[title] = Chapter(title, self.p, directory_path, self)
 
         #print("Chapter created: " + self.chapters[title].title)
         self.workspace.reload_workspace(self.p, self)
@@ -569,16 +568,16 @@ class Story(ft.View):
 
 
     # Called to create a note object
-    def create_note(self, title: str, file_path: str=None):
+    def create_note(self, title: str, directory_path: str=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
         from models.notes import Notes 
 
         # If no path is passed in, construct the full file path for the note JSON file
-        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            note_filename = f"{title}.json"
-            file_path = os.path.join(self.data['notes_directory_path'], note_filename)
+        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            directory_path = self.data['notes_directory_path']
+            #file_path = os.path.join(self.data['notes_directory_path'], note_filename)
 
-        self.notes[title] = Notes(title, self.p, file_path, self)
+        self.notes[title] = Notes(title, self.p, directory_path, self)
 
         #print("Note created: " + notes.title)
 
