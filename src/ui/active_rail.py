@@ -8,7 +8,7 @@ import flet as ft
 from models.app import app
 from models.story import Story
 from ui.rails.characters_rail import create_characters_rail  
-from ui.rails.content_rail import create_content_rail
+from ui.rails.content_rail import Content_Rail
 from ui.rails.timeline_rail import Timeline_Rail
 from ui.rails.world_building_rail import create_world_building_rail
 from ui.rails.drawing_board_rail import create_drawing_board_rail
@@ -48,7 +48,7 @@ class Active_Rail(ft.Container):
 
             # Give us the correct rail on program startup based on our selected workspace
             if story.all_workspaces_rail.selected_rail == "content":
-                self.content = create_content_rail(page)
+                self.content = Content_Rail(page, story)
             elif story.all_workspaces_rail.selected_rail == "characters":
                 self.content = create_characters_rail(page)
             elif story.all_workspaces_rail.selected_rail == "timeline":

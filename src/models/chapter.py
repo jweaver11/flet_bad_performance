@@ -3,7 +3,6 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.plotline import Plotline
 
 
 # Class that holds our timeline object, that holds our plotlines
@@ -22,7 +21,6 @@ class Chapter(Widget):
         )
 
         
-
         # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
         self.load_from_dict(file_path)
 
@@ -89,60 +87,13 @@ class Chapter(Widget):
             self.data = default_data
 
 
-        # ---------------------------------------------------------
-        # Load our PLOTLINES from the plotlines directory
-        plotlines_directory_path = os.path.join(os.path.dirname(chapter_file_path), "plotlines")
-        
-        try: 
-            # Go through all the saved files in the plotlines
-            if os.path.exists(plotlines_directory_path):
-                for dirpath, dirnames, filenames in os.walk(plotlines_directory_path):
-                    for filename in filenames:
-                        
-                        # All our objects are stored as JSON
-                        if filename.endswith(".json"):
-                            file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
-                            try:
-                                # Read the JSON file
-                                with open(file_path, "r") as f:
-                                    plotline_data = json.load(f)
-                                    #print(plotline_data)
-                                
-                                # Extract the title from the data
-                                plotline_title = plotline_data.get("title", filename.replace(".json", ""))
-
-                                # Create Plotline object with the title, filepath, and data
-                                from models.plotline import Plotline
-                                plotline = Plotline(plotline_title, file_path, plotline_data)
-
-                                self.plotlines[plotline_title] = plotline
-                                #print(self.plotlines[plotline_title].title) 
-
-                            # Handle errors if the path is wrong
-                            except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                                print(f"Error loading plotline from {filename}: {e}")    
-
-             
-                            
-        # Handle errors if the path is wrong
-        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-            print(f"Error loading any plotlines from {filename}: {e}")
-
-        # If no plotlines exist, we create a default one to get started
-        if len(self.plotlines) == 0:
-            print("No plotlines found for this timeline, creatting one to get started")
-            self.create_plotline("Main Plotline")
-            print(self.plotlines)
-                
-
-
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
 
         # Our column that will display our header filters and body of our widget
-        body = ft.Text("hello from: ", self.title)
+        body = ft.Text(f"hello from: {self.title}")
 
 
         # our tab.content is the column we build above.

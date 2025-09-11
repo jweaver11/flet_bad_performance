@@ -613,7 +613,6 @@ class Workspace(ft.Container):
 
 
 
-
 # Called to create our workspace whenever there is NO active story or no stories at all
 def create_workspace(page: ft.Page) -> ft.Container:   
 

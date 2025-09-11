@@ -153,6 +153,10 @@ def arrange_widgets(story: Story):
     # Settings
     if app.settings is not None: 
         add_object_to_pin(app.settings)
+
+    for title, chapter in story.chapters.items():
+        add_object_to_pin(chapter)
+
     # Characters
     for char in story.characters:
         add_object_to_pin(char)

@@ -7,7 +7,7 @@ from models.app import app
 from models.story import Story
 import os
 from ui.rails.characters_rail import create_characters_rail
-from ui.rails.content_rail import create_content_rail
+from ui.rails.content_rail import Content_Rail
 from ui.rails.timeline_rail import Timeline_Rail
 from ui.rails.world_building_rail import create_world_building_rail
 from ui.rails.drawing_board_rail import create_drawing_board_rail
@@ -247,7 +247,7 @@ class All_Workspaces_Rail(ft.Container):
         # the active rail is created after this object, so if when we reload the rail...
         # on program start, it will break the program.
             if self.selected_rail == "content":    # Set the active_rail content to the new selection
-                story.content_rail = create_content_rail(self.p)
+                story.content_rail = Content_Rail(self.p, story)
                 story.active_rail.content = story.content_rail
             elif self.selected_rail == "characters":
                 story.characters_rail = create_characters_rail(self.p)

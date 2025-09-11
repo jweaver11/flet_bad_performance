@@ -34,7 +34,7 @@ class Story(ft.View):
         # Objects for our active rail content
         self.content_rail = None  # Is an extended ft.Container
         self.characters_rail = None  # Is an extended ft.Container
-        self.plotline_rail = None  # Is an extended ft.Container
+        self.timeline_rail = None  # Is an extended ft.Container
         self.world_building_rail = None  # Is an extended ft.Container
         self.drawing_board_rail = None  # Is an extended ft.Container
         self.notes_rail = None  # Is an extended ft.Container
@@ -422,7 +422,7 @@ class Story(ft.View):
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading notes from {filename}: {e}")
-                        
+
 
     # Called as part of the startup method during program launch
     def load_characters(self):
@@ -524,6 +524,24 @@ class Story(ft.View):
         #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
 
+
+    def create_chapter(self, title: str, file_path: str=None):
+        ''' Creates a new chapter object, saves it to our live story object, and saves it to storage'''
+        print("Create chapter called")
+
+        from models.chapter import Chapter
+
+        # If no path is passed in, construct the full file path for the chapter JSON file
+        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            chapter_filename = f"{title}.json"
+            file_path = os.path.join(self.data['content_directory_path'], chapter_filename)
+
+        self.chapters[title] = Chapter(title, self.p, file_path, self)
+
+        #print("Chapter created: " + self.chapters[title].title)
+        self.workspace.reload_workspace(self.p, self)
+
+        print("num chapters: " + str(len(self.chapters)))
 
     # Called to create a character object
     def create_character(self, title: str, file_path: str=None):
