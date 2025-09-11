@@ -29,16 +29,6 @@ class App:
         # When settings is created, it uses default story if none exists
         #self.active_story = self.stories['default_story']
 
-    # Called when opening a different story, or when new story is created
-    def set_new_active_story(self) -> Story:
-        ''' Sets a new active story based on the title given WIP '''
-
-        print("Setting new active story called")
-
-        # When settings is created, it uses default story if none exists
-        #self.active_story = self.stories[self.settings.data['active_story']]
-
-
     # Called when app creates a new story
     def create_new_story(self, title: str, page: ft.Page, template: str) -> Story:
         ''' Creates the new story object, then saves it to a new folder WIP '''
