@@ -7,8 +7,8 @@ import flet as ft
 from constants import data_paths
 from models.app import app
 from models.story import Story
-from handlers.reload_workspace import remove_drag_targets
-from handlers.reload_workspace import reload_workspace
+#from handlers.reload_workspace import remove_drag_targets
+#from handlers.reload_workspace import reload_workspace
 
 # Called by main on program start to create our menu bar
 def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
@@ -318,7 +318,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                 # Fix broken widgets button
 
 
-                ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: remove_drag_targets(), tooltip="Click if broken"),
+                ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: settings_clicked(story)),   # Settings button
                 ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
