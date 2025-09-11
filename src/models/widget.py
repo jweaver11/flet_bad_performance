@@ -12,7 +12,7 @@ from models.story import Story
 
 class Widget(ft.Container):
     # Constructor
-    def __init__(self, title: str, tag: str, p: ft.Page, file_path: str, story: Story):
+    def __init__(self, title: str, tag: str, p: ft.Page, directory_path: str, story: Story):
 
         # set uniformity for all widgets
         super().__init__(
@@ -24,7 +24,7 @@ class Widget(ft.Container):
         self.title = title  # Title of our object
         self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
-        self.file_path = file_path
+        self.directory_path = directory_path
         self.story = story
         
 

@@ -412,7 +412,7 @@ class Story(ft.View):
                         if content_data.get("tag", "") == "chapter":
                             print("yo mommma")
                             from models.chapter import Chapter
-                            chapter = Chapter(content_title, page, file_path, self)
+                            chapter = Chapter(content_title, page, dirpath, self)
                             self.chapters[content_title] = chapter
                             print("Chapter loaded")
 
@@ -463,7 +463,7 @@ class Story(ft.View):
                         
                         # Create Character object with the title
                         from models.character import Character
-                        character = Character(character_title, page, file_path, self)
+                        character = Character(character_title, page, dirpath, self)
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
@@ -516,7 +516,7 @@ class Story(ft.View):
 
                         # Create Note object with the title
                         from models.notes import Notes
-                        note = Notes(note_title, page, file_path, self)
+                        note = Notes(note_title, page, dirpath, self)
                         #character.path = file_path  # Set the path to the loaded file
 
                         self.notes[note_title] = note
@@ -550,18 +550,18 @@ class Story(ft.View):
 
 
     # Called to create a character object
-    def create_character(self, title: str, file_path: str=None):
+    def create_character(self, title: str, directory_path: str=None):
         ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
         #print("Create character called")
 
         from models.character import Character
 
         # If no path is passed in, construct the full file path for the character JSON file
-        if file_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            character_filename = f"{title}.json"
-            file_path = os.path.join(self.data['characters_directory_path'], character_filename)
+        if directory_path is None:
+            directory_path = self.data['characters_directory_path'] # There SHOULD always be a path passed in, but this will catch errors
+
         
-        self.characters.append(Character(title, self.p, file_path, self))
+        self.characters.append(Character(title, self.p, directory_path, self))
 
         #print("Character created: " + character.title)
 

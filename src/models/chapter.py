@@ -9,20 +9,20 @@ from models.widget import Widget
 # Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
 class Chapter(Widget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
             tag = "chapter",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
-            file_path = file_path,  # Path to our timeline json file
+            directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 
         
         # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
-        self.load_from_dict(file_path)
+        self.load_from_dict(directory_path)
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
@@ -34,24 +34,26 @@ class Chapter(Widget):
 
         #print(f"Saving chapter data to {self.data['file_path']}")
 
+        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+
         try:
-            with open(self.data['file_path'], "w") as f:
+            with open(file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Plotline saved successfully to {self.file_path}")
         except Exception as e:
-            print(f"Error saving chapter to {self.data['file_path']}: {e}")
+            print(f"Error saving chapter to {file_path}: {e}")
 
     # Called at end of constructor
-    def load_from_dict(self, file_path: str):
+    def load_from_dict(self, directory_path: str):
         ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
 
         # Sets the path to our file based on our title inside of the timeline directory
-        chapter_file_path = file_path
+        file_path = os.path.join(directory_path, f"{self.title}.json")
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             'title': self.title,
-            'file_path': chapter_file_path,
+            'directory_path': directory_path,
             'tag': self.tag,
             'pin_location': "bottom",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
@@ -62,10 +64,10 @@ class Chapter(Widget):
         # Loads our TIMELINE object only
         try:
             # Try to load existing settings from file
-            if os.path.exists(chapter_file_path):
-                self.file_path = chapter_file_path  # Set the path to the file
+            if os.path.exists(file_path):
+                self.file_path = file_path  # Set the path to the file
                 #print(f"Loading character data from {self.path}")
-                with open(chapter_file_path, "r") as f:
+                with open(file_path, "r") as f:
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
@@ -74,7 +76,7 @@ class Chapter(Widget):
                 # Set specific attributes form our data
                 self.title = self.data.get('title', self.title)  # live title = data title, default to current title if error
                 self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error
-                self.file_path = self.data.get('file_path', chapter_file_path)  # live file path = data file path, default to constructed path if error
+                self.directory_path = self.data.get('file_path', file_path)  # live file path = data file path, default to constructed path if error
                 
             else:
                
@@ -84,7 +86,7 @@ class Chapter(Widget):
 
         # Our error for our try statement. Uses our default error if there is an error loading the file/doesn't exist
         except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            print(f"Error loading timeline data: {e}")
+            print(f"Error loading content data: {e}")
             # Fall back to default data on error
             self.data = default_data
 

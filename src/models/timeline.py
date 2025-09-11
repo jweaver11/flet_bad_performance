@@ -17,7 +17,7 @@ class Timeline(Widget):
             title = title,  # Title of the widget that will show up on its tab
             tag = "timeline",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
-            file_path = file_path,  # Path to our timeline json file
+            directory_path = file_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 

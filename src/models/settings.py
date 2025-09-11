@@ -15,7 +15,7 @@ import json
 
 class Settings(Widget):
     # Constructor
-    def __init__(self, page: ft.Page, file_path: str, story: Story=None):
+    def __init__(self, page: ft.Page, directory_path: str, story: Story=None):
         
         # Constructor the parent widget class
         super().__init__(
@@ -23,11 +23,11 @@ class Settings(Widget):
             tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             story = story,
-            file_path = file_path,
+            directory_path = directory_path,
         )
 
         # Loads our settings data from the JSON file
-        self.__load_from_dict()
+        self.load_from_dict()
 
         # Called when someone expands the drop down holding the color scheme options
         def get_color_scheme_options():
@@ -163,20 +163,25 @@ class Settings(Widget):
 
     # Save our object as a dictionary for json serialization
     def save_dict(self):
-        #print("save settings dict called")
-        settings_file_path = os.path.join(settings_path, "settings.json")
         
-        with open(settings_file_path, "w") as f:
-            json.dump(self.data, f, indent=4)
+        #print("save settings dict called")
+        file_path = os.path.join(settings_path, "settings.json")
+
+        try:
+        
+            with open(file_path, "w") as f:
+                json.dump(self.data, f, indent=4)
+        except Exception as e:
+            print(f"Error saving settings to {file_path}: {e}")
 
     # Called when new settings object is created
-    def __load_from_dict(self):
+    def load_from_dict(self):
         ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
 
         #print("load from dict called")
 
         # Set the path to our settings file
-        settings_file_path = os.path.join(settings_path, "settings.json")
+        file_path = os.path.join(settings_path, "settings.json")
 
         # Data set upon first launch of program, or if file can't be loaded
         default_data = {
@@ -204,8 +209,8 @@ class Settings(Widget):
         
         try:
             # Try to load existing settings from file
-            if os.path.exists(settings_file_path):
-                with open(settings_file_path, "r") as f:
+            if os.path.exists(file_path):
+                with open(file_path, "r") as f:
                     loaded_data = json.load(f)
                 
                 # Start with default data and update with loaded data
