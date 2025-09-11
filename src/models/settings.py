@@ -241,8 +241,11 @@ class Settings(Widget):
         ''' Toggles if the all workspaces rail is reorderable or not '''
 
         # Grabs our active story from the view on page, and toggles its reorder logic
-        story = self.p.views[0]
-        story.all_workspaces_rail.toggle_reorder_rail(story)
+        try:
+            story = self.p.views[0]
+            story.all_workspaces_rail.toggle_reorder_rail(story)
+        except Exception as e:
+            print(f"Error toggling rail reorderable: {e}")
 
 
 

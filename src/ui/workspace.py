@@ -294,7 +294,7 @@ class Workspace(ft.Container):
 
         # Right pin resizer method and variable
         def move_right_pin_divider(e: ft.DragUpdateEvent):
-            print("move right pin divider called")
+            #print("move right pin divider called")
             if (e.delta_x < 0 and self.right_pin.width < page.width/2) or (e.delta_x > 0 and self.right_pin.width > 200):
                 self.right_pin.width -= e.delta_x
             formatted_right_pin.update()
@@ -318,7 +318,7 @@ class Workspace(ft.Container):
 
         # Bottom pin resizer method and variable
         def move_bottom_pin_divider(e: ft.DragUpdateEvent):
-            print("move bottom pin divider called")
+            #print("move bottom pin divider called")
             if (e.delta_y < 0 and self.bottom_pin.height < page.height/2) or (e.delta_y > 0 and self.bottom_pin.height > 200):
                 self.bottom_pin.height -= e.delta_y
             formatted_bottom_pin.update()

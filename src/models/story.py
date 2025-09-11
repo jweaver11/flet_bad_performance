@@ -59,6 +59,7 @@ class Story(ft.View):
         # Loads our info about our story from its JSON file
         self.load_from_dict()    # This function creates one if story object was created not loaded
 
+        # Loads our content objects from storage into our story object. Includes chapters and images
         self.load_content()
 
         # Loads our characters from file storage into our characters list
@@ -373,13 +374,15 @@ class Story(ft.View):
         if hasattr(obj, 'path'):
             delete_object_file(obj)
 
-
+    # Called on story startup to load all our content objects
     def load_content(self):
         ''' Loads our content from our content folder inside of our story folder '''
 
+        #print("load content called")
+
         # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['content_directory_path']):
-            #print("Characters folder does not exist, creating it.")
+            print("Characters folder does not exist, creating it.")
             os.makedirs(self.data['content_directory_path'])   
             return
         
@@ -387,13 +390,13 @@ class Story(ft.View):
         
         # Iterate through all files in the characters folder
         #for filename in os.listdir(data_paths.characters_path):
-        for dirpath, dirnames, filenames in os.walk(self.data['notes_directory_path']):
+        for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
             for filename in filenames:
 
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
                     file_path = os.path.join(dirpath, filename)   
-                    #print("dirpath = ", dirpath)
+                    print("dirpath = ", dirpath)
                     try:
                         # Read the JSON file
                         with open(file_path, "r") as f:
@@ -402,6 +405,8 @@ class Story(ft.View):
                         # Extract the title from the data
                         content_title = content_data.get("title", filename.replace(".json", ""))
 
+                        print(content_data)
+
 
                         # Check our tag to see what type of content it is
                         if content_data.get("tag", "") == "chapter":
@@ -409,19 +414,20 @@ class Story(ft.View):
                             from models.chapter import Chapter
                             chapter = Chapter(content_title, page, file_path, self)
                             self.chapters[content_title] = chapter
+                            print("Chapter loaded")
 
-                        elif content_data.get("tag", "") == "manuscript":
-                            print("manuscript tag found, skipping for now")
+                        elif content_data.get("tag", "") == "image":
+                            print("image tag found, skipping for now")
                             
                         else:
                             print("content tag not valid, skipping")
                             return
 
-                        print(self.notes[content_title].title)      
+                             
                     
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                        print(f"Error loading notes from {filename}: {e}")
+                        print(f"Error loading content from {filename}: {e}")
 
 
     # Called as part of the startup method during program launch
@@ -524,7 +530,7 @@ class Story(ft.View):
         #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
 
-
+    # Called when the button to create a new chapter is clicked
     def create_chapter(self, title: str, file_path: str=None):
         ''' Creates a new chapter object, saves it to our live story object, and saves it to storage'''
         print("Create chapter called")
@@ -542,6 +548,7 @@ class Story(ft.View):
         self.workspace.reload_workspace(self.p, self)
 
         print("num chapters: " + str(len(self.chapters)))
+
 
     # Called to create a character object
     def create_character(self, title: str, file_path: str=None):

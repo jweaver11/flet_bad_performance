@@ -8,7 +8,7 @@ from models.story import Story
 # Class is created in main on program startup
 class Content_Rail(ft.Container):
     # Constructor
-    def __init__(self, page: ft.Page, story: Story=None):
+    def __init__(self, page: ft.Page, story: Story):
         
         # Initialize the parent Container class first
         super().__init__()
@@ -21,33 +21,27 @@ class Content_Rail(ft.Container):
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
-        if story is not None:
 
-            self.content = ft.Column(
-                controls=[
-                    ft.TextButton(  # 'Create Character button'
-                        "Chapters", 
-                        icon=ft.Icons.WAVES_OUTLINED, 
-                        on_click=lambda e: self.create_chapter("Chapter 1", story)
-                    ),
-                    ft.TextButton(  # 'Create Character button'
-                        "Stuff", 
-                        icon=ft.Icons.WAVES_OUTLINED, 
-                    ),
-                    ft.TextButton(  # 'Create Character button'
-                        "More stuff", 
-                        icon=ft.Icons.WAVES_OUTLINED, 
-                    ),
-                    ft.Text("hi there")
-                ]
-            )
-            self.p.update()
+        self.content = ft.Column(
+            controls=[
+                ft.TextButton(  # 'Create Character button'
+                    "Chapters", 
+                    icon=ft.Icons.WAVES_OUTLINED, 
+                    on_click=lambda e: self.create_chapter("Chapter 1", story)
+                ),
+                ft.TextButton(  # 'Create Character button'
+                    "Stuff", 
+                    icon=ft.Icons.WAVES_OUTLINED, 
+                ),
+                ft.TextButton(  # 'Create Character button'
+                    "More stuff", 
+                    icon=ft.Icons.WAVES_OUTLINED, 
+                ),
+                ft.Text("hi there")
+            ]
+        )
+        self.p.update()
 
-        else:
-
-            print("Warning: Story is None, cannot load plot and timeline rail.")
-            self.content = ft.Text("Create a story to get started!")
-            self.p.update()
 
 
     def create_chapter(self, title: str, story: Story):
