@@ -21,7 +21,7 @@ class Character(Widget):
         # Parent class constructor
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
-            tag = "character",  # Tag for logic, mostly for routing it through our story object
+            tag = "character",  # Tag for logic, for routing and for import/export
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             directory_path = directory_path,    # Directory where our json file is stored
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder

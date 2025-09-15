@@ -27,9 +27,10 @@ class Story(ft.View):
         self.p = page  # Reference to our page object for updating UI elements
         
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
-        self.all_workspaces_rail = None  # Is a extended ft.Container
-        self.active_rail = None     # Is a extended ft.Container
-        self.workspace = None   # Is a extended ft.Container
+        self.menubar = None     # Is an extended ft.Container
+        self.all_workspaces_rail = None     # Is an extended ft.Container
+        self.active_rail = None     # Is an extended ft.Container
+        self.workspace = None       # Is an extended ft.Container
 
         # Objects for our active rail content
         self.content_rail = None  # Is an extended ft.Container
@@ -68,6 +69,12 @@ class Story(ft.View):
         # Loads our timeline from file storage, which holds our plotlines
         self.load_timeline()
 
+        # Load our world building objects from file storage
+        #self.load_world_building()
+
+        # Loads our drawing board from file storage
+        #self.load_drawing_board()
+
         # Loads our notes from file storage
         self.load_notes()
 
@@ -88,7 +95,7 @@ class Story(ft.View):
             "content",
             "characters",
             "timeline",
-            "worldbuilding",
+            "world_building",
             "drawing_board",
             "notes",
         ]
@@ -165,8 +172,12 @@ class Story(ft.View):
             'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
             'notes_directory_path': os.path.join(directory_path, "notes"),
 
+            # Path to our plotlines inside of our timeline directory
             'plotlines_directory_path': os.path.join(directory_path, "timeline", "plotlines"),
 
+            # Path to our locations inside of our notes directory
+
+            
             'top_pin_height': 0,
             'left_pin_width': 0,
             'main_pin_height': 0,
@@ -220,7 +231,7 @@ class Story(ft.View):
         self.controls.clear()
 
         # Create our page elements as their own pages so they can update
-        menubar = create_menu_bar(page, self)
+        self.menubar = create_menu_bar(page, self)
 
         # Create our rails and workspace objects
         self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
@@ -284,7 +295,7 @@ class Story(ft.View):
         )
 
         # Views render like columns, so we add elements top-down
-        self.controls = [menubar, row]
+        self.controls = [self.menubar, row]
 
         
     # Called when saving new objects to the story (characters, chapters, etc.)
