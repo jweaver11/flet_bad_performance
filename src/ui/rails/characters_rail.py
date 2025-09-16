@@ -188,19 +188,15 @@ def create_character(role_tag, page: ft.Page):
             name = name.capitalize()  # Auto capitalize names
             
             # Create the temporary character object so we can check tags for logic
-            new_character = Character(name, page) #TODO NEED TO PASS FILE PATH HERE
+            #new_character = Character(name, page) #TODO NEED TO PASS FILE PATH HERE
+
+            page.views[0].create_character(name)
 
             # Set the appropriate tag based on the category
-            if role_tag == "main":
-                new_character.data["Role"] = "Main"
-            elif role_tag == "side":
-                new_character.data["Role"] = "Side"
-            elif role_tag == "background":
-                new_character.data["Role"] = "Background"
 
             # Adds our new character to the story
             #app.active_story.save_object(new_character)
-            reload_character_rail(page)   
+            #reload_character_rail(page)   
             #reload_workspace(page)  
 
             # Close the dialog
@@ -509,7 +505,7 @@ def reload_character_rail(page: ft.Page):
         ft.IconButton(
             ft.Icons.ADD_ROUNDED, 
             tooltip="Create Side Character",
-            on_click=lambda e: create_character("side", page),
+            on_click=lambda e: create_character("side", page), 
             icon_color=ft.Colors.PRIMARY,  # Match expanded color
         )
     )
