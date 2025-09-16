@@ -32,19 +32,9 @@ class Story(ft.View):
         self.active_rail = None     # Is an extended ft.Container
         self.workspace = None       # Is an extended ft.Container
 
-        # Objects for our active rail content
-        self.content_rail = None  # Is an extended ft.Container
-        self.characters_rail = None  # Is an extended ft.Container
-        self.timeline_rail = None  # Is an extended ft.Container
-        self.world_building_rail = None  # Is an extended ft.Container
-        self.drawing_board_rail = None  # Is an extended ft.Container
-        self.notes_rail = None  # Is an extended ft.Container
-
-        # Make a list for positional indexing
+        # Our live workspace objects in the story object
         self.content = {}
-
         self.chapters = {}
-        self.manuscripts = {}
         self.images = {}    # title, path
         self.characters = []    # Make into dict later?
         self.timeline = None    # Singular timeline widget object, that holds our plotlines

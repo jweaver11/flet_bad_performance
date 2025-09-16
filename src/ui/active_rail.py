@@ -60,7 +60,7 @@ class Active_Rail(ft.Container):
             elif story.all_workspaces_rail.selected_rail == "notes":
                 self.content = create_notes_rail(page, story)
             else:
-                self.content = create_characters_rail(page)
+                self.content = Content_Rail(page, story)
 
             # Update the page to reflect changes
             self.p.update()
