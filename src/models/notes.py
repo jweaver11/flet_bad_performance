@@ -34,18 +34,18 @@ class Notes(Widget):
         ''' Saves our data to our notes json file. '''
 
         try:
-            with open(self.file_path, "w") as f:
+            with open(self.directory_path, "w") as f:
                 json.dump(self.data, f, indent=4)
-            print(f"Notes saved successfully to {self.file_path}")
+            print(f"Notes saved successfully to {self.directory_path}")
         except Exception as e:
-            print(f"Error saving notes to {self.file_path}: {e}")
+            print(f"Error saving notes to {self.directory_path}: {e}")
 
     # Called at end of constructor
-    def load_from_dict(self, file_path: str):
+    def load_from_dict(self, directory_path: str):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # Sets the path to our file based on our title inside of the notes directory
-        note_file_path = file_path
+        note_file_path = directory_path
 
         ## IN THE FUTURE, WE WILL ITERATE THROUGH ALL THE FILES IN ALL THE SUBFOLDERS...
         ## OF THE story.data['notes_directory_path'] TO LOAD ALL OUR NOTES, AND PASS IN THE PATH FROM THERE.
