@@ -9,7 +9,7 @@ from models.widget import Widget
     
 
 class Notes(Widget):
-    def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
         self.content = ""  # Content of the notes
         #self.created_at = ft.datetime.now()  # Creation timestamp
         #self.updated_at = ft.datetime.now()  # Last updated timestamp
@@ -19,12 +19,12 @@ class Notes(Widget):
             title = title,  # Title of the widget that will show up on its tab
             tag = "notes",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
-            file_path = file_path,  # Path to our notes json file
+            directory_path = directory_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
         
         # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
-        self.load_from_dict(file_path)
+        self.load_from_dict(directory_path)
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
