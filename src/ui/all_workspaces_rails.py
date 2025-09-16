@@ -9,7 +9,7 @@ import os
 from ui.rails.characters_rail import create_characters_rail
 from ui.rails.content_rail import Content_Rail
 from ui.rails.timeline_rail import Timeline_Rail
-from ui.rails.world_building_rail import create_world_building_rail
+from ui.rails.world_building_rail import World_Building_Rail
 from ui.rails.drawing_board_rail import create_drawing_board_rail
 from ui.rails.notes_rail import create_notes_rail
 
@@ -256,7 +256,7 @@ class All_Workspaces_Rail(ft.Container):
                 story.timeline_rail = Timeline_Rail(self.p, story)
                 story.active_rail.content = story.timeline_rail
             elif self.selected_rail == "world_building":
-                story.world_building_rail = create_world_building_rail(self.p)
+                story.world_building_rail = World_Building_Rail(self.p, story)
                 story.active_rail.content = story.world_building_rail
             elif self.selected_rail == "drawing_board":
                 story.drawing_board_rail = create_drawing_board_rail(self.p)
