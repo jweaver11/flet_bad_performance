@@ -155,4 +155,11 @@ class Widget(ft.Container):
             self.data['visible'] = True
             self.save_dict()
         
-        story.workspace.reload_workspace(self.p, story)
+        # Catch errors when no story loaded for settings widget
+        if self.title == "Settings":
+            from models.app import app
+            for key, story in app.stories.items():
+                story.workspace.reload_workspace(self.p, story)
+            self.p.update()
+        else:
+            story.workspace.reload_workspace(self.p, story)

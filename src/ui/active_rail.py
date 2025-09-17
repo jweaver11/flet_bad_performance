@@ -11,7 +11,7 @@ from ui.rails.characters_rail import create_characters_rail
 from ui.rails.content_rail import Content_Rail
 from ui.rails.timeline_rail import Timeline_Rail
 from ui.rails.world_building_rail import World_Building_Rail
-from ui.rails.drawing_board_rail import create_drawing_board_rail
+from ui.rails.drawing_board_rail import Drawing_Board_Rail
 from ui.rails.notes_rail import create_notes_rail
 
 
@@ -61,7 +61,7 @@ class Active_Rail(ft.Container):
                 self.content = World_Building_Rail(page, story)
 
             elif story.all_workspaces_rail.selected_rail == "drawing_board":
-                self.content = create_drawing_board_rail(page)
+                self.content = Drawing_Board_Rail(page, story)
 
             elif story.all_workspaces_rail.selected_rail == "notes":
                 self.content = create_notes_rail(page, story)

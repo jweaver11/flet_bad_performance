@@ -3,12 +3,41 @@
 import flet as ft
 from models.story import Story
 
-def create_drawing_board_rail(page: ft.Page, story: Story=None) -> ft.Control:
-    return ft.Column(
-        controls=[
-            ft.TextButton(  # 'Create Character button'
-                "Drawing Board",  
-            ),
-            ft.Text("This is the drawing board rail")
-        ]
-    )
+
+# Class for our Drawing Board rail
+class Drawing_Board_Rail(ft.Container):
+    # Constructor
+    def __init__(self, page: ft.Page, story: Story):
+        
+        # Initialize the parent Container class first
+        super().__init__()
+            
+        # Page reference
+        self.p = page
+
+        # Reload the rail on start
+        self.reload_rail(story)
+
+
+    # Called when changes occur that require rail to be reloaded, but the object does not need to be recreated. (More efficient)
+    def reload_rail(self, story: Story) -> ft.Control:
+        ''' Reloads the drawing board rail '''
+
+        # Build the content of our rail
+        self.content = ft.Column(
+            spacing=0,
+            expand=True,
+            controls=[
+                ft.Text("Drawing Board Rail"),
+                ft.Text("From the story: "),
+                ft.Text(story.title),
+                ft.TextButton(
+                    "Drawing Board",
+                    #on_click=lambda e: story.create_character("John Doe")
+                ),
+                # Add more controls here as needed
+            ]
+        )
+
+        # Apply the update
+        self.p.update()

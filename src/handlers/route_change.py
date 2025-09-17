@@ -27,10 +27,12 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     
     # If we have a story route that matches our new route, load it to the page views
     if new_story is not None:
+        
         # Rebuild our view each switch. This is only called to ensure things like rails being collapsed and workspace
         # orders are properly loaded each time we switch stories
         new_story.build_view()  
         page.views.append(new_story)
+
         # Set our new title to reflect this new loaded story
         page_title = "StoryBoard -- " + new_story.title + " -- Saved status"
         page.title = page_title
@@ -45,7 +47,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
             "/",
             [
                 menu_bar,
-                ft.Text("No active story. Please create or load a story from the menu."),
+                ft.Text("Route changed, but it didn't match any stories. Something broke"),
             ],
         )
 
