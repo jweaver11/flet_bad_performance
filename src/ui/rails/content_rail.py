@@ -13,15 +13,17 @@ class Content_Rail(ft.Container):
         # Initialize the parent Container class first
         super().__init__()
             
+        # Page reference
         self.p = page
 
+        # Reload the rail on start
         self.reload_rail(story)
 
     # Reload the rail whenever we need
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
-
+        # Build the content of our rail
         self.content = ft.Column(
             controls=[
                 ft.TextButton(  # 'Create Character button'
@@ -40,18 +42,16 @@ class Content_Rail(ft.Container):
                 ft.Text("hi there")
             ]
         )
+
+        # Apply our update
         self.p.update()
 
-
-
+    # Called when user creates a new chapter
     def create_chapter(self, title: str, story: Story):
-        ''' Creates a new plotline branch inside of the current story '''
-
+        ''' Creates a new chapter object current story '''
         
-        # default path for now
-        if story is not None:
-            story.create_chapter(title, file_path=story.data['content_directory_path'])
-            self.reload_rail(story)
-        else:
-            print("No story selected, how u hit dis button dumbo??")
+        # Pass in default path for now, but accepts new ones in future for organization
+        story.create_chapter(title, file_path=story.data['content_directory_path'])
+        self.reload_rail(story)
+        
 

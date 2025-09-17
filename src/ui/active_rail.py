@@ -30,42 +30,45 @@ class Active_Rail(ft.Container):
             width=app.settings.data['active_rail_width'],  # Sets the width
         )
 
-        self.reload_rail(page, story)
+        self.display_active_rail(page, story)
 
         
-    # Called when other stories are selected and we need to reload the rail
-    def reload_rail(self, page: ft.Page, story: Story):
+    # Called when other workspaces are selected
+    def display_active_rail(self, page: ft.Page, story: Story):
         ''' Reloads the active rail based on the selected workspace in all_workspaces_rail '''
 
-        if story is not None:
+        # If no story is passed in, just load a rail prompting user to create a story
+        if story is None:
 
-            # Check if all_workspaces_rail is initialized yet
-            if story.all_workspaces_rail is None:
-                # Default to content rail if all_workspaces_rail is not yet initialized
-                self.content = create_characters_rail(page)
-                print("Warning: all_workspaces_rail is None, defaulting to characters rail.")
-                return
+            print("Warning: Story is None, cannot load active rail.")
+            self.content = ft.Text("Create a story to get started!")
+            self.p.update()
+
+        # Otherwise build our active rail based on the selected workspace
+        else:
 
             # Give us the correct rail on program startup based on our selected workspace
             if story.all_workspaces_rail.selected_rail == "content":
                 self.content = Content_Rail(page, story)
+
             elif story.all_workspaces_rail.selected_rail == "characters":
                 self.content = create_characters_rail(page)
+
             elif story.all_workspaces_rail.selected_rail == "timeline":
                 self.content = Timeline_Rail(page, story)
+
             elif story.all_workspaces_rail.selected_rail == "world_building":
                 self.content = World_Building_Rail(page, story)
+
             elif story.all_workspaces_rail.selected_rail == "drawing_board":
                 self.content = create_drawing_board_rail(page)
+
             elif story.all_workspaces_rail.selected_rail == "notes":
                 self.content = create_notes_rail(page, story)
+
             else:
+                # Default to the content rail
                 self.content = Content_Rail(page, story)
 
             # Update the page to reflect changes
-            self.p.update()
-
-        else:
-            print("Warning: Story is None, cannot load active rail.")
-            self.content = ft.Text("Create a story to get started!")
             self.p.update()

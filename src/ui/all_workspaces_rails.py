@@ -19,8 +19,6 @@ class All_Workspaces_Rail(ft.Container):
     # Constructor for our all_workspaces_rail object. Needs a page reference passed in
     def __init__(self, page: ft.Page, story: Story):
 
-        #from models.app import app    # Always grabs updated reference when creating
-
         self.p = page   # Page reference
 
         # Selected workspace is story dependent, so read from the story instead
@@ -237,35 +235,18 @@ class All_Workspaces_Rail(ft.Container):
         ''' Changes our selected workspace in settings and for our object.
         Applies the correct active rail to match the selection '''
         
-        # Save our newly selected workspace in the settings, and save it for our object
+        # Save our newly selected workspace in the settings, and save it for our object (just easier for referencing)
         if story is not None:   # Make objects later, rather than return functions
             story.data['selected_rail'] = e.control.destinations[0].data
             story.save_dict()
             self.selected_rail = story.data['selected_rail']
 
-        # We change the active rail here rather than when we reload it because...
-        # the active rail is created after this object, so if when we reload the rail...
-        # on program start, it will break the program.
-            if self.selected_rail == "content":    # Set the active_rail content to the new selection
-                story.content_rail = Content_Rail(self.p, story)
-                story.active_rail.content = story.content_rail
-            elif self.selected_rail == "characters":
-                story.characters_rail = create_characters_rail(self.p)
-                story.active_rail.content = story.characters_rail
-            elif self.selected_rail == "timeline":
-                story.timeline_rail = Timeline_Rail(self.p, story)
-                story.active_rail.content = story.timeline_rail
-            elif self.selected_rail == "world_building":
-                story.world_building_rail = World_Building_Rail(self.p, story)
-                story.active_rail.content = story.world_building_rail
-            elif self.selected_rail == "drawing_board":
-                story.drawing_board_rail = create_drawing_board_rail(self.p)
-                story.active_rail.content = story.drawing_board_rail
-            elif self.selected_rail == "notes":
-                story.notes_rail = create_notes_rail(self.p, story)
-                story.active_rail.content = story.notes_rail
+            # Has the active rail grab its new selection
+            story.active_rail.display_active_rail(self.p, story) 
 
+            # Reloads our own rail to reflect icon changes
             self.reload_rail(story)  # Reload the rail to apply the new selection
+
 
         # Handle when there is no active story (shouldn't happen)
         else:
