@@ -12,7 +12,7 @@ from ui.rails.content_rail import Content_Rail
 from ui.rails.timeline_rail import Timeline_Rail
 from ui.rails.world_building_rail import World_Building_Rail
 from ui.rails.drawing_board_rail import Drawing_Board_Rail
-from ui.rails.notes_rail import create_notes_rail
+from ui.rails.notes_rail import Notes_Rail
 
 
 # Class is created in main on program startup
@@ -30,6 +30,7 @@ class Active_Rail(ft.Container):
             width=app.settings.data['active_rail_width'],  # Sets the width
         )
 
+        # Displays our active rail on startup
         self.display_active_rail(page, story)
 
         
@@ -64,7 +65,7 @@ class Active_Rail(ft.Container):
                 self.content = Drawing_Board_Rail(page, story)
 
             elif story.all_workspaces_rail.selected_rail == "notes":
-                self.content = create_notes_rail(page, story)
+                self.content = Notes_Rail(page, story)
 
             else:
                 # Default to the content rail
