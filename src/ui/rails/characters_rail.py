@@ -229,8 +229,8 @@ def create_character(role_tag, page: ft.Page):
     # Called by out logic to check our characters name for uniqueness
     def check_character(name) -> bool:
         ''' Checks all our characters names and makes sure the name is unique '''
-        '''
-        for character in app.active_story.characters:
+        
+        for character in page.views[0].characters:
             if character.title.lower() == name.lower():
                 page.open(
                     ft.SnackBar(
@@ -246,7 +246,7 @@ def create_character(role_tag, page: ft.Page):
                 )
                 page.update()
                 return False
-        '''
+        
         return True
 
     # Add our dialog to the page and apply the changes
