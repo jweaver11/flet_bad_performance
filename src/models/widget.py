@@ -55,7 +55,7 @@ class Widget(ft.Container):
                 # Drag event handlers
                 on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging
                 #on_drag_complete = Do nothing. The accepted drag targets handle logic and removing pin drag targets
-                #on_drag_cancel=impliment when we have custom draggables. Remove the pin drag targets
+                #on_drag_cancel=lambda e: story.workspace.remove_drag_targets,
 
                 # Content when we are dragging the follows the mouse
                 content_feedback=ft.TextButton(self.title), # Normal text won't restrict its own size, so we use a button

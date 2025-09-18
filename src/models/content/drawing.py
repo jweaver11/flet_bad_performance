@@ -17,6 +17,12 @@ class Drawing(Widget):
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 
+        # Load our data if we have any, otherwise set defaults
+        self.load_from_dict(directory_path)
+
+        # Load our widget UI on start after we have loaded our data
+        self.reload_widget()
+
 
     def save_dict(self):
         pass
@@ -25,7 +31,26 @@ class Drawing(Widget):
         pass
 
     def reload_widget(self):
-        pass
+        # Our column that will display our header filters and body of our widget
+        body = ft.Text(f"hello from: {self.title}")
+
+
+        # our tab.content is the column we build above.
+        self.tab.content=body  # We add this in combo with our 'tabs' later
+
+        # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
+        content = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            #divider_color=ft.Colors.TRANSPARENT,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+            tabs=[self.tab]    # Gives our tab control here
+        )
+        
+        # Content of our widget (ft.Container) is our created tabs content
+        self.content = content
 
 
 

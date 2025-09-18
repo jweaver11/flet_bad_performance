@@ -100,7 +100,7 @@ class Workspace(ft.Container):
                 right=0, top=0, bottom=0, 
             ),
             
-]
+        ]
 
 
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
