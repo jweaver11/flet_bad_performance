@@ -484,7 +484,7 @@ class Story(ft.View):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
         # Only one timeline object per story (even if multiverse/regression), so we don't need a create function for timelines
         # Creating out timeline will load the data if it exists, so we just create a new one on launch
-        from models.timeline import Timeline
+        from models.timeline.timeline import Timeline
         self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
 
 

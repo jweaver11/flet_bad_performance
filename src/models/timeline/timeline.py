@@ -3,7 +3,7 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.plotline import Plotline
+from models.timeline.plotline import Plotline
 
 
 # Class that holds our timeline object, that holds our plotlines
@@ -126,7 +126,7 @@ class Timeline(Widget):
                                 plotline_title = plotline_data.get("title", filename.replace(".json", ""))
 
                                 # Create Plotline object with the title, filepath, and data
-                                from models.plotline import Plotline
+                                from models.timeline.plotline import Plotline
                                 plotline = Plotline(plotline_title, file_path, plotline_data)
 
                                 self.plotlines[plotline_title] = plotline

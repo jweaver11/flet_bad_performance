@@ -45,11 +45,3 @@ class World_Building_Rail(ft.Container):
         # Apply the update
         self.p.update()
 
-
-
-# Description of world
-# Power systems (if any)
-# Social systems
-# Geography
-# History/Timeline
-# ...
