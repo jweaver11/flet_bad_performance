@@ -166,6 +166,9 @@ def arrange_widgets(story: Story):
     # Timeline
     if story.timeline is not None:
         add_object_to_pin(story.timeline)
+    # World widget for the world building
+    if story.world is not None:
+        add_object_to_pin(story.world)
     # Notes
     for title, note in story.notes.items():
         add_object_to_pin(note)

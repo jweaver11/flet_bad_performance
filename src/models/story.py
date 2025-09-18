@@ -41,10 +41,12 @@ class Story(ft.View):
 
         self.characters = []    # Make into dict later?
         self.timeline = None    # Singular timeline widget object, that holds our plotlines
+
+        self.world = None
         self.notes = {}
 
         # Called outside of constructor to avoid circular import issues, or it would be called here
-        #self.startup()
+        #self.startup() # The init_saved_stories calls this, or when a new story is created
         
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
@@ -64,7 +66,7 @@ class Story(ft.View):
         self.load_timeline()
 
         # Load our world building objects from file storage
-        self.load_world_building()
+        self.load_world()
 
         # Loads our notes from file storage
         self.load_notes()
@@ -104,6 +106,19 @@ class Story(ft.View):
 
         self.template = template
         self.template = "default"
+
+        world_building_folders = [
+            "locations",
+            "lores",
+            "power_systems",
+            "social_systems",
+            "history",
+            "geography",
+        ]
+        for folder in world_building_folders:
+            folder_path = os.path.join(directory_path, "world_building", folder)
+            os.makedirs(folder_path, exist_ok=True)
+
         # Load stuff from templates we create. For now, new stories default to this so we can play with folders
         # In the future, only newly created stories get templates
         if self.template == "default":
@@ -159,9 +174,9 @@ class Story(ft.View):
             'content_directory_path': os.path.join(directory_path, "content"),
             'characters_directory_path': os.path.join(directory_path, "characters"),
             'timeline_directory_path': os.path.join(directory_path, "timeline"),
-            'worldbuilding_directory_path': os.path.join(directory_path, "worldbuilding"),
-            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed, TBD
+            'world_building_directory_path': os.path.join(directory_path, "worldbuilding"),
             'notes_directory_path': os.path.join(directory_path, "notes"),
+            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed, TBD
 
             # Path to our plotlines inside of our timeline directory
             'plotlines_directory_path': os.path.join(directory_path, "timeline", "plotlines"),
@@ -499,8 +514,9 @@ class Story(ft.View):
         self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
 
     # Called on story startup to load all our world building widget
-    def load_world_building(self):
-        pass
+    def load_world(self):
+        from models.world_building.world_building import World_Building
+        self.world = World_Building("World_Building_Title", self.p, self.data['world_building_directory_path'], self)
 
 
     # Called on story startup to load all our notes objects
@@ -533,7 +549,7 @@ class Story(ft.View):
                         note_title = note_data.get("title", filename.replace(".json", ""))
 
                         # Create Note object with the title
-                        from models.notes import Notes
+                        from models.note import Notes
                         note = Notes(note_title, page, dirpath, self)
                         #character.path = file_path  # Set the path to the loaded file
 
@@ -602,7 +618,7 @@ class Story(ft.View):
     # Called to create a note object
     def create_note(self, title: str, directory_path: str=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
-        from models.notes import Notes 
+        from models.note import Notes 
 
         # If no path is passed in, construct the full file path for the note JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors

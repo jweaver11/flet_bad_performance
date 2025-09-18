@@ -30,13 +30,9 @@ class World_Building_Rail(ft.Container):
                 ft.Text("From the story: "),
                 ft.Text(story.title),
                 ft.TextButton(
-                    "world",
-                    on_click=lambda e: story.create_character("John Doe")
-                    #TODO create text box for user input of char name & save
-                ),
-                ft.TextButton(
-                    "building",
-                    #on_click=lambda e: self.create_plotline("plotline 2", story)
+                    "Show world",
+                    on_click=lambda e: self.show_world(story)
+                    
                 ),
                 # Add more controls here as needed
             ]
@@ -45,3 +41,10 @@ class World_Building_Rail(ft.Container):
         # Apply the update
         self.p.update()
 
+    def show_world(self, story: Story):
+        ''' Shows the world building widget '''
+
+        if story.world is not None:
+            story.world.show_widget()
+    
+        
