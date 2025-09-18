@@ -62,7 +62,7 @@ class Story(ft.View):
         self.load_timeline()
 
         # Load our world building objects from file storage
-        #self.load_world_building()
+        self.load_world_building()
 
         # Loads our drawing board from file storage
         #self.load_drawing_board()
@@ -360,16 +360,16 @@ class Story(ft.View):
     
         # Find our objects reference in the pins and remove it
         if hasattr(obj, 'pin_location'):
-            if obj.pin_location == "top" and obj in self.top_pin.controls:
-                self.top_pin.controls.remove(obj)
-            elif obj.pin_location == "left" and obj in self.left_pin.controls:
-                self.left_pin.controls.remove(obj)
-            elif obj.pin_location == "main" and obj in self.main_pin.controls:
-                self.main_pin.controls.remove(obj)
-            elif obj.pin_location == "right" and obj in self.right_pin.controls:
-                self.right_pin.controls.remove(obj)
-            elif obj.pin_location == "bottom" and obj in self.bottom_pin.controls:
-                self.bottom_pin.controls.remove(obj)
+            if obj.pin_location == "top" and obj in self.workspace.top_pin.controls:
+                self.workspace.top_pin.controls.remove(obj)
+            elif obj.pin_location == "left" and obj in self.workspace.left_pin.controls:
+                self.workspace.left_pin.controls.remove(obj)
+            elif obj.pin_location == "main" and obj in self.workspace.main_pin.controls:
+                self.workspace.main_pin.controls.remove(obj)
+            elif obj.pin_location == "right" and obj in self.workspace.right_pin.controls:
+                self.workspace.right_pin.controls.remove(obj)
+            elif obj.pin_location == "bottom" and obj in self.workspace.bottom_pin.controls:
+                self.workspace.bottom_pin.controls.remove(obj) 
             else:
                 print("Object not found in any pin location, cannot delete")
 
@@ -390,46 +390,58 @@ class Story(ft.View):
             return
         
         page = self.p
+
+        # Loads all chapters from our content directory
+        def load_chapters():
+            for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
+                for filename in filenames:
+
+                    # All our objects are stored as JSON
+                    if filename.endswith(".json"):
+                        file_path = os.path.join(dirpath, filename)   
+                        #print("dirpath = ", dirpath)
+                        try:
+                            # Read the JSON file
+                            with open(file_path, "r") as f:
+                                content_data = json.load(f)
+                            
+                            # Extract the title from the data
+                            content_title = content_data.get("title", filename.replace(".json", ""))
+
+                            #print(content_data)
+
+
+                            # Check our tag to see what type of content it is
+                            if content_data.get("tag", "") == "chapter":
+                                #print("yo mommma")
+                                from models.content.chapter import Chapter
+                                chapter = Chapter(content_title, page, dirpath, self)
+                                self.chapters[content_title] = chapter
+                                #print("Chapter loaded")
+
+                            elif content_data.get("tag", "") == "image":
+                                print("image tag found, skipping for now")
+                                
+                            else:
+                                print("content tag not valid, skipping")
+                                return
+
+                                
+                        # Handle errors if the path is wrong
+                        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                            print(f"Error loading content from {filename}: {e}")
+
+
+        # Loads all images or drawings from our content directory
+        def load_images():
+            ''' Images get loaded into the drawing board widget, either displaying as an image or canvas '''
+            pass
         
         # Iterate through all files in the characters folder
         #for filename in os.listdir(data_paths.characters_path):
-        for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
-            for filename in filenames:
 
-                # All our objects are stored as JSON
-                if filename.endswith(".json"):
-                    file_path = os.path.join(dirpath, filename)   
-                    print("dirpath = ", dirpath)
-                    try:
-                        # Read the JSON file
-                        with open(file_path, "r") as f:
-                            content_data = json.load(f)
-                        
-                        # Extract the title from the data
-                        content_title = content_data.get("title", filename.replace(".json", ""))
-
-                        #print(content_data)
-
-
-                        # Check our tag to see what type of content it is
-                        if content_data.get("tag", "") == "chapter":
-                            #print("yo mommma")
-                            from models.chapter import Chapter
-                            chapter = Chapter(content_title, page, dirpath, self)
-                            self.chapters[content_title] = chapter
-                            #print("Chapter loaded")
-
-                        elif content_data.get("tag", "") == "image":
-                            print("image tag found, skipping for now")
-                            
-                        else:
-                            print("content tag not valid, skipping")
-                            return
-
-                            
-                    # Handle errors if the path is wrong
-                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                        print(f"Error loading content from {filename}: {e}")
+        load_chapters()
+        load_images()
 
 
     # Called as part of the startup method during program launch
@@ -454,7 +466,7 @@ class Story(ft.View):
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
                     file_path = os.path.join(dirpath, filename)   
-                    print("dirpath = ", dirpath)
+                    #print("dirpath = ", dirpath)
                     
                     try:
                         # Read the JSON file
@@ -486,6 +498,9 @@ class Story(ft.View):
         # Creating out timeline will load the data if it exists, so we just create a new one on launch
         from models.timeline.timeline import Timeline
         self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
+
+    def load_world_building(self):
+        pass
 
 
     # Called on story startup to load all our notes objects
@@ -537,7 +552,7 @@ class Story(ft.View):
         ''' Creates a new chapter object, saves it to our live story object, and saves it to storage'''
         print("Create chapter called")
 
-        from models.chapter import Chapter
+        from models.content.chapter import Chapter
 
         # If no path is passed in, construct the full file path for the chapter JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
