@@ -24,8 +24,8 @@ class Timeline(Widget):
         self.plotlines = {}
 
         # Plotpoints
-        self.plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.plot_points.value))
-        self.arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.arcs.value))
+        self.filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
+        self.filter_arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.filter_arcs.value))
 
         # The UI element that will display our filters
         self.filters = ft.Row()
@@ -161,7 +161,7 @@ class Timeline(Widget):
         header = ft.Row(
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
-            controls=[self.plot_points, self.arcs],
+            controls=[self.filter_plot_points, self.filter_arcs],
         )
 
         # Run through our plotlines and create a checkbox for each one for filtering

@@ -25,14 +25,9 @@ class Timeline_Rail(ft.Container):
             spacing=0,
             expand=True,
             controls=[
-                ft.Text("Plot and Timeline Rail"),
+                ft.Text("Timeline Rail"),
                 ft.Text("From the story: "),
                 ft.Text(story.title),
-                ft.TextButton(
-                    "create character",
-                    on_click=lambda e: story.create_character("John Doe")
-                    #TODO create text box for user input of char name & save
-                ),
                 ft.TextButton(
                     "create plotline",
                     on_click=lambda e: self.create_plotline("plotline 2", story)
