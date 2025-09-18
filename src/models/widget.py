@@ -138,7 +138,6 @@ class Widget(ft.Container):
             from models.app import app
             for key, story in app.stories.items():
                 story.workspace.reload_workspace(self.p, story)
-            self.p.update()
 
         # Otherwise, our widget will have a story, so we just reload that one
         else:
@@ -160,6 +159,5 @@ class Widget(ft.Container):
             from models.app import app
             for key, story in app.stories.items():
                 story.workspace.reload_workspace(self.p, story)
-            self.p.update()
         else:
             story.workspace.reload_workspace(self.p, story)

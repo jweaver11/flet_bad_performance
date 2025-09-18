@@ -1,7 +1,6 @@
 ''' All the global variables and functions that are used to initialize the app '''
 
 from models.story import Story
-from models.settings import Settings
 import flet as ft
 import os
 

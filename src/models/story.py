@@ -53,6 +53,7 @@ class Story(ft.View):
         self.load_from_dict()    # This function creates one if story object was created not loaded
 
         # Loads our content objects from storage into our story object. Includes chapters and images
+        # This also loads our drawing board images here, since they can be opened in either workspace
         self.load_content()
 
         # Loads our characters from file storage into our characters list
@@ -63,9 +64,6 @@ class Story(ft.View):
 
         # Load our world building objects from file storage
         self.load_world_building()
-
-        # Loads our drawing board from file storage
-        #self.load_drawing_board()
 
         # Loads our notes from file storage
         self.load_notes()
@@ -161,7 +159,7 @@ class Story(ft.View):
             'characters_directory_path': os.path.join(directory_path, "characters"),
             'timeline_directory_path': os.path.join(directory_path, "timeline"),
             'worldbuilding_directory_path': os.path.join(directory_path, "worldbuilding"),
-            'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"),
+            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed, TBD
             'notes_directory_path': os.path.join(directory_path, "notes"),
 
             # Path to our plotlines inside of our timeline directory
@@ -433,15 +431,15 @@ class Story(ft.View):
 
 
         # Loads all images or drawings from our content directory
-        def load_images():
+        def load_drawings():
             ''' Images get loaded into the drawing board widget, either displaying as an image or canvas '''
+            from models.content.drawing import Drawing
             pass
         
-        # Iterate through all files in the characters folder
-        #for filename in os.listdir(data_paths.characters_path):
-
+        # Call our internal functions to load our content types
         load_chapters()
-        load_images()
+        load_drawings()
+        # Load animations -- TBD in future if possible
 
 
     # Called as part of the startup method during program launch
@@ -482,8 +480,7 @@ class Story(ft.View):
                         #character.path = file_path  # Set the path to the loaded file
                         self.characters.append(character)
                         
-                        
-                    
+                         
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
@@ -494,11 +491,13 @@ class Story(ft.View):
     # Called on story startup to create our timeline object.
     def load_timeline(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
+
         # Only one timeline object per story (even if multiverse/regression), so we don't need a create function for timelines
         # Creating out timeline will load the data if it exists, so we just create a new one on launch
         from models.timeline.timeline import Timeline
         self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
 
+    # Called on story startup to load all our world building widget
     def load_world_building(self):
         pass
 
@@ -564,6 +563,11 @@ class Story(ft.View):
         self.workspace.reload_workspace(self.p, self)
 
         print("num chapters: " + str(len(self.chapters)))
+
+    # Called when the button to create a new drawing is clicked
+    def create_drawing(self, title: str, directory_path: str=None):
+        ''' Creates a new drawing object and saves it to our live story object and storage '''
+        pass
 
 
     # Called to create a character object

@@ -39,5 +39,14 @@ class Drawing_Board_Rail(ft.Container):
             ]
         )
 
+        
+        # New
+        # Open
+        # Upload
+        # TODO: RAIL Has brushes, tools, colors, etc.
+        # Structure of content_directory, showing images in the rail
+        # - click one to open it in a drawing board
+
+
         # Apply the update
         self.p.update()
