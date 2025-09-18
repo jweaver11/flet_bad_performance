@@ -23,6 +23,14 @@ class Drawing_Board_Rail(ft.Container):
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the drawing board rail '''
 
+        # New
+        # Open
+        # Upload
+        # TODO: RAIL Has brushes, tools, colors, etc.
+        # Structure of content_directory, showing images in the rail
+        # - click one to open it in a drawing board
+
+
         # Build the content of our rail
         self.content = ft.Column(
             spacing=0,
@@ -32,20 +40,14 @@ class Drawing_Board_Rail(ft.Container):
                 ft.Text("From the story: "),
                 ft.Text(story.title),
                 ft.TextButton(
-                    "Drawing Board",
-                    #on_click=lambda e: story.create_character("John Doe")
+                    "Create Drawing",
+                    on_click=lambda e: story.create_drawing("Drawing_Title")
                 ),
                 # Add more controls here as needed
             ]
         )
 
         
-        # New
-        # Open
-        # Upload
-        # TODO: RAIL Has brushes, tools, colors, etc.
-        # Structure of content_directory, showing images in the rail
-        # - click one to open it in a drawing board
 
 
         # Apply the update

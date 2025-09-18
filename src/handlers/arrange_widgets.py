@@ -157,6 +157,9 @@ def arrange_widgets(story: Story):
     # Chapters
     for title, chapter in story.chapters.items():
         add_object_to_pin(chapter)
+    # Drawings
+    for title, drawing in story.drawings.items():
+        add_object_to_pin(drawing)
     # Characters
     for char in story.characters:
         add_object_to_pin(char)

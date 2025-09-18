@@ -37,7 +37,8 @@ class Story(ft.View):
         self.content = {}
 
         self.chapters = {}
-        self.images = {}    # title, path
+        self.drawings = {}
+
         self.characters = []    # Make into dict later?
         self.timeline = None    # Singular timeline widget object, that holds our plotlines
         self.notes = {}
@@ -567,6 +568,15 @@ class Story(ft.View):
     # Called when the button to create a new drawing is clicked
     def create_drawing(self, title: str, directory_path: str=None):
         ''' Creates a new drawing object and saves it to our live story object and storage '''
+
+        from models.content.drawing import Drawing
+        print("Create drawing called")
+        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            directory_path = self.data['characters_directory_path']
+
+        self.drawings[title] = Drawing(title, self.p, directory_path, self)
+        self.workspace.reload_workspace(self.p, self)
+
         pass
 
 
