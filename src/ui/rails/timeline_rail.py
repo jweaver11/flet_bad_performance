@@ -24,6 +24,8 @@ class Timeline_Rail(ft.Container):
         self.content = ft.Column(
             spacing=0,
             expand=True,
+            scroll="auto",
+            alignment=ft.MainAxisAlignment.START,
             controls=[
                 ft.Container(height=10),
                 ft.Row([
@@ -51,17 +53,28 @@ class Timeline_Rail(ft.Container):
         )
 
         for key, plotline in story.timeline.plotlines.items():
-            list_view = ft.ListView(
-                expand=True,
-                spacing=5,
-                padding=ft.padding.all(10),
-                auto_scroll=True,
+            list_view = ft.ExpansionTile(
+                shape=ft.RoundedRectangleBorder(),
+                
+                #expand=True,
+                #spacing=5,
+                #padding=ft.padding.all(10),
+                #auto_scroll=True,
+                title=ft.Text(plotline.title),
                 controls=[
-                    ft.Text(plotline.title)
+                    ft.Container(height=6),
+                    ft.Row([
+                        ft.TextField(label="Start Date", value=str(plotline.data['start_date']), expand=True),
+                        ft.TextField(label="End Date", value=str(plotline.data['end_date']), expand=True),
+                    ]),
+                    ft.ExpansionTile(title=ft.Text("Branches")),
+                    ft.ExpansionTile(title=ft.Text("Plot Points")),
+                    ft.ExpansionTile(title=ft.Text("Arcs")),
                 ]
             )
 
             self.content.controls.append(list_view)
+            self.content.controls.append(ft.Container(height=10))
 
 
         def open_menu(story: Story):
@@ -73,17 +86,16 @@ class Timeline_Rail(ft.Container):
                 self.p.update()
             
             menu = ft.Container(
-                left=story.mouse_x,
+                left=story.mouse_x,     # Positions the menu at the mouse location
                 top=story.mouse_y,
-                #border=ft.border.all(1, ft.Colors.BLACK),
                 border_radius=ft.border_radius.all(6),
                 bgcolor=ft.Colors.ON_SECONDARY,
-                padding=10,
+                padding=2,
                 alignment=ft.alignment.center,
                 content=ft.Column([
-                    ft.Text("Option 1"),
-                    ft.Text("Option 2"),
-                    ft.Text("Option 3"),
+                    ft.TextButton("Option 1"),
+                    ft.TextButton("Option 2"),
+                    ft.TextButton("Option 3"),
                 ]),
             )
             outside_detector = ft.GestureDetector(

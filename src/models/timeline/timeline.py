@@ -150,8 +150,8 @@ class Timeline(Widget):
             print("No plotlines found for this timeline, creatting one to get started")
             self.create_plotline("Main Plotline")
             print(self.plotlines)
-        else:
-            print("num of plotlines", len(self.plotlines))
+        #else:
+            #print("num of plotlines", len(self.plotlines))
                 
 
 

@@ -398,9 +398,12 @@ def reload_character_rail(page: ft.Page):
     side_characters.controls.clear()
     background_characters.controls.clear()
 
+    #story = page.views[0]  # Our current story object
+    #print(story)
+
     '''
     # Run through each character in our story
-    for character in app.active_story.characters:
+    for character in story.characters:
         # Create a new character tile for the rail
 
         new_char = ft.Draggable(
@@ -465,6 +468,7 @@ def reload_character_rail(page: ft.Page):
 
         )
     '''
+    
 
 
         
