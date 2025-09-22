@@ -2,6 +2,7 @@ import json
 import os
 
 # Live objects that are stored in our timeline object
+# We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
 class Plotline:
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
@@ -31,6 +32,8 @@ class Plotline:
 
                 'start_date': None,    # Start and end date of this particular plotline
                 'end_date': None,
+
+                'color': "blue",
 
                 # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
                 # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
@@ -69,5 +72,9 @@ class Plotline:
             #print(f"Plotline saved successfully to {self.file_path}")
         except Exception as e:
             print(f"Error saving plotline to {self.file_path}: {e}")
+
+
+    def load_from_dict(self):
+        pass
 
         

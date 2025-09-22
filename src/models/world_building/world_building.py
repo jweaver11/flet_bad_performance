@@ -16,6 +16,7 @@ class World_Building(Widget):
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
+        self.visible = False
 
         self.locations = {}
         self.lore = {}

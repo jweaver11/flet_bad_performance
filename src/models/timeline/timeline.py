@@ -26,9 +26,10 @@ class Timeline(Widget):
         # Plotpoints
         self.filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
         self.filter_arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.filter_arcs.value))
+        self.reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))
 
         # The UI element that will display our filters
-        self.filters = ft.Row()
+        self.filters = ft.Row(scroll="auto")
 
         # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
         self.load_from_dict(file_path)
@@ -72,6 +73,7 @@ class Timeline(Widget):
                 'show_plot_points': True,
                 'show_arcs': True,
             },
+            # Plotlines are stored as their own files, so we only have them in live memory
         }
         
         # Loads our TIMELINE object only
@@ -148,6 +150,8 @@ class Timeline(Widget):
             print("No plotlines found for this timeline, creatting one to get started")
             self.create_plotline("Main Plotline")
             print(self.plotlines)
+        else:
+            print("num of plotlines", len(self.plotlines))
                 
 
 
@@ -176,6 +180,7 @@ class Timeline(Widget):
                     on_change=lambda e: print(plotline.title + " is now " + str(plotline.data['visible']))
                 )
             )
+        plotline_filters.append(self.reset_zoom_button)
             
         # Add our plotlines as filters to our header
         header.controls.extend(plotline_filters)
@@ -187,17 +192,58 @@ class Timeline(Widget):
             left=0,
             right=0,
             bottom=0,
+            margin=ft.margin.all(10),
             expand=True,
-            content=ft.Divider(color=ft.Colors.RED),
+            content=ft.Column(
+                expand=True,
+                controls=[
+                    ft.Container(expand=True,),
+                    ft.Divider(color=ft.Colors.with_opacity(0.4, ft.Colors.RED), thickness=2),
+                    ft.Container(expand=True,),
+                ]
+            )
         )
+
+        plotlines = ft.Column(
+            top=0,
+            left=0,
+            right=0,
+            bottom=0,
+            expand=True,
+        )
+
+        plotlines.controls.append(ft.Container(expand=True))
+
+        for key, plotline in self.plotlines.items():
+            if plotline.data['visible']:
+                plotlines.controls.append(
+                    ft.Container(
+                        margin=ft.margin.only(left=20, right=20),
+                        expand=True,
+                        alignment=ft.alignment.center,
+                        content=ft.Column(
+                            expand=True,
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                #ft.Text(plotline.title, color=ft.Colors.WHITE, size=16),
+                                ft.Divider(color=ft.Colors.with_opacity(0.4, ft.Colors.BLUE), thickness=2),
+                            ],
+                        )
+                    )
+                )
+
+        plotlines.controls.append(ft.Container(expand=True))
 
         # Stack that holds our timeline and any plotlines that sit overtop it (may not use in future)
         stack = ft.Stack(
             expand=True,
             controls=[
-                timeline
+                timeline,
+                plotlines
             ]
         )
+
+
 
         # The body that is our interactive viewer, allowing zoom in and out and moving around
         body = ft.InteractiveViewer(
