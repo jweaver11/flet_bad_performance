@@ -4,7 +4,6 @@ Holds our settings icon, feedback, and account name as well
 '''
 
 import flet as ft
-from constants import data_paths
 from models.app import app
 from models.story import Story
 #from handlers.reload_workspace import remove_drag_targets

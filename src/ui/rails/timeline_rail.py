@@ -20,23 +20,18 @@ class Timeline_Rail(ft.Container):
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
-        mouse_x = 0
-        mouse_y = 0
-
         # Build the content of our rail
         self.content = ft.Column(
             spacing=0,
             expand=True,
             controls=[
                 ft.Container(height=10),
-
                 ft.Row([
                     ft.TextField(
                         label="Start Date",
                         value=str(story.timeline.data['story_start_date']),
-                        expand=True
+                        expand=True,
                     ),
-
                     ft.TextField(
                         label="End Date",
                         value=str(story.timeline.data['story_end_date']),
@@ -72,37 +67,44 @@ class Timeline_Rail(ft.Container):
         def open_menu(story: Story):
             
             #print(f"Open menu at x={story.mouse_x}, y={story.mouse_y}")
+
+            def close_menu(e):
+                self.p.overlay.clear()
+                self.p.update()
             
             menu = ft.Container(
-                content=ft.Text("Popup menu"),
                 left=story.mouse_x,
                 top=story.mouse_y,
-                #width=100,
-                #height=50,
-                bgcolor=ft.Colors.WHITE,
-                border=ft.border.all(1, ft.Colors.BLACK),
+                #border=ft.border.all(1, ft.Colors.BLACK),
+                border_radius=ft.border_radius.all(6),
+                bgcolor=ft.Colors.ON_SECONDARY,
                 padding=10,
-                alignment=ft.alignment.center
+                alignment=ft.alignment.center,
+                content=ft.Column([
+                    ft.Text("Option 1"),
+                    ft.Text("Option 2"),
+                    ft.Text("Option 3"),
+                ]),
+            )
+            outside_detector = ft.GestureDetector(
+                expand=True,
+                on_tap=close_menu,
+                on_secondary_tap=close_menu,
             )
 
+            self.p.overlay.append(outside_detector)
             self.p.overlay.append(menu)
             
             self.p.update()
 
-
             
-            #print(f"Stored mouse at x={mouse_x}, y={mouse_y}")
-
-            
-            
-
+        
 
         self.content.controls.append(
             ft.GestureDetector(
                 content=ft.Text("GD"),
                 on_secondary_tap=lambda e: open_menu(story),
                 mouse_cursor="click",
-                #on_hover=story.on_hover,
             )
         )
         
