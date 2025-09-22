@@ -59,6 +59,7 @@ class Timeline(Widget):
         default_data = {
             'title': self.title,
             'file_path': timeline_file_path,
+            'tag': "timeline",
 
             'pin_location': "bottom",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it

@@ -63,6 +63,7 @@ class Character(Widget):
             'title': self.title,
             'directory_path': directory_path,
             'visible': True,
+            'tag': "character",
             'pin_location': "left", # New characters start pinned left
 
             'tab_color': "primary",  # Initial tab color matches color scheme

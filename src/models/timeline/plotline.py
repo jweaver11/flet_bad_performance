@@ -25,6 +25,7 @@ class Plotline:
             self.data = {
                 'title': self.title,
                 'file_path': self.file_path,   # was timeline_file_path
+                'tag': "plotline",
 
                 'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
 

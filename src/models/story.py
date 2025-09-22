@@ -172,14 +172,19 @@ class Story(ft.View):
 
             # Paths to our workspaces for easier reference later
             'content_directory_path': os.path.join(directory_path, "content"),
+
             'characters_directory_path': os.path.join(directory_path, "characters"),
+
             'timeline_directory_path': os.path.join(directory_path, "timeline"),
+            'plotlines_directory_path': os.path.join(directory_path, "timeline", "plotlines"),
+
             'world_building_directory_path': os.path.join(directory_path, "worldbuilding"),
+
             'notes_directory_path': os.path.join(directory_path, "notes"),
+
             #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed, TBD
 
             # Path to our plotlines inside of our timeline directory
-            'plotlines_directory_path': os.path.join(directory_path, "timeline", "plotlines"),
 
             # Path to our locations inside of our notes directory
 
