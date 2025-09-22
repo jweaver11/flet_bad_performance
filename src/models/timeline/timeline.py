@@ -65,8 +65,8 @@ class Timeline(Widget):
             'pin_location': "bottom",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             
-            'story_start_date': None,  # Start and end date of the main story
-            'story_end_date': None,
+            'story_start_date': "",  # Start and end date of the main story
+            'story_end_date': "",
 
             'filters': {    # Filters we can apply to change the view of our plotline, while keeping the data intact
                 'show_timeskips': True,
@@ -304,6 +304,8 @@ class Timeline(Widget):
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
         self.plotlines[title] = Plotline(title, file_path)
+
+        self.reload_widget()  # Reload our widget to show the new plotline
 
         return
         

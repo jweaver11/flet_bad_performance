@@ -45,6 +45,9 @@ class Story(ft.View):
         self.world = None
         self.notes = {}
 
+        self.mouse_x = 0
+        self.mouse_y = 0
+
         # Called outside of constructor to avoid circular import issues, or it would be called here
         #self.startup() # The init_saved_stories calls this, or when a new story is created
         
@@ -305,8 +308,24 @@ class Story(ft.View):
             ],
         )
 
+        # Our gesture detector that holds our row, and allows us to track our mouse position
+        gd = ft.GestureDetector(
+            content=row,
+            expand=True,
+            on_hover=self.on_hover,
+            hover_interval=100,
+        )
+
         # Views render like columns, so we add elements top-down
-        self.controls = [self.menubar, row]
+        self.controls = [self.menubar, gd]
+
+    # Called every time the mouse moves over the workspace
+    def on_hover(self, e):
+        ''' Stores our mouse positioning so we know where to open menus '''
+
+        self.mouse_x = e.local_x 
+        self.mouse_y = e.local_y
+        #print(f"Mouse at x={self.mouse_x}, y={self.mouse_y}")
 
         
     # Called when saving new objects to the story (characters, chapters, etc.)
