@@ -19,6 +19,7 @@ class Timeline_Rail(ft.Container):
     # Reload the rail whenever we need
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
+        
 
         # Build the content of our rail
         self.content = ft.Column(
@@ -52,24 +53,48 @@ class Timeline_Rail(ft.Container):
    
         )
 
+        # Run through each plotline in the story
         for key, plotline in story.timeline.plotlines.items():
+            # Create an expansion tile for our plotpoints
+            plotpoint_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Plot Points"),
+            )
+            # Run through each plotpoint, and add it to our plotpoints expansion tile
+            for plotpoint in plotline.plotpoints.values():
+                plotpoint_expansion_tile.controls.append(
+                    ft.Text(plotpoint.title)
+                )
+            # Add a text field at bottom to create new plotpoints
+            plotpoint_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Plot Point",
+                    data=plotline.title,
+                    on_submit=lambda e: self.submit_plotpoint(e, story),
+                    expand=True,
+                )
+            )
+            # TODO button that when pressed makes a textfield visible and autofocused to input plotpoint name
+
+            # Build our view for this plotline
             list_view = ft.ExpansionTile(
-                shape=ft.RoundedRectangleBorder(),
+                shape=ft.RoundedRectangleBorder(),  # Get rid of edges of expansion tile
                 
                 #expand=True,
                 #spacing=5,
                 #padding=ft.padding.all(10),
                 #auto_scroll=True,
-                title=ft.Text(plotline.title),
+                title=ft.Text(plotline.title),  # Set the title of expansion tile to the plotline
                 controls=[
-                    ft.Container(height=6),
-                    ft.Row([
+                    ft.Container(height=6), # Spacing
+                    ft.Row([    # Add start date and end date text fields
                         ft.TextField(label="Start Date", value=str(plotline.data['start_date']), expand=True),
                         ft.TextField(label="End Date", value=str(plotline.data['end_date']), expand=True),
                     ]),
-                    ft.ExpansionTile(title=ft.Text("Branches")),
-                    ft.ExpansionTile(title=ft.Text("Plot Points")),
-                    ft.ExpansionTile(title=ft.Text("Arcs")),
+
+                    plotpoint_expansion_tile,   # Add our plotpoints expansion tile we built above
+
+                    ft.ExpansionTile(title=ft.Text("Branches"), shape=ft.RoundedRectangleBorder()),
+                    ft.ExpansionTile(title=ft.Text("Arcs"), shape=ft.RoundedRectangleBorder()),
                 ]
             )
 
@@ -149,3 +174,19 @@ class Timeline_Rail(ft.Container):
             self.reload_rail(story)
         
         print(len(story.timeline.plotlines))
+
+
+    # When new plotpoint is submitted
+    def submit_plotpoint(self, e, story: Story):
+        plotline_title = e.control.data
+        plotpoint_title = e.control.value
+        print(plotline_title)
+        print(plotpoint_title)
+
+        for key, plotline in story.timeline.plotlines.items():
+            if plotline.title == plotline_title:
+                plotline.create_plotpoint(plotpoint_title)
+                print(f"New plotpoint created on the {plotline_title} plotline. Name: {plotpoint_title} ")
+                self.reload_rail(story)
+                break
+

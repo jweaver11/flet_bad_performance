@@ -10,14 +10,14 @@ from models.timeline.plotline import Plotline
 # Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
 class Timeline(Widget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, file_path: str, story: Story):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
             tag = "timeline",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
-            directory_path = file_path,  # Path to our timeline json file
+            directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 
@@ -32,7 +32,7 @@ class Timeline(Widget):
         self.filters = ft.Row(scroll="auto")
 
         # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
-        self.load_from_dict(file_path)
+        self.load_from_dict(directory_path)
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
@@ -50,11 +50,11 @@ class Timeline(Widget):
             print(f"Error saving timeline to {self.file_path}: {e}")
 
     # Called at end of constructor
-    def load_from_dict(self, file_path: str):
+    def load_from_dict(self, directory_path: str):
         ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
 
         # Sets the path to our file based on our title inside of the timeline directory
-        timeline_file_path = os.path.join(file_path, "timeline.json")
+        timeline_file_path = os.path.join(directory_path, "timeline.json")
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
