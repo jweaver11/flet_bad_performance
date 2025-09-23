@@ -40,7 +40,7 @@ class Story(ft.View):
         self.drawings = {}
 
         self.characters = []    # Make into dict later?
-        self.timeline = None    # Singular timeline widget object, that holds our plotlines
+        self.plotline = None    # Singular timeline widget object, that holds our plotlines
 
         self.world = None
         self.notes = {}
@@ -66,7 +66,7 @@ class Story(ft.View):
         self.load_characters()
 
         # Loads our timeline from file storage, which holds our plotlines
-        self.load_timeline()
+        self.load_plotline()
 
         # Load our world building objects from file storage
         self.load_world()
@@ -90,7 +90,7 @@ class Story(ft.View):
         story_structure_folders = [
             "content",
             "characters",
-            "timeline",
+            "plotline",
             "world_building",
             "drawing_board",
             "notes",
@@ -102,9 +102,9 @@ class Story(ft.View):
             os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
 
         # Create our sub folders inside of timeline
-        timeline_folders = ["plotlines"]
-        for folder in timeline_folders:
-            folder_path = os.path.join(directory_path, "timeline", folder)
+        plotline_folders = ["timelines"]
+        for folder in plotline_folders:
+            folder_path = os.path.join(directory_path, "plotline", folder)
             os.makedirs(folder_path, exist_ok=True)
 
         self.template = template
@@ -178,8 +178,8 @@ class Story(ft.View):
 
             'characters_directory_path': os.path.join(directory_path, "characters"),
 
-            'timeline_directory_path': os.path.join(directory_path, "timeline"),
-            'plotlines_directory_path': os.path.join(directory_path, "timeline", "plotlines"),
+            'plotline_directory_path': os.path.join(directory_path, "plotline"),
+            'timelines_directory_path': os.path.join(directory_path, "plotline", "timelines"),
 
             'world_building_directory_path': os.path.join(directory_path, "worldbuilding"),
 
@@ -528,14 +528,14 @@ class Story(ft.View):
         #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
 
-    # Called on story startup to create our timeline object.
-    def load_timeline(self):
+    # Called on story startup to create our plotline object.
+    def load_plotline(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
 
-        # Only one timeline object per story (even if multiverse/regression), so we don't need a create function for timelines
-        # Creating out timeline will load the data if it exists, so we just create a new one on launch
-        from models.timeline.timeline import Timeline
-        self.timeline = Timeline("Timeline", self.p, self.data['timeline_directory_path'], self)
+        # Only one plotline object per story (even if multiverse/regression), so we don't need a create function for plotlines
+        # Creating out plotline will load the data if it exists, so we just create a new one on launch
+        from models.plotline.plotline import Plotline
+        self.plotline = Plotline("Plotline", self.p, self.data['plotline_directory_path'], self)
 
     # Called on story startup to load all our world building widget
     def load_world(self):

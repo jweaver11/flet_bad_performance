@@ -3,7 +3,7 @@ import os
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
-class Plotline:
+class Timeline:
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
     def __init__(self, title: str, directory_path: str, data: dict = None):
@@ -97,8 +97,9 @@ class Plotline:
         
 
     def create_plotpoint(self, title: str):
-        from models.timeline.plotpoint import Plotpoint
-        self.plotpoints[title] = Plotpoint(title)
+        #from models.timeline.plotpoint import Plotpoint
+        #self.plotpoints[title] = Timeline(title)
+        pass
 
 
         

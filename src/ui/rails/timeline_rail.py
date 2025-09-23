@@ -32,12 +32,12 @@ class Timeline_Rail(ft.Container):
                 ft.Row([
                     ft.TextField(
                         label="Start Date",
-                        value=str(story.timeline.data['story_start_date']),
+                        value=str(story.plotline.data['story_start_date']),
                         expand=True,
                     ),
                     ft.TextField(
                         label="End Date",
-                        value=str(story.timeline.data['story_end_date']),
+                        value=str(story.plotline.data['story_end_date']),
                         expand=True
                     ),
                 ]),
@@ -54,13 +54,13 @@ class Timeline_Rail(ft.Container):
         )
 
         # Run through each plotline in the story
-        for key, plotline in story.timeline.plotlines.items():
+        for timeline in story.plotline.timelines.values():
             # Create an expansion tile for our plotpoints
             plotpoint_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Plot Points"),
             )
             # Run through each plotpoint, and add it to our plotpoints expansion tile
-            for plotpoint in plotline.plotpoints.values():
+            for plotpoint in timeline.plotpoints.values():
                 plotpoint_expansion_tile.controls.append(
                     ft.Text(plotpoint.title)
                 )
@@ -68,7 +68,7 @@ class Timeline_Rail(ft.Container):
             plotpoint_expansion_tile.controls.append(
                 ft.TextField(
                     label="Create Plot Point",
-                    data=plotline.title,
+                    data=timeline.title,
                     on_submit=lambda e: self.submit_plotpoint(e, story),
                     expand=True,
                 )
@@ -83,12 +83,12 @@ class Timeline_Rail(ft.Container):
                 #spacing=5,
                 #padding=ft.padding.all(10),
                 #auto_scroll=True,
-                title=ft.Text(plotline.title),  # Set the title of expansion tile to the plotline
+                title=ft.Text(timeline.title),  # Set the title of expansion tile to the plotline
                 controls=[
                     ft.Container(height=6), # Spacing
                     ft.Row([    # Add start date and end date text fields
-                        ft.TextField(label="Start Date", value=str(plotline.data['start_date']), expand=True),
-                        ft.TextField(label="End Date", value=str(plotline.data['end_date']), expand=True),
+                        ft.TextField(label="Start Date", value=str(timeline.data['start_date']), expand=True),
+                        ft.TextField(label="End Date", value=str(timeline.data['end_date']), expand=True),
                     ]),
 
                     plotpoint_expansion_tile,   # Add our plotpoints expansion tile we built above
@@ -161,7 +161,7 @@ class Timeline_Rail(ft.Container):
         # Check if name is unique
         name_is_unique = True
 
-        for key, plotline in story.timeline.plotlines.items():
+        for key, plotline in story.plotline.plotlines.items():
             if plotline.title == title:
                 name_is_unique = False
                 print("Plotline name already exists!")

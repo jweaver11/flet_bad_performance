@@ -56,7 +56,7 @@ class Active_Rail(ft.Container):
             elif story.all_workspaces_rail.selected_rail == "characters":
                 self.content = create_characters_rail(page)
 
-            elif story.all_workspaces_rail.selected_rail == "timeline":
+            elif story.all_workspaces_rail.selected_rail == "plotline":
                 self.content = Timeline_Rail(page, story)
 
             elif story.all_workspaces_rail.selected_rail == "world_building":

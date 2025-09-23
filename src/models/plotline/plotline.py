@@ -3,12 +3,12 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.timeline.plotline import Plotline
+from models.plotline.timeline import Timeline
 
 
 # Class that holds our timeline object, that holds our plotlines
 # Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
-class Timeline(Widget):
+class Plotline(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
         
@@ -21,7 +21,7 @@ class Timeline(Widget):
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
         )
 
-        self.plotlines = {}
+        self.timelines = {}
 
         # Plotpoints
         self.filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
@@ -40,18 +40,20 @@ class Timeline(Widget):
 
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
-        ''' Saves our data to our timeline json file. '''
+        ''' Saves our data to our plotline json file. '''
+
+        file_path = os.path.join(self.directory_path, "plotline.json")
 
         try:
-            with open(self.data['file_path'], "w") as f:
+            with open(file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Plotline saved successfully to {self.file_path}")
         except Exception as e:
-            print(f"Error saving timeline to {self.file_path}: {e}")
+            print(f"Error saving plotline to {file_path}: {e}")
 
     # Called at end of constructor
     def load_from_dict(self, directory_path: str):
-        ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
+        ''' Loads our plotline data and timelines data from our seperate timelines files inside the timelines directory '''
 
         # Sets the path to our file based on our title inside of the timeline directory
         timeline_file_path = os.path.join(directory_path, "timeline.json")
@@ -59,7 +61,7 @@ class Timeline(Widget):
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             'title': self.title,
-            'file_path': timeline_file_path,
+            'directory_path': self.directory_path,
             'tag': "timeline",
 
             'pin_location': "bottom",
@@ -73,7 +75,7 @@ class Timeline(Widget):
                 'show_plot_points': True,
                 'show_arcs': True,
             },
-            # Plotlines are stored as their own files, so we only have them in live memory
+            
         }
         
         # Loads our TIMELINE object only
@@ -122,17 +124,17 @@ class Timeline(Widget):
                             try:
                                 # Read the JSON file
                                 with open(file_path, "r") as f:
-                                    plotline_data = json.load(f)
+                                    timeline_data = json.load(f)
                                     #print(plotline_data)
                                 
                                 # Extract the title from the data
-                                plotline_title = plotline_data.get("title", filename.replace(".json", ""))
+                                timeline_title = timeline_data.get("title", filename.replace(".json", ""))
 
                                 # Create Plotline object with the title, filepath, and data
-                                from models.timeline.plotline import Plotline
-                                plotline = Plotline(plotline_title, file_path, plotline_data)
+                                from models.plotline.timeline import Timeline
+                                timeline = Timeline(timeline_title, file_path, timeline_data)
 
-                                self.plotlines[plotline_title] = plotline
+                                self.timelines[timeline_title] = timeline
                                 #print(self.plotlines[plotline_title].title) 
 
                             # Handle errors if the path is wrong
@@ -146,12 +148,10 @@ class Timeline(Widget):
             print(f"Error loading any plotlines from {filename}: {e}")
 
         # If no plotlines exist, we create a default one to get started
-        if len(self.plotlines) == 0:
-            print("No plotlines found for this timeline, creatting one to get started")
-            self.create_plotline("Main Plotline")
-            print(self.plotlines)
-        #else:
-            #print("num of plotlines", len(self.plotlines))
+        if len(self.timelines) == 0:
+            #print("No plotlines found for this timeline, creatting one to get started")
+            self.create_timeline("Main Plotline")
+            #print(self.timelines)
                 
 
 
@@ -170,16 +170,17 @@ class Timeline(Widget):
         )
 
         # Run through our plotlines and create a checkbox for each one for filtering
-        for key, plotline in self.plotlines.items():
+        for key, timeline in self.timelines.items():
             #print(plotline.title, " is being shown")
             plotline_filters.append(
                 ft.Checkbox(
-                    label=plotline.title, 
+                    label=timeline.title, 
                     value=True, 
-                    data=plotline.title,
-                    on_change=lambda e: print(plotline.title + " is now " + str(plotline.data['visible']))
+                    data=timeline.title,
+                    on_change=lambda e: print(timeline.title + " is now " + str(timeline.data['visible']))
                 )
             )
+
         plotline_filters.append(self.reset_zoom_button)
             
         # Add our plotlines as filters to our header
@@ -187,7 +188,7 @@ class Timeline(Widget):
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our plotlines that that will display timeskips, etc. 
-        timeline = ft.Container(
+        plotline = ft.Container(
             top=0,
             left=0,
             right=0,
@@ -204,7 +205,7 @@ class Timeline(Widget):
             )
         )
 
-        plotlines = ft.Column(
+        timelines = ft.Column(
             top=0,
             left=0,
             right=0,
@@ -212,11 +213,11 @@ class Timeline(Widget):
             expand=True,
         )
 
-        plotlines.controls.append(ft.Container(expand=True))
+        timelines.controls.append(ft.Container(expand=True))
 
-        for key, plotline in self.plotlines.items():
-            if plotline.data['visible']:
-                plotlines.controls.append(
+        for timeline in self.timelines.values():
+            if timeline.data['visible']:
+                timelines.controls.append(
                     ft.Container(
                         margin=ft.margin.only(left=20, right=20),
                         expand=True,
@@ -232,14 +233,14 @@ class Timeline(Widget):
                     )
                 )
 
-        plotlines.controls.append(ft.Container(expand=True))
+        timelines.controls.append(ft.Container(expand=True))
 
         # Stack that holds our timeline and any plotlines that sit overtop it (may not use in future)
         stack = ft.Stack(
             expand=True,
             controls=[
-                timeline,
-                plotlines
+                plotline,
+                timelines
             ]
         )
 
@@ -284,7 +285,7 @@ class Timeline(Widget):
 
 
     # Called when we want to create a new plotline
-    def create_plotline(self, title: str):  # -> PLotline
+    def create_timeline(self, title: str):  # -> PLotline
         ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
 
         # Check for invalid names
@@ -293,17 +294,17 @@ class Timeline(Widget):
             return
         
         # Check plotline name doesn't already exist
-        for key, plotline in self.plotlines.items():
-            if plotline.title == title:
+        for key, timeline in self.timelines.items():
+            if timeline.title == title:
                 print("Plotline with that title already exists")
                 return
         
 
         # Set file path for our plotline
-        file_path = os.path.join(self.story.data['plotlines_directory_path'], f"{title}.json")
+        file_path = os.path.join(self.story.data['timelines_directory_path'], f"{title}.json")
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
-        self.plotlines[title] = Plotline(title, file_path)
+        self.timelines[title] = Timeline(title, file_path)
 
         self.reload_widget()  # Reload our widget to show the new plotline
 

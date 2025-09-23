@@ -46,10 +46,10 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             nonlocal is_unique
 
             if isinstance(e, ft.TextField):
-                print("Received the text field. title is e.value")
+                #print("Received the text field. title is e.value")
                 title = e.value
             else:
-                print("received the event, title is e.control.value")
+                #print("received the event, title is e.control.value")
                 title = e.control.value
 
             print(title)
