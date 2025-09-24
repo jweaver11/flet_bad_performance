@@ -183,9 +183,9 @@ class Timeline_Rail(ft.Container):
         print(plotline_title)
         print(plotpoint_title)
 
-        for key, plotline in story.timeline.plotlines.items():
-            if plotline.title == plotline_title:
-                plotline.create_plotpoint(plotpoint_title)
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == plotline_title:
+                timeline.create_plotpoint(plotpoint_title)
                 print(f"New plotpoint created on the {plotline_title} plotline. Name: {plotpoint_title} ")
                 self.reload_rail(story)
                 break

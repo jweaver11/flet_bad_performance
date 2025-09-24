@@ -1,12 +1,14 @@
 import flet as ft
 from models.widget import Widget
 from models.story import Story
+import os
+import json
 
 
 # Our widget class that displays our world building and lore information
 class World_Building(Widget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -15,6 +17,7 @@ class World_Building(Widget):
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
+            data = data,
         )
         self.visible = False
 
@@ -31,10 +34,24 @@ class World_Building(Widget):
 
 
     def save_dict(self):
+        # Print(f"Saving plotline data to {self.data['file_path']}")
+        file_path = os.path.join(self.directory_path, "world.json")
+
+        try:
+            # Create the directory if it doesn't exist
+            os.makedirs(self.directory_path, exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:
+                json.dump(self.data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving world to {file_path}: {e}")
         pass
 
     def load_from_dict(self, directory_path: str):
-        pass
+        self.save_dict()
 
     def reload_widget(self):
         # Our column that will display our header filters and body of our widget

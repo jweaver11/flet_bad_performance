@@ -15,7 +15,7 @@ import json
 
 class Settings(Widget):
     # Constructor
-    def __init__(self, page: ft.Page, directory_path: str, story: Story=None):
+    def __init__(self, page: ft.Page, directory_path: str, story: Story=None, data: dict = None):
         
         # Constructor the parent widget class
         super().__init__(
@@ -24,6 +24,7 @@ class Settings(Widget):
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             story = story,
             directory_path = directory_path,
+            data = data,
         )
 
         # Loads our settings data from the JSON file

@@ -18,6 +18,7 @@ class Chapter(Widget):
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
+            data = None,
         )
 
         

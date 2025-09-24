@@ -16,7 +16,7 @@ from models.story import Story
 # Widget requires a title, tag, page reference, and a pin location
 class Character(Widget):
     # Constructor
-    def __init__(self, name: str, page: ft.Page, directory_path: str, story: Story):
+    def __init__(self, name: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
 
         # Parent class constructor
         super().__init__(
@@ -25,6 +25,7 @@ class Character(Widget):
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             directory_path = directory_path,    # Directory where our json file is stored
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
+            data = data,
         )
         
 

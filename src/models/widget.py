@@ -12,7 +12,7 @@ from models.story import Story
 
 class Widget(ft.Container):
     # Constructor
-    def __init__(self, title: str, tag: str, p: ft.Page, directory_path: str, story: Story):
+    def __init__(self, title: str, tag: str, p: ft.Page, directory_path: str, story: Story, data: dict = None):
 
         # set uniformity for all widgets
         super().__init__(
@@ -20,13 +20,16 @@ class Widget(ft.Container):
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
         )
     
-        # Required parameters: title, tag, page reference, pin location
+        # Required parameters: title, tag, page reference, pin location, story
         self.title = title  # Title of our object
         self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
-        self.directory_path = directory_path
-        self.story = story
+        self.directory_path = directory_path    # Path to our directory that will contain our json file
+        self.story = story  # Reference to our story object that owns this widget
+        self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
         
+        #if data is None:
+            #print(f"No data loaded for {self.title}. ")
 
 
         # Our icon button that will hide the widget when clicked in the workspace

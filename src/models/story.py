@@ -39,7 +39,7 @@ class Story(ft.View):
         self.chapters = {}
         self.drawings = {}
 
-        self.characters = []    # Make into dict later?
+        self.characters = {}    
         self.plotline = None    # Singular timeline widget object, that holds our plotlines
 
         self.world = None
@@ -65,7 +65,7 @@ class Story(ft.View):
         # Loads our characters from file storage into our characters list
         self.load_characters()
 
-        # Loads our timeline from file storage, which holds our plotlines
+        # Loads our timeline from file storage, which holds our timelines
         self.load_plotline()
 
         # Load our world building objects from file storage
@@ -419,66 +419,55 @@ class Story(ft.View):
     def load_content(self):
         ''' Loads our content from our content folder inside of our story folder '''
 
-        #print("load content called")
+        #print("Loading content")
 
-        # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
+        from models.content.chapter import Chapter
+
+        # Check if the characters folder exists. Creates it if it doesn't. Exists in case people delete this folder
         if not os.path.exists(self.data['content_directory_path']):
-            print("Characters folder does not exist, creating it.")
-            os.makedirs(self.data['content_directory_path'])   
+            #print("Content folder does not exist, creating it.")
+            os.makedirs(self.data['content_directory_path'])    
             return
-        
-        page = self.p
 
-        # Loads all chapters from our content directory
-        def load_chapters():
-            for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
-                for filename in filenames:
+        # Loads all files inside the content directory and its sub folders
+        for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
+            for filename in filenames:
 
-                    # All our objects are stored as JSON
-                    if filename.endswith(".json"):
-                        file_path = os.path.join(dirpath, filename)   
-                        #print("dirpath = ", dirpath)
-                        try:
-                            # Read the JSON file
-                            with open(file_path, "r") as f:
-                                content_data = json.load(f)
+                # All our objects are stored as JSON
+                if filename.endswith(".json"):
+                    file_path = os.path.join(dirpath, filename)   
+                    #print("dirpath = ", dirpath)
+                    try:
+                        # Read the JSON file
+                        with open(file_path, "r", encoding='utf-8') as f:
+                            # Set our data to be passed into our objects
+                            content_data = json.load(f)
+                        
+                        # Extract the title from the data
+                        content_title = content_data.get("title", filename.replace(".json", ""))
+
+                        # Check our tag to see what type of content it is, and load appropriately
+                        if content_data.get("tag", "") == "chapter":
                             
-                            # Extract the title from the data
-                            content_title = content_data.get("title", filename.replace(".json", ""))
+                            self.chapters[content_title] = Chapter(content_title, self.p, dirpath, self, content_data)
+                            #print("Chapter loaded")
 
-                            #print(content_data)
+                        elif content_data.get("tag", "") == "image":
+                            print("image tag found, skipping for now")
 
+                        elif content_data.get("tag", "") == "drawing":
+                            print("drawing tag found, skipping for now")
+                            
+                        # Error handling for invalid tags
+                        else:
+                            print("content tag not valid, skipping")
+                            return
 
-                            # Check our tag to see what type of content it is
-                            if content_data.get("tag", "") == "chapter":
-                                #print("yo mommma")
-                                from models.content.chapter import Chapter
-                                chapter = Chapter(content_title, page, dirpath, self)
-                                self.chapters[content_title] = chapter
-                                #print("Chapter loaded")
+                            
+                    # Handle errors if the path is wrong
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                        print(f"Error loading content from {filename}: {e}")
 
-                            elif content_data.get("tag", "") == "image":
-                                print("image tag found, skipping for now")
-                                
-                            else:
-                                print("content tag not valid, skipping")
-                                return
-
-                                
-                        # Handle errors if the path is wrong
-                        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                            print(f"Error loading content from {filename}: {e}")
-
-
-        # Loads all images or drawings from our content directory
-        def load_drawings():
-            ''' Images get loaded into the drawing board widget, either displaying as an image or canvas '''
-            from models.content.drawing import Drawing
-            pass
-        
-        # Call our internal functions to load our content types
-        load_chapters()
-        load_drawings()
         # Load animations -- TBD in future if possible
 
 
@@ -486,15 +475,15 @@ class Story(ft.View):
     def load_characters(self):
         ''' Loads all our characters from our characters folder and adds them to the live story object'''
 
-        #print("load characters called")
+        #print("Loading characters")
+
+        from models.character import Character
         
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['characters_directory_path']):
             #print("Characters folder does not exist, creating it.")
-            os.makedirs(self.data['.characters_path'])    
+            os.makedirs(self.data['characters_directory_path'])    
             return
-        
-        page = self.p
         
         # Iterate through all files in the characters folder
         #for filename in os.listdir(data_paths.characters_path):
@@ -508,52 +497,111 @@ class Story(ft.View):
                     
                     try:
                         # Read the JSON file
-                        with open(file_path, "r") as f:
+                        with open(file_path, "r", encoding='utf-8') as f:
                             character_data = json.load(f)
                         
                         # Extract the title from the data
                         character_title = character_data.get("title", filename.replace(".json", ""))
+                            
+                        # Create our character object using our loaded data
+                        self.characters[character_title] = Character(character_title, self.p, dirpath, self, character_data)
                         
-                        # Create Character object with the title
-                        from models.character import Character
-                        character = Character(character_title, page, dirpath, self)
-                        #character.path = file_path  # Set the path to the loaded file
-                        self.characters.append(character)
-                        
-                         
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
 
-        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
+        
 
 
     # Called on story startup to create our plotline object.
     def load_plotline(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
 
-        # Only one plotline object per story (even if multiverse/regression), so we don't need a create function for plotlines
-        # Creating out plotline will load the data if it exists, so we just create a new one on launch
         from models.plotline.plotline import Plotline
-        self.plotline = Plotline("Plotline", self.p, self.data['plotline_directory_path'], self)
+ 
+        # Check if the plotline folder directory exists. Creates it if it doesn't. 
+        # Handles errors on startup if people delete this folder, otherwise uneccessary
+        if not os.path.exists(self.data['plotline_directory_path']):
+            #print("Plotline folder does not exist, creating it.")
+            os.makedirs(self.data['plotline_directory_path'])    
+            return
+        
+        # Construct the path to plotline.json
+        plotline_json_path = os.path.join(self.data['plotline_directory_path'], 'plotline.json')
+
+        # Set data blank initially
+        plotline_data = None
+        
+        # Attempt to open and read the plotline.json file. Sets our stored data if successful
+        try:
+            with open(plotline_json_path, 'r', encoding='utf-8') as file:
+                plotline_data = json.load(file)
+              
+                #print(f"Successfully loaded plotline data: {plotline_data}")
+        except FileNotFoundError:
+            print(f"plotline.json not found at {plotline_json_path}")
+            
+        except json.JSONDecodeError as e:
+            print(f"Error parsing plotline.json: {e}")
+           
+        except Exception as e:
+            print(f"Unexpected error reading plotline.json: {e}")
+            
+        
+        # Create our plotline object with no data if story is new, or loaded data if it exists already
+        self.plotline = Plotline("Plotline", self.p, self.data['plotline_directory_path'], self, plotline_data)
+       
 
     # Called on story startup to load all our world building widget
     def load_world(self):
+        ''' Loads our world object from storage, or creates a new one if it doesn't exist '''
+
         from models.world_building.world_building import World_Building
-        self.world = World_Building("World_Building_Title", self.p, self.data['world_building_directory_path'], self)
+ 
+        # Check if the plotline folder exists. Creates it if it doesn't. 
+        # Handles errors on startup if people delete this folder, otherwise uneccessary
+        if not os.path.exists(self.data['world_building_directory_path']):
+            #print("Plotline folder does not exist, creating it.")
+            os.makedirs(self.data['world_building_directory_path'])    
+            return
+        
+        # Construct the path to plotline.json
+        world_json_path = os.path.join(self.data['world_building_directory_path'], 'world.json')
+
+        # Set data blank initially
+        world_data = None
+        
+        # Attempt to open and read the plotline.json file. Sets our stored data if successful
+        try:
+            with open(world_json_path, 'r', encoding='utf-8') as file:
+                world_data = json.load(file)
+                # You can now use plotline_data as needed
+                #print(f"Successfully loaded world data")
+        except FileNotFoundError:
+            print(f"world.json not found at {world_json_path}")
+        
+        except json.JSONDecodeError as e:
+            print(f"Error parsing plotline.json: {e}")
+            
+        except Exception as e:
+            print(f"Unexpected error reading world.json: {e}")
+          
+        
+        # Create our world object with no data if story is new, or loaded data if it exists already
+        self.world = World_Building("World_Building_Title", self.p, self.data['world_building_directory_path'], self, world_data)
 
 
     # Called on story startup to load all our notes objects
     def load_notes(self):
         ''' Loads all our note objects stored in the notes directory path'''
 
+        from models.note import Notes
+
         # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['notes_directory_path']):
             #print("Characters folder does not exist, creating it.")
             os.makedirs(self.data['notes_directory_path'])    
             return
-        
-        page = self.p
         
         # Iterate through all files in the characters folder
         #for filename in os.listdir(data_paths.characters_path):
@@ -562,23 +610,22 @@ class Story(ft.View):
 
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
+
                     file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
-                    #print("dirpath = ", dirpath)
+
+                    # Set data none initially
+                    note_data = None
+                    
                     try:
                         # Read the JSON file
-                        with open(file_path, "r") as f:
+                        with open(file_path, "r", encoding='utf-8') as f:
                             note_data = json.load(f)
                         
                         # Extract the title from the data
                         note_title = note_data.get("title", filename.replace(".json", ""))
 
-                        # Create Note object with the title
-                        from models.note import Notes
-                        note = Notes(note_title, page, dirpath, self)
-                        #character.path = file_path  # Set the path to the loaded file
-
-                        self.notes[note_title] = note
-                        print(self.notes[note_title].title)      
+                        self.notes[note_title] = Notes(note_title, self.p, dirpath, self, note_data)
+                        #print(self.notes[note_title].title)      
                     
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
@@ -631,8 +678,7 @@ class Story(ft.View):
         if directory_path is None:
             directory_path = self.data['characters_directory_path'] # There SHOULD always be a path passed in, but this will catch errors
 
-        
-        self.characters.append(Character(title, self.p, directory_path, self))
+        self.characters[title] = Character(title, self.p, directory_path, self)
 
         #print("Character created: " + character.title)
 
