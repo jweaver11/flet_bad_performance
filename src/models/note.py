@@ -30,17 +30,6 @@ class Notes(Widget):
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
-    # Called whenever there are changes in our data that need to be saved
-    def save_dict(self):
-        ''' Saves our data to our notes json file. '''
-
-        try:
-            with open(self.directory_path, "w") as f:
-                json.dump(self.data, f, indent=4)
-            print(f"Notes saved successfully to {self.directory_path}")
-        except Exception as e:
-            print(f"Error saving notes to {self.directory_path}: {e}")
-
     # Called at end of constructor
     def load_from_dict(self, directory_path: str):
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''

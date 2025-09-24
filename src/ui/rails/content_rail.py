@@ -51,7 +51,7 @@ class Content_Rail(ft.Container):
         ''' Creates a new chapter object current story '''
         
         # Pass in default path for now, but accepts new ones in future for organization
-        story.create_chapter(title, file_path=story.data['content_directory_path'])
+        story.create_chapter(title, directory_path=story.data['content_directory_path'])
         self.reload_rail(story)
         
 

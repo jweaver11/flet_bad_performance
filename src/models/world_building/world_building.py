@@ -13,7 +13,7 @@ class World_Building(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "world",  # Tag for logic, might be phasing out later so ignore this
+            tag = "world_building",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
@@ -21,36 +21,13 @@ class World_Building(Widget):
         )
         self.visible = False
 
-        self.locations = {}
-        self.lore = {}
-        self.power_systems = {}
-        self.social_systems = {}
-        self.geography = {}
-
-
         self.load_from_dict(directory_path)  # Loads our object from a dictionary (from json file)
 
         self.reload_widget()
-
-
-    def save_dict(self):
-        # Print(f"Saving plotline data to {self.data['file_path']}")
-        file_path = os.path.join(self.directory_path, "world.json")
-
-        try:
-            # Create the directory if it doesn't exist
-            os.makedirs(self.directory_path, exist_ok=True)
-            
-            # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:
-                json.dump(self.data, f, indent=4)
         
-        # Handle errors
-        except Exception as e:
-            print(f"Error saving world to {file_path}: {e}")
-        pass
 
     def load_from_dict(self, directory_path: str):
+        
         self.save_dict()
 
     def reload_widget(self):
@@ -76,7 +53,11 @@ class World_Building(Widget):
         self.content = content
 
 
-
+#locations = {}
+        #self.lore = {}
+        #self.power_systems = {}
+##social_systems = {}
+        #self.geography = {}
 
 # Description of world
 # Power systems (if any)

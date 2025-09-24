@@ -155,21 +155,21 @@ def arrange_widgets(story: Story):
         add_object_to_pin(app.settings)
 
     # Chapters
-    for title, chapter in story.chapters.items():
+    for chapter in story.chapters.values():
         add_object_to_pin(chapter)
     # Drawings
-    for title, drawing in story.drawings.items():
+    for drawing in story.drawings.values():
         add_object_to_pin(drawing)
     # Characters
-    for char in story.characters:
+    for char in story.characters.values():
         add_object_to_pin(char)
     # Timeline
     if story.plotline is not None:
         add_object_to_pin(story.plotline)
     # World widget for the world building
-    if story.world is not None:
-        add_object_to_pin(story.world)
+    if story.world_building is not None:
+        add_object_to_pin(story.world_building)
     # Notes
-    for title, note in story.notes.items():
+    for note in story.notes.values():
         add_object_to_pin(note)
 

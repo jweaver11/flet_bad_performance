@@ -42,7 +42,7 @@ class Story(ft.View):
         self.characters = {}    
         self.plotline = None    # Singular timeline widget object, that holds our plotlines
 
-        self.world = None
+        self.world_building = None
         self.notes = {}
 
         self.mouse_x = 0
@@ -69,7 +69,7 @@ class Story(ft.View):
         self.load_plotline()
 
         # Load our world building objects from file storage
-        self.load_world()
+        self.load_world_building()
 
         # Loads our notes from file storage
         self.load_notes()
@@ -136,7 +136,6 @@ class Story(ft.View):
                 os.makedirs(folder_path, exist_ok=True)
 
         
-
         # Create story metadata file
         self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
 
@@ -179,17 +178,13 @@ class Story(ft.View):
             'characters_directory_path': os.path.join(directory_path, "characters"),
 
             'plotline_directory_path': os.path.join(directory_path, "plotline"),
-            'timelines_directory_path': os.path.join(directory_path, "plotline", "timelines"),
+            #'timelines_directory_path': os.path.join(directory_path, "plotline", "timelines"),
 
-            'world_building_directory_path': os.path.join(directory_path, "worldbuilding"),
+            'world_building_directory_path': os.path.join(directory_path, "world_building"),
 
             'notes_directory_path': os.path.join(directory_path, "notes"),
 
             #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed, TBD
-
-            # Path to our plotlines inside of our timeline directory
-
-            # Path to our locations inside of our notes directory
 
             
             'top_pin_height': 0,
@@ -201,7 +196,6 @@ class Story(ft.View):
             'created_at': None,
             'last_modified': None
         }
-
 
 
         try:
@@ -553,7 +547,7 @@ class Story(ft.View):
        
 
     # Called on story startup to load all our world building widget
-    def load_world(self):
+    def load_world_building(self):
         ''' Loads our world object from storage, or creates a new one if it doesn't exist '''
 
         from models.world_building.world_building import World_Building
@@ -566,29 +560,29 @@ class Story(ft.View):
             return
         
         # Construct the path to plotline.json
-        world_json_path = os.path.join(self.data['world_building_directory_path'], 'world.json')
+        world_json_path = os.path.join(self.data['world_building_directory_path'], 'world_building.json')
 
         # Set data blank initially
-        world_data = None
+        world_building_data = None
         
         # Attempt to open and read the plotline.json file. Sets our stored data if successful
         try:
             with open(world_json_path, 'r', encoding='utf-8') as file:
-                world_data = json.load(file)
+                world_building_data = json.load(file)
                 # You can now use plotline_data as needed
                 #print(f"Successfully loaded world data")
         except FileNotFoundError:
             print(f"world.json not found at {world_json_path}")
         
         except json.JSONDecodeError as e:
-            print(f"Error parsing plotline.json: {e}")
+            print(f"Error parsing world_building.json: {e}")
             
         except Exception as e:
             print(f"Unexpected error reading world.json: {e}")
           
         
         # Create our world object with no data if story is new, or loaded data if it exists already
-        self.world = World_Building("World_Building_Title", self.p, self.data['world_building_directory_path'], self, world_data)
+        self.world_building = World_Building("World_Building", self.p, self.data['world_building_directory_path'], self, world_building_data)
 
 
     # Called on story startup to load all our notes objects

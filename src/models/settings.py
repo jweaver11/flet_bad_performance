@@ -162,18 +162,6 @@ class Settings(Widget):
         # Sets our object content to be our tab
         self.content = tab
 
-    # Save our object as a dictionary for json serialization
-    def save_dict(self):
-        
-        #print("save settings dict called")
-        file_path = os.path.join(settings_path, "settings.json")
-
-        try:
-        
-            with open(file_path, "w") as f:
-                json.dump(self.data, f, indent=4)
-        except Exception as e:
-            print(f"Error saving settings to {file_path}: {e}")
 
     # Called when new settings object is created
     def load_from_dict(self):

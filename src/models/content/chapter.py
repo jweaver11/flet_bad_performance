@@ -9,7 +9,7 @@ from models.widget import Widget
 # Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
 class Chapter(Widget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -18,7 +18,7 @@ class Chapter(Widget):
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            data = None,
+            data = data,
         )
 
         
@@ -28,21 +28,6 @@ class Chapter(Widget):
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
-
-    # Called whenever there are changes in our data that need to be saved
-    def save_dict(self):
-        ''' Saves our data to our timeline json file. '''
-
-        #print(f"Saving chapter data to {self.data['file_path']}")
-
-        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
-
-        try:
-            with open(file_path, "w") as f:
-                json.dump(self.data, f, indent=4)
-            #print(f"Plotline saved successfully to {self.file_path}")
-        except Exception as e:
-            print(f"Error saving chapter to {file_path}: {e}")
 
     # Called at end of constructor
     def load_from_dict(self, directory_path: str):

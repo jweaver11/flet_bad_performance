@@ -149,20 +149,20 @@ class Timeline_Rail(ft.Container):
         self.content.controls.append(ft.Container(height=20))
 
         self.content.controls.append(
-            ft.TextField(label="Create New Plotline", on_submit=lambda e: self.create_plotline(e.control.value, story)),
+            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.create_timeline(e.control.value, story)),
         )
 
         self.p.update()
 
     # Called when user creates a new plotline
-    def create_plotline(self, title: str, story: Story):
+    def create_timeline(self, title: str, story: Story):
         ''' Creates a new plotline branch inside of the current story '''
 
         # Check if name is unique
         name_is_unique = True
 
-        for key, plotline in story.plotline.plotlines.items():
-            if plotline.title == title:
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == title:
                 name_is_unique = False
                 print("Plotline name already exists!")
                 break
@@ -170,10 +170,9 @@ class Timeline_Rail(ft.Container):
         if name_is_unique:
 
             # Calls story function to create a new plotline
-            story.timeline.create_plotline(title)
+            story.plotline.create_timeline(title)
             self.reload_rail(story)
         
-        print(len(story.timeline.plotlines))
 
 
     # When new plotpoint is submitted

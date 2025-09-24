@@ -27,6 +27,9 @@ class Character(Widget):
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
             data = data,
         )
+
+        if self.data is None:
+            self.data = self.create_default_data()
         
 
         # Variables that have to be loaded differently from data
@@ -34,35 +37,23 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Load our character data from the file, or set default data if creating new character
-        self.load_from_dict(directory_path) 
+        self.create_default_data() 
+
+        # if data is None, create default data() -> default data
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
 
-     # Save our object as a dictionary for json serialization
-    def save_dict(self):
-        #print("save settings dict called")
-
-        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
-        
-        # Save our data
-        try:
-            with open(file_path, "w") as f:
-                json.dump(self.data, f, indent=4)
-        except Exception as e:
-            print(f"Error saving character to {file_path}: {e}")
-
     # Called when new character object is created.
-    def load_from_dict(self, directory_path: str):
+    def create_default_data(self) -> dict:
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
-        #print("load from dict called")
-        file_path = os.path.join(directory_path, f"{self.title}.json")
+        print("Createing default data for character: " + self.title)
 
         # Data set upon first launch of program, or if file can't be loaded
-        default_data = {
+        return {
             'title': self.title,
-            'directory_path': directory_path,
+            'directory_path': self.directory_path,
             'visible': True,
             'tag': "character",
             'pin_location': "left", # New characters start pinned left
@@ -111,41 +102,7 @@ class Character(Widget):
             'Notes' : {},   # Category that says Notes on the left, then lists the expandable ft.TextField?
         }
         
-        try:
-            # Try to load existing settings from file
-            if os.path.exists(file_path):
-                #self.path = character_file_path  # Set the path to the file
-                #print(f"Loading character data from {self.path}")
-                with open(file_path, "r") as f:
-                    loaded_data = json.load(f)
-                
-                # Start with default data and update with loaded data
-                self.data = default_data.copy()
-                self.data.update(loaded_data)
-
-                # Set specific attributes form our l
-                self.visible = self.data.get('visible', True)
-                
-                #print(f"Settings loaded successfully from {character_file_path}")
-            else:
-                # File doesn't exist, use default data
-                self.data = default_data
-                #print("Settings file does not exist, using default values.")
-                
-                # Optionally create the file with default data
-                self.save_dict()  # This will save the default data to file
-                
-        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            # Handle JSON parsing errors or file access issues
-            #print(f"Error loading settings: {e}")
-            #print("Using default values.")
-            self.data = default_data
-            
-            # Optionally create/overwrite the file with default data
-            try:
-                self.save_dict()  # This will save the default data to file
-            except Exception as save_error:
-                print(f"Could not save character: {save_error}")
+        
 
 
     # Called after any changes happen to the data that need to be reflected in the UI

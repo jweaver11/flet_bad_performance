@@ -36,27 +36,8 @@ class Plotline(Widget):
         self.load_from_dict(directory_path)
 
         # Load our widget UI on start after we have loaded our data
-        self.reload_widget()
+        self.reload_widget() 
 
-
-    # Called whenever there are changes in our data that need to be saved
-    def save_dict(self):
-        ''' Saves our data to our plotline json file. '''
-
-        # Print(f"Saving plotline data to {self.data['file_path']}")
-        file_path = os.path.join(self.directory_path, "plotline.json")
-
-        try:
-            # Create the directory if it doesn't exist
-            os.makedirs(self.directory_path, exist_ok=True)
-            
-            # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
-                json.dump(self.data, f, indent=4)
-        
-        # Handle errors
-        except Exception as e:
-            print(f"Error saving plotline to {file_path}: {e}")
 
     # Called at end of constructor
     def load_from_dict(self, directory_path: str):

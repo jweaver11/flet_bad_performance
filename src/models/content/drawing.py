@@ -6,7 +6,7 @@ from models.story import Story
 # Our widget class that displays our world building and lore information
 class Drawing(Widget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -15,7 +15,7 @@ class Drawing(Widget):
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            data = None,
+            data = data,
         )
 
         # Load our data if we have any, otherwise set defaults
@@ -25,11 +25,8 @@ class Drawing(Widget):
         self.reload_widget()
 
 
-    def save_dict(self):
-        pass
-
     def load_from_dict(self, directory_path: str):
-        pass
+        self.save_dict()
 
     def reload_widget(self):
         # Our column that will display our header filters and body of our widget

@@ -5,9 +5,9 @@ All objects contain a title, tag, page reference, pin location, tab color, and a
 '''
 
 import flet as ft
-#from handlers.reload_workspace import reload_workspace
 from models.story import Story
-#from handlers.reload_workspace import show_pin_drag_targets
+import os
+import json
 
 
 class Widget(ft.Container):
@@ -98,6 +98,26 @@ class Widget(ft.Container):
             ),                       
         )
 
+    # Called whenever there are changes in our data
+    def save_dict(self):
+        ''' Saves our current data to the json file '''
+
+        # Print(f"Saving plotline data to {self.data['file_path']}")
+        file_path = os.path.join(self.directory_path, f"{self.title}.json")
+
+        try:
+            # Create the directory if it doesn't exist. Catches errors from users deleting folders
+            os.makedirs(self.directory_path, exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:   
+                json.dump(self.data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving object to {file_path}: {e}")
+
+
     # Called when a draggable starts dragging.
     def start_drag(self, e: ft.DragStartEvent):
         ''' Shows our pin drag targets '''
@@ -139,7 +159,7 @@ class Widget(ft.Container):
         # Settings doesn't have a story, so we reload all the stories workspaces instead of just the one for our widget
         if self.title == "Settings":
             from models.app import app
-            for key, story in app.stories.items():
+            for story in app.stories.values():
                 story.workspace.reload_workspace(self.p, story)
 
         # Otherwise, our widget will have a story, so we just reload that one
