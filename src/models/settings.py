@@ -15,7 +15,7 @@ import json
 
 class Settings(Widget):
     # Constructor
-    def __init__(self, page: ft.Page, directory_path: str, story: Story=None, data: dict = None):
+    def __init__(self, page: ft.Page, directory_path: str, story: Story=None, data: dict=None):
         
         # Constructor the parent widget class
         super().__init__(
@@ -27,8 +27,12 @@ class Settings(Widget):
             data = data,
         )
 
-        # Loads our settings data from the JSON file
-        self.load_from_dict()
+        if self.data is None:
+            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict()
+
+        self.visible = self.data['visible']  # If we will show this widget or not
+
 
         # Called when someone expands the drop down holding the color scheme options
         def get_color_scheme_options():
@@ -164,16 +168,13 @@ class Settings(Widget):
 
 
     # Called when new settings object is created
-    def load_from_dict(self):
+    def create_default_data(self):
         ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
 
         #print("load from dict called")
 
-        # Set the path to our settings file
-        file_path = os.path.join(settings_path, "settings.json")
-
         # Data set upon first launch of program, or if file can't be loaded
-        default_data = {
+        return {
             'visible': False,   # If our settings widget is visible or not
             'pin_location': "main", 
             'active_story': "/",    # this works as a route for the correct story
@@ -196,39 +197,6 @@ class Settings(Widget):
             'active_rail_width': 200,   # Width of our active rail that we can resize
         }
         
-        try:
-            # Try to load existing settings from file
-            if os.path.exists(file_path):
-                with open(file_path, "r") as f:
-                    loaded_data = json.load(f)
-                
-                # Start with default data and update with loaded data
-                self.data = default_data.copy()
-                self.data.update(loaded_data)
-                self.visible = self.data.get('visible', False)
-                
-                #print(f"Settings loaded successfully from {settings_file_path}")
-
-            else:
-                # File doesn't exist, use default data
-                self.data = default_data
-                #print("Settings file does not exist, using default values.")
-                
-                # Optionally create the file with default data
-                self.save_dict()
-                
-        # Handle JSON parsing errors or file access issues
-        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            # Handle JSON parsing errors or file access issues
-            #print(f"Error loading settings: {e}")
-            #print("Using default values.")
-            self.data = default_data
-            
-            # Optionally create/overwrite the file with default data
-            try:
-                self.save_dict()  # This will save the default data to file
-            except Exception as save_error:
-                print(f"Could not save default settings: {save_error}")
 
     # Called when the button to reorder the workspaces is clicked
     def toggle_rail_reorderable(self):

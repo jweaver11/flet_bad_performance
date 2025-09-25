@@ -32,7 +32,6 @@ class Character(Widget):
         if self.data is None:
             self.data = self.create_default_data()
             self.save_dict()    # Save our data to the file if the character is new
-
         
         self.visible = self.data['visible']  # Whether or not this character is visible in the character rail
         

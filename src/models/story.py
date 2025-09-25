@@ -11,7 +11,8 @@ from constants import data_paths
 # Class for our different story objects
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str, page: ft.Page, template: str=None):      # Add is_from_template later
+    def __init__(self, title: str, page: ft.Page, data: dict=None, template: str=None):
+        # Title, page, data, and template
         
         # Parent constructor
         super().__init__(
@@ -20,11 +21,22 @@ class Story(ft.View):
             spacing=0,      # No spacing between menubar and rest of page
         )  
 
-        # Determine if story is from template and we should load template content when it is created, not loaded
-        self.template = template
+        self.title = title  # Gives our story a title when its created
+        self.p = page   # Reference to our page object for updating UI elements
+        self.data = data    # Sets our data (if any) passed in. New stories just have none
+        self.template = template        # Sets our template. Only gets a template on new story creation and a template selected
 
-        self.title = title # Gives our story a title when its created
-        self.p = page  # Reference to our page object for updating UI elements
+
+        # If story is new and not loaded from storage, create default data and save it
+        if self.data is None:
+            print("No data passed in")
+            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict(template)    # Passes in our template (if any)
+            
+        else:
+            print("Data passed in")
+        
+
         
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar = None     # Is an extended ft.Container
@@ -32,18 +44,14 @@ class Story(ft.View):
         self.active_rail = None     # Is an extended ft.Container
         self.workspace = None       # Is an extended ft.Container
 
-
-        # Make a list for positional indexing
         self.content = {}
 
         self.chapters = {}
         self.drawings = {}
-
         self.characters = {}    
-        self.plotline = None    # Singular timeline widget object, that holds our plotlines
-
-        self.world_building = None
-        self.notes = {}
+        self.plotline = None   
+        self.world_building = None  
+        self.notes = {}  
 
         self.mouse_x = 0
         self.mouse_y = 0
@@ -54,9 +62,6 @@ class Story(ft.View):
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
     def startup(self):
-
-        # Loads our info about our story from its JSON file
-        self.load_from_dict()    # This function creates one if story object was created not loaded
 
         # Loads our content objects from storage into our story object. Includes chapters and images
         # This also loads our drawing board images here, since they can be opened in either workspace
@@ -80,13 +85,15 @@ class Story(ft.View):
     
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self, template: str=None):
-        ''' Saves the data of our story to its JSON File '''
+        ''' Saves the data of our story to its JSON File, and all its folders as well '''
         #print("save story dict called")
 
         ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
 
-        # Sets our path to our story folder, and creates the folder structure if it doesn't exist
+        # Sets our path to our story folder
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+
+        # Set our workspace folder structure inside our story folder
         story_structure_folders = [
             "content",
             "characters",
@@ -96,20 +103,16 @@ class Story(ft.View):
             "notes",
         ]
         
-        # Actually creates the folders in our story path
+        # Create the workspace folder strucutre above
         for folder in story_structure_folders:
             folder_path = os.path.join(directory_path, folder)
-            os.makedirs(folder_path, exist_ok=True) # exist_ok=True avoids errors if folder already exists, and won't re-create it
+            os.makedirs(folder_path, exist_ok=True) # Checks if they exist or not
 
         # Create our sub folders inside of timeline
-        plotline_folders = ["timelines"]
-        for folder in plotline_folders:
-            folder_path = os.path.join(directory_path, "plotline", folder)
-            os.makedirs(folder_path, exist_ok=True)
+        timelines_folder = os.path.join(directory_path, "plotline", "timelines")
+        os.makedirs(timelines_folder, exist_ok=True)
 
-        self.template = template
-        self.template = "default"
-
+        # Set our sub folders inside of world building
         world_building_folders = [
             "locations",
             "lores",
@@ -118,28 +121,28 @@ class Story(ft.View):
             "history",
             "geography",
         ]
+        # Create the sub folders inside of world building
         for folder in world_building_folders:
             folder_path = os.path.join(directory_path, "world_building", folder)
             os.makedirs(folder_path, exist_ok=True)
 
-        # Load stuff from templates we create. For now, new stories default to this so we can play with folders
-        # In the future, only newly created stories get templates
-        if self.template == "default":
-            # sub template folders inside of notes
-            notes_folders = [
-                "themes",
-                "quotes",
-                "research",
-            ]
-            for folder in notes_folders:
-                folder_path = os.path.join(directory_path,  "notes", folder)
-                os.makedirs(folder_path, exist_ok=True)
+        # Set our sub folders inside of notes
+        notes_folders = [
+            "themes",
+            "quotes",
+            "research",
+        ]
+        # Create the sub folders inside of notes
+        for folder in notes_folders:
+            folder_path = os.path.join(directory_path,  "notes", folder)
+            os.makedirs(folder_path, exist_ok=True)
 
+        # Temp, how to use templates. Add structures
+        if template == "default":
+            pass
         
         # Create story metadata file
         self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
-
-        self.template = "none"  # Reset this so we don't load template content again if story is loaded from storage
         
         # Create the path to the story's JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
@@ -155,9 +158,11 @@ class Story(ft.View):
             print(f"Error saving story data: {e}")
 
     # Called when loading a story from storage or when creating a new story
-    def load_from_dict(self):
+    def create_default_data(self) -> dict:
         ''' Loads our story data from its JSON file. If no file exists, we create one with default data '''
         #print("load story dict called")
+
+        #template = self.template
 
         # Create the path to the story's directory and data JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
@@ -165,7 +170,7 @@ class Story(ft.View):
 
         
         # Default data structure
-        default_data = {
+        return {
             'title': self.title,
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
             'story_data_file_path' : story_data_file_path,  # Path to our main story json file
@@ -196,32 +201,6 @@ class Story(ft.View):
             'last_modified': None
         }
 
-
-        try:
-            # Check if the story file exists
-            if os.path.exists(story_data_file_path):
-                # Load existing data from file
-                with open(story_data_file_path, 'r') as f:
-                    loaded_data = json.load(f)
-                
-                # Merge loaded data with default data (in case new fields were added)
-                self.data = {**default_data, **loaded_data}
-                #print(f"Loaded story data from {story_data_file_path}")
-
-                self.title = self.data.get('title', self.title)  # Update title in case it was changed
-
-            else:
-                # File doesn't exist, use default data
-                self.data = default_data
-                #print(f"Story file {story_data_file_path} not found, using default data")
-                
-                # Create the file with default data
-                self.save_dict()
-                
-        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            print(f"Error loading story data: {e}")
-            # Fall back to default data on error
-            self.data = default_data
 
     # Called when new story object is created, either by program or by being loaded from storage
     def build_view(self) -> list[ft.Control]:

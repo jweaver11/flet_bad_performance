@@ -33,9 +33,10 @@ class App:
         #from handlers.reload_workspace import reload_workspace
         
         # Create a new story object and add it to our stories dict
-        self.stories[title] = Story(title, page, template)
+        self.stories[title] = Story(title, page, data=None, template=template)
         self.stories[title].startup()
 
+        # Opens this new story as the active one on screen
         page.route = self.stories[title].route
 
         

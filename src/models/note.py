@@ -23,28 +23,27 @@ class Notes(Widget):
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
             data = data,
         )
+
+        if self.data is None:
+            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict()
+
+        self.visible = self.data['visible']  # If we will show this widget or not
         
-        # Loads our notes data from file, or sets default data if no file exists. This is called at the end of the constructor
-        self.load_from_dict(directory_path)
+       
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
     # Called at end of constructor
-    def load_from_dict(self, directory_path: str):
+    def create_default_data(self) -> dict:
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
-        # Sets the path to our file based on our title inside of the notes directory
-        note_file_path = directory_path
-
-        ## IN THE FUTURE, WE WILL ITERATE THROUGH ALL THE FILES IN ALL THE SUBFOLDERS...
-        ## OF THE story.data['notes_directory_path'] TO LOAD ALL OUR NOTES, AND PASS IN THE PATH FROM THERE.
-        ## FOR NOW, ALL NOTES JUST STORED INSIDE THE NOTES DIRECTORY, SO IT DOESNT MATTER
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        default_data = {
+        return {
             "title": self.title,
-            'file_path': note_file_path,
+            'directory_path': self.directory_path,
 
             'pin_location': "right",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
@@ -54,33 +53,6 @@ class Notes(Widget):
             "created_at": None,
             "last_modified": None
         }
-
-        try:
-            # Try to load existing settings from file
-            if os.path.exists(note_file_path):
-                self.path = note_file_path  # Set the path to the file
-                #print(f"Loading character data from {self.path}")
-                with open(note_file_path, "r") as f:
-                    loaded_data = json.load(f)
-                
-                # Start with default data and update with loaded data
-                self.data = {**default_data, **loaded_data}
-
-                # Set specific attributes form our data
-                self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error
-                
-            else:
-               
-                self.data = default_data    # Set our live object data to our default data
-                
-                self.save_dict()  # Create the file (or write to it) that saves our live object data
-
-        # Our error for our try statement. Uses our default error if there is an error loading the file/doesn't exist
-        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            print(f"Error loading story data: {e}")
-            # Fall back to default data on error
-            self.data = default_data
-        
 
     # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild
     def reload_widget(self):

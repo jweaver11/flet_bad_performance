@@ -3,6 +3,7 @@
 from models.story import Story
 import flet as ft
 import os
+import json
 
 # Called on app startup in main
 def init_settings(page: ft.Page):
@@ -11,9 +12,26 @@ def init_settings(page: ft.Page):
     from models.app import app
     from constants import data_paths
 
-    # Sets our settings for our app. This will load the existing settings if they exist, otherwise create default settings
-    if app.settings is None:
-        app.settings = Settings(page, data_paths.settings_path)
+    # Path to our settings file
+    settings_file_path = os.path.join(data_paths.settings_path, "settings.json")
+
+    try:
+        # Read the JSON file
+        with open(settings_file_path, "r", encoding='utf-8') as f:
+            settings_data = json.load(f)
+
+    # If no file exists, create one with default settings
+    except(FileNotFoundError):
+        print("Settings file not found, creating default settings.")
+        settings_data = None  # If there's an error, we will create default settings
+            
+    # Other errors
+    except Exception as e:
+        print(f"Error loading settings {settings_file_path}: {e}")
+        settings_data = None  # If there's an error, we will create default settings
+
+    # Sets our app settings to our loaded settings. If none were loaded (I.E. first launch), Settings with create its own defaults
+    app.settings = Settings(page, data_paths.settings_path, data=settings_data)
 
 
 # Called on app startup in main
@@ -22,57 +40,54 @@ def init_load_saved_stories(page: ft.Page):
     
     from constants import data_paths
     from models.app import app
-
-    #print(data_paths.stories_directory_path)
     
-    # Check if stories directory exists
+    # Create the stories directory if it doesnt exist already
     if not os.path.exists(data_paths.stories_directory_path):
-        print("Stories directory does not exist, creating it.")
         os.makedirs(data_paths.stories_directory_path)
-        return
+        return  # No stories to load if we just created the directory, so return out
 
     # Iterate through all items in the stories directory
-    for item in os.listdir(data_paths.stories_directory_path):
-        item_path = os.path.join(data_paths.stories_directory_path, item)
-        
-        # Check if the item is a directory (story folder)
-        if os.path.isdir(item_path):
-            story_title = item
-            
-            # Look for JSON files within this story folder (ignore subdirectories)
-            try:
-                for file in os.listdir(item_path):
-                    file_path = os.path.join(item_path, file)
-                    
-                    # Only process JSON files (not subdirectories)
-                    if os.path.isfile(file_path) and file.endswith(".json"):
-                        # Create story object - this will load its data automatically
-                        story = Story(story_title, page, "none")
-                        app.stories[story_title] = story
-                        #print(f"Loading story: {story_title} from {file_path}")
-                        
-                        #break  # Only need one JSON file per story folder
-                        
-            except Exception as e:
-                print(f"Error loading story {story_title}: {e}")
-        
-        # Also handle legacy JSON files directly in the stories directory for backward compatibility
-        elif item.endswith(".json"):
-            story_title = item.replace(".json", "")
-            
-            try:
-                # Create story object - this will load its data automatically
-                story = Story(story_title, page)
-                app.stories[story_title] = story
-                #print(f"Loaded legacy story: {story_title}")
-                
-            except Exception as e:
-                print(f"Error loading legacy story {story_title}: {e}")
+    for story_folder in os.listdir(data_paths.stories_directory_path):
 
-    # Initialize each story's UI componenets
+        story_directory = os.path.join(data_paths.stories_directory_path, story_folder)
+            
+        # Look for JSON files within this story folder (ignore subdirectories)
+        try:
+            
+            
+            for item in os.listdir(story_directory):
+
+                # Check for the story json data file
+                if item.endswith(".json"):
+
+                    file_path = os.path.join(story_directory, item)
+
+                    # Read the JSON file
+                    with open(file_path, "r", encoding='utf-8') as f:
+                        # Set our data to be passed into our objects
+                        story_data = json.load(f)
+
+                    # Our story title is the same as the folder
+                    story_title = story_data.get("title", file_path.replace(".json", ""))
+
+                    with open(file_path, "r", encoding='utf-8') as f:
+                        story_data = json.load(f)
+                        
+                        app.stories[story_title] = Story(story_title, page, data=story_data)
+
+                    # We loaded our story inside this story folder, so break this loop
+                    break
+                    
+                else:
+                    continue
+                    
+        except Exception as e:
+            print(f"Error loading story {story_title}: {e}. May not be a directory")
+        
+
+    # Initialize and load all our stories data and UI elements
     for story in app.stories.values():
         story.startup()
-        #print(f"Initialized story: {story.title}")
         if story.title == app.settings.data.get('active_story', None):
             page.route = story.route    # This will call our route change function and set our story view
 

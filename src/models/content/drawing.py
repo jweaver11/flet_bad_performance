@@ -18,15 +18,20 @@ class Drawing(Widget):
             data = data,
         )
 
-        # Load our data if we have any, otherwise set defaults
-        self.load_from_dict(directory_path)
+        if self.data is None:
+            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict()
+
+        self.visible = self.data['visible']  # If we will show this widget or not
+
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
 
-    def load_from_dict(self, directory_path: str):
-        self.save_dict()
+    def create_default_data(self) -> dict:
+        return {}
+        
 
     def reload_widget(self):
         # Our column that will display our header filters and body of our widget

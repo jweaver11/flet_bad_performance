@@ -21,23 +21,22 @@ class Chapter(Widget):
             data = data,
         )
 
-        
-        # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
-        self.load_from_dict(directory_path)
+        if self.data is None:
+            self.data = self.create_default_data()  # Create default data if none was passed in
+
+        self.visible = self.data['visible']  # If we will show this widget or not
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
 
     # Called at end of constructor
-    def load_from_dict(self, directory_path: str):
+    def create_default_data(self, directory_path: str) -> dict:
         ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
 
-        # Sets the path to our file based on our title inside of the timeline directory
-        file_path = os.path.join(directory_path, f"{self.title}.json")
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        default_data = {
+        return {
             'title': self.title,
             'directory_path': directory_path,
             'tag': self.tag,
@@ -46,36 +45,6 @@ class Chapter(Widget):
             
             'content': "",    # Content of our chapter
         }
-        
-        # Loads our TIMELINE object only
-        try:
-            # Try to load existing settings from file
-            if os.path.exists(file_path):
-                self.file_path = file_path  # Set the path to the file
-                #print(f"Loading character data from {self.path}")
-                with open(file_path, "r") as f:
-                    loaded_data = json.load(f)
-                
-                # Start with default data and update with loaded data
-                self.data = {**default_data, **loaded_data}
-
-                # Set specific attributes form our data
-                self.title = self.data.get('title', self.title)  # live title = data title, default to current title if error
-                self.visible = self.data.get('visible', True)   # live visible bool = data visible bool, default to true if error
-                self.directory_path = self.data.get('file_path', file_path)  # live file path = data file path, default to constructed path if error
-                
-            else:
-               
-                self.data = default_data    # Set our live object data to our default data
-                
-                self.save_dict()  # Create the file (or write to it) that saves our live object data
-
-        # Our error for our try statement. Uses our default error if there is an error loading the file/doesn't exist
-        except (json.JSONDecodeError, FileNotFoundError, PermissionError) as e:
-            print(f"Error loading content data: {e}")
-            # Fall back to default data on error
-            self.data = default_data
-
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
