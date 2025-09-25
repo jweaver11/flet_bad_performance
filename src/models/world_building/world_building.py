@@ -54,10 +54,10 @@ class World_Building(Widget):
 
 
 #locations = {}
-        #self.lore = {}
-        #self.power_systems = {}
+#self.lore = {}
+#self.power_systems = {}
 ##social_systems = {}
-        #self.geography = {}
+#self.geography = {}
 
 # Description of world
 # Power systems (if any)

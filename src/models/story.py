@@ -178,7 +178,6 @@ class Story(ft.View):
             'characters_directory_path': os.path.join(directory_path, "characters"),
 
             'plotline_directory_path': os.path.join(directory_path, "plotline"),
-            #'timelines_directory_path': os.path.join(directory_path, "plotline", "timelines"),
 
             'world_building_directory_path': os.path.join(directory_path, "world_building"),
 

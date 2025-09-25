@@ -28,8 +28,14 @@ class Character(Widget):
             data = data,
         )
 
+        # If no data passed in (New character, not loaded one), give it default data
         if self.data is None:
             self.data = self.create_default_data()
+            self.save_dict()    # Save our data to the file if the character is new
+
+        
+        self.visible = self.data['visible']  # Whether or not this character is visible in the character rail
+        
         
 
         # Variables that have to be loaded differently from data
@@ -37,7 +43,6 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Load our character data from the file, or set default data if creating new character
-        self.create_default_data() 
 
         # if data is None, create default data() -> default data
 
@@ -48,7 +53,7 @@ class Character(Widget):
     def create_default_data(self) -> dict:
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
-        print("Createing default data for character: " + self.title)
+        print("Creating default data for character: " + self.title)
 
         # Data set upon first launch of program, or if file can't be loaded
         return {

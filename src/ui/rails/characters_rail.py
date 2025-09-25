@@ -230,7 +230,7 @@ def create_character(role_tag, page: ft.Page):
     def check_character(name) -> bool:
         ''' Checks all our characters names and makes sure the name is unique '''
         
-        for character in page.views[0].characters:
+        for character in page.views[0].characters.values():
             if character.title.lower() == name.lower():
                 page.open(
                     ft.SnackBar(
