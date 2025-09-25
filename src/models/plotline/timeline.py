@@ -13,6 +13,7 @@ class Timeline:
         self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
 
         self.plot_points: dict = {} # Declare plot_points dictionary
+        self.arcs: dict = {}
 
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
@@ -23,9 +24,10 @@ class Timeline:
         else:
 
             self.load_plot_points()  # Load our plotpoints
-            # self.load_arcs()
+            self.load_arcs()
             # self.load_timeskips()
 
+        #print("Length of arcs", len(self.arcs))
 
     # Called when saving changes in our timeline object to file
     def save_dict(self):
@@ -88,6 +90,16 @@ class Timeline:
             self.plot_points[key] = Plot_Point(**value)
         
         return self.plot_points
+    
+    def load_arcs(self) -> dict:
+        ''' Loads arcs from data into self.arcs dictionary '''
+        
+        # Looks up our arcs in our data, then passes in that data to create a live object
+        for key, value in self.data['arcs'].items():
+            from models.plotline.arc import Arc
+            self.arcs[key] = Arc(**value)
+        
+        return self.arcs
         
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
@@ -98,6 +110,17 @@ class Timeline:
         self.plot_points[title] = Plot_Point(title=title)
 
         self.data['plot_points'][title] = self.plot_points[title].__dict__
+
+        self.save_dict()
+
+    def create_arc(self, title: str):
+        ''' Creates a new arc inside of our timeline object, and updates the data to match '''
+
+        from models.plotline.arc import Arc
+
+        self.arcs[title] = Arc(title=title)
+
+        self.data['arcs'][title] = self.arcs[title].__dict__
 
         self.save_dict()
 

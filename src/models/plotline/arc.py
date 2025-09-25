@@ -3,13 +3,11 @@ from typing import Optional, List
 
 @dataclass
 class Arc:
-    def __init__(self, title: str):
-        self.data = {
-            
-            'title': "Arc Title",
-            'description': "Arc Description",
-            'start_date': None,
-            'end_date': None,
-            'involved_characters': [],
+
+    title: str  # Required, has no default
+    description: str = "Arc Description"
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    involved_characters: List[str] = field(default_factory=list)
                 
-        }
+        

@@ -56,16 +56,16 @@ class Timeline_Rail(ft.Container):
         # Run through each plotline in the story
         for timeline in story.plotline.timelines.values():
             # Create an expansion tile for our plotpoints
-            plotpoint_expansion_tile = ft.ExpansionTile(
+            plot_points_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Plot Points"),
             )
             # Run through each plotpoint, and add it to our plotpoints expansion tile
             for plotpoint in timeline.plot_points.values():
-                plotpoint_expansion_tile.controls.append(
+                plot_points_expansion_tile.controls.append(
                     ft.Text(plotpoint.title)
                 )
             # Add a text field at bottom to create new plotpoints
-            plotpoint_expansion_tile.controls.append(
+            plot_points_expansion_tile.controls.append(
                 ft.TextField(
                     label="Create Plot Point",
                     data=timeline.title,
@@ -73,7 +73,23 @@ class Timeline_Rail(ft.Container):
                     expand=True,
                 )
             )
-            # TODO button that when pressed makes a textfield visible and autofocused to input plotpoint name
+            # TODO button that when pressed makes a textfield visible and autofocused when inputting plotpoint name
+
+            arcs_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Arcs"),
+            )
+            for arc in timeline.arcs.values():
+                arcs_expansion_tile.controls.append(
+                    ft.Text(arc.title)
+                )
+            arcs_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Arc",
+                    expand=True,
+                    on_submit=lambda e: self.submit_arc(e, story),
+                    data=timeline.title,
+                )
+            )
 
             # Build our view for this plotline
             list_view = ft.ExpansionTile(
@@ -91,10 +107,11 @@ class Timeline_Rail(ft.Container):
                         ft.TextField(label="End Date", value=str(timeline.data['end_date']), expand=True),
                     ]),
 
-                    plotpoint_expansion_tile,   # Add our plotpoints expansion tile we built above
+                    plot_points_expansion_tile,   # Add our plotpoints expansion tile we built above
 
                     ft.ExpansionTile(title=ft.Text("Branches"), shape=ft.RoundedRectangleBorder()),
-                    ft.ExpansionTile(title=ft.Text("Arcs"), shape=ft.RoundedRectangleBorder()),
+
+                    arcs_expansion_tile,    # Add our arcs expansion tile we built above
                 ]
             )
 
@@ -178,13 +195,25 @@ class Timeline_Rail(ft.Container):
     # When new plotpoint is submitted
     def submit_plotpoint(self, e, story: Story):
         # Our plotline title is stored in the data, while the new title is from the control value
-        plotline_title = e.control.data
+        timeline_title = e.control.data
         plotpoint_title = e.control.value
 
         for timeline in story.plotline.timelines.values():
-            if timeline.title == plotline_title:
+            if timeline.title == timeline_title:
                 timeline.create_plot_point(plotpoint_title)
-                print(f"New plotpoint created on the {plotline_title} plotline. Name: {plotpoint_title} ")
+                print(f"New plotpoint created on the {timeline_title} timeline. Name: {plotpoint_title} ")
+                self.reload_rail(story)
+                break
+
+    def submit_arc(self, e, story: Story):
+        # Our plotline title is stored in the data, while the new title is from the control value
+        timeline_title = e.control.data
+        arc_title = e.control.value
+
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_arc(arc_title)
+                print(f"New arc created on the {timeline_title} timeline Name: {arc_title} ")
                 self.reload_rail(story)
                 break
 
