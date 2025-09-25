@@ -170,7 +170,7 @@ class Timeline_Rail(ft.Container):
         if name_is_unique:
 
             # Calls story function to create a new plotline
-            story.plotline.create_timeline(title)
+            story.plotline.create_new_timeline(title)
             self.reload_rail(story)
         
 

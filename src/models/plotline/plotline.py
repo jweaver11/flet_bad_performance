@@ -39,10 +39,6 @@ class Plotline(Widget):
         # The UI element that will display our filters
         self.filters = ft.Row(scroll="auto")
 
-        # Loads our notes data from file, or sets default data if no file exists. Also loads our plotlines
-        #self.load_from_dict(directory_path)
-        # Load our timelines if we have any
-        self.load_timelines()
         self.save_dict()
 
 
@@ -75,55 +71,6 @@ class Plotline(Widget):
             },
             
         }
-        
-    def load_timelines(self):
-
-        from models.plotline.timeline import Timeline
-
-        # Sets the path to our file based on our title inside of the plotline directory
-        #timeline_file_path = os.path.join(self.directory_path, "plotline.json")
-        # ---------------------------------------------------------
-        # Load our PLOTLINES from the plotlines directory
-        timelines_directory_path = os.path.join(os.path.dirname(self.story.data['plotline_directory_path']), "timelines")
-
-        # title, dir path, data
-        
-        try: 
-            # Go through all the saved files in the plotlines
-            if os.path.exists(timelines_directory_path):
-                for dirpath, dirnames, filenames in os.walk(timelines_directory_path):
-                    for filename in filenames:
-                        
-                        # All our objects are stored as JSON
-                        if filename.endswith(".json"):
-                            file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
-                            try:
-                                # Read the JSON file
-                                with open(file_path, "r") as f:
-                                    timeline_data = json.load(f)
-                                    #print(plotline_data)
-                                
-                                # Extract the title from the data
-                                timeline_title = timeline_data.get("title", filename.replace(".json", ""))
-
-                                self.timelines[timeline_title] = Timeline(timeline_title, file_path, timeline_data)
-                                #print(self.plotlines[plotline_title].title) 
-
-                            # Handle errors if the path is wrong
-                            except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                                print(f"Error loading timeline from {filename}: {e}")    
-
-             
-                            
-        # Handle errors if the path is wrong
-        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-            print(f"Error loading any timelines from {filename}: {e}")
-
-        # If no plotlines exist, we create a default one to get started
-        if len(self.timelines) == 0:
-            #print("No plotlines found for this timeline, creatting one to get started")
-            self.create_timeline("Main Timeline")
-            #print(self.timelines)
                 
 
     # Called after any changes happen to the data that need to be reflected in the UI
@@ -256,7 +203,7 @@ class Plotline(Widget):
 
 
     # Called when we want to create a new plotline
-    def create_timeline(self, title: str) -> Timeline:  # -> Timeline
+    def create_new_timeline(self, title: str) -> Timeline:  # -> Timeline
         ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
 
         # Check for invalid names
@@ -265,17 +212,17 @@ class Plotline(Widget):
             return
         
         # Check timeline name doesn't already exist
-        for key, timeline in self.timelines.items():
+        for timeline in self.timelines.values():
             if timeline.title == title:
                 print("Plotline with that title already exists")
                 return
         
 
         # Set file path for our plotline
-        file_path = os.path.join(self.story.data['plotline_directory_path'], "timelines", f"{title}.json")
+        directory_path = os.path.join(self.story.data['plotline_directory_path'], "timelines")
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
-        self.timelines[title] = Timeline(title, file_path)
+        self.timelines[title] = Timeline(title, directory_path, data=None)
 
         self.reload_widget()  # Reload our widget to show the new plotline
 

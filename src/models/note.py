@@ -24,21 +24,19 @@ class Notes(Widget):
             data = data,
         )
 
+        # If no data was passed in (Created not loaded), we give it default data and save it to a new file
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()
+            self.save_dict()    # Save our new data to a file
 
         self.visible = self.data['visible']  # If we will show this widget or not
         
-       
-
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
     # Called at end of constructor
     def create_default_data(self) -> dict:
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
-
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         return {

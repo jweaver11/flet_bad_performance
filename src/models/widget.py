@@ -102,7 +102,7 @@ class Widget(ft.Container):
     def save_dict(self):
         ''' Saves our current data to the json file '''
 
-        # Print(f"Saving plotline data to {self.data['file_path']}")
+        # Print(f"Saving object data to {self.data['file_path']}")
         file_path = os.path.join(self.directory_path, f"{self.title}.json")
 
         try:

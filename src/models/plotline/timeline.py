@@ -6,7 +6,7 @@ import os
 class Timeline:
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
-    def __init__(self, title: str, directory_path: str, data: dict = None):
+    def __init__(self, title: str, directory_path: str, data: dict=None):
 
         self.title = title  # Set our title
         self.directory_path = directory_path  # Path to our plotline json file
@@ -15,8 +15,27 @@ class Timeline:
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict()
 
         self.plotpoints = {}   # 'plotpoint_title': {plotpoint object}
+
+
+    # Called when saving changes in our timeline object to file
+    def save_dict(self):
+        # Print(f"Saving plotline data to {self.data['file_path']}")
+        file_path = os.path.join(self.directory_path, f"{self.title}.json")
+
+        try:
+            # Create the directory if it doesn't exist. Catches errors from users deleting folders
+            os.makedirs(self.directory_path, exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:   
+                json.dump(self.data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving object to {file_path}: {e}")
         
 
 

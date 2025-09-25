@@ -24,12 +24,9 @@ class Story(ft.View):
         self.title = title  # Gives our story a title when its created
         self.p = page   # Reference to our page object for updating UI elements
         self.data = data    # Sets our data (if any) passed in. New stories just have none
-        self.template = template        # Sets our template. Only gets a template on new story creation and a template selected
-
 
         # If story is new and not loaded from storage, create default data and save it
         if self.data is None:
-
             # Create default data for the story json file
             self.data = self.create_default_data() 
 
@@ -39,9 +36,6 @@ class Story(ft.View):
             # Creates our folder structure for the new story using our template (if there is one)
             self.create_story_structure(template)  
             
-        else:
-            print("Data passed in")
-        
 
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar = None     # Is an extended ft.Container
@@ -49,15 +43,15 @@ class Story(ft.View):
         self.active_rail = None     # Is an extended ft.Container
         self.workspace = None       # Is an extended ft.Container
 
-        self.content = {}
-
+        # Our widgets objects
         self.chapters = {}
         self.drawings = {}
         self.characters = {}    
-        self.plotline = None   
-        self.world_building = None  
+        self.plotline = None   # Only one plotline obj
+        self.world_building = None  # Only one world building obj
         self.notes = {}  
 
+        # Variables to store our mouse position for opening menus
         self.mouse_x = 0
         self.mouse_y = 0
 
@@ -87,9 +81,15 @@ class Story(ft.View):
         # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view()
 
-    
+
+    # Called when a new story is created and not loaded with any data
     def create_story_structure(self, template: str=None):
         ''' Creates our story folder structure inside of our stories directory '''
+
+        # Temp, how to use templates. Add structures
+        if template == "default":
+            # Add folders to structures
+            pass
         
         # Sets our path to our story folder
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
@@ -137,10 +137,6 @@ class Story(ft.View):
         for folder in notes_folders:
             folder_path = os.path.join(directory_path,  "notes", folder)
             os.makedirs(folder_path, exist_ok=True)
-
-        # Temp, how to use templates. Add structures
-        if template == "default":
-            pass
         
         # Create story metadata file
         self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
@@ -159,12 +155,11 @@ class Story(ft.View):
             print(f"Error saving story data: {e}")
 
 
-    
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
         ''' Saves the data of our story to its JSON File, and all its folders as well '''
         
-        # 
+        # Our file path we store our data in
         file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
 
         try:
@@ -183,15 +178,11 @@ class Story(ft.View):
     # Called when loading a story from storage or when creating a new story
     def create_default_data(self) -> dict:
         ''' Loads our story data from its JSON file. If no file exists, we create one with default data '''
-        #print("load story dict called")
-
-        #template = self.template
 
         # Create the path to the story's directory and data JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
         story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
 
-        
         # Default data structure
         return {
             'title': self.title,
@@ -202,18 +193,13 @@ class Story(ft.View):
 
             # Paths to our workspaces for easier reference later
             'content_directory_path': os.path.join(directory_path, "content"),
-
             'characters_directory_path': os.path.join(directory_path, "characters"),
-
             'plotline_directory_path': os.path.join(directory_path, "plotline"),
-
             'world_building_directory_path': os.path.join(directory_path, "world_building"),
-
             'notes_directory_path': os.path.join(directory_path, "notes"),
 
-            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed, TBD
+            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed? TBD
 
-            
             'top_pin_height': 0,
             'left_pin_width': 0,
             'main_pin_height': 0,
@@ -545,6 +531,47 @@ class Story(ft.View):
         
         # Create our plotline object with no data if story is new, or loaded data if it exists already
         self.plotline = Plotline("Plotline", self.p, self.data['plotline_directory_path'], self, plotline_data)
+
+        # Function to load our timline objects from the data 
+        def load_timelines():
+
+            from models.plotline.timeline import Timeline
+
+            # Load our PLOTLINES from the plotlines directory
+            timelines_directory_path = os.path.join(self.data['plotline_directory_path'], "timelines")
+            
+            try: 
+
+                # Check every item (file) in this story folder
+                for item in os.listdir(timelines_directory_path):
+
+                    # Set the file path to this json file so we can open it
+                    file_path = os.path.join(timelines_directory_path, item)
+
+                    # Read the JSON file
+                    with open(file_path, "r", encoding='utf-8') as f:
+                        # Set our data to be passed into our objects
+                        timeline_data = json.load(f)
+
+                    # Our story title is the same as the folder
+                    timeline_title = timeline_data.get("title", file_path.replace(".json", ""))
+
+                    # Create using the object (not the function) so we can pass in data
+                    self.plotline.timelines[timeline_title] = Timeline(timeline_title, timelines_directory_path, timeline_data)              
+                                
+            # Handle errors if the path is wrong
+            except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                print(f"Error loading any timelines from {timelines_directory_path}: {e}")
+
+            # If no plotlines exist, we create a default one to get started
+            if len(self.plotline.timelines) == 0:
+                
+                # Creating a new timeline
+                self.plotline.create_new_timeline("Main Timeline")
+                #print(self.timelines)
+
+        load_timelines()
+
        
 
     # Called on story startup to load all our world building widget

@@ -275,7 +275,7 @@ class Workspace(ft.Container):
             self.widgets.update()
             self.master_stack.update()
         def save_left_pin_width(e: ft.DragEndEvent):
-            print("save left pin width called")
+            #print("save left pin width called")
             story.data['left_pin_width'] = self.left_pin.width
             story.save_dict()
         left_pin_resizer = ft.GestureDetector(
