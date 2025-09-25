@@ -55,7 +55,7 @@ class Plotline(Widget):
         return {
             'title': self.title,
             'directory_path': self.directory_path,
-            'tag': "timeline",
+            'tag': "plotline",
 
             'pin_location': "bottom",
             'visible': True,    

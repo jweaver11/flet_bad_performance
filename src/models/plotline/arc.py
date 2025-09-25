@@ -1,5 +1,7 @@
+from dataclasses import dataclass, field
+from typing import Optional, List
 
-
+@dataclass
 class Arc:
     def __init__(self, title: str):
         self.data = {

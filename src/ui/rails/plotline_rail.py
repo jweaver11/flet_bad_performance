@@ -60,8 +60,7 @@ class Timeline_Rail(ft.Container):
                 title=ft.Text("Plot Points"),
             )
             # Run through each plotpoint, and add it to our plotpoints expansion tile
-            for plotpoint in timeline.plotpoints.values():
-                print(plotpoint)
+            for plotpoint in timeline.plot_points.values():
                 plotpoint_expansion_tile.controls.append(
                     ft.Text(plotpoint.title)
                 )
@@ -178,14 +177,13 @@ class Timeline_Rail(ft.Container):
 
     # When new plotpoint is submitted
     def submit_plotpoint(self, e, story: Story):
+        # Our plotline title is stored in the data, while the new title is from the control value
         plotline_title = e.control.data
         plotpoint_title = e.control.value
-        #print(plotline_title)
-        #print(plotpoint_title)
 
         for timeline in story.plotline.timelines.values():
             if timeline.title == plotline_title:
-                timeline.create_plotpoint(plotpoint_title)
+                timeline.create_plot_point(plotpoint_title)
                 print(f"New plotpoint created on the {plotline_title} plotline. Name: {plotpoint_title} ")
                 self.reload_rail(story)
                 break

@@ -12,12 +12,19 @@ class Timeline:
         self.directory_path = directory_path  # Path to our plotline json file
         self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
 
+        self.plot_points: dict = {} # Declare plot_points dictionary
+
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
             self.save_dict()
+        
+        # Else if there is data (We loaded it), run the rest of our functions. More efficient than lazy loading
+        else:
 
-        self.plotpoints = {}   # 'plotpoint_title': {plotpoint object}
+            self.load_plot_points()  # Load our plotpoints
+            # self.load_arcs()
+            # self.load_timeskips()
 
 
     # Called when saving changes in our timeline object to file
@@ -51,7 +58,7 @@ class Timeline:
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             'is_expanded': True,
 
-            'plotpoints_are_expanded': True,   # If the plotpoints section is expanded
+            'plot_points_are_expanded': True,   # If the plotpoints section is expanded
             'arcs_are_expanded': True,         # If the arcs section is expanded
             'timeskips_are_expanded': True,    # If the timeskips section is expanded
 
@@ -70,17 +77,42 @@ class Timeline:
             # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
             'arcs': {},     # 'arc_title': {arc object}
         }
+    
+    # Called in the constructor if we loaded this timeline from a file.
+    def load_plot_points(self) -> dict:
+        ''' Loads plotpoints from data into self.plotpoints dictionary '''
         
+        # Looks up our plotpoints in our data, then passes in that data to create a live object
+        for key, value in self.data['plot_points'].items():
+            from models.plotline.plot_point import Plot_Point
+            self.plot_points[key] = Plot_Point(**value)
+        
+        return self.plot_points
+        
+    # Called when creating a new plotpoint
+    def create_plot_point(self, title: str):
+        ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
 
-    def create_plotpoint(self, title: str):
+        from models.plotline.plot_point import Plot_Point
 
-        from models.plotline.plotpoint import Plotpoint
+        self.plot_points[title] = Plot_Point(title=title)
 
-        print("Creating new plotpoint: " + title)
-        self.plotpoints[title] = Plotpoint(title=title)
-        print(self.plotpoints)
-        print(self.plotpoints[title])
-        print(self.plotpoints[title].title)
+        self.data['plot_points'][title] = self.plot_points[title].__dict__
+
+        self.save_dict()
+
+
+    # Called when deleting a plotpoint
+    def delete_plot_point(self, title: str):
+        ''' Deletes a plotpoint from our timeline object, and updates the data to match '''
+        
+        if title in self.plot_points:
+            del self.plot_points[title]
+        
+        if title in self.data['plot_points']:
+            del self.data['plot_points'][title]
+        
+        self.save_dict()
 
 
 

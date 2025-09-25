@@ -1,4 +1,7 @@
+from dataclasses import dataclass, field
+from typing import Optional, List
 
+@dataclass
 
 class Timeskips:
     def __init__(self, title: str):
