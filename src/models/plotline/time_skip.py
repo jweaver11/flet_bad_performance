@@ -2,12 +2,10 @@ from dataclasses import dataclass, field
 from typing import Optional, List
 
 @dataclass
+class Time_Skip:
 
-class Timeskips:
-    def __init__(self, title: str):
-        self.data = {
-            'title': title, 
-            'start_date': None, 
-            'end_date': None
-        }
+    title: str  # Required, has no default
+    
+    start_date: Optional[str] = None   # Start and end date of this particular plot
+    end_date: Optional[str] = None
         

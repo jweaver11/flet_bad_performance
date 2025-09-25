@@ -12,8 +12,10 @@ class Timeline:
         self.directory_path = directory_path  # Path to our plotline json file
         self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
 
+        self.branches: dict = {}
         self.plot_points: dict = {} # Declare plot_points dictionary
         self.arcs: dict = {}
+        self.time_skips: dict = {}
 
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
@@ -25,9 +27,7 @@ class Timeline:
 
             self.load_plot_points()  # Load our plotpoints
             self.load_arcs()
-            # self.load_timeskips()
-
-        #print("Length of arcs", len(self.arcs))
+            self.load_time_skips()
 
     # Called when saving changes in our timeline object to file
     def save_dict(self):
@@ -62,7 +62,7 @@ class Timeline:
 
             'plot_points_are_expanded': True,   # If the plotpoints section is expanded
             'arcs_are_expanded': True,         # If the arcs section is expanded
-            'timeskips_are_expanded': True,    # If the timeskips section is expanded
+            'time_skips_are_expanded': True,    # If the timeskips section is expanded
 
             'start_date': "",    # Start and end date of this particular plotline
             'end_date': "",
@@ -71,7 +71,7 @@ class Timeline:
 
             # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
             # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
-            'timeskips': {},    # 'timeskip_title': {timeskip object}
+            'time_skips': {},    # 'timeskip_title': {timeskip object}
             
             # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
             'plot_points': {},      # 'plotpoint_title': {plotpoint object}
@@ -100,6 +100,14 @@ class Timeline:
             self.arcs[key] = Arc(**value)
         
         return self.arcs
+    
+    def load_time_skips(self) -> dict:
+
+        for key, value in self.data['time_skips'].items():
+            from models.plotline.time_skip import Time_Skip
+            self.time_skips[key] = Time_Skip(**value)
+
+        return self.time_skips
         
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
@@ -108,7 +116,6 @@ class Timeline:
         from models.plotline.plot_point import Plot_Point
 
         self.plot_points[title] = Plot_Point(title=title)
-
         self.data['plot_points'][title] = self.plot_points[title].__dict__
 
         self.save_dict()
@@ -119,8 +126,17 @@ class Timeline:
         from models.plotline.arc import Arc
 
         self.arcs[title] = Arc(title=title)
-
         self.data['arcs'][title] = self.arcs[title].__dict__
+
+        self.save_dict()
+
+    def create_time_skip(self, title: str):
+        ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
+
+        from models.plotline.time_skip import Time_Skip
+
+        self.time_skips[title] = Time_Skip(title=title)
+        self.data['time_skips'][title] = self.time_skips[title].__dict__
 
         self.save_dict()
 

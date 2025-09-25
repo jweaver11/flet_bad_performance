@@ -91,6 +91,22 @@ class Timeline_Rail(ft.Container):
                 )
             )
 
+            time_skips_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Time Skips"),
+            )
+            for time_skip in timeline.time_skips.values():
+                time_skips_expansion_tile.controls.append(
+                    ft.Text(time_skip.title)
+                )
+            time_skips_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Time Skip",
+                    expand=True,
+                    on_submit=lambda e: self.submit_timeskip(e, story),
+                    data=timeline.title,
+                )
+            )
+
             # Build our view for this plotline
             list_view = ft.ExpansionTile(
                 shape=ft.RoundedRectangleBorder(),  # Get rid of edges of expansion tile
@@ -112,6 +128,8 @@ class Timeline_Rail(ft.Container):
                     ft.ExpansionTile(title=ft.Text("Branches"), shape=ft.RoundedRectangleBorder()),
 
                     arcs_expansion_tile,    # Add our arcs expansion tile we built above
+
+                    time_skips_expansion_tile,
                 ]
             )
 
@@ -166,13 +184,13 @@ class Timeline_Rail(ft.Container):
         self.content.controls.append(ft.Container(height=20))
 
         self.content.controls.append(
-            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.create_timeline(e.control.value, story)),
+            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.submit_timeline(e.control.value, story)),
         )
 
         self.p.update()
 
     # Called when user creates a new plotline
-    def create_timeline(self, title: str, story: Story):
+    def submit_timeline(self, title: str, story: Story):
         ''' Creates a new plotline branch inside of the current story '''
 
         # Check if name is unique
@@ -217,3 +235,15 @@ class Timeline_Rail(ft.Container):
                 self.reload_rail(story)
                 break
 
+    def submit_timeskip(self, e, story: Story):
+        timeline_title = e.control.data
+        timeskip_title = e.control.value
+
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_time_skip(timeskip_title)
+                print(f"New timeskip created on the {timeline_title} timeline Name: {timeskip_title} ")
+                self.reload_rail(story)
+                break
+
+    
