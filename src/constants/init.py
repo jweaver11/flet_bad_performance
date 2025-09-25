@@ -54,12 +54,13 @@ def init_load_saved_stories(page: ft.Page):
         # Look for JSON files within this story folder (ignore subdirectories)
         try:
             
-            
+            # Check every item (folder and file) in this story folder
             for item in os.listdir(story_directory):
 
-                # Check for the story json data file
+                # Check for the story json data file. If it is, we'll load our story around this ffile data
                 if item.endswith(".json"):
 
+                    # Set the file path to this json file so we can open it
                     file_path = os.path.join(story_directory, item)
 
                     # Read the JSON file
@@ -69,15 +70,13 @@ def init_load_saved_stories(page: ft.Page):
 
                     # Our story title is the same as the folder
                     story_title = story_data.get("title", file_path.replace(".json", ""))
-
-                    with open(file_path, "r", encoding='utf-8') as f:
-                        story_data = json.load(f)
                         
-                        app.stories[story_title] = Story(story_title, page, data=story_data)
+                    app.stories[story_title] = Story(story_title, page, data=story_data)
 
                     # We loaded our story inside this story folder, so break this loop
                     break
                     
+                # Else, continue through the next story folder
                 else:
                     continue
                     

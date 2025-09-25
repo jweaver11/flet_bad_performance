@@ -29,15 +29,20 @@ class Story(ft.View):
 
         # If story is new and not loaded from storage, create default data and save it
         if self.data is None:
-            print("No data passed in")
-            self.data = self.create_default_data()  # Create default data if none was passed in
-            self.save_dict(template)    # Passes in our template (if any)
+
+            # Create default data for the story json file
+            self.data = self.create_default_data() 
+
+            # Save our data we just created
+            self.save_dict()    
+
+            # Creates our folder structure for the new story using our template (if there is one)
+            self.create_story_structure(template)  
             
         else:
             print("Data passed in")
         
 
-        
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar = None     # Is an extended ft.Container
         self.all_workspaces_rail = None     # Is an extended ft.Container
@@ -83,13 +88,9 @@ class Story(ft.View):
         self.build_view()
 
     
-    # Called whenever there are changes in our data that need to be saved
-    def save_dict(self, template: str=None):
-        ''' Saves the data of our story to its JSON File, and all its folders as well '''
-        #print("save story dict called")
-
-        ''' Loads all our objects from storage (characters, chapters, etc.) and saves them to the story object'''
-
+    def create_story_structure(self, template: str=None):
+        ''' Creates our story folder structure inside of our stories directory '''
+        
         # Sets our path to our story folder
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
 
@@ -156,6 +157,28 @@ class Story(ft.View):
             
         except (PermissionError, OSError) as e:
             print(f"Error saving story data: {e}")
+
+
+    
+    # Called whenever there are changes in our data that need to be saved
+    def save_dict(self):
+        ''' Saves the data of our story to its JSON File, and all its folders as well '''
+        
+        # 
+        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+
+        try:
+            # Create the directory if it doesn't exist. Catches errors from users deleting folders
+            os.makedirs(self.data['directory_path'], exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:   
+                json.dump(self.data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving object to {file_path}: {e}")
+
 
     # Called when loading a story from storage or when creating a new story
     def create_default_data(self) -> dict:

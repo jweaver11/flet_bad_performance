@@ -37,7 +37,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
         page_title = "StoryBoard -- " + new_story.title + " -- Saved status"
         page.title = page_title
 
-        print("Route change:", page.route)
+        #print("Route change:", page.route)
 
     # Otherwise, give us a blank page
     else:

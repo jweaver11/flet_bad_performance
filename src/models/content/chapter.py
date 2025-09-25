@@ -33,7 +33,6 @@ class Chapter(Widget):
     # Called at end of constructor
     def create_default_data(self, directory_path: str) -> dict:
         ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
-
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         return {
