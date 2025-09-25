@@ -12,6 +12,7 @@ class Timeline:
         self.directory_path = directory_path  # Path to our plotline json file
         self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
 
+        # Create our live object dictionaries
         self.branches: dict = {}
         self.plot_points: dict = {} # Declare plot_points dictionary
         self.arcs: dict = {}
@@ -25,6 +26,7 @@ class Timeline:
         # Else if there is data (We loaded it), run the rest of our functions. More efficient than lazy loading
         else:
 
+            # Otherwise load our timeline data
             self.load_plot_points()  # Load our plotpoints
             self.load_arcs()
             self.load_time_skips()
@@ -69,15 +71,18 @@ class Timeline:
 
             'color': "blue",
 
-            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
-            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
-            'time_skips': {},    # 'timeskip_title': {timeskip object}
-            
+            'branches': {},   # 'branch_title': {branch object}
+
             # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
             'plot_points': {},      # 'plotpoint_title': {plotpoint object}
 
             # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
             'arcs': {},     # 'arc_title': {arc object}
+
+            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
+            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
+            'time_skips': {},    # 'timeskip_title': {timeskip object}
+            
         }
     
     # Called in the constructor if we loaded this timeline from a file.

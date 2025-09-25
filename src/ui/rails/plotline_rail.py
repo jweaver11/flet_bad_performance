@@ -202,6 +202,7 @@ class Timeline_Rail(ft.Container):
                 print("Plotline name already exists!")
                 break
 
+        # Make sure the name is unique before creating
         if name_is_unique:
 
             # Calls story function to create a new plotline
@@ -209,41 +210,50 @@ class Timeline_Rail(ft.Container):
             self.reload_rail(story)
         
 
-
     # When new plotpoint is submitted
     def submit_plotpoint(self, e, story: Story):
         # Our plotline title is stored in the data, while the new title is from the control value
         timeline_title = e.control.data
         plotpoint_title = e.control.value
 
+        # Go through each timeline until we find the right one
         for timeline in story.plotline.timelines.values():
             if timeline.title == timeline_title:
                 timeline.create_plot_point(plotpoint_title)
                 print(f"New plotpoint created on the {timeline_title} timeline. Name: {plotpoint_title} ")
-                self.reload_rail(story)
+                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
                 break
 
+    # When new arc is submitted
     def submit_arc(self, e, story: Story):
+        ''' Creates a new arc object on the specified timeline '''
+
         # Our plotline title is stored in the data, while the new title is from the control value
         timeline_title = e.control.data
         arc_title = e.control.value
 
+        # Go through each timeline until we find the right one
         for timeline in story.plotline.timelines.values():
             if timeline.title == timeline_title:
                 timeline.create_arc(arc_title)
                 print(f"New arc created on the {timeline_title} timeline Name: {arc_title} ")
-                self.reload_rail(story)
+                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
                 break
 
+    # Called when new timeskip is submitted
     def submit_timeskip(self, e, story: Story):
+        ''' Creates a new timeskip object on the specified timeline '''
+
+        # Our plotline title is stored in the data, while the new title is from the control value
         timeline_title = e.control.data
         timeskip_title = e.control.value
 
+        # Go through each timeline until we find the right one
         for timeline in story.plotline.timelines.values():
             if timeline.title == timeline_title:
                 timeline.create_time_skip(timeskip_title)
                 print(f"New timeskip created on the {timeline_title} timeline Name: {timeskip_title} ")
-                self.reload_rail(story)
+                self.reload_rail(story)  # Reload the rail to reflect the change and break the loop
                 break
 
     
