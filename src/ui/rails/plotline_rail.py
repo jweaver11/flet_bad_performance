@@ -61,6 +61,7 @@ class Timeline_Rail(ft.Container):
             )
             # Run through each plotpoint, and add it to our plotpoints expansion tile
             for plotpoint in timeline.plotpoints.values():
+                print(plotpoint)
                 plotpoint_expansion_tile.controls.append(
                     ft.Text(plotpoint.title)
                 )
@@ -179,8 +180,8 @@ class Timeline_Rail(ft.Container):
     def submit_plotpoint(self, e, story: Story):
         plotline_title = e.control.data
         plotpoint_title = e.control.value
-        print(plotline_title)
-        print(plotpoint_title)
+        #print(plotline_title)
+        #print(plotpoint_title)
 
         for timeline in story.plotline.timelines.values():
             if timeline.title == plotline_title:

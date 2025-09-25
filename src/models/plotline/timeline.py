@@ -22,7 +22,8 @@ class Timeline:
 
     # Called when saving changes in our timeline object to file
     def save_dict(self):
-        # Print(f"Saving plotline data to {self.data['file_path']}")
+        ''' Saves our data dict to our json file '''
+
         file_path = os.path.join(self.directory_path, f"{self.title}.json")
 
         try:
@@ -38,8 +39,9 @@ class Timeline:
             print(f"Error saving object to {file_path}: {e}")
         
 
-
+    # Called at the constructor if this is a new timeline that was not loaded
     def create_default_data(self) -> dict:
+        ''' Returns a default dict data sctructure for a new timeline '''
 
         return {
             'title': self.title,
@@ -71,9 +73,15 @@ class Timeline:
         
 
     def create_plotpoint(self, title: str):
-        #from models.timeline.plotpoint import Plotpoint
-        #self.plotpoints[title] = Timeline(title)
-        pass
+
+        from models.plotline.plotpoint import Plotpoint
+
+        print("Creating new plotpoint: " + title)
+        self.plotpoints[title] = Plotpoint(title=title)
+        print(self.plotpoints)
+        print(self.plotpoints[title])
+        print(self.plotpoints[title].title)
+
 
 
         

@@ -38,22 +38,22 @@ class Story(ft.View):
             
 
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
-        self.menubar = None     # Is an extended ft.Container
-        self.all_workspaces_rail = None     # Is an extended ft.Container
-        self.active_rail = None     # Is an extended ft.Container
-        self.workspace = None       # Is an extended ft.Container
+        self.menubar: None     # Is an extended ft.Container
+        self.all_workspaces_rail: None     # Is an extended ft.Container
+        self.active_rail: None     # Is an extended ft.Container
+        self.workspace: None       # Is an extended ft.Container
 
         # Our widgets objects
-        self.chapters = {}
-        self.drawings = {}
-        self.characters = {}    
-        self.plotline = None   # Only one plotline obj
-        self.world_building = None  # Only one world building obj
-        self.notes = {}  
+        self.chapters: dict = {}   
+        self.drawings: dict = {}
+        self.characters: dict = {}   
+        self.plotline: None   # Only one plotline obj
+        self.world_building: None  # Only one world building obj
+        self.notes: dict = {} 
 
         # Variables to store our mouse position for opening menus
-        self.mouse_x = 0
-        self.mouse_y = 0
+        self.mouse_x: int = 0
+        self.mouse_y: int = 0
 
         # Called outside of constructor to avoid circular import issues, or it would be called here
         #self.startup() # The init_saved_stories calls this, or when a new story is created
@@ -570,6 +570,7 @@ class Story(ft.View):
                 self.plotline.create_new_timeline("Main Timeline")
                 #print(self.timelines)
 
+        # Call the function to load our timelines inside the plotline
         load_timelines()
 
        
@@ -722,6 +723,7 @@ class Story(ft.View):
         #print("Note created: " + notes.title)
 
         self.workspace.reload_workspace(self.p, self)
+
 
     # text field to name the note    
     def name_note(e):
