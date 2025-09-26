@@ -1,12 +1,18 @@
 import json
 import os
+import flet as ft
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
-class Timeline:
+class Timeline(ft.GestureDetector):
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
     def __init__(self, title: str, directory_path: str, data: dict=None):
+
+        # Initialize our flet control. Theres problems with the data if this is not done first
+        super().__init__(
+            on_enter=self.on_hover,
+        )
 
         self.title = title  # Set our title
         self.directory_path = directory_path  # Path to our plotline json file
@@ -23,13 +29,13 @@ class Timeline:
             self.data = self.create_default_data()  # Create default data if none was passed in
             self.save_dict()
         
-        # Else if there is data (We loaded it), run the rest of our functions. More efficient than lazy loading
-        else:
+        # Else if there is data (We loaded it), run the rest of our functions
+        self.load_plot_points() 
+        self.load_arcs()
+        self.load_time_skips()
 
-            # Otherwise load our timeline data
-            self.load_plot_points()  # Load our plotpoints
-            self.load_arcs()
-            self.load_time_skips()
+        # Builds/reloads our timeline UI
+        self.reload_timeline()
 
     # Called when saving changes in our timeline object to file
     def save_dict(self):
@@ -96,6 +102,7 @@ class Timeline:
         
         return self.plot_points
     
+    # Called in the constructor if we loaded this timeline from a file.
     def load_arcs(self) -> dict:
         ''' Loads arcs from data into self.arcs dictionary '''
         
@@ -106,7 +113,9 @@ class Timeline:
         
         return self.arcs
     
+    # Called in the constructor if we loaded this timeline from a file.
     def load_time_skips(self) -> dict:
+        ''' Loads timeskips from data into self.time_skips dictionary '''
 
         for key, value in self.data['time_skips'].items():
             from models.plotline.time_skip import Time_Skip
@@ -125,6 +134,7 @@ class Timeline:
 
         self.save_dict()
 
+    # Called when creating a new arc
     def create_arc(self, title: str):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
 
@@ -135,6 +145,7 @@ class Timeline:
 
         self.save_dict()
 
+    # Called when creating a new timeskip
     def create_time_skip(self, title: str):
         ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
 
@@ -144,7 +155,6 @@ class Timeline:
         self.data['time_skips'][title] = self.time_skips[title].__dict__
 
         self.save_dict()
-
 
     # Called when deleting a plotpoint
     def delete_plot_point(self, title: str):
@@ -157,6 +167,50 @@ class Timeline:
             del self.data['plot_points'][title]
         
         self.save_dict()
+
+    # Called when deleting an arc
+    def delete_arc(self, title: str):
+        ''' Deletes an arc from our timeline object, and updates the data to match '''
+        
+        if title in self.arcs:
+            del self.arcs[title]
+        
+        if title in self.data['arcs']:
+            del self.data['arcs'][title]
+        
+        self.save_dict()
+
+    # Called when deleting a timeskip
+    def delete_time_skip(self, title: str):
+        ''' Deletes a timeskip from our timeline object, and updates the data to match '''
+        
+        if title in self.time_skips:
+            del self.time_skips[title]
+        
+        if title in self.data['time_skips']:
+            del self.data['time_skips'][title]
+
+        self.save_dict()
+
+    def reload_timeline(self):
+        self.content = ft.Container(
+            margin=ft.margin.only(left=20, right=20),
+            expand=True,
+            alignment=ft.alignment.center,
+            content=ft.Column(
+                expand=True,
+                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[
+                    #ft.Text(plotline.title, color=ft.Colors.WHITE, size=16),
+                    ft.Divider(color=ft.Colors.with_opacity(0.4, ft.Colors.BLUE), thickness=2),
+                ],
+            )
+        )
+
+    def on_hover(self, e: ft.HoverEvent):
+        print(e)
+        # Grab local mouse to figure out x and map it to our timeline
+    
 
 
 

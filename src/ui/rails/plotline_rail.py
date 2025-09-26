@@ -58,6 +58,7 @@ class Timeline_Rail(ft.Container):
             # Create an expansion tile for our plotpoints
             plot_points_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Plot Points"),
+                shape=ft.RoundedRectangleBorder(),
             )
             # Run through each plotpoint, and add it to our plotpoints expansion tile
             for plotpoint in timeline.plot_points.values():
@@ -77,10 +78,11 @@ class Timeline_Rail(ft.Container):
 
             arcs_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Arcs"),
+                shape=ft.RoundedRectangleBorder(),
             )
             for arc in timeline.arcs.values():
                 arcs_expansion_tile.controls.append(
-                    ft.Text(arc.title)
+                    ft.Text(arc.title),
                 )
             arcs_expansion_tile.controls.append(
                 ft.TextField(
@@ -93,6 +95,7 @@ class Timeline_Rail(ft.Container):
 
             time_skips_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Time Skips"),
+                shape=ft.RoundedRectangleBorder(),
             )
             for time_skip in timeline.time_skips.values():
                 time_skips_expansion_tile.controls.append(
@@ -124,8 +127,6 @@ class Timeline_Rail(ft.Container):
                     ]),
 
                     plot_points_expansion_tile,   # Add our plotpoints expansion tile we built above
-
-                    ft.ExpansionTile(title=ft.Text("Branches"), shape=ft.RoundedRectangleBorder()),
 
                     arcs_expansion_tile,    # Add our arcs expansion tile we built above
 
