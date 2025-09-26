@@ -33,8 +33,56 @@ class Settings(Widget):
 
         self.visible = self.data['visible']  # If we will show this widget or not
 
+        self.reload_widget()  # Loads our settings widget UI
 
-        # Called when someone expands the drop down holding the color scheme options
+
+
+
+    # Called when new settings object is created
+    def create_default_data(self):
+        ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
+
+        #print("load from dict called")
+
+        # Data set upon first launch of program, or if file can't be loaded
+        return {
+            'visible': False,   # If our settings widget is visible or not
+            'pin_location': "main", 
+            'active_story': "/",    # this works as a route for the correct story
+            'is_maximized': True,   # If the window is maximized or not
+            
+            'tab_color': "blue",        # the tab color
+            'theme_mode': "dark",       # the apps theme mode, dark or light
+            'theme_color_scheme': "blue",   # the color scheme of the app
+            'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
+            'workspaces_rail_order': [      # Order of the workspace rail
+                "content",
+                "characters",
+                "plot_and_timeline",
+                "world_building",
+                "drawing_board",
+                "notes",
+            ],
+            'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
+            'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
+            'active_rail_width': 200,   # Width of our active rail that we can resize
+        }
+        
+
+    # Called when the button to reorder the workspaces is clicked
+    def toggle_rail_reorderable(self):
+        ''' Toggles if the all workspaces rail is reorderable or not '''
+
+        # Grabs our active story from the view on page, and toggles its reorder logic
+        try:
+            story = self.p.views[0]
+            story.all_workspaces_rail.toggle_reorder_rail(story)
+        except Exception as e:
+            print(f"Error toggling rail reorderable: {e}")
+
+    
+    # Called when someone expands the drop down holding the color scheme options
+    def reload_widget(self):
         def get_color_scheme_options():
             ''' Adds our choices to the color scheme dropdown control'''
 
@@ -132,7 +180,7 @@ class Settings(Widget):
             
 
         # Icon of the theme button that changes depending on if we're dark or light mode
-        self.theme_icon = ft.Icons.DARK_MODE if page.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
+        self.theme_icon = ft.Icons.DARK_MODE if self.p.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
 
         # Button that changes the theme from dark or light when clicked
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
@@ -165,49 +213,6 @@ class Settings(Widget):
         
         # Sets our object content to be our tab
         self.content = tab
-
-
-    # Called when new settings object is created
-    def create_default_data(self):
-        ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
-
-        #print("load from dict called")
-
-        # Data set upon first launch of program, or if file can't be loaded
-        return {
-            'visible': False,   # If our settings widget is visible or not
-            'pin_location': "main", 
-            'active_story': "/",    # this works as a route for the correct story
-            'is_maximized': True,   # If the window is maximized or not
-            
-            'tab_color': "blue",        # the tab color
-            'theme_mode': "dark",       # the apps theme mode, dark or light
-            'theme_color_scheme': "blue",   # the color scheme of the app
-            'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
-            'workspaces_rail_order': [      # Order of the workspace rail
-                "content",
-                "characters",
-                "plot_and_timeline",
-                "world_building",
-                "drawing_board",
-                "notes",
-            ],
-            'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
-            'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
-            'active_rail_width': 200,   # Width of our active rail that we can resize
-        }
-        
-
-    # Called when the button to reorder the workspaces is clicked
-    def toggle_rail_reorderable(self):
-        ''' Toggles if the all workspaces rail is reorderable or not '''
-
-        # Grabs our active story from the view on page, and toggles its reorder logic
-        try:
-            story = self.p.views[0]
-            story.all_workspaces_rail.toggle_reorder_rail(story)
-        except Exception as e:
-            print(f"Error toggling rail reorderable: {e}")
 
 
 

@@ -106,8 +106,100 @@ class Character(Widget):
             'Notes' : {},   # Category that says Notes on the left, then lists the expandable ft.TextField?
         }
         
+    
+    # Change our tab color of widget. Accepts a flet color as parameter
+    def submit_color_change(self, color):
+        colors = [
+            "red",
+            "pink",
+            "purple",
+            "blue",
+            "cyan",
+            "teal",
+            "green",
+            "lime",
+            "yellow",
+            "orange",
+            "brown",
+            "light grey",
+            "grey",
+            "none",
+        ]
+
+        self.tab_color = color
+        self.reload_widget()
+        self.p.update()
+
+    
+    # Called when the morality dropdown is changed
+    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
+    def submit_morality_change(self, e):
+        print("Morality change ran")
+        self.data['Morality'] = e.control.value
+
+        morality = self.check_morality(e)
+        if morality == "lawful_good":
+            self.name_color = ft.Colors.GREEN_200
+        #...
+
+        self.reload_widget()    # Apply our changes to the name at top of widget
+        # reload rail as well
+
+        self.p.update()
+    
+    # Called by the changes in characters morality.
+    def check_morality(self, e=None) -> str:
+        # If we have the setting turned on to change char name colors, change them
+        return "lawful_good"
+     
         
 
+        # USE MORALITY CHART (AND N/A), NOT JUST GOOD EVIL NEUTRAL
+                
+
+    # Called when the textfield for writing in custom sex's is submitted
+    # Adds our custom sex to our stories sex_options list
+    def submit_sex_change(self, e):
+        #print("sex submit ran")
+
+        self.data['Sex'] = e.control.value
+
+        if e.control.value == "None":
+            self.data['Sex'] = None
+        else:
+            self.data['Sex'] = e.control.value
+
+        print(self.data['Sex'])
+
+        if self.data['Sex'] == "Male":
+            self.sex_color = ft.Colors.BLUE
+        elif self.data['Sex'] == "Female":
+            self.sex_color = ft.Colors.PINK
+        else:
+            self.sex_color = ft.Colors.PRIMARY
+        
+        
+        self.reload_widget()
+        self.p.update()
+
+    # Called when the age is changed. Changes the age data
+    def submit_age_change(self, e):
+        #print("Age change ran")
+        self.data['Age'].data = e.control.value
+        print(self.data['Age'].data)
+
+    # Called when the race is changed. Changes the race data
+    def submit_race_change(self, e):
+        #print("Race change ran")
+        self.data['Physical Description'].data['Race'] = e.control.value
+        #print(self.data['Physical Description'].data['Race'])
+        self.p.update()
+        
+
+    # Expand the tile to show physical descriptions
+    def expand_physical_description(self, e):
+        #print("expand physical description ran")
+        pass
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
@@ -138,7 +230,7 @@ class Character(Widget):
                                     ft.DropdownOption(text="None"),
                                     
                                 ],
-                                on_change=self.morality_change,
+                                on_change=self.submit_morality_change,
                             ),
                                
                             ft.Dropdown(      # Sex of each character
@@ -153,7 +245,7 @@ class Character(Widget):
                                     ft.DropdownOption(text="Other"),
                                     ft.DropdownOption(text="None"),
                                 ],
-                                on_change=self.sex_submit,
+                                on_change=self.submit_sex_change,
                             ),
                         ]
                     ),
@@ -179,216 +271,6 @@ class Character(Widget):
         
         # Set our content
         self.content = content
-        
-    
-    # Change our tab color of widget. Accepts a flet color as parameter
-    def change_color(self, color):
-        self.tab_color = color
-        self.reload_widget()
-        self.p.update()
-
-    
-    # Called when the morality dropdown is changed
-    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
-    def morality_change(self, e):
-        print("Morality change ran")
-        self.data['Morality'] = e.control.value
-
-        self.check_morality(e)
-        self.reload_widget()    # Apply our changes to the name at top of widget
-
-        self.p.update()
-    
-    # Called by the changes in characters morality. Changes the name_color property to reflect those changes
-    def check_morality(self, e=None):
-        # If we have the setting turned on to change char name colors, change them
-        if app.settings.change_name_colors.value == True:
-            print("color changing is true, we running the logic")
-            # Check the morality and change color accordingly
-            #TODO figure out color association & logic for assignment with morality alignments
-            if self.data['Morality'] == "Good":
-                self.name_color = ft.Colors.GREEN_200
-            elif self.data['Morality'] == "Evil":
-                self.name_color = ft.Colors.RED_200
-            elif self.data['Morality'] == "Neutral":
-                self.name_color = ft.Colors.GREY_300
-            elif self.data['Morality'] == "Undecided":
-                self.name_color = ft.Colors.GREY_300
-            elif self.data['Morality'] == "None":    # Deselect all choices
-                self.name_color = ft.Colors.PRIMARY
-                self.data['Morality'] = None
-                
-
-        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
-        else:
-            print("Color changing disabled, turning off all their colors")
-            for character in app.active_story.characters:
-                character.name_color = ft.Colors.PRIMARY
-            # Apply our changes
-            self.p.update()
-            return
-
-        # Reload the rail
-        from ui.rails.characters_rail import reload_character_rail
-        reload_character_rail(self.p)
-
-
-    # Called when the textfield for writing in custom sex's is submitted
-    # Adds our custom sex to our stories sex_options list
-    def sex_submit(self, e):
-        #print("sex submit ran")
-
-        self.data['Sex'] = e.control.value
-
-        if e.control.value == "None":
-            self.data['Sex'] = None
-        else:
-            self.data['Sex'] = e.control.value
-
-        print(self.data['Sex'])
-
-        if self.data['Sex'] == "Male":
-            self.sex_color = ft.Colors.BLUE
-        elif self.data['Sex'] == "Female":
-            self.sex_color = ft.Colors.PINK
-        else:
-            self.sex_color = ft.Colors.PRIMARY
-        
-        
-        self.reload_widget()
-        self.p.update()
-
-    # Called when the age is changed. Changes the age data
-    def age_change(self, e):
-        #print("Age change ran")
-        self.data['Age'].data = e.control.value
-        print(self.data['Age'].data)
-
-    # Called when the race is changed. Changes the race data
-    def race_change(self, e):
-        #print("Race change ran")
-        self.data['Physical Description'].data['Race'] = e.control.value
-        #print(self.data['Physical Description'].data['Race'])
-        self.p.update()
-
-    # Expand the tile to show physical descriptions
-    def expand_physical_description(self, e):
-        #print("expand physical description ran")
-        pass
             
-
-
-
-'''
-    # Called when the morality dropdown is changed
-    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
-    def morality_change(self, e):
-        e.control.data = e.control.value
-
-        self.check_morality()
-        self.reload_widget()    # Apply our changes to the name at top of widget
-
-        self.p.update()
-    
-    # Called by the changes in characters morality. Changes the name_color property to reflect thos changes
-    def check_morality(self):
-        # If we have the setting turned on to change char name colors, change them
-        if app.settings.change_name_colors.value == True:
-            print("color changing is true, we running the logic")
-            # Check the morality and change color accordingly
-            if self.data['Morality'].data == "Good":
-                self.name_color = ft.Colors.GREEN_200
-            elif self.data['Morality'].data == "Evil":
-                self.name_color = ft.Colors.RED_200
-            elif self.data['Morality'].data == "Neutral":
-                self.name_color = ft.Colors.GREY_300
-            elif self.data['Morality'].data == "N/A":
-                self.name_color = ft.Colors.GREY_300
-            elif self.data['Morality'].data == "Deselect":    # Deselect all choices
-                self.name_color = ft.Colors.PRIMARY
-                self.data['Morality'].value = None
-                
-            # Update our color
-            self.data['Morality'].color = self.name_color
-
-        # If setting is turned off for char name colors, make all characters name_color the primary color scheme
-        else:
-            print("Color changing disabled, turning off all their colors")
-            for character in app.active_story.characters:
-                character.name_color = ft.Colors.PRIMARY
-            # Apply our changes
-            self.p.update()
-            return
-
-        # Reload the rail
-        from workspaces.character.character_rail import reload_character_rail
-        reload_character_rail(self.p)
-
-
-    # Called when the textfield for writing in custom sex's is submitted
-    # Adds our custom sex to our stories sex_options list
-    def sex_submit(self, e):
-        print("Color change ran")
-
-        # Save most of our variables in our data in the flet controls
-        e.control.data = e.control.value
-
-        # If deselect is clicked
-        if self.data['Sex'].data == "Deselect":
-            self.data['Sex'].value = None
-            self.reload_widget()    # When manually resetting value, must reload widget
-        
-        # If deselect is not clicked
-        elif self.data['Sex'].data == "Male":
-        # Checks that our data saved correctly, and changes color accordingly
-            self.data['Sex'].color = ft.Colors.BLUE
-            
-        elif self.data['Sex'].data == "Female":
-            self.data['Sex'].color = ft.Colors.PINK
-        
-        self.p.update()
-
-    # Called when the age is changed. Changes the age data
-    def age_change(self, e):
-        print("Age change ran")
-        self.data['Age'].data = e.control.value
-        print(self.data['Age'].data)
-
-    # Called when the race is changed. Changes the race data
-    def race_change(self, e):
-        print("Race change ran")
-        self.data['Physical Description'].data['Race'] = e.control.value
-        print(self.data['Physical Description'].data['Race'])
-        self.p.update()
-
-    # Expand the tile to show physical descriptions
-    def expand_physical_description(self, e):
-        print("expand physical description ran")
-        
-
-            
-    "red"
-    "pink",
-    "purple",
-    "blue",
-    "cyan",
-    "teal",
-    "green",
-    "lime",
-    "yellow",
-    "orange",
-    "brown",
-    "light grey",
-    "grey",
-    "none",
-                                        
-                          
-    # Next row which shows the physical desciption. Expands when button clicked
-    self.data['Physical Description'], 
-
-    # Next row that shows family, which can expand right to left
-    self.data['Family'],
-                    
-'''
 
 

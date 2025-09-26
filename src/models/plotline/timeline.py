@@ -208,6 +208,11 @@ class Timeline(ft.GestureDetector):
 
         self.save_dict()
 
+    def on_hover(self, e: ft.HoverEvent):
+        #print(e)
+        pass
+        # Grab local mouse to figure out x and map it to our timeline
+
     # Called when we need to rebuild out timeline UI
     def reload_timeline(self):
         # Content of our Timeline (Gesture detector)
@@ -224,11 +229,6 @@ class Timeline(ft.GestureDetector):
                 ],
             )
         )
-
-    def on_hover(self, e: ft.HoverEvent):
-        #print(e)
-        pass
-        # Grab local mouse to figure out x and map it to our timeline
     
 
 

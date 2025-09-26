@@ -16,6 +16,89 @@ class Timeline_Rail(ft.Container):
 
         self.reload_rail(story)
 
+    # Called when user creates a new plotline
+    def submit_timeline(self, title: str, story: Story):
+        ''' Creates a new plotline branch inside of the current story '''
+
+        # Check if name is unique
+        name_is_unique = True
+
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == title:
+                name_is_unique = False
+                print("Plotline name already exists!")
+                break
+
+        # Make sure the name is unique before creating
+        if name_is_unique:
+
+            # Calls story function to create a new plotline
+            story.plotline.create_new_timeline(title)
+            self.reload_rail(story)
+
+
+    def submit_branch(self, e, story: Story):
+        ''' Creates a new branch object on the specified timeline '''
+
+        # Our plotline title is stored in the data, while the new title is from the control value
+        timeline_title = e.control.data
+        branch_title = e.control.value
+
+        # Go through each timeline until we find the right one
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_branch(branch_title)
+                print(f"New branch created on the {timeline_title} timeline. Name: {branch_title} ")
+                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
+                break
+        
+
+    # When new plotpoint is submitted
+    def submit_plotpoint(self, e, story: Story):
+        # Our plotline title is stored in the data, while the new title is from the control value
+        timeline_title = e.control.data
+        plotpoint_title = e.control.value
+
+        # Go through each timeline until we find the right one
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_plot_point(plotpoint_title)
+                print(f"New plotpoint created on the {timeline_title} timeline. Name: {plotpoint_title} ")
+                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
+                break
+
+    # When new arc is submitted
+    def submit_arc(self, e, story: Story):
+        ''' Creates a new arc object on the specified timeline '''
+
+        # Our plotline title is stored in the data, while the new title is from the control value
+        timeline_title = e.control.data
+        arc_title = e.control.value
+
+        # Go through each timeline until we find the right one
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_arc(arc_title)
+                print(f"New arc created on the {timeline_title} timeline Name: {arc_title} ")
+                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
+                break
+
+    # Called when new timeskip is submitted
+    def submit_timeskip(self, e, story: Story):
+        ''' Creates a new timeskip object on the specified timeline '''
+
+        # Our plotline title is stored in the data, while the new title is from the control value
+        timeline_title = e.control.data
+        timeskip_title = e.control.value
+
+        # Go through each timeline until we find the right one
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_time_skip(timeskip_title)
+                print(f"New timeskip created on the {timeline_title} timeline Name: {timeskip_title} ")
+                self.reload_rail(story)  # Reload the rail to reflect the change and break the loop
+                break
+
     # Reload the rail whenever we need
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
@@ -208,88 +291,4 @@ class Timeline_Rail(ft.Container):
         )
 
         self.p.update()
-
-    # Called when user creates a new plotline
-    def submit_timeline(self, title: str, story: Story):
-        ''' Creates a new plotline branch inside of the current story '''
-
-        # Check if name is unique
-        name_is_unique = True
-
-        for timeline in story.plotline.timelines.values():
-            if timeline.title == title:
-                name_is_unique = False
-                print("Plotline name already exists!")
-                break
-
-        # Make sure the name is unique before creating
-        if name_is_unique:
-
-            # Calls story function to create a new plotline
-            story.plotline.create_new_timeline(title)
-            self.reload_rail(story)
-
-
-    def submit_branch(self, e, story: Story):
-        ''' Creates a new branch object on the specified timeline '''
-
-        # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
-        branch_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for timeline in story.plotline.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_branch(branch_title)
-                print(f"New branch created on the {timeline_title} timeline. Name: {branch_title} ")
-                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
-                break
-        
-
-    # When new plotpoint is submitted
-    def submit_plotpoint(self, e, story: Story):
-        # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
-        plotpoint_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for timeline in story.plotline.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_plot_point(plotpoint_title)
-                print(f"New plotpoint created on the {timeline_title} timeline. Name: {plotpoint_title} ")
-                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
-                break
-
-    # When new arc is submitted
-    def submit_arc(self, e, story: Story):
-        ''' Creates a new arc object on the specified timeline '''
-
-        # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
-        arc_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for timeline in story.plotline.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_arc(arc_title)
-                print(f"New arc created on the {timeline_title} timeline Name: {arc_title} ")
-                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
-                break
-
-    # Called when new timeskip is submitted
-    def submit_timeskip(self, e, story: Story):
-        ''' Creates a new timeskip object on the specified timeline '''
-
-        # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
-        timeskip_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for timeline in story.plotline.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_time_skip(timeskip_title)
-                print(f"New timeskip created on the {timeline_title} timeline Name: {timeskip_title} ")
-                self.reload_rail(story)  # Reload the rail to reflect the change and break the loop
-                break
-
     
