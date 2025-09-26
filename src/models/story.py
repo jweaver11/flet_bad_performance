@@ -345,14 +345,18 @@ class Story(ft.View):
 
 
     # Called when deleting an object from the story (character, chapter, etc.)
-    def delete_object(self, obj):
+
+    #Change to delete widget
+
+    def delete_object(self, widget):
         ''' Deletes the object from our live story object and its reference in the pins.
         We then remove its storage file from our file storage as well. '''
+        from models.widget import Widget
 
         print("Delete object called")
 
         # Called inside the delete_object method to remove the file from storage
-        def delete_object_file(obj):
+        def delete_widget_file(widget: Widget):
             ''' Grabs our objects path, and removes the associated file from storage '''
 
             print("delete object from file called")
@@ -360,41 +364,42 @@ class Story(ft.View):
             try:
                 
                 # Check if the file exists before attempting to delete
-                if os.path.exists(obj.path):
-                    os.remove(obj.path)
-                    print(f"Successfully deleted file: {obj.path}")
+                if os.path.exists(widget.directory_path):
+                    file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
+                    os.remove(file_path)
+                    print(f"Successfully deleted file: {widget.path}")
                 else:
-                    print(f"File not found: {obj.path}")
+                    print(f"File not found: {widget.path}")
                     
             except (OSError, IOError) as e:
-                print(f"Error deleting file {obj.title}.json: {e}")
+                print(f"Error deleting file {widget.title}.json: {e}")
             except AttributeError as e:
                 print(f"Object missing required attributes (title or path): {e}")
 
         # Remove from characters list if it is a character
-        if hasattr(obj, 'tag') and obj.tag == "character":
+        if hasattr(widget, 'tag') and widget.tag == "character":
             # Remove object from the characters list
-            if obj in self.characters:
-                self.characters.remove(obj)
+            if widget in self.characters:
+                self.characters.remove(widget)
     
         # Find our objects reference in the pins and remove it
-        if hasattr(obj, 'pin_location'):
-            if obj.pin_location == "top" and obj in self.workspace.top_pin.controls:
-                self.workspace.top_pin.controls.remove(obj)
-            elif obj.pin_location == "left" and obj in self.workspace.left_pin.controls:
-                self.workspace.left_pin.controls.remove(obj)
-            elif obj.pin_location == "main" and obj in self.workspace.main_pin.controls:
-                self.workspace.main_pin.controls.remove(obj)
-            elif obj.pin_location == "right" and obj in self.workspace.right_pin.controls:
-                self.workspace.right_pin.controls.remove(obj)
-            elif obj.pin_location == "bottom" and obj in self.workspace.bottom_pin.controls:
-                self.workspace.bottom_pin.controls.remove(obj) 
+        if hasattr(widget, 'pin_location'):
+            if widget.pin_location == "top" and widget in self.workspace.top_pin.controls:
+                self.workspace.top_pin.controls.remove(widget)
+            elif widget.pin_location == "left" and widget in self.workspace.left_pin.controls:
+                self.workspace.left_pin.controls.remove(widget)
+            elif widget.pin_location == "main" and widget in self.workspace.main_pin.controls:
+                self.workspace.main_pin.controls.remove(widget)
+            elif widget.pin_location == "right" and widget in self.workspace.right_pin.controls:
+                self.workspace.right_pin.controls.remove(widget)
+            elif widget.pin_location == "bottom" and widget in self.workspace.bottom_pin.controls:
+                self.workspace.bottom_pin.controls.remove(widget) 
             else:
                 print("Object not found in any pin location, cannot delete")
 
         # Remove the objects storage file as well
-        if hasattr(obj, 'path'):
-            delete_object_file(obj)
+        if hasattr(widget, 'path'):
+            delete_widget_file(widget)
 
     # Called on story startup to load all our content objects
     def load_content(self):
