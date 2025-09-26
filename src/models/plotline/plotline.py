@@ -28,15 +28,20 @@ class Plotline(Widget):
         # If we don't have data (New story with no plotline data yet), create default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
+            # Save our data
+            self.save_dict()
 
         # If we do have data (in our plotline), load our timelines from the data.
         self.load_timelines()
 
+        # If no plotlines exist, we create a default one to get started
+        if len(self.timelines) == 0:
+            # Create one like this so we don't call reload_widget before our UI elements are defined
+            timeline_directory_path = os.path.join(self.directory_path, "timelines")
+            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, data=None)
+
         # Set visibility from our data
         self.visible = self.data['visible']  # If we will show this widget or not
-
-        # Save our data
-        self.save_dict()
 
         # The UI element that will display our filters
         self.filters = ft.Row(scroll="auto")
@@ -108,13 +113,6 @@ class Plotline(Widget):
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading any timelines from {timelines_directory_path}: {e}")
 
-        # If no plotlines exist, we create a default one to get started
-        if len(self.timelines) == 0:
-            
-            # Creating a new timeline
-            self.create_new_timeline("Main Timeline")
-            #print(self.timelines)
-
 
 
     # Called when we want to create a new plotline
@@ -138,8 +136,8 @@ class Plotline(Widget):
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
         self.timelines[title] = Timeline(title, directory_path, data=None)
-
-        self.reload_widget()  # Reload our widget to show the new plotline
+        
+        self.reload_widget()  # Reload our widget to show the new timeline
 
         return 
     

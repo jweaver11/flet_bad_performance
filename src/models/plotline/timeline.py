@@ -23,6 +23,7 @@ class Timeline(ft.GestureDetector):
         self.plot_points: dict = {} # Declare plot_points dictionary
         self.arcs: dict = {}
         self.time_skips: dict = {}
+        self.connections: dict = {} # Connect points, arcs, branch, etc.???
 
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
@@ -67,8 +68,9 @@ class Timeline(ft.GestureDetector):
             'tag': "timeline",
 
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            'is_expanded': True,
+            'rail_dropdown_is_expanded': True,
 
+            'branches_are_expanded': True,      # If the branches section is expanded
             'plot_points_are_expanded': True,   # If the plotpoints section is expanded
             'arcs_are_expanded': True,         # If the arcs section is expanded
             'time_skips_are_expanded': True,    # If the timeskips section is expanded

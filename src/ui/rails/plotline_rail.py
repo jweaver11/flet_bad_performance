@@ -49,8 +49,7 @@ class Timeline_Rail(ft.Container):
         )
 
         self.content.controls.append(
-            ft.Text("Plotlines:")
-   
+            ft.Text("Timelines:")
         )
 
         # Run through each plotline in the story
