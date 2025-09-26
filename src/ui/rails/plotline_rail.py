@@ -55,6 +55,24 @@ class Timeline_Rail(ft.Container):
 
         # Run through each plotline in the story
         for timeline in story.plotline.timelines.values():
+            branch_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Branches"),
+                shape=ft.RoundedRectangleBorder(),
+            )
+            for branch in timeline.branches.values():
+                branch_expansion_tile.controls.append(
+                    ft.Text(branch.title)
+                )
+            branch_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Branch",
+                    expand=True,
+                    on_submit=lambda e: self.submit_branch(e, story),
+                    data=timeline.title,
+                )
+            )
+
+
             # Create an expansion tile for our plotpoints
             plot_points_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Plot Points"),
@@ -125,6 +143,8 @@ class Timeline_Rail(ft.Container):
                         ft.TextField(label="Start Date", value=str(timeline.data['start_date']), expand=True),
                         ft.TextField(label="End Date", value=str(timeline.data['end_date']), expand=True),
                     ]),
+
+                    branch_expansion_tile,  # Add our branches expansion tile we built above
 
                     plot_points_expansion_tile,   # Add our plotpoints expansion tile we built above
 
@@ -209,6 +229,22 @@ class Timeline_Rail(ft.Container):
             # Calls story function to create a new plotline
             story.plotline.create_new_timeline(title)
             self.reload_rail(story)
+
+
+    def submit_branch(self, e, story: Story):
+        ''' Creates a new branch object on the specified timeline '''
+
+        # Our plotline title is stored in the data, while the new title is from the control value
+        timeline_title = e.control.data
+        branch_title = e.control.value
+
+        # Go through each timeline until we find the right one
+        for timeline in story.plotline.timelines.values():
+            if timeline.title == timeline_title:
+                timeline.create_branch(branch_title)
+                print(f"New branch created on the {timeline_title} timeline. Name: {branch_title} ")
+                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
+                break
         
 
     # When new plotpoint is submitted

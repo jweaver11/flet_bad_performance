@@ -1,16 +1,30 @@
-from dataclasses import dataclass, field
-from typing import Optional, List
+import flet as ft
 
 # Data class for arcs on a timeline - change to branch as well later??
-@dataclass
-class Arc:
+class Arc(ft.GestureDetector):
+    def __init__(self, title: str, data: dict=None):
 
-    title: str  # Required, has no default
-    description: str = "Arc Description"
+        super().__init__(
+            on_enter=self.on_hover,
+        )
 
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+        self.title = title  # Required, has no default
+        self.data = data    # Optional, if none given, will be created with default values
 
-    involved_characters: List[str] = field(default_factory=list)
-                
-        
+        if self.data is None:
+            self.data = self.create_default_data()
+
+   
+    def create_default_data(self):
+        return {
+            'title': self.title,
+            'description': "",
+            'start_date': "",
+            'end_date': "",
+            'involved_characters': [],
+            'related_locations': [],
+            'related_items': [],
+        }
+
+    def on_hover(self, e: ft.HoverEvent):
+        print(e)

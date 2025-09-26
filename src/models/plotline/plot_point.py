@@ -1,19 +1,34 @@
-from dataclasses import dataclass, field
-from typing import Optional, List
+import flet as ft
 
 
 # Data class for plot points on a timeline - change to branch as well later??
-@dataclass
-class Plot_Point:
+class Plot_Point(ft.GestureDetector):
 
-    title: str  # Required, has no default
-    description: str = "Plot Point Description"   
+    def __init__(self, title: str, data: dict=None):
 
-    date: Optional[str] = None   
-    time: Optional[str] = None  
+        super().__init__(
+            on_enter=self.on_hover,
+        )
 
-    involved_characters: List[str] = field(default_factory=list)
-    related_locations: List[str] = field(default_factory=list)
-    related_items: List[str] = field(default_factory=list)
+        self.title = title  # Required, has no default
+        self.data = data    # Optional, if none given, will be created with default values
 
-    other: int = 0
+        if self.data is None:
+            self.data = self.create_default_data()
+
+    def create_default_data(self):
+        return {
+            'title': self.title,
+            'description': "",
+            'is_major': False,
+            'date': "",
+            'time': "",
+            'involved_characters': [],
+            'related_locations': [],
+            'related_items': [],
+
+        }
+
+
+    def on_hover(self, e: ft.HoverEvent):
+        print(e)

@@ -30,6 +30,7 @@ class Timeline(ft.GestureDetector):
             self.save_dict()
         
         # Else if there is data (We loaded it), run the rest of our functions
+        self.load_branches()
         self.load_plot_points() 
         self.load_arcs()
         self.load_time_skips()
@@ -91,57 +92,70 @@ class Timeline(ft.GestureDetector):
             
         }
     
-    # Called in the constructor if we loaded this timeline from a file.
-    def load_plot_points(self) -> dict:
-        ''' Loads plotpoints from data into self.plotpoints dictionary '''
-        
-        # Looks up our plotpoints in our data, then passes in that data to create a live object
-        for key, value in self.data['plot_points'].items():
-            from models.plotline.plot_point import Plot_Point
-            self.plot_points[key] = Plot_Point(**value)
-        
-        return self.plot_points
+    # Called in the constructor
+    def load_branches(self):
+        ''' Loads branches from data into self.branches  '''
+        from models.plotline.branch import Branch
+
+        # Looks up our branches in our data, then passes in that data to create a live object
+        for key, data in self.data['branches'].items():
+            self.branches[key] = Branch(title=key, data=data)
     
-    # Called in the constructor if we loaded this timeline from a file.
-    def load_arcs(self) -> dict:
-        ''' Loads arcs from data into self.arcs dictionary '''
+    # Called in the constructor
+    def load_plot_points(self):
+        ''' Loads plotpoints from data into self.plotpoints  '''
+        from models.plotline.plot_point import Plot_Point
+
+        # Looks up our plotpoints in our data, then passes in that data to create a live object
+        for key, data in self.data['plot_points'].items():
+            self.plot_points[key] = Plot_Point(title=key, data=data)
+        
+    
+    # Called in the constructor 
+    def load_arcs(self):
+        ''' Loads arcs from data into self.arcs  '''
         
         # Looks up our arcs in our data, then passes in that data to create a live object
-        for key, value in self.data['arcs'].items():
+        for key, data in self.data['arcs'].items():
             from models.plotline.arc import Arc
-            self.arcs[key] = Arc(**value)
-        
-        return self.arcs
+            self.arcs[key] = Arc(title=key, data=data)
     
-    # Called in the constructor if we loaded this timeline from a file.
-    def load_time_skips(self) -> dict:
-        ''' Loads timeskips from data into self.time_skips dictionary '''
+    # Called in the constructor
+    def load_time_skips(self):
+        ''' Loads timeskips from data into self.time_skips  '''
 
-        for key, value in self.data['time_skips'].items():
+        for key, data in self.data['time_skips'].items():
             from models.plotline.time_skip import Time_Skip
-            self.time_skips[key] = Time_Skip(**value)
+            self.time_skips[key] = Time_Skip(title=key, data=data)
 
         return self.time_skips
+    
+    def create_branch(self, title: str):
+        ''' Creates a new branch inside of our timeline object, and updates the data to match '''
+        from models.plotline.branch import Branch
+
+        self.branches[title] = Branch(title=title)
+        self.data['branches'][title] = self.branches[title].data
+
+        self.save_dict()
         
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
-
         from models.plotline.plot_point import Plot_Point
 
         self.plot_points[title] = Plot_Point(title=title)
-        self.data['plot_points'][title] = self.plot_points[title].__dict__
+        self.data['plot_points'][title] = self.plot_points[title].data
 
         self.save_dict()
 
     # Called when creating a new arc
     def create_arc(self, title: str):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
-
         from models.plotline.arc import Arc
 
         self.arcs[title] = Arc(title=title)
-        self.data['arcs'][title] = self.arcs[title].__dict__
+        self.data['arcs'][title] = self.arcs[title].data
 
         self.save_dict()
 
@@ -152,7 +166,7 @@ class Timeline(ft.GestureDetector):
         from models.plotline.time_skip import Time_Skip
 
         self.time_skips[title] = Time_Skip(title=title)
-        self.data['time_skips'][title] = self.time_skips[title].__dict__
+        self.data['time_skips'][title] = self.time_skips[title].data
 
         self.save_dict()
 
@@ -192,7 +206,9 @@ class Timeline(ft.GestureDetector):
 
         self.save_dict()
 
+    # Called when we need to rebuild out timeline UI
     def reload_timeline(self):
+        # Content of our Timeline (Gesture detector)
         self.content = ft.Container(
             margin=ft.margin.only(left=20, right=20),
             expand=True,
@@ -208,7 +224,8 @@ class Timeline(ft.GestureDetector):
         )
 
     def on_hover(self, e: ft.HoverEvent):
-        print(e)
+        #print(e)
+        pass
         # Grab local mouse to figure out x and map it to our timeline
     
 
