@@ -37,7 +37,6 @@ class Image(Widget):
         # Our column that will display our header filters and body of our widget
         body = ft.Text(f"hello from: {self.title}")
 
-
         # our tab.content is the column we build above.
         self.tab.content=body  # We add this in combo with our 'tabs' later
 
@@ -54,6 +53,8 @@ class Image(Widget):
         
         # Content of our widget (ft.Container) is our created tabs content
         self.content = content
+
+        self.p.update()
 
 
 

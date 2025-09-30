@@ -28,12 +28,12 @@ class Content_Rail(ft.Container):
                 ft.TextButton(  # 'Create boook button'
                     "Create New Book", 
                     icon=ft.Icons.WAVES_OUTLINED, 
-                    on_click=lambda e: self.create_chapter("Chapter 1", story)
+                    #on_click=lambda e: self.create_chapter("Chapter 1", story)
                 ),
                 ft.TextButton(  # 'Create season button'
                     "Create New Season", 
                     icon=ft.Icons.WAVES_OUTLINED, 
-                    on_click=lambda e: self.create_chapter("Chapter 1", story)
+                    #on_click=lambda e: self.create_chapter("Chapter 1", story)
                 ),
                 ft.TextButton(  # 'Create chapter button'
                     "Create New Chapter", 

@@ -21,6 +21,7 @@ class Chapter(Widget):
         # If no data is passed in (Newly created chapter), give it default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict()
 
         self.visible = self.data['visible']  # If we will show this widget or not
 
@@ -44,35 +45,66 @@ class Chapter(Widget):
             
             'content': "",    # Content of our chapter
         }
+    
+    def submit_mini_note(self, e):
+        title = e.control.value
+        self.create_mini_note(title)
+        e.control.value = ""
+        self.p.update()
+
+    def create_mini_note(self, title: str):
+        ''' Creates a mini note inside an image or chapter '''
+
+        print(title)
+
+        from models.mini_note import MiniNote
+
+
+        # Add to list
+        self.mini_notes.append(MiniNote(title=title, page=self.p))
+        
+        print(self.mini_notes)
+
+        self.reload_widget()
+
+        #return mini_note
+
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
         # Our column that will display our header filters and body of our widget
-        body = ft.Text(f"hello from: {self.title}")
+        body = ft.Column([
+            ft.Text(f"hello from: {self.title}"),
+            ft.TextField(
+                label="Create Mini Note",
+                hint_text="Type your note here...",
+                expand=True,
+                on_submit=self.submit_mini_note,
+            )
+        ])
 
         # Our stack holds the body under the tab, so put it there
         self.stack.controls.append(body)
 
-        # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
-        spacing_container = ft.Container(expand=True, ignore_interactions=True)
-        self.stack.controls.append(spacing_container)
-        self.stack.controls.append(spacing_container)
-
         # Column that holds our mini note controls on the right 1/3 of the widget
         mini_notes_column = ft.Column(
             spacing=6,
-            controls=[],
+            controls=self.mini_notes,   # They'll only be rendered if visible
         )
 
-        # Check how many of our mini notes are visible, and add them to our column
-        for mini_note in self.mini_notes.values():
-            if mini_note.visible:
-                mini_notes_column.controls.append(mini_note)
+        # Spacing container to give some space between our body and mini notes
+        mini_notes_row = ft.Row(expand=True,)
+
+        # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
+        spacing_container = ft.Container(expand=True, ignore_interactions=True, bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.RED))
+        mini_notes_row.controls.append(spacing_container)
+        mini_notes_row.controls.append(spacing_container)
+        mini_notes_row.controls.append(mini_notes_column)
 
         # Add the column on top of our stack
-        self.stack.controls.append(mini_notes_column)
+        self.stack.controls.append(mini_notes_row)
 
 
         # Our tab content holds the stack that holds our body
@@ -92,5 +124,7 @@ class Chapter(Widget):
         
         # Content of our widget (ft.Container) is our created 'tabs' content
         self.content = content
+
+        self.p.update()
 
         

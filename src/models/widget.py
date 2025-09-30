@@ -28,7 +28,7 @@ class Widget(ft.Container):
         self.story = story  # Reference to our story object that owns this widget
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
 
-        self.mini_notes = {}
+        self.mini_notes = []
 
         # Declaring UI elements that widgets will have
         self.hide_tab_icon: ft.IconButton = ft.IconButton()  # Icon button that hides the widget from the workspace

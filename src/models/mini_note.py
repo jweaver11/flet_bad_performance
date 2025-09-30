@@ -6,33 +6,25 @@ from models.story import Story
 # Class that holds our mini note objects inside images or chapters
 class MiniNote(ft.Container):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, story: Story, data: dict = None):
+    def __init__(self, title: str, page: ft.Page, data: dict = None):
 
         super().__init__(
             expand=True,
-            spacing=None,
-            right=10,
             border_radius=ft.border_radius.all(6),
-            controls=[]
+            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
         )
 
         self.visible = True
-        
-        # Initialize from our parent class 'Widget'. 
-        
+           
         self.title = title,  # Title of the widget that will show up on its tab
         self.p = page,   # Grabs our original page for convenience and consistency
-        self.story = story,       # Saves our story object that this widget belongs to, so we can access it later
         self.data = data,
 
-        # Required - title, page, story
-        # Not required - body, visible
-
-        # If no data is passed in (Newly created chapter), give it default data
+        # If no data is passed in (Newly created mini note), give it default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
 
-        self.visible = self.data['visible']  # If we will show this widget or not
+        #self.visible = self.data['visible']
 
         self.title_control = ft.TextField(
             value=self.title,
@@ -40,7 +32,8 @@ class MiniNote(ft.Container):
         )
 
         self.content_control = ft.TextField(
-            value=self.data['content'],
+            #value=self.data['content'],
+            label="Body",
             expand=True,
             multiline=True,
         )
@@ -67,18 +60,21 @@ class MiniNote(ft.Container):
     def reload(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
-        # Our column that will display our header filters and body of our widget
-        title = ft.TextButton(f"Hello from mini note: {self.title}")
+        print(f"Reloading mini note: {self.title}!")
 
-        content = ft.TextField(
-            value=self.data['content'],
+        # Our column that will display our header filters and body of our widget
+        self.title_control = ft.TextButton(f"Hello from mini note: {self.title}")
+
+        self.content_control = ft.TextField(
+            #value=self.data['content'],
+            label="Body",
             expand=True,
             multiline=True,
         )
 
         self.content = ft.Column(
             spacing=6,
-            controls=[title, content],
+            controls=[self.title_control, self.content_control],
         )
 
 
