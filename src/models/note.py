@@ -1,8 +1,6 @@
 ''' Notes Model for the story object only. Displays in its own widget'''
 
 import flet as ft
-import json
-import os
 from models.story import Story
 from models.widget import Widget
 
@@ -24,7 +22,7 @@ class Notes(Widget):
             data = data,
         )
 
-        # If no data was passed in (Created not loaded), we give it default data and save it to a new file
+        # If no data was passed in (newly created chapter, not loaded), we give it default data and save it to a new file
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
             self.save_dict()    # Save our new data to a file

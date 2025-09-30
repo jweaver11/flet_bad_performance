@@ -21,6 +21,7 @@ class Chapter(Widget):
             data = data,
         )
 
+        # If no data is passed in (Newly created chapter), give it default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
 
@@ -31,13 +32,13 @@ class Chapter(Widget):
 
 
     # Called at end of constructor
-    def create_default_data(self, directory_path: str) -> dict:
+    def create_default_data(self) -> dict:
         ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
         
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         return {
             'title': self.title,
-            'directory_path': directory_path,
+            'directory_path': self.directory_path,
             'tag': self.tag,
             'pin_location': "bottom",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it

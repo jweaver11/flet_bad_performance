@@ -91,6 +91,8 @@ class Timeline(ft.GestureDetector):
             # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
             # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
             'time_skips': {},    # 'timeskip_title': {timeskip object}
+
+            # Mark part of timeline as written/drawn
             
         }
     

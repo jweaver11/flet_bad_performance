@@ -3,7 +3,7 @@ from models.widget import Widget
 from models.story import Story
 
 
-# Our widget class that displays our world building and lore information
+# Our widget class that displays images
 class Drawing(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
