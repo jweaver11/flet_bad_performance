@@ -4,7 +4,6 @@ import flet as ft
 from models.story import Story
 
 
-
 # Class is created in main on program startup
 class Content_Rail(ft.Container):
     # Constructor
@@ -26,29 +25,38 @@ class Content_Rail(ft.Container):
         # Build the content of our rail
         self.content = ft.Column(
             controls=[
-                ft.TextButton(  # 'Create Character button'
-                    "Chapters", 
+                ft.TextButton(  # 'Create boook button'
+                    "Create New Book", 
                     icon=ft.Icons.WAVES_OUTLINED, 
                     on_click=lambda e: self.create_chapter("Chapter 1", story)
                 ),
-                ft.TextButton(  # 'Create Character button'
-                    "Stuff", 
+                ft.TextButton(  # 'Create season button'
+                    "Create New Season", 
                     icon=ft.Icons.WAVES_OUTLINED, 
+                    on_click=lambda e: self.create_chapter("Chapter 1", story)
                 ),
-                ft.TextButton(  # 'Create Character button'
-                    "More stuff", 
+                ft.TextButton(  # 'Create chapter button'
+                    "Create New Chapter", 
                     icon=ft.Icons.WAVES_OUTLINED, 
+                    on_click=lambda e: self.create_chapter("Chapter 1", story)
                 ),
-                ft.Text("hi there")
             ]
         )
 
         # Apply our update
         self.p.update()
 
+
+    def create_new_book(self, title: str, story: Story):
+        pass
+
+    def create_new_season(self, title: str, story: Story):
+        pass
+
     # Called when user creates a new chapter
     def create_chapter(self, title: str, story: Story):
-        ''' Creates a new chapter object current story '''
+        ''' Grabs our story.type object and creates a new chapter directory inside it.
+         Chapter directory can contain images, notes, and the text content for the chapter itself '''
         
         # Pass in default path for now, but accepts new ones in future for organization
         story.create_chapter(title, directory_path=story.data['content_directory_path'])

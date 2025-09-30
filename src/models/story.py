@@ -11,7 +11,7 @@ from constants import data_paths
 # Class for our different story objects
 class Story(ft.View):
     # Constructor for when new story is created
-    def __init__(self, title: str, page: ft.Page, data: dict=None, template: str=None):
+    def __init__(self, title: str, page: ft.Page, data: dict=None, template: str=None, type: str=None):
         # Title, page, data, and template
         
         # Parent constructor
@@ -24,6 +24,7 @@ class Story(ft.View):
         self.title = title  # Gives our story a title when its created
         self.p = page   # Reference to our page object for updating UI elements
         self.data = data    # Sets our data (if any) passed in. New stories just have none
+        self.type = type    # Type of story, novel or comic. Affects how templates for creating new content will work
 
         # If story is new and not loaded from storage, create default data and save it
         if self.data is None:
@@ -45,7 +46,7 @@ class Story(ft.View):
 
         # Our widgets objects
         self.chapters: dict = {}   
-        self.drawings: dict = {}
+        self.images: dict = {}
         self.characters: dict = {}   
         self.plotline: None   # Only one plotline obj
         self.world_building: None  # Only one world building obj
@@ -188,6 +189,7 @@ class Story(ft.View):
             'title': self.title,
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
             'story_data_file_path' : story_data_file_path,  # Path to our main story json file
+            'type': self.type,   # Type of story: novel or comic
 
             'selected_rail': 'characters',
 
@@ -498,7 +500,6 @@ class Story(ft.View):
 
         
 
-
     # Called on story startup to create our plotline object.
     def load_plotline(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
@@ -538,7 +539,6 @@ class Story(ft.View):
         self.plotline = Plotline("Plotline", self.p, self.data['plotline_directory_path'], self, plotline_data)
 
        
-
     # Called on story startup to load all our world building widget
     def load_world_building(self):
         ''' Loads our world object from storage, or creates a new one if it doesn't exist '''
@@ -638,20 +638,6 @@ class Story(ft.View):
         self.workspace.reload_workspace(self.p, self)
 
         print("num chapters: " + str(len(self.chapters)))
-
-    # Called when the button to create a new drawing is clicked
-    def create_drawing(self, title: str, directory_path: str=None):
-        ''' Creates a new drawing object and saves it to our live story object and storage '''
-
-        from models.content.drawing import Drawing
-        print("Create drawing called")
-        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            directory_path = self.data['characters_directory_path']
-
-        self.drawings[title] = Drawing(title, self.p, directory_path, self)
-        self.workspace.reload_workspace(self.p, self)
-
-        pass
 
 
     # Called to create a character object

@@ -27,76 +27,17 @@ class Widget(ft.Container):
         self.directory_path = directory_path    # Path to our directory that will contain our json file
         self.story = story  # Reference to our story object that owns this widget
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
-        
-        #if data is None:
-            #print(f"No data loaded for {self.title}. ")
 
+        self.mini_notes = {}
 
-        # Our icon button that will hide the widget when clicked in the workspace
-        self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
-            scale=0.8,
-            on_click=lambda e: self.hide_widget(story),
-            icon=ft.Icons.CLOSE_ROUNDED,
-            icon_color=ft.Colors.OUTLINE,
-        )
+        # Declaring UI elements that widgets will have
+        self.hide_tab_icon: ft.IconButton = ft.IconButton()  # Icon button that hides the widget from the workspace
+        self.tab_color: ft.Colors = ft.Colors("primary")  # Color of the tab text and divider
+        self.tab: ft.Tab = ft.Tab()  # Tab that holds our title and hide icon
+        self.stack: ft.Stack = ft.Stack()  # Stack that holds our content for our widget, and allows us to add our mini notes overtop
 
-        self.tab_color =  ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
-
-        # Tab that holds our widget title and 'body'.
-        # Since this is a ft.Tab, it needs to be nested in a ft.Tabs control or it wont render.
-        # We do this so we can use tabs in the main pin area, but still show as a container in other pin areas
-        self.tab = ft.Tab(
-
-            # Initialize the content. This will be our content of the body of the widget
-            content=ft.Container(), 
-
-            # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
-            tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
-                group="widgets",    # Group for draggables (and receiving drag targets) to accept each other
-                data=self,  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
-
-                # Drag event handlers
-                on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging
-                #on_drag_complete = Do nothing. The accepted drag targets handle logic and removing pin drag targets
-                #on_drag_cancel=lambda e: story.workspace.remove_drag_targets,
-
-                # Content when we are dragging the follows the mouse
-                content_feedback=ft.TextButton(self.title), # Normal text won't restrict its own size, so we use a button
-
-                # The content of our draggable. We use a gesture detector so we have more events
-                content=ft.GestureDetector(
-
-                    # Change mouse cursor to the selector cursor when hovering over the tab
-                    mouse_cursor=ft.MouseCursor.CLICK,
-
-                    # Event handlers for hovering and stop hovering over tab
-                    on_hover=self.hover_tab,
-                    on_exit=self.stop_hover_tab,
-
-                    # Content of the gesture detector. This has our actual title and hide icon
-                    content=ft.Row(
-
-                        # The controls of the row that are now left to right
-                        controls=[
-                            # A container for padding. We do this because we can still drag this type of padding
-                            ft.Container(width=6),
-
-                            # The text control that holds our title of the object
-                            ft.Text(
-                                weight=ft.FontWeight.BOLD, # Make the text bold
-                                color=self.tab_color,   # Set our color to the tab color
-                                theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
-                                value=self.title,   # Set the text to our title
-                                
-                            ),
-
-                            # Our icon button that hides the widget when clicked
-                            self.hide_tab_icon, 
-                        ]
-                    )
-                ),
-            ),                       
-        )
+        # Gives our objects their uniform tabs.
+        self.create_tab(story)  # Tabs that don't need too be reloaded for color changes are only built here
 
     # Called whenever there are changes in our data
     def save_dict(self):
@@ -121,14 +62,9 @@ class Widget(ft.Container):
     # Called when a draggable starts dragging.
     def start_drag(self, e: ft.DragStartEvent):
         ''' Shows our pin drag targets '''
-
-        # For now, settings don't drag and give the exception error instead
-        try:
-            self.story.workspace.show_pin_drag_targets()
-        except Exception as e:
-            print(f"Error showing pin drag targets: {e}")
-
-
+        
+        self.story.workspace.show_pin_drag_targets()
+        
     # Called when mouse hovers over the tab part of the widget
     def hover_tab(self, e):
         ''' Changes the hide icon button color slightly for more interactivity '''
@@ -184,3 +120,94 @@ class Widget(ft.Container):
                 story.workspace.reload_workspace(self.p, story)
         else:
             story.workspace.reload_workspace(self.p, story)
+
+    def create_mini_note(self, title: str):
+        ''' Creates a mini note inside an image or chapter '''
+
+        from models.mini_note import MiniNote
+
+        # Create our mini note object
+        mini_note = MiniNote(
+            title=title,
+            page=self.p,
+            story=self.story,
+        )
+
+        # Add to our notes dictionary for access later
+        self.mini_notes[title] = mini_note
+
+        # Add to our UI
+        #self.content.controls.append(mini_note)
+        self.p.update()
+
+        return mini_note
+
+    # Called at end of constructor
+    def create_tab(self, story: Story):
+        ''' Creates our tab for our widget that has the title and hide icon '''
+
+        # Our icon button that will hide the widget when clicked in the workspace
+        self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
+            scale=0.8,
+            on_click=lambda e: self.hide_widget(story),
+            icon=ft.Icons.CLOSE_ROUNDED,
+            icon_color=ft.Colors.OUTLINE,
+        )
+
+        self.tab_color =  ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
+
+        # Tab that holds our widget title and 'body'.
+        # Since this is a ft.Tab, it needs to be nested in a ft.Tabs control or it wont render.
+        # We do this so we can use tabs in the main pin area, but still show as a container in other pin areas
+        self.tab = ft.Tab(
+
+            # Initialize the content. This will be our content of the body of the widget
+            content=ft.Stack(), 
+
+            # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
+            tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
+                group="widgets",    # Group for draggables (and receiving drag targets) to accept each other
+                data=self,  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
+
+                # Drag event handlers
+                on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging
+                #on_drag_complete = Do nothing. The accepted drag targets handle logic and removing pin drag targets
+                #on_drag_cancel=lambda e: story.workspace.remove_drag_targets,
+
+                # Content when we are dragging the follows the mouse
+                content_feedback=ft.TextButton(self.title), # Normal text won't restrict its own size, so we use a button
+
+                # The content of our draggable. We use a gesture detector so we have more events
+                content=ft.GestureDetector(
+
+                    # Change mouse cursor to the selector cursor when hovering over the tab
+                    mouse_cursor=ft.MouseCursor.CLICK,
+
+                    # Event handlers for hovering and stop hovering over tab
+                    on_hover=self.hover_tab,
+                    on_exit=self.stop_hover_tab,
+
+                    # Content of the gesture detector. This has our actual title and hide icon
+                    content=ft.Row(
+
+                        # The controls of the row that are now left to right
+                        controls=[
+                            # A container for padding. We do this because we can still drag this type of padding
+                            ft.Container(width=6),
+
+                            # The text control that holds our title of the object
+                            ft.Text(
+                                weight=ft.FontWeight.BOLD, # Make the text bold
+                                color=self.tab_color,   # Set our color to the tab color
+                                theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
+                                value=self.title,   # Set the text to our title
+                                
+                            ),
+
+                            # Our icon button that hides the widget when clicked
+                            self.hide_tab_icon, 
+                        ]
+                    )
+                ),
+            ),                       
+        )

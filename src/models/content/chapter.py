@@ -1,12 +1,9 @@
 import flet as ft
-import json
-import os
 from models.story import Story
 from models.widget import Widget
 
 
-# Class that holds our timeline object, that holds our plotlines
-# Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
+# Class that holds our text chapter objects
 class Chapter(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
@@ -42,6 +39,8 @@ class Chapter(Widget):
             'tag': self.tag,
             'pin_location': "bottom",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+
+            'mini_notes': {},
             
             'content': "",    # Content of our chapter
         }
@@ -50,13 +49,35 @@ class Chapter(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
-
         # Our column that will display our header filters and body of our widget
         body = ft.Text(f"hello from: {self.title}")
 
+        # Our stack holds the body under the tab, so put it there
+        self.stack.controls.append(body)
 
-        # our tab.content is the column we build above.
-        self.tab.content=body  # We add this in combo with our 'tabs' later
+        # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
+        spacing_container = ft.Container(expand=True, ignore_interactions=True)
+        self.stack.controls.append(spacing_container)
+        self.stack.controls.append(spacing_container)
+
+        # Column that holds our mini note controls on the right 1/3 of the widget
+        mini_notes_column = ft.Column(
+            spacing=6,
+            controls=[],
+        )
+
+        # Check how many of our mini notes are visible, and add them to our column
+        for mini_note in self.mini_notes.values():
+            if mini_note.visible:
+                mini_notes_column.controls.append(mini_note)
+
+        # Add the column on top of our stack
+        self.stack.controls.append(mini_notes_column)
+
+
+        # Our tab content holds the stack that holds our body
+        self.tab.content=self.stack  # We add this in combo with our 'tabs' later
+
 
         # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
         content = ft.Tabs(
@@ -69,7 +90,7 @@ class Chapter(Widget):
             tabs=[self.tab]    # Gives our tab control here
         )
         
-        # Content of our widget (ft.Container) is our created tabs content
+        # Content of our widget (ft.Container) is our created 'tabs' content
         self.content = content
 
         

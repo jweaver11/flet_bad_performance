@@ -36,19 +36,10 @@ class Drawing_Board_Rail(ft.Container):
             spacing=0,
             expand=True,
             controls=[
-                ft.Text("Drawing Board Rail"),
-                ft.Text("From the story: "),
-                ft.Text(story.title),
-                ft.TextButton(
-                    "Create Drawing",
-                    on_click=lambda e: story.create_drawing("Drawing_Title")
-                ),
+                ft.Text("Drawing Board Rail is Under Construction"),
                 # Add more controls here as needed
             ]
         )
-
-        
-
 
         # Apply the update
         self.p.update()
