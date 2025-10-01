@@ -1,11 +1,11 @@
-# Notes that are displayed inside of other widgets
 import flet as ft
 from models.story import Story
-from models.mini_widget import MiniWidget
 
 
-# Class that holds our mini note objects inside images or chapters
-class MiniNote(MiniWidget):
+# Parent Class that holds our mini note objects (ft.Containers), that are held within widget objects only
+# These child objects appear inside of another widget, (from right or left) to show more detail and child information
+# Example, clicking a plotpoint, arc, etc. on a timeline brings up a mini widget
+class MiniWidget(ft.Container):
     # Constructor
     def __init__(self, title: str, page: ft.Page, data: dict = None):
 

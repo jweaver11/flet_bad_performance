@@ -55,24 +55,19 @@ class Chapter(Widget):
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
 
-        print(title)
-
-        from models.mini_note import MiniNote
-
+        from models.mini_widget import MiniNote
 
         # Add to list
-        self.mini_notes.append(MiniNote(title=title, page=self.p))
-        
-        print(self.mini_notes)
+        self.mini_notes.append(MiniNote(title=title, page=self.p, data=None))
 
         self.reload_widget()
-
-        #return mini_note
 
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
+
+        self.stack.controls.clear()
 
         # Our column that will display our header filters and body of our widget
         body = ft.Column([
@@ -94,13 +89,19 @@ class Chapter(Widget):
             controls=self.mini_notes,   # They'll only be rendered if visible
         )
 
+        for mn in self.mini_notes:
+            if mn.visible:
+                mini_notes_column.expand = True
+                break
+
         # Spacing container to give some space between our body and mini notes
-        mini_notes_row = ft.Row(expand=True,)
+        mini_notes_row = ft.Row(expand=True)
 
         # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
-        spacing_container = ft.Container(expand=True, ignore_interactions=True, bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.RED))
+        spacing_container = ft.Container(expand=True, ignore_interactions=True)
         mini_notes_row.controls.append(spacing_container)
         mini_notes_row.controls.append(spacing_container)
+
         mini_notes_row.controls.append(mini_notes_column)
 
         # Add the column on top of our stack
