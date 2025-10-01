@@ -99,7 +99,7 @@ class Timeline(ft.GestureDetector):
     # Called in the constructor
     def load_branches(self):
         ''' Loads branches from data into self.branches  '''
-        from models.plotline.branch import Branch
+        from models.mini_widgets.plotline.branch import Branch
 
         # Looks up our branches in our data, then passes in that data to create a live object
         for key, data in self.data['branches'].items():
@@ -108,7 +108,7 @@ class Timeline(ft.GestureDetector):
     # Called in the constructor
     def load_plot_points(self):
         ''' Loads plotpoints from data into self.plotpoints  '''
-        from models.plotline.plot_point import Plot_Point
+        from models.mini_widgets.plotline.plot_point import Plot_Point
 
         # Looks up our plotpoints in our data, then passes in that data to create a live object
         for key, data in self.data['plot_points'].items():
@@ -121,7 +121,7 @@ class Timeline(ft.GestureDetector):
         
         # Looks up our arcs in our data, then passes in that data to create a live object
         for key, data in self.data['arcs'].items():
-            from models.plotline.arc import Arc
+            from models.mini_widgets.plotline.arc import Arc
             self.arcs[key] = Arc(title=key, data=data)
     
     # Called in the constructor
@@ -129,14 +129,14 @@ class Timeline(ft.GestureDetector):
         ''' Loads timeskips from data into self.time_skips  '''
 
         for key, data in self.data['time_skips'].items():
-            from models.plotline.time_skip import Time_Skip
+            from models.mini_widgets.plotline.time_skip import Time_Skip
             self.time_skips[key] = Time_Skip(title=key, data=data)
 
         return self.time_skips
     
     def create_branch(self, title: str):
         ''' Creates a new branch inside of our timeline object, and updates the data to match '''
-        from models.plotline.branch import Branch
+        from models.mini_widgets.plotline.branch import Branch
 
         self.branches[title] = Branch(title=title)
         self.data['branches'][title] = self.branches[title].data
@@ -146,7 +146,7 @@ class Timeline(ft.GestureDetector):
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
-        from models.plotline.plot_point import Plot_Point
+        from models.mini_widgets.plotline.plot_point import Plot_Point
 
         self.plot_points[title] = Plot_Point(title=title)
         self.data['plot_points'][title] = self.plot_points[title].data
@@ -156,7 +156,7 @@ class Timeline(ft.GestureDetector):
     # Called when creating a new arc
     def create_arc(self, title: str):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
-        from models.plotline.arc import Arc
+        from models.mini_widgets.plotline.arc import Arc
 
         self.arcs[title] = Arc(title=title)
         self.data['arcs'][title] = self.arcs[title].data
@@ -167,7 +167,7 @@ class Timeline(ft.GestureDetector):
     def create_time_skip(self, title: str):
         ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
 
-        from models.plotline.time_skip import Time_Skip
+        from models.mini_widgets.plotline.time_skip import Time_Skip
 
         self.time_skips[title] = Time_Skip(title=title)
         self.data['time_skips'][title] = self.time_skips[title].data

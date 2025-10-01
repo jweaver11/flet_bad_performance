@@ -59,7 +59,7 @@ class Branch(ft.GestureDetector):
     # Called in the constructor
     def load_plot_points(self):
         ''' Loads plotpoints from data into self.plotpoints  '''
-        from models.plotline.plot_point import Plot_Point
+        from models.mini_widgets.plotline.plot_point import Plot_Point
 
         # Looks up our plotpoints in our data, then passes in that data to create a live object
         for key, data in self.data['plot_points'].items():
@@ -72,7 +72,7 @@ class Branch(ft.GestureDetector):
         
         # Looks up our arcs in our data, then passes in that data to create a live object
         for key, data in self.data['arcs'].items():
-            from models.plotline.arc import Arc
+            from models.mini_widgets.plotline.arc import Arc
             self.arcs[key] = Arc(title=key, data=data)
     
     # Called in the constructor
@@ -80,7 +80,7 @@ class Branch(ft.GestureDetector):
         ''' Loads timeskips from data into self.time_skips  '''
 
         for key, data in self.data['time_skips'].items():
-            from models.plotline.time_skip import Time_Skip
+            from models.mini_widgets.plotline.time_skip import Time_Skip
             self.time_skips[key] = Time_Skip(title=key, data=data)
 
         return self.time_skips

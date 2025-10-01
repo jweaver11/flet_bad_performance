@@ -5,7 +5,7 @@ the create 'character button' at the bottom.
 '''
 
 import flet as ft
-from models.character import Character
+from models.widgets.character import Character
 from models.story import Story
 
 class Characters_Rail(ft.Container):

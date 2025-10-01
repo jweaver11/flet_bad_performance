@@ -409,7 +409,7 @@ class Story(ft.View):
 
         #print("Loading content")
 
-        from models.content.chapter import Chapter
+        from models.widgets.content.chapter import Chapter
 
         # Check if the characters folder exists. Creates it if it doesn't. Exists in case people delete this folder
         if not os.path.exists(self.data['content_directory_path']):
@@ -465,7 +465,7 @@ class Story(ft.View):
 
         #print("Loading characters")
 
-        from models.character import Character
+        from models.widgets.character import Character
         
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['characters_directory_path']):
@@ -504,7 +504,7 @@ class Story(ft.View):
     def load_plotline(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
 
-        from models.plotline.plotline import Plotline
+        from models.widgets.plotline import Plotline
  
         # Check if the plotline folder directory exists. Creates it if it doesn't. 
         # Handles errors on startup if people delete this folder, otherwise uneccessary
@@ -543,7 +543,7 @@ class Story(ft.View):
     def load_world_building(self):
         ''' Loads our world object from storage, or creates a new one if it doesn't exist '''
 
-        from models.world_building.world_building import World_Building
+        from models.widgets.world_building import World_Building
  
         # Check if the plotline folder exists. Creates it if it doesn't. 
         # Handles errors on startup if people delete this folder, otherwise uneccessary
@@ -582,7 +582,7 @@ class Story(ft.View):
     def load_notes(self):
         ''' Loads all our note objects stored in the notes directory path'''
 
-        from models.note import Notes
+        from models.widgets.note import Notes
 
         # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['notes_directory_path']):
@@ -626,7 +626,7 @@ class Story(ft.View):
         ''' Creates a new chapter object, saves it to our live story object, and saves it to storage'''
         print("Create chapter called")
 
-        from models.content.chapter import Chapter
+        from models.widgets.content.chapter import Chapter
 
         # If no path is passed in, construct the full file path for the chapter JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
@@ -645,7 +645,7 @@ class Story(ft.View):
         ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
         #print("Create character called")
 
-        from models.character import Character
+        from models.widgets.character import Character
 
         # If no path is passed in, construct the full file path for the character JSON file
         if directory_path is None:
@@ -661,7 +661,7 @@ class Story(ft.View):
     # Called to create a note object
     def create_note(self, title: str, directory_path: str=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
-        from models.note import Notes 
+        from models.widgets.note import Notes 
 
         # If no path is passed in, construct the full file path for the note JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors

@@ -3,7 +3,7 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.plotline.timeline import Timeline
+from models.timeline import Timeline
 
 
 # Class that holds our timeline object, that holds our plotlines
@@ -85,7 +85,7 @@ class Plotline(Widget):
     # Function to load our timline objects from the data 
     def load_timelines(self):
 
-        from models.plotline.timeline import Timeline
+        from models.timeline import Timeline
 
         # Load our PLOTLINES from the plotlines directory
         timelines_directory_path = os.path.join(self.data['directory_path'], "timelines")

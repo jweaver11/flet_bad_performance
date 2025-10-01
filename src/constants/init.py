@@ -8,7 +8,7 @@ import json
 # Called on app startup in main
 def init_settings(page: ft.Page):
     ''' Loads our settings from a JSON file into our rendered settings control. If none exist, creates default settings '''
-    from models.settings import Settings
+    from models.widgets.settings import Settings
     from models.app import app
     from constants import data_paths
 

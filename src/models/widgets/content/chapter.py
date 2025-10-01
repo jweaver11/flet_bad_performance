@@ -86,10 +86,10 @@ class Chapter(Widget):
         # Column that holds our mini note controls on the right 1/3 of the widget
         mini_notes_column = ft.Column(
             spacing=6,
-            controls=self.mini_notes,   # They'll only be rendered if visible
+            controls=self.mini_widgets,   # They'll only be rendered if visible
         )
 
-        for mn in self.mini_notes:
+        for mn in self.mini_widgets:
             if mn.visible:
                 mini_notes_column.expand = True
                 break
