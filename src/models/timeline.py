@@ -30,7 +30,7 @@ class Timeline(ft.GestureDetector):
             self.data = self.create_default_data()  # Create default data if none was passed in
             self.save_dict()
         
-        # Else if there is data (We loaded it), run the rest of our functions
+        # Load the rest of our data from the file
         self.load_branches()
         self.load_plot_points() 
         self.load_arcs()

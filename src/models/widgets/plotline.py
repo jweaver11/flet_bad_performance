@@ -31,7 +31,7 @@ class Plotline(Widget):
             # Save our data
             self.save_dict()
 
-        # If we do have data (in our plotline), load our timelines from the data.
+        # Load our timelines from our data
         self.load_timelines()
 
         # If no plotlines exist, we create a default one to get started

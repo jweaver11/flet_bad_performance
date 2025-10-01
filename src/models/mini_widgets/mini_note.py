@@ -9,21 +9,12 @@ class MiniNote(MiniWidget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, data: dict = None):
 
+        # Initialize our mini widget parent class
         super().__init__(
-            expand=True,
-            border_radius=ft.border_radius.all(6),
-            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
+            title=title,
+            page=page,
+            data=data,
         )
-
-        self.visible = True
-           
-        self.title = title  # Title of the widget that will show up on its tab
-        self.p = page   # Grabs our original page for convenience and consistency
-        self.data = data
-
-        # If no data is passed in (Newly created mini note), give it default data
-        if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
 
         #self.visible = self.data['visible']
 
