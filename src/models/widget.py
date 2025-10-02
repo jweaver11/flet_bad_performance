@@ -30,12 +30,17 @@ class Widget(ft.Container):
 
         # If this is a new widget (Not loaded), give it default data all widgets need
         if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.create_default_data()  # Create default data if none was passed in
             self.save_dict()    # Save our data to the file if the object is new
 
+        # Declare our mini widgets dictionary
         self.mini_widgets = {}
 
-        self.visible = self.data['visible']  # If we will show this widget or not
+        # Apply our visibility
+        self.visible = self.data['visible'] 
+
+        # Load any mini widgets this object may have
+        self.load_mini_widgets()
 
         # Declaring UI elements that widgets will have
         self.hide_tab_icon: ft.IconButton = ft.IconButton()  # Icon button that hides the widget from the workspace
@@ -69,7 +74,12 @@ class Widget(ft.Container):
     def create_default_data(self) -> dict:
         ''' Returns required data all widgets must have '''
 
-        return {
+        # If no data exists, this declares it as an empty dictionary to catch errors
+        if self.data is None:
+            self.data = {}
+
+        # Give all widgets their default data
+        default_data = {
             'title': self.title,
             'directory_path': self.directory_path,
             'tag': self.tag,
@@ -77,6 +87,26 @@ class Widget(ft.Container):
             'visible': True,    
             'mini_widgets': {},
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_data)
+        return
+    
+    # Called in a childs constructor to load any mini widgets that it may have
+    def load_mini_widgets(self):
+        ''' Checks all the items under the data['mini_widgets'] dictionary and creates the appropriate mini widget objects '''
+
+        from models.mini_widgets.mini_note import MiniNote
+        #from models.mini_widgets.plotline import arcs...
+
+        # Make sure we have the mini widgets key
+        if 'mini_widgets' not in self.data:
+            self.create_default_data()
+
+        for key, mini_widget in self.data['mini_widgets'].items():
+            # Check the tag to see what type of mini widget it is, and create the appropriate object
+            if mini_widget['tag'] == "mini_note":
+                self.mini_widgets[key] = MiniNote(title=key, parent=self, page=self.p, data=mini_widget)
 
 
     # Called when a draggable starts dragging.

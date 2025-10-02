@@ -29,8 +29,6 @@ class Chapter(Widget):
             self.create_default_content_data()  # Create data defaults for each chapter widget
             self.save_dict()    # Save our data to the file
 
-        self.load_mini_widgets()
-
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
@@ -47,9 +45,7 @@ class Chapter(Widget):
         # Update existing data with any new default fields we added
         self.data.update(default_chapter_data)  
         return
-    
-    def load_mini_widgets(self):
-        pass
+        
     
     def submit_mini_note(self, e):
         title = e.control.value
@@ -62,8 +58,7 @@ class Chapter(Widget):
 
         from models.mini_widgets.mini_note import MiniNote
 
-        # Add to list
-        self.mini_widgets.append(MiniNote(title=title, parent=self, page=self.p, data=None))
+        self.mini_widgets[title] = MiniNote(title=title, parent=self, page=self.p, data=None)
 
         self.reload_widget()
 
@@ -91,11 +86,11 @@ class Chapter(Widget):
         # Column that holds our mini note controls on the right 1/3 of the widget
         mini_notes_column = ft.Column(
             spacing=6,
-            controls=self.mini_widgets,   # They'll only be rendered if visible
+            controls=self.mini_widgets.values(),   # They'll only be rendered if visible
         )
 
-        for mn in self.mini_widgets:
-            if mn.visible:
+        for mini_widget in self.mini_widgets.values():
+            if mini_widget.visible:
                 mini_notes_column.expand = True
                 break
 

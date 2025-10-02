@@ -15,9 +15,6 @@ class Notes(Widget):
         else:
             loaded = True
 
-        #self.created_at = ft.datetime.now()  # Creation timestamp
-        #self.updated_at = ft.datetime.now()  # Last updated timestamp
-
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
@@ -32,8 +29,6 @@ class Notes(Widget):
         if not loaded:
             self.create_default_note_data()  # Create data defaults for each note widget
             self.save_dict()    # Save our data to the file
-
-        self.visible = self.data['visible']  # If we will show this widget or not
         
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()

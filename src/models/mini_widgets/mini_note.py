@@ -51,7 +51,10 @@ class MiniNote(MiniWidget):
     
     # Called when clicking x to hide the mini note
     def toggle_visible(self, e):
-        self.visible = not self.visible
+        print("Toggling visible called")
+        self.data['visible'] = not self.data['visible']
+        self.visible = self.data['visible']
+        self.save_dict()
         self.p.update()
 
     # Called after any changes happen to the data that need to be reflected in the UI
@@ -77,6 +80,7 @@ class MiniNote(MiniWidget):
         )
 
         self.p.update()
+
 
 
 
