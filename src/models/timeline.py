@@ -36,6 +36,8 @@ class Timeline(ft.GestureDetector):
         self.load_arcs()
         self.load_time_skips()
 
+        #self.load_mini_widgets()
+
         # Builds/reloads our timeline UI
         self.reload_timeline()
 

@@ -16,7 +16,13 @@ from models.story import Story
 # Widget requires a title, tag, page reference, and a pin location
 class Character(Widget):
     # Constructor
-    def __init__(self, name: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
+    def __init__(self, name: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
+
+        # Check if we're loading a character or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
 
         # Parent class constructor
         super().__init__(
@@ -25,87 +31,77 @@ class Character(Widget):
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             directory_path = directory_path,    # Directory where our json file is stored
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
-            data = data,
+            data = data,    # Passes in our data if we loaded it, or None if its a new character
         )
 
-        # If no data passed in (New character, not loaded one), give it default data
-        if self.data is None:
-            self.data = self.create_default_data()
-            self.save_dict()    # Save our data to the file if the character is new
+        # If our character is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_character_data()    # Create data defaults for each character widget
+            self.save_dict()    # Save our data to the file 
         
-        self.visible = self.data['visible']  # Whether or not this character is visible in the character rail
-        
-        
-
-        # Variables that have to be loaded differently from data
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
-        # Load our character data from the file, or set default data if creating new character
-
-        # if data is None, create default data() -> default data
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
 
     # Called when new character object is created.
-    def create_default_data(self) -> dict:
+    def create_default_character_data(self) -> dict:
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
-        print("Creating default data for character: " + self.title)
-
-        # Data set upon first launch of program, or if file can't be loaded
-        return {
-            'title': self.title,
-            'directory_path': self.directory_path,
-            'visible': True,
-            'tag': "character",
-            'pin_location': "left", # New characters start pinned left
+        # Default data for new characters
+        default_character_data = {
+    
+            'pin_location': "left",     # Overide default pin location of main
 
             'tab_color': "primary",  # Initial tab color matches color scheme
             'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
             'sex_color': "primary",    # Color of selected option in sex dropdown
-
-            'Role': "Main",     # Char is either main, side, or bg. Doesn't show up in widget, but app can still change it  
-            'Morality': "",
-            'Sex': "",
-            'Age': "",   # Text field
+ 
+            'morality': "",
+            'sex': "",
+            'age': "",   
             
             'Physical Description': {
                 'Race': "",
                 'Skin Color': "",
-                'Hair Color': "",   # Textfield
-                'Eye Color': "",    # Textfield
-                'Height': "",   # TextField
-                'Weight': "",   # TextField
-                'Build': "",    # 
+                'Hair Color': "",   
+                'Eye Color': "",    
+                'Height': "",   
+                'Weight': "",   
+                'Build': "",    
                 'Distinguishing Features': "",  # some sort of flet list
             },
             'Family':  {
-                #'Love Interest': Character or str,
-                'Love Interest': "",    # Sets a string
+                'Love Interest': "",    # Name of another character, or str
                 'Father': "",   # Textfield with selectable options
                 'Mother': "",    
                 'Siblings': "",
                 'Children': "",
                 'Ancestors': "",
             },  
-                
-            'Occupation': "",   # Textfield
-            'Goals': "",    # Textfield list
-            'Origin': {     # Category on the left
-                'Birth Date': "",   # textfield
-                'Hometown': "",     # Textfield and a select from location radio picker
-                'Education': "",        # Textfield
+            'Trauma': "",
+            'Occupation': "",   
+            'Goals': "",    
+            'Origin': {     
+                'Birth Date': "",   
+                'Hometown': "",     
+                'Education': "",        
             },
             
-            'Personality': "",  # expandable ft.TextField
-            'Backstory': "",    # expandable ft.TextField
-            'Abilities': "",    # Some sort of list
+            'Personality': "",  
+            'Backstory': "",    
+            'Abilities': "",    
             'Dead': False,
-            'Notes' : {},   # Category that says Notes on the left, then lists the expandable ft.TextField?
+            'Notes' : {},  
         }
-        
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_character_data)  
+
+        return
+
     
     # Change our tab color of widget. Accepts a flet color as parameter
     def submit_color_change(self, color):
@@ -162,38 +158,19 @@ class Character(Widget):
     def submit_sex_change(self, e):
         #print("sex submit ran")
 
-        self.data['Sex'] = e.control.value
-
-        if e.control.value == "None":
-            self.data['Sex'] = None
-        else:
-            self.data['Sex'] = e.control.value
-
-        print(self.data['Sex'])
-
-        if self.data['Sex'] == "Male":
-            self.sex_color = ft.Colors.BLUE
-        elif self.data['Sex'] == "Female":
-            self.sex_color = ft.Colors.PINK
-        else:
-            self.sex_color = ft.Colors.PRIMARY
-        
-        
-        self.reload_widget()
-        self.p.update()
+        pass
 
     # Called when the age is changed. Changes the age data
     def submit_age_change(self, e):
         #print("Age change ran")
-        self.data['Age'].data = e.control.value
-        print(self.data['Age'].data)
+        self.data['age'].data = e.control.value
+        #print(self.data['Age'].data)
+        self.save_dict()
 
     # Called when the race is changed. Changes the race data
     def submit_race_change(self, e):
         #print("Race change ran")
-        self.data['Physical Description'].data['Race'] = e.control.value
-        #print(self.data['Physical Description'].data['Race'])
-        self.p.update()
+        pass
         
 
     # Expand the tile to show physical descriptions
@@ -218,7 +195,7 @@ class Character(Widget):
                            #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                 label="Morality",
-                                value=self.data['Morality'],
+                                value=self.data['morality'],
                                 #padding=ft.padding.all(0),
                                 color=self.data['name_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
@@ -235,7 +212,7 @@ class Character(Widget):
                                
                             ft.Dropdown(      # Sex of each character
                                 label="Sex",
-                                value=self.data['Sex'],
+                                value=self.data['sex'],
                                 #padding=ft.padding.all(0),
                                 color=self.data['sex_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),

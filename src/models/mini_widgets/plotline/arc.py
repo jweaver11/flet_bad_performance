@@ -21,6 +21,7 @@ class Arc(ft.GestureDetector):
             'description': "",
             'start_date': "",
             'end_date': "",
+            'events': [],       # Step by step of plot events through the arc. Call plot point??
             'involved_characters': [],
             'related_locations': [],
             'related_items': [],

@@ -489,7 +489,7 @@ class Story(ft.View):
                             character_data = json.load(f)
                         
                         # Extract the title from the data
-                        character_title = character_data.get("title", filename.replace(".json", ""))
+                        character_title = character_data.get("title", filename.replace(".json", ""))    # TODO Add error handling
                             
                         # Create our character object using our loaded data
                         self.characters[character_title] = Character(character_title, self.p, dirpath, self, character_data)

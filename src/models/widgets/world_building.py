@@ -9,6 +9,12 @@ import json
 class World_Building(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
+
+        # Check if we're loading our world or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -17,18 +23,29 @@ class World_Building(Widget):
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            data = data,
+            data = data,    # Set our passed in data to our objects data
         )
         self.visible = False
 
-        self.load_from_dict(directory_path)  # Loads our object from a dictionary (from json file)
+        # If our character is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_world_building_data()  # Create data defaults for our world widget
+            self.save_dict()    # Save our data to the file 
 
         self.reload_widget()
         
+    # Called when new story is created, and no data for our world exists
+    def create_default_world_building_data(self):
+        ''' Gives our world building widget default data it will need if none exists '''
 
-    def load_from_dict(self, directory_path: str):
-        
-        self.save_dict()
+        # Default data for our world building widget
+        default_world_building_data = {
+            'content': "",
+        }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_world_building_data)
+        return
 
     def reload_widget(self):
         # Our column that will display our header filters and body of our widget

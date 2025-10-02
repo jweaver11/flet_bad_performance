@@ -35,11 +35,11 @@ class Content_Rail(ft.Container):
                     icon=ft.Icons.WAVES_OUTLINED, 
                     #on_click=lambda e: self.create_chapter("Chapter 1", story)
                 ),
-                ft.TextButton(  # 'Create chapter button'
-                    "Create New Chapter", 
-                    icon=ft.Icons.WAVES_OUTLINED, 
-                    on_click=lambda e: self.create_chapter("Chapter 1", story)
-                ),
+                ft.TextField(
+                    label="New Chapter Title",
+                    hint_text="put title here dummy",
+                    on_submit=lambda e: self.create_chapter(e.control.value, story)
+                )
             ]
         )
 

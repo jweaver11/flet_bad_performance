@@ -8,7 +8,13 @@ from models.widget import Widget
 
 class Notes(Widget):
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
-        self.content = ""  # Content of the notes
+
+        # Check if we're loading a note or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
         #self.created_at = ft.datetime.now()  # Creation timestamp
         #self.updated_at = ft.datetime.now()  # Last updated timestamp
 
@@ -22,10 +28,10 @@ class Notes(Widget):
             data = data,
         )
 
-        # If no data was passed in (newly created chapter, not loaded), we give it default data and save it to a new file
-        if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()    # Save our new data to a file
+        # If our note is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_note_data()  # Create data defaults for each note widget
+            self.save_dict()    # Save our data to the file
 
         self.visible = self.data['visible']  # If we will show this widget or not
         
@@ -33,22 +39,20 @@ class Notes(Widget):
         self.reload_widget()
 
     # Called at end of constructor
-    def create_default_data(self) -> dict:
+    def create_default_note_data(self) -> dict:
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        return {
-            "title": self.title,
-            'directory_path': self.directory_path,
-
-            'pin_location': "right",
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-
-            "content": "",
+        default_note_data = {
             "character_count": 0,
             "created_at": None,
-            "last_modified": None
+            "last_modified": None,
+            "content": "",
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_note_data)  
+        return
 
     # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild
     def reload_widget(self):

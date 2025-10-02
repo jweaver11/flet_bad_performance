@@ -11,6 +11,12 @@ from models.timeline import Timeline
 class Plotline(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
+
+        # Check if we're loading our plotline or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -25,11 +31,10 @@ class Plotline(Widget):
         # Our timeline controls
         self.timelines = {}
 
-        # If we don't have data (New story with no plotline data yet), create default data
-        if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
-            # Save our data
-            self.save_dict()
+        # If our plotline is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_plotline_data()  # Create data defaults for our plotline widget
+            self.save_dict()    # Save our data to the file
 
         # Load our timelines from our data
         self.load_timelines()
@@ -56,19 +61,12 @@ class Plotline(Widget):
 
 
     # Called at end of constructor
-    def create_default_data(self) -> dict:
+    def create_default_plotline_data(self) -> dict:
         ''' Loads our plotline data and timelines data from our seperate timelines files inside the timelines directory '''
-  
-        print("Creating default data for plotline: " + self.title)
 
-        return {
-            'title': self.title,
-            'directory_path': self.directory_path,
-            'tag': "plotline",
-
+        # Default data for our plotline widget
+        default_plotline_data = {
             'pin_location': "bottom",
-            'visible': True,    
-            
             # Start and end date of entire story
             'story_start_date': "", 
             'story_end_date': "",
@@ -78,8 +76,11 @@ class Plotline(Widget):
                 'show_plot_points': True,
                 'show_arcs': True,
             },
-            
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_plotline_data)
+        return
 
 
     # Function to load our timline objects from the data 

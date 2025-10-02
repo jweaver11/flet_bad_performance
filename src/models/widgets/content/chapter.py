@@ -6,7 +6,13 @@ from models.widget import Widget
 # Class that holds our text chapter objects
 class Chapter(Widget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
+
+        # Check if we're loading a chapter or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -15,36 +21,35 @@ class Chapter(Widget):
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            data = data,
+            data = data,    # This gets initialized at the end of our constructor
         )
 
-        # If no data is passed in (Newly created chapter), give it default data
-        if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()
+        # If our character is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_content_data()  # Create data defaults for each chapter widget
+            self.save_dict()    # Save our data to the file
 
-        self.visible = self.data['visible']  # If we will show this widget or not
+        self.load_mini_widgets()
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
 
-    # Called at end of constructor
-    def create_default_data(self) -> dict:
-        ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
+    # Called when creating new chapter widget, not when loading one
+    def create_default_content_data(self) -> dict:
+        ''' Returns default data all chapter widgets will have '''
         
-        # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        return {
-            'title': self.title,
-            'directory_path': self.directory_path,
-            'tag': self.tag,
-            'pin_location': "bottom",
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-
-            'mini_notes': {},
-            
+        # Default data for new chapters
+        default_chapter_data = {
             'content': "",    # Content of our chapter
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_chapter_data)  
+        return
+    
+    def load_mini_widgets(self):
+        pass
     
     def submit_mini_note(self, e):
         title = e.control.value
@@ -55,10 +60,10 @@ class Chapter(Widget):
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
 
-        from models.mini_widget import MiniNote
+        from models.mini_widgets.mini_note import MiniNote
 
         # Add to list
-        self.mini_notes.append(MiniNote(title=title, page=self.p, data=None))
+        self.mini_widgets.append(MiniNote(title=title, parent=self, page=self.p, data=None))
 
         self.reload_widget()
 

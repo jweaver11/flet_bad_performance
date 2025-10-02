@@ -2,21 +2,21 @@
 import flet as ft
 from models.story import Story
 from models.mini_widget import MiniWidget
+from models.widget import Widget
 
 
 # Class that holds our mini note objects inside images or chapters
 class MiniNote(MiniWidget):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, data: dict = None):
+    def __init__(self, title: str, parent: Widget, page: ft.Page, data: dict=None):
 
         # Initialize our mini widget parent class
         super().__init__(
-            title=title,
-            page=page,
-            data=data,
+            title=title,        # Title of our mini note
+            parent=parent,      # Parent widget that holds us
+            page=page,          # Page reference
+            data=data,          # Data if we're loading an existing mini note, otherwise blank
         )
-
-        #self.visible = self.data['visible']
 
         self.title_control = ft.TextField(
             value=self.title,
@@ -31,7 +31,7 @@ class MiniNote(MiniWidget):
         )
 
         # Load our widget UI on start after we have loaded our data
-        self.reload()
+        self.reload_mini_widget()
 
 
     # Called at end of constructor
@@ -46,6 +46,7 @@ class MiniNote(MiniWidget):
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             
             'content': "",    # Content of our chapter
+            'One': 1,
         }
     
     # Called when clicking x to hide the mini note
@@ -54,7 +55,7 @@ class MiniNote(MiniWidget):
         self.p.update()
 
     # Called after any changes happen to the data that need to be reflected in the UI
-    def reload(self):
+    def reload_mini_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
         # Our column that will display our header filters and body of our widget

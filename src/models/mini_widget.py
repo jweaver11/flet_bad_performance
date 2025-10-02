@@ -1,5 +1,8 @@
 import flet as ft
 from models.story import Story
+import os
+import json
+from models.widget import Widget
 
 
 # Parent Class that holds our mini note objects (ft.Containers), that are held within widget objects only
@@ -7,23 +10,25 @@ from models.story import Story
 # Example, clicking a plotpoint, arc, etc. on a timeline brings up a mini widget
 class MiniWidget(ft.Container):
     # Constructor
-    def __init__(self, title: str, page: ft.Page, data: dict = None):
+    def __init__(self, title: str, parent: Widget, page: ft.Page, data: dict = None, ):
 
         super().__init__(
             expand=True,
             border_radius=ft.border_radius.all(6),
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
         )
-
-        self.visible = True
            
         self.title = title  # Title of the widget that will show up on its tab
         self.p = page   # Grabs our original page for convenience and consistency
-        self.data = data
+        self.data = data    # Pass in our data when loading existing mini widgets
+        self.parent = parent
 
         # If no data is passed in (Newly created mini note), give it default data
         if self.data is None:
             self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict(parent)
+
+        self.visible = self.data['visible']
 
         #self.visible = self.data['visible']
 
@@ -41,6 +46,13 @@ class MiniWidget(ft.Container):
 
         # Load our widget UI on start after we have loaded our data
         self.reload()
+
+    def save_dict(self, parent: Widget):
+        ''' Saves our current data to the PARENTS json file '''
+
+        parent.data['mini_widgets'][self.title] = self.data
+
+        parent.save_dict()
 
 
     # Called at end of constructor

@@ -28,7 +28,14 @@ class Widget(ft.Container):
         self.story = story  # Reference to our story object that owns this widget
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
 
-        self.mini_widgets = []
+        # If this is a new widget (Not loaded), give it default data all widgets need
+        if self.data is None:
+            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.save_dict()    # Save our data to the file if the object is new
+
+        self.mini_widgets = {}
+
+        self.visible = self.data['visible']  # If we will show this widget or not
 
         # Declaring UI elements that widgets will have
         self.hide_tab_icon: ft.IconButton = ft.IconButton()  # Icon button that hides the widget from the workspace
@@ -57,6 +64,19 @@ class Widget(ft.Container):
         # Handle errors
         except Exception as e:
             print(f"Error saving object to {file_path}: {e}")
+
+    # Called when creating a new widget, not when loading one
+    def create_default_data(self) -> dict:
+        ''' Returns required data all widgets must have '''
+
+        return {
+            'title': self.title,
+            'directory_path': self.directory_path,
+            'tag': self.tag,
+            'pin_location': "main",  
+            'visible': True,    
+            'mini_widgets': {},
+        }
 
 
     # Called when a draggable starts dragging.
@@ -116,7 +136,7 @@ class Widget(ft.Container):
         # Catch errors when no story loaded for settings widget
         if self.title == "Settings":
             from models.app import app
-            for key, story in app.stories.items():
+            for story in app.stories.values():
                 story.workspace.reload_workspace(self.p, story)
         else:
             story.workspace.reload_workspace(self.p, story)

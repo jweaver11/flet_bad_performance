@@ -16,6 +16,12 @@ import json
 class Settings(Widget):
     # Constructor
     def __init__(self, page: ft.Page, directory_path: str, story: Story=None, data: dict=None):
+
+        # Check if we're loading a character or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
         
         # Constructor the parent widget class
         super().__init__(
@@ -27,9 +33,10 @@ class Settings(Widget):
             data = data,
         )
 
-        if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()
+        # If our settings are new and not loaded, give it default data
+        if not loaded:
+            self.create_default_settings_data()  # Create data defaults for our settings widgets
+            self.save_dict()    # Save our data to the file
 
         self.visible = self.data['visible']  # If we will show this widget or not
 
@@ -39,13 +46,11 @@ class Settings(Widget):
 
 
     # Called when new settings object is created
-    def create_default_data(self):
+    def create_default_settings_data(self):
         ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
 
-        #print("load from dict called")
-
-        # Data set upon first launch of program, or if file can't be loaded
-        return {
+        # Default data for our settings widget
+        default_settings_data = {
             'visible': False,   # If our settings widget is visible or not
             'pin_location': "main", 
             'active_story': "/",    # this works as a route for the correct story
@@ -67,6 +72,10 @@ class Settings(Widget):
             'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
             'active_rail_width': 200,   # Width of our active rail that we can resize
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_settings_data)
+        return
         
 
     # Called when the button to reorder the workspaces is clicked
