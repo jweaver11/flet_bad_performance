@@ -7,7 +7,7 @@ from models.timeline import Timeline
 
 
 # Class that holds our timeline object, that holds our plotlines
-# Stories generally only have one plotline, unless we want multiple timelines, regression, multiverse, etc.
+# Stories generally only have one timeline, unless we want multiple timelines, regression, multiverse, etc.
 class Plotline(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
@@ -43,7 +43,7 @@ class Plotline(Widget):
         if len(self.timelines) == 0:
             # Create one like this so we don't call reload_widget before our UI elements are defined
             timeline_directory_path = os.path.join(self.directory_path, "timelines")
-            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, data=None)
+            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, page=self.page, story=self.story, data=None)
 
         # Set visibility from our data
         self.visible = self.data['visible']  # If we will show this widget or not
@@ -116,9 +116,17 @@ class Plotline(Widget):
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading any timelines from {timelines_directory_path}: {e}")
 
+        # After we have loaded our timelines, we steal their mini widgets to show in our plotline.
+        # Timelines r not widgets, so they can't display the mini widgets themselves
         for timeline in self.timelines.values():
+            # Initialize timeline entry in mini_widgets if it doesn't exist
+            if timeline.title not in self.mini_widgets:
+                self.mini_widgets[timeline.title] = {'arcs': {}}
+            elif 'arcs' not in self.mini_widgets[timeline.title]:
+                self.mini_widgets[timeline.title]['arcs'] = {}
+                
             for arc in timeline.arcs.values():
-                self.mini_widgets[arc.title] = arc
+                self.mini_widgets[timeline.title]['arcs'][arc.title] = arc
 
 
 
@@ -161,6 +169,7 @@ class Plotline(Widget):
         # Have a show/hide filters button in top left of widget
         # Show zoomed in time dates when zoomed in??
 
+        # Unique widget, has its child timelines hold its mini widgets
         self.stack.controls.clear()
 
         plotline_filters = []
@@ -262,12 +271,15 @@ class Plotline(Widget):
 
         self.stack.controls.append(column)
 
-        # Column that holds our mini note controls on the right 1/3 of the widget
+        # Column that holds our mini widget controls on the right 1/3 of the widget
         mini_widgets_column = ft.Column(
             spacing=6,
-            controls=self.mini_widgets.values(),   # They'll only be rendered if visible
+            expand=True,
+            #controls=self.mini_widgets.values(),   # They'll only be rendered if visible
         )
 
+        # TODO 
+        # Iterate through all values in the mini widgets dict, not the keys
         for mini_widget in self.mini_widgets.values():
             if mini_widget.visible:
                 mini_widgets_column.expand = True
