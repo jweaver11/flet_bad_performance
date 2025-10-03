@@ -28,13 +28,13 @@ class Widget(ft.Container):
         self.story = story  # Reference to our story object that owns this widget
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
 
+        # Declare our mini widgets dictionary
+        self.mini_widgets = {}
+
         # If this is a new widget (Not loaded), give it default data all widgets need
         if self.data is None:
             self.create_default_data()  # Create default data if none was passed in
             self.save_dict()    # Save our data to the file if the object is new
-
-        # Declare our mini widgets dictionary
-        self.mini_widgets = {}
 
         # Apply our visibility
         self.visible = self.data['visible'] 
@@ -74,7 +74,7 @@ class Widget(ft.Container):
     def create_default_data(self) -> dict:
         ''' Returns required data all widgets must have '''
 
-        # If no data exists, this declares it as an empty dictionary to catch errors
+        # Error catching
         if self.data is None:
             self.data = {}
 
@@ -99,14 +99,19 @@ class Widget(ft.Container):
         from models.mini_widgets.mini_note import MiniNote
         #from models.mini_widgets.plotline import arcs...
 
-        # Make sure we have the mini widgets key
+        # Error handling
         if 'mini_widgets' not in self.data:
             self.create_default_data()
 
+        print("mini widgets before", self.mini_widgets)
+
         for key, mini_widget in self.data['mini_widgets'].items():
+
             # Check the tag to see what type of mini widget it is, and create the appropriate object
             if mini_widget['tag'] == "mini_note":
-                self.mini_widgets[key] = MiniNote(title=key, parent=self, page=self.p, data=mini_widget)
+                self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
+
+        print("mini widgets after", self.mini_widgets)
 
 
     # Called when a draggable starts dragging.
@@ -174,7 +179,7 @@ class Widget(ft.Container):
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
 
-        from models.mini_widget import MiniNote
+        from models.mini_widgets.mini_note import MiniNote
 
         # Create our mini note object
         mini_note = MiniNote(
@@ -184,7 +189,7 @@ class Widget(ft.Container):
         )
 
         # Add to our notes dictionary for access later
-        self.mini_notes[title] = mini_note
+        #self.mini_notes[title] = mini_note
 
         # Add to our UI
         #self.content.controls.append(mini_note)

@@ -10,7 +10,7 @@ from models.widget import Widget
 # Example, clicking a plotpoint, arc, etc. on a timeline brings up a mini widget
 class MiniWidget(ft.Container):
     # Constructor
-    def __init__(self, title: str, parent: Widget, page: ft.Page, data: dict = None, ):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
 
         super().__init__(
             expand=True,
@@ -21,14 +21,14 @@ class MiniWidget(ft.Container):
         self.title = title  # Title of the widget that will show up on its tab
         self.p = page   # Grabs our original page for convenience and consistency
         self.data = data    # Pass in our data when loading existing mini widgets
-        self.parent = parent
+        self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
 
-        # If no data is passed in (Newly created mini note), give it default data
+        # If no data is passed in (Newly created mini widget), give it default data
         if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.create_default_data()  # Create default data if none was passed in
             self.save_dict()
 
-        # Apply our vsibility
+        # Apply our visibility
         self.visible = self.data['visible']
 
         self.title_control = ft.TextField(
@@ -43,38 +43,55 @@ class MiniWidget(ft.Container):
             multiline=True,
         )
 
-    # Called when saving changes in our mini widgets data to the PARENTS json file
+    # Called when saving changes in our mini widgets data to the OWNERS json file
     def save_dict(self):
-        ''' Saves our current data to the PARENTS json file '''
+        ''' Saves our current data to the OWNERS json file '''
 
-        # TODO PARENT DATA IS BEING PASSED IN AS NONE
-        if self.parent.data is None:
-            print("Error: Parent data is None, cannot save mini widget data")
+        if self.owner.data is None:
+            print("Error: owner data is None, cannot save mini widget data")
             return
 
-        if self.parent.data['mini_widgets'] is None:
-            self.parent.data['mini_widgets'] = {}
+        # Grab our owner object, and update their data pertaining to this mini widget
+        self.owner.data['mini_widgets'][self.title] = self.data
 
-        # Grab our parent object, and update their data pertaining to this mini widget
-        self.parent.data['mini_widgets'][self.title] = self.data
-
-        # Save our parents json file to match their data
-        self.parent.save_dict()
+        # Save our owners json file to match their data
+        self.owner.save_dict()
 
 
 
     # Called at end of constructor
     def create_default_data(self) -> dict:
-        ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
-        
+        ''' Creates default data for the mini widget when no data is passed in '''
+
+        print("Creating default data for mini widget")
+
+        if self.data is None:
+            self.data = {}
+
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        return {
+        default_data = {
             'title': self.title,
             'tag': "",
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            'content': "",    # Content of our chapter
+            'content': "",    # Content of our mini widget
         }
 
+        self.data.update(default_data)
+        return
+
+    def hide_mini_widget(self, e):
+        print("Hiding mini widget")
+        self.data['visible'] = False
+        self.visible = self.data['visible']
+        self.save_dict()
+        self.p.update()
+
+    def show_mini_widget(self, e):
+        print("Showing mini widget")
+        self.data['visible'] = True
+        self.visible = self.data['visible']
+        self.save_dict()
+        self.p.update()
 
 
         

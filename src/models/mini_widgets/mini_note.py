@@ -8,15 +8,19 @@ from models.widget import Widget
 # Class that holds our mini note objects inside images or chapters
 class MiniNote(MiniWidget):
     # Constructor
-    def __init__(self, title: str, parent: Widget, page: ft.Page, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
 
-        # Initialize our mini widget parent class
+        # Initialize our mini widget owner class
         super().__init__(
             title=title,        # Title of our mini note
-            parent=parent,      # Parent widget that holds us
+            owner=owner,      # owner widget that holds us
             page=page,          # Page reference
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         )
+
+        self.data['tag'] = "mini_note"  # Tag to identify this as a mini note
+
+        self.save_dict()
 
         self.title_control = ft.TextField(
             value=self.title,
@@ -34,20 +38,7 @@ class MiniNote(MiniWidget):
         self.reload_mini_widget()
 
 
-    # Called at end of constructor
-    def create_default_data(self) -> dict:
-        ''' Loads our timeline data and plotlines data from our seperate plotlines files inside the plotlines directory '''
-        
-        # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        return {
-            'title': self.title,
-            'tag': "mini_note",
-        
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            
-            'content': "",    # Content of our chapter
-            'One': 1,
-        }
+    
     
     # Called when clicking x to hide the mini note
     def toggle_visible(self, e):

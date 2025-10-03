@@ -58,7 +58,7 @@ class Chapter(Widget):
 
         from models.mini_widgets.mini_note import MiniNote
 
-        self.mini_widgets[title] = MiniNote(title=title, parent=self, page=self.p, data=None)
+        self.mini_widgets[title] = MiniNote(title=title, owner=self, page=self.p, data=None)
 
         self.reload_widget()
 
@@ -82,6 +82,8 @@ class Chapter(Widget):
 
         # Our stack holds the body under the tab, so put it there
         self.stack.controls.append(body)
+
+        print("Mini widgets in chapter:", self.mini_widgets)
 
         # Column that holds our mini note controls on the right 1/3 of the widget
         mini_notes_column = ft.Column(
