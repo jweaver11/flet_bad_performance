@@ -45,6 +45,6 @@ class World_Building_Rail(ft.Container):
         ''' Shows the world building widget '''
 
         if story.world_building is not None:
-            story.world_building.show_widget(story)
+            story.world_building.toggle_visibility(story)
     
         

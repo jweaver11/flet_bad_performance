@@ -103,15 +103,11 @@ class Widget(ft.Container):
         if 'mini_widgets' not in self.data:
             self.create_default_data()
 
-        print("mini widgets before", self.mini_widgets)
-
         for key, mini_widget in self.data['mini_widgets'].items():
 
             # Check the tag to see what type of mini widget it is, and create the appropriate object
             if mini_widget['tag'] == "mini_note":
                 self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
-
-        print("mini widgets after", self.mini_widgets)
 
 
     # Called when a draggable starts dragging.
@@ -135,17 +131,14 @@ class Widget(ft.Container):
         self.p.update()
 
     # Called when app clicks the hide icon in the tab
-    def hide_widget(self, story: Story):
+    def toggle_visibility(self, story: Story):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
-        print(f"Hiding widget {self.title}")
         # Set our container object to invisible - won't be rendered anywhere
-        self.visible = False
-
-        # Update the child object's data and save to file
-        if hasattr(self, 'data'):
-            self.data['visible'] = False
-            self.save_dict()
+        self.data['visible'] = not self.data['visible']
+        self.visible = self.data['visible']
+        self.save_dict()
+        self.p.update()
             
         # Settings doesn't have a story, so we reload all the stories workspaces instead of just the one for our widget
         if self.title == "Settings":
@@ -157,24 +150,7 @@ class Widget(ft.Container):
         else:
             story.workspace.reload_workspace(self.p, story)
 
-    # Called when app clicks the widget in the rail
-    def show_widget(self, story: Story):
-        ''' Makes our widget visible for our workspace and updates the json to reflect the change '''
-
-        #print(f"Showing widget {self.title}")
-        self.visible = True
-        
-        if hasattr(self, 'data'):
-            self.data['visible'] = True
-            self.save_dict()
-        
-        # Catch errors when no story loaded for settings widget
-        if self.title == "Settings":
-            from models.app import app
-            for story in app.stories.values():
-                story.workspace.reload_workspace(self.p, story)
-        else:
-            story.workspace.reload_workspace(self.p, story)
+    
 
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
@@ -204,7 +180,7 @@ class Widget(ft.Container):
         # Our icon button that will hide the widget when clicked in the workspace
         self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
-            on_click=lambda e: self.hide_widget(story),
+            on_click=lambda e: self.toggle_visibility(story),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
         )

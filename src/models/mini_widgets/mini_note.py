@@ -37,17 +37,6 @@ class MiniNote(MiniWidget):
         # Load our widget UI on start after we have loaded our data
         self.reload_mini_widget()
 
-
-    
-    
-    # Called when clicking x to hide the mini note
-    def toggle_visible(self, e):
-        print("Toggling visible called")
-        self.data['visible'] = not self.data['visible']
-        self.visible = self.data['visible']
-        self.save_dict()
-        self.p.update()
-
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
@@ -55,7 +44,7 @@ class MiniNote(MiniWidget):
         # Our column that will display our header filters and body of our widget
         self.title_control = ft.TextButton(
             f"Hello from mini note: {self.title}",
-            on_click=self.toggle_visible,
+            on_click=self.toggle_visibility,
         )
 
         self.content_control = ft.TextField(

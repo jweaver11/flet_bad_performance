@@ -293,14 +293,10 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         ''' Toggles the visibility of the settings widget in the menubar '''
         print("Settings clicked")
 
-        # Change our settings data to visible or not
-        app.settings.data['visible'] = not app.settings.data['visible']
-        app.settings.save_dict()
-
         if app.settings.data['visible']:
-            app.settings.show_widget(story)
+            app.settings.toggle_visibility(story)
         else:
-            app.settings.hide_widget(story)
+            app.settings.toggle_visibility(story)
 
 
         

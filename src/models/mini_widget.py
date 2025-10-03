@@ -63,8 +63,7 @@ class MiniWidget(ft.Container):
     def create_default_data(self) -> dict:
         ''' Creates default data for the mini widget when no data is passed in '''
 
-        print("Creating default data for mini widget")
-
+        # Catch errors
         if self.data is None:
             self.data = {}
 
@@ -76,22 +75,17 @@ class MiniWidget(ft.Container):
             'content': "",    # Content of our mini widget
         }
 
+        # Update existing data with any new default fields we added
         self.data.update(default_data)
         return
 
-    def hide_mini_widget(self, e):
-        print("Hiding mini widget")
-        self.data['visible'] = False
+    # Called when clicking x to hide the mini note
+    def toggle_visibility(self, e):
+        ''' Shows or hides our mini widget, depending on current state '''
+
+        self.data['visible'] = not self.data['visible']
         self.visible = self.data['visible']
         self.save_dict()
         self.p.update()
-
-    def show_mini_widget(self, e):
-        print("Showing mini widget")
-        self.data['visible'] = True
-        self.visible = self.data['visible']
-        self.save_dict()
-        self.p.update()
-
 
         

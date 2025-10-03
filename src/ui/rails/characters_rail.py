@@ -68,7 +68,7 @@ class Characters_Rail(ft.Container):
         for character in story.characters.values():
             char_button = ft.TextButton(
                 text=character.title,
-                on_click=lambda e, char=character: char.show_widget(story), # Needs this reference, idk y
+                on_click=lambda e, char=character: char.toggle_visibility(story), # Needs this reference, idk y
             )
             column.controls.append(char_button)
 
