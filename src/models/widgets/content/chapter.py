@@ -83,31 +83,29 @@ class Chapter(Widget):
         # Our stack holds the body under the tab, so put it there
         self.stack.controls.append(body)
 
-        print("Mini widgets in chapter:", self.mini_widgets)
-
         # Column that holds our mini note controls on the right 1/3 of the widget
-        mini_notes_column = ft.Column(
+        mini_widgets_column = ft.Column(
             spacing=6,
             controls=self.mini_widgets.values(),   # They'll only be rendered if visible
         )
 
         for mini_widget in self.mini_widgets.values():
             if mini_widget.visible:
-                mini_notes_column.expand = True
+                mini_widgets_column.expand = True
                 break
 
         # Spacing container to give some space between our body and mini notes
-        mini_notes_row = ft.Row(expand=True)
+        mini_widgets_row = ft.Row(expand=True)
 
         # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
         spacing_container = ft.Container(expand=True, ignore_interactions=True)
-        mini_notes_row.controls.append(spacing_container)
-        mini_notes_row.controls.append(spacing_container)
+        mini_widgets_row.controls.append(spacing_container)
+        mini_widgets_row.controls.append(spacing_container)
 
-        mini_notes_row.controls.append(mini_notes_column)
+        mini_widgets_row.controls.append(mini_widgets_column)
 
         # Add the column on top of our stack
-        self.stack.controls.append(mini_notes_row)
+        self.stack.controls.append(mini_widgets_row)
 
 
         # Our tab content holds the stack that holds our body

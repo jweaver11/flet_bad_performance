@@ -70,6 +70,7 @@ def arrange_widgets(story: Story):
                     # Update pin location and give it a new reference in new main pin location
                     obj.data['pin_location'] = "main"   
                     update_pin_location(obj) 
+                    obj.save_dict()
 
                     # Remove the old reference from the old pin
                     story.workspace.top_pin.controls.remove(obj)  # Remove from top pin
@@ -83,6 +84,7 @@ def arrange_widgets(story: Story):
 
                     obj.data['pin_location'] = "main"
                     update_pin_location(obj) 
+                    obj.save_dict()
 
                     story.workspace.left_pin.controls.remove(obj)
                     
@@ -94,6 +96,7 @@ def arrange_widgets(story: Story):
 
                     obj.data['pin_location'] = "main"
                     update_pin_location(obj) 
+                    obj.save_dict()
 
                     story.workspace.right_pin.controls.remove(obj)
                     
@@ -104,6 +107,7 @@ def arrange_widgets(story: Story):
                 if obj.visible == True and hasattr(obj, 'data') and obj.data:
                     obj.data['pin_location'] = "main"
                     update_pin_location(obj) 
+                    obj.save_dict()
 
                     story.workspace.bottom_pin.controls.remove(obj)
                     

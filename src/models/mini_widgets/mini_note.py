@@ -9,6 +9,11 @@ from models.widget import Widget
 class MiniNote(MiniWidget):
     # Constructor
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+        # Check if we're loading a mini note or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
 
         # Initialize our mini widget owner class
         super().__init__(
@@ -18,9 +23,11 @@ class MiniNote(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         )
 
-        self.data['tag'] = "mini_note"  # Tag to identify this as a mini note
-
-        self.save_dict()
+        # If our character is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_mini_note_data()  # Create data defaults for each chapter widget
+            self.save_dict()    # Save our data to the file
+            
 
         self.title_control = ft.TextField(
             value=self.title,
@@ -36,6 +43,20 @@ class MiniNote(MiniWidget):
 
         # Load our widget UI on start after we have loaded our data
         self.reload_mini_widget()
+
+    def create_default_mini_note_data(self) -> dict:
+        ''' Gives default data for all mini note objects and alters the tag '''
+
+        default_mini_note_data = {
+            'tag': "mini_note",  # Tag to identify this as a mini note
+            'content': "",    # Content of our mini note
+        }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_mini_note_data)
+        return
+
+
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):

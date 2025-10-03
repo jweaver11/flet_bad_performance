@@ -66,7 +66,9 @@ class Plotline(Widget):
 
         # Default data for our plotline widget
         default_plotline_data = {
+            
             'pin_location': "bottom",
+
             # Start and end date of entire story
             'story_start_date': "", 
             'story_end_date': "",
@@ -85,10 +87,10 @@ class Plotline(Widget):
 
     # Function to load our timline objects from the data 
     def load_timelines(self):
+        ''' Loads our timelines from our timelines directory inside our plotline directory '''
 
         from models.timeline import Timeline
-
-        # Load our PLOTLINES from the plotlines directory
+        # Load our timelines from our timeline directory
         timelines_directory_path = os.path.join(self.data['directory_path'], "timelines")
         
         try: 
@@ -108,11 +110,15 @@ class Plotline(Widget):
                 timeline_title = timeline_data.get("title", file_path.replace(".json", ""))
 
                 # Create using the object (not the function) so we can pass in data
-                self.timelines[timeline_title] = Timeline(timeline_title, timelines_directory_path, timeline_data)              
+                self.timelines[timeline_title] = Timeline(timeline_title, timelines_directory_path, self.p, self.story, timeline_data)              
                             
         # Handle errors if the path is wrong
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading any timelines from {timelines_directory_path}: {e}")
+
+        for timeline in self.timelines.values():
+            for arc in timeline.arcs.values():
+                self.mini_widgets[arc.title] = arc
 
 
 
@@ -136,7 +142,7 @@ class Plotline(Widget):
         directory_path = os.path.join(self.story.data['plotline_directory_path'], "timelines")
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
-        self.timelines[title] = Timeline(title, directory_path, data=None)
+        self.timelines[title] = Timeline(title=title, directory_path=directory_path, page=self.p, story=self.story, data=None)
         
         self.reload_widget()  # Reload our widget to show the new timeline
 
@@ -146,8 +152,6 @@ class Plotline(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
-        plotline_filters = []
-
         # When hovering over timeline or branch, make slightly brighter and thicker. Right clicking allows
         # adding/removing pp, branches, arcs, timeskips, etc.
         # Clicking brings up a mini-menu in the plotline widget to show details and allow editing
@@ -156,6 +160,10 @@ class Plotline(Widget):
         # Timeline object andd all its children are gesture detectors
         # Have a show/hide filters button in top left of widget
         # Show zoomed in time dates when zoomed in??
+
+        self.stack.controls.clear()
+
+        plotline_filters = []
 
         # Header that shows our filter options, as well as what plotlines are visible
         # Add reset zoom button later
@@ -214,6 +222,10 @@ class Plotline(Widget):
         for timeline in self.timelines.values():
             if timeline.visible:
                 timelines.controls.append(timeline)
+
+            for arc in timeline.arcs.values():
+                if arc.visible:
+                    timelines.controls.append(arc.timeline_control)
                 
 
         timelines.controls.append(ft.Container(expand=True))
@@ -248,9 +260,36 @@ class Plotline(Widget):
             controls=[header, body]
         )
 
+        self.stack.controls.append(column)
+
+        # Column that holds our mini note controls on the right 1/3 of the widget
+        mini_widgets_column = ft.Column(
+            spacing=6,
+            controls=self.mini_widgets.values(),   # They'll only be rendered if visible
+        )
+
+        for mini_widget in self.mini_widgets.values():
+            if mini_widget.visible:
+                mini_widgets_column.expand = True
+                break
+
+        # Spacing container to give some space between our body and mini notes
+        mini_widgets_row = ft.Row(expand=True)
+
+        # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
+        spacing_container = ft.Container(expand=True, ignore_interactions=True)
+        mini_widgets_row.controls.append(spacing_container)
+        mini_widgets_row.controls.append(spacing_container)
+
+        mini_widgets_row.controls.append(mini_widgets_column)
+
+        # Add the column on top of our stack
+        self.stack.controls.append(mini_widgets_row)
+
 
         # our tab.content is the column we build above.
-        self.tab.content=column   # We add this in combo with our 'tabs' later
+        # Our tab content holds the stack that holds our body
+        self.tab.content=self.stack  # We add this in combo with our 'tabs' later
 
         # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
         content = ft.Tabs(
@@ -265,5 +304,7 @@ class Plotline(Widget):
         
         # Content of our widget (ft.Container) is our created tabs content
         self.content = content
+        
+        self.p.update()
         
         

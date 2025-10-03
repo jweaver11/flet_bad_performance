@@ -1,13 +1,14 @@
 import json
 import os
 import flet as ft
+from models.story import Story
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
 class Timeline(ft.GestureDetector):
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
-    def __init__(self, title: str, directory_path: str, data: dict=None):
+    def __init__(self, title: str, directory_path: str, page: ft.Page, story: Story, data: dict=None):
 
         # Initialize our flet control. Theres problems with the data if this is not done first
         super().__init__(
@@ -16,7 +17,10 @@ class Timeline(ft.GestureDetector):
 
         self.title = title  # Set our title
         self.directory_path = directory_path  # Path to our plotline json file
+        self.p = page  # Page reference for convenience
+        self.story = story  # Story object that contains this timeline
         self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
+
 
         # Create our live object dictionaries
         self.branches: dict = {}
@@ -105,7 +109,7 @@ class Timeline(ft.GestureDetector):
 
         # Looks up our branches in our data, then passes in that data to create a live object
         for key, data in self.data['branches'].items():
-            self.branches[key] = Branch(title=key, data=data)
+            self.branches[key] = Branch(title=key, owner=self, page=self.p, data=data)
     
     # Called in the constructor
     def load_plot_points(self):
@@ -114,7 +118,7 @@ class Timeline(ft.GestureDetector):
 
         # Looks up our plotpoints in our data, then passes in that data to create a live object
         for key, data in self.data['plot_points'].items():
-            self.plot_points[key] = Plot_Point(title=key, data=data)
+            self.plot_points[key] = Plot_Point(title=key, owner=self, page=self.p, data=data)
         
     
     # Called in the constructor 
@@ -124,7 +128,7 @@ class Timeline(ft.GestureDetector):
         # Looks up our arcs in our data, then passes in that data to create a live object
         for key, data in self.data['arcs'].items():
             from models.mini_widgets.plotline.arc import Arc
-            self.arcs[key] = Arc(title=key, data=data)
+            self.arcs[key] = Arc(title=key, owner=self, page=self.p, data=data)
     
     # Called in the constructor
     def load_time_skips(self):
@@ -132,7 +136,7 @@ class Timeline(ft.GestureDetector):
 
         for key, data in self.data['time_skips'].items():
             from models.mini_widgets.plotline.time_skip import Time_Skip
-            self.time_skips[key] = Time_Skip(title=key, data=data)
+            self.time_skips[key] = Time_Skip(title=key, owner=self, page=self.p, data=data)
 
         return self.time_skips
     
@@ -140,7 +144,7 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new branch inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.branch import Branch
 
-        self.branches[title] = Branch(title=title)
+        self.branches[title] = Branch(title=title, owner=self, page=self.p)
         self.data['branches'][title] = self.branches[title].data
 
         self.save_dict()
@@ -150,7 +154,7 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.plot_point import Plot_Point
 
-        self.plot_points[title] = Plot_Point(title=title)
+        self.plot_points[title] = Plot_Point(title=title, owner=self, page=self.p)
         self.data['plot_points'][title] = self.plot_points[title].data
 
         self.save_dict()
@@ -160,7 +164,7 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.arc import Arc
 
-        self.arcs[title] = Arc(title=title)
+        self.arcs[title] = Arc(title=title, owner=self, page=self.p)
         self.data['arcs'][title] = self.arcs[title].data
 
         self.save_dict()
@@ -171,7 +175,7 @@ class Timeline(ft.GestureDetector):
 
         from models.mini_widgets.plotline.time_skip import Time_Skip
 
-        self.time_skips[title] = Time_Skip(title=title)
+        self.time_skips[title] = Time_Skip(title=title, owner=self, page=self.p)
         self.data['time_skips'][title] = self.time_skips[title].data
 
         self.save_dict()

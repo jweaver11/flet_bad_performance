@@ -1,7 +1,4 @@
 import flet as ft
-from models.story import Story
-import os
-import json
 from models.widget import Widget
 
 
@@ -9,7 +6,7 @@ from models.widget import Widget
 # These child objects appear inside of another widget, (from right or left) to show more detail and child information
 # Example, clicking a plotpoint, arc, etc. on a timeline brings up a mini widget
 class MiniWidget(ft.Container):
-    # Constructor
+    # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
 
         super().__init__(
@@ -82,6 +79,8 @@ class MiniWidget(ft.Container):
     # Called when clicking x to hide the mini note
     def toggle_visibility(self, e):
         ''' Shows or hides our mini widget, depending on current state '''
+
+        print(f"Toggling visibility for mini widget: {self.title}")
 
         self.data['visible'] = not self.data['visible']
         self.visible = self.data['visible']

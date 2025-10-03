@@ -9,10 +9,11 @@ from models.story import Story
 import os
 import json
 
+# TODO Show widget outline when clicked on rail as a pseudo 'focus'
 
 class Widget(ft.Container):
-    # Constructor
-    def __init__(self, title: str, tag: str, p: ft.Page, directory_path: str, story: Story, data: dict = None):
+    # Constructor. all widgets require a title, tag, page reference, directory path, and story reference
+    def __init__(self, title: str, tag: str, p: ft.Page, directory_path: str, story: Story, data: dict=None):
 
         # set uniformity for all widgets
         super().__init__(
