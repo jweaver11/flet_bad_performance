@@ -27,7 +27,6 @@ class Character(Widget):
         # Parent class constructor
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
-            tag = "character",  # Tag for logic, for routing and for import/export
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             directory_path = directory_path,    # Directory where our json file is stored
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
@@ -50,10 +49,16 @@ class Character(Widget):
     def create_default_character_data(self) -> dict:
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
         # Default data for new characters
         default_character_data = {
     
             'pin_location': "left",     # Overide default pin location of main
+            'tag': "character",  
 
             'tab_color': "primary",  # Initial tab color matches color scheme
             'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A

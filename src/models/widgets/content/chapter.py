@@ -17,7 +17,6 @@ class Chapter(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "chapter",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
@@ -36,9 +35,17 @@ class Chapter(Widget):
     # Called when creating new chapter widget, not when loading one
     def create_default_content_data(self) -> dict:
         ''' Returns default data all chapter widgets will have '''
+
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
         
         # Default data for new chapters
         default_chapter_data = {
+            'tag': "chapter",
+            'visible': True,    # If this chapter is visible in the UI or not
+
             'content': "",    # Content of our chapter
         }
 
@@ -68,21 +75,21 @@ class Chapter(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
-        self.stack.controls.clear()
+        self.body_content_stack.controls.clear()
 
         # Our column that will display our header filters and body of our widget
         body = ft.Column([
             ft.Text(f"hello from: {self.title}"),
             ft.TextField(
                 label="Create Mini Note",
-                hint_text="Type your note here...",
+                hint_text="Mini Note Title",
                 expand=True,
                 on_submit=self.submit_mini_note,
             )
         ])
 
         # Our stack holds the body under the tab, so put it there
-        self.stack.controls.append(body)
+        self.body_content_stack.controls.append(body)
 
         # Column that holds our mini note controls on the right 1/3 of the widget
         mini_widgets_column = ft.Column(
@@ -108,12 +115,11 @@ class Chapter(Widget):
         mini_widgets_row.controls.append(mini_widgets_column)
 
         # Add the column on top of our stack
-        self.stack.controls.append(mini_widgets_row)
+        self.body_content_stack.controls.append(mini_widgets_row)
 
 
         # Our tab content holds the stack that holds our body
-        self.tab.content=self.stack  # We add this in combo with our 'tabs' later
-
+        self.tab.content=self.body_content_stack  # We add this in combo with our 'tabs' later
 
         # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
         content = ft.Tabs(

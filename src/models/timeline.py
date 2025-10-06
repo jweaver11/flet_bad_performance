@@ -163,15 +163,16 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.arc import Arc
 
-        self.story.plotline.mini_widgets.append(Arc(title=title, owner=self, page=self.p, data=None))
-
         self.arcs[title] = Arc(title=title, owner=self, page=self.p)
+        self.story.plotline.mini_widgets.append(self.arcs[title])
+
         self.data['arcs'][title] = self.arcs[title].data
 
         self.save_dict()
 
         self.reload_timeline()
-        self.story.plotline.reload_widget()
+
+        self.story.plotline.reload_widget()  # New arc needs to be added to mini widgets in the UI, so we reload the widget
 
     # Called when creating a new timeskip
     def create_time_skip(self, title: str):

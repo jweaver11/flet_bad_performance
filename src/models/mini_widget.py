@@ -66,8 +66,9 @@ class MiniWidget(ft.Container):
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
             'title': self.title,
-            'tag': "",
+            'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+            'is_selected': True, # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
             'content': "",    # Content of our mini widget
         }
 

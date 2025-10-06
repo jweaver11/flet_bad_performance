@@ -21,7 +21,6 @@ class Plotline(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "plotline",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
@@ -64,10 +63,16 @@ class Plotline(Widget):
     def create_default_plotline_data(self) -> dict:
         ''' Loads our plotline data and timelines data from our seperate timelines files inside the timelines directory '''
 
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
         # Default data for our plotline widget
         default_plotline_data = {
             
             'pin_location': "bottom",
+            'tag': "plotline",  
 
             # Start and end date of entire story
             'story_start_date': "", 
@@ -136,8 +141,6 @@ class Plotline(Widget):
                 for arc in timeline.arcs.values():
                     self.mini_widgets.append(arc)
 
-            print(self.mini_widgets)
-
         load_mini_widgets()
 
 
@@ -172,6 +175,7 @@ class Plotline(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
+        # TODO:
         # When hovering over timeline or branch, make slightly brighter and thicker. Right clicking allows
         # adding/removing pp, branches, arcs, timeskips, etc.
         # Clicking brings up a mini-menu in the plotline widget to show details and allow editing
@@ -181,8 +185,10 @@ class Plotline(Widget):
         # Have a show/hide filters button in top left of widget
         # Show zoomed in time dates when zoomed in??
 
+        # TODO If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
+
         # Unique widget, has its child timelines hold its mini widgets
-        self.stack.controls.clear()
+        self.body_content_stack.controls.clear()
 
         plotline_filters = []
 
@@ -281,7 +287,7 @@ class Plotline(Widget):
             controls=[header, body]
         )
 
-        self.stack.controls.append(column)
+        self.body_content_stack.controls.append(column)
 
         # Column that holds our mini widget controls on the right 1/3 of the widget
         mini_widgets_column = ft.Column(
@@ -290,11 +296,6 @@ class Plotline(Widget):
             #controls=self.mini_widgets.values(),   # They'll only be rendered if visible
             controls=self.mini_widgets,   # They'll only be rendered if visible,
         )
-
-        # TODO 
-        # Iterate through all values in the mini widgets dict, not the keys
-
-
 
         
         #for mini_widget in self.mini_widgets.values():
@@ -314,12 +315,12 @@ class Plotline(Widget):
         mini_widgets_row.controls.append(mini_widgets_column)
 
         # Add the column on top of our stack
-        self.stack.controls.append(mini_widgets_row)
+        self.body_content_stack.controls.append(mini_widgets_row)
 
 
         # our tab.content is the column we build above.
         # Our tab content holds the stack that holds our body
-        self.tab.content=self.stack  # We add this in combo with our 'tabs' later
+        self.tab.content=self.body_content_stack  # We add this in combo with our 'tabs' later
 
         # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
         content = ft.Tabs(
