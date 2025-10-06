@@ -19,7 +19,7 @@ class Arc(MiniWidget):
             owner=owner,      # owner widget that holds us
             page=page,          # Page reference
             data=data,          # Data if we're loading an existing mini note, otherwise blank
-        )
+        ) 
 
         # If our character is new and not loaded, give it default data
         if not loaded:
@@ -57,7 +57,7 @@ class Arc(MiniWidget):
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file '''
 
-        if self.owner.data is None:
+        if self.owner.data is None or not isinstance(self.owner.data, dict):
             print("Error: owner data is None, cannot save mini widget data")
             return
 

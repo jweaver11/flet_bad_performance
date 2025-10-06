@@ -31,7 +31,7 @@ class Timeline(ft.GestureDetector):
 
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
+            self.create_default_data()  # Create default data if none was passed in
             self.save_dict()
         
         # Load the rest of our data from the file
@@ -66,7 +66,12 @@ class Timeline(ft.GestureDetector):
     def create_default_data(self) -> dict:
         ''' Returns a default dict data sctructure for a new timeline '''
 
-        return {
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
+        default_timeline_data = {
             'title': self.title,
             'directory_path': self.directory_path,   # was timeline_file_path
             'tag': "timeline",
@@ -97,6 +102,10 @@ class Timeline(ft.GestureDetector):
             # Mark part of timeline as written/drawn
             
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_timeline_data)  
+        return
     
     # Called in the constructor
     def load_branches(self):
@@ -150,8 +159,10 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.plot_point import Plot_Point
 
-        self.plot_points[title] = Plot_Point(title=title, owner=self, page=self.p)
-        self.data['plot_points'][title] = self.plot_points[title].data
+        new_plot_point = Plot_Point(title=title, owner=self, page=self.p, data=None)
+
+        self.plot_points[title] = new_plot_point
+        self.story.plotline.mini_widgets.append(self.plot_points[title])
 
         self.save_dict()
 
@@ -163,17 +174,18 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.arc import Arc
 
-        
+        # Create the new arc
+        new_arc = Arc(title=title, owner=self, page=self.p, data=None)
 
-        self.story.plotline.mini_widgets.append(Arc(title=title, owner=self, page=self.p))
+        # Add our arc to our arcs dict and to the plotline mini widgets list
+        self.arcs[title] = new_arc
+        self.story.plotline.mini_widgets.append(self.arcs[title]) 
 
-        self.arcs[title] = Arc(title=title, owner=self, page=self.p, data=None)
+        # Update our data to match
         self.save_dict()
 
-        #self.story.plotline.mini_widgets.append(self.arcs[title])
-
+        # Apply our changes in the UI
         self.reload_timeline()
-
         self.story.plotline.reload_widget()  # New arc needs to be added to mini widgets in the UI, so we reload the widget
 
     # Called when creating a new timeskip

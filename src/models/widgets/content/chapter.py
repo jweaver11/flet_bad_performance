@@ -25,7 +25,7 @@ class Chapter(Widget):
 
         # If our character is new and not loaded, give it default data
         if not loaded:
-            self.create_default_content_data()  # Create data defaults for each chapter widget
+            self.create_default_chapter_data()  # Create data defaults for each chapter widget
             self.save_dict()    # Save our data to the file
 
         # Load our widget UI on start after we have loaded our data
@@ -33,7 +33,7 @@ class Chapter(Widget):
 
 
     # Called when creating new chapter widget, not when loading one
-    def create_default_content_data(self) -> dict:
+    def create_default_chapter_data(self) -> dict:
         ''' Returns default data all chapter widgets will have '''
 
         # Error catching
