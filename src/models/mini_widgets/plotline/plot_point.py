@@ -5,7 +5,7 @@ from models.widget import Widget
 
 # Data class for plot points on a timeline - change to branch as well later??
 class Plot_Point(MiniWidget):
-# Constructor. Requires title, owner widget, page reference, and optional data dictionary
+    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
         # Check if we're loading an arc or creating a new one
         if data is None:
@@ -24,12 +24,11 @@ class Plot_Point(MiniWidget):
         # If our character is new and not loaded, give it default data
         if not loaded:
             self.create_default_plot_point_data()  # Create data defaults for each chapter widget
-            self.save_dict()    # Save our data to the file
 
         self.reload_mini_widget()
 
     
-    # Have to save to plotline for mini widgets to function. 
+    # Called when saving our mini widget data
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file '''
 
@@ -62,8 +61,9 @@ class Plot_Point(MiniWidget):
 
         }
 
-        # Update existing data with any new default fields we added
-        self.data.update(default_plot_point_data)  
+        # Merge default data with existing data, preserving any existing values
+        self.data = {**default_plot_point_data, **self.data} 
+        self.save_dict()    # Save our data to the file
         return
 
 

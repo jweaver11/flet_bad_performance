@@ -69,11 +69,29 @@ class MiniWidget(ft.Container):
             'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
             'is_selected': True, # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
-            'content': "",    # Content of our mini widget
         }
 
         # Update existing data with any new default fields we added
         self.data.update(default_data)
+        return
+    
+    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
+    def repair_data(self, tag: str):
+        ''' Repairs any missing data fields in existing mini widgets '''
+
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        required_data = {
+            'title': self.title,    # Fix our title if broke
+            'tag': tag,         # Fix our tag so we know what to load
+            'visible': self.visible,        # Keep our current visibility state
+            'is_selected': False,        # Just assume we're not selected
+        }
+
+        # Update our data with any missing fields
+        self.data.update(required_data)
+        self.save_dict()
         return
 
     # Called when clicking x to hide the mini note

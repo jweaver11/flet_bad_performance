@@ -1,25 +1,79 @@
 import flet as ft
+from models.mini_widget import MiniWidget
+from models.widget import Widget
 
-class Time_Skip(ft.GestureDetector):
 
-    def __init__(self, title: str, data: dict=None):
+class Time_Skip(MiniWidget):
+
+    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
+    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+        # Check if we're loading an arc or creating a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # Parent constructor
         super().__init__(
-            on_enter=self.on_hover,
-        )
+            title=title,        # Title of our mini note
+            owner=owner,      # owner widget that holds us
+            page=page,          # Page reference
+            data=data,          # Data if we're loading an existing mini note, otherwise blank
+        ) 
 
-        self.title = title
-        self.data = data    # Optional, if none given, will be created with default values
+        # If our character is new and not loaded, give it default data
+        if not loaded:
+            self.create_default_time_skip_data()  # Create data defaults for each chapter widget
 
-        if self.data is None:
-            self.data = self.create_default_data()
+        self.reload_mini_widget()
+
+    # Called when saving our mini widget data
+    def save_dict(self):
+        ''' Saves our current data to the OWNERS json file '''
+
+        if self.owner.data is None or not isinstance(self.owner.data, dict):
+            print("Error: owner data is None, cannot save mini widget data")
+            return
+
+        # Grab our owner object, and update their data pertaining to this mini widget
+        self.owner.data['time_skips'][self.title] = self.data
+
+        # Save our owners json file to match their data
+        self.owner.save_dict()
 
         
-    def create_default_data(self):
-        return {
+    def create_default_time_skip_data(self):
+
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+            
+        default_time_skip_data = {
             'title': self.title,
+            'tag': "time_skip",
             'start_date': "",
             'end_date': "",
         }
+
+        # Merge default data with existing data, preserving any existing values
+        self.data = {**default_time_skip_data, **self.data}
+        self.save_dict()    # Save our data to the file
+        return
+
     
     def on_hover(self, e: ft.HoverEvent):
         print(e)
+
+
+    def reload_mini_widget(self):
+
+        self.content = ft.Column(
+            [
+                self.title_control,
+                self.content_control,
+            ],
+            expand=True,
+        )
+
+        self.p.update()

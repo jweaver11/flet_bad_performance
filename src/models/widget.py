@@ -33,7 +33,6 @@ class Widget(ft.Container):
         # If this is a new widget (Not loaded), give it default data all widgets need
         if self.data is None:
             self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()    # Save our data to the file if the object is new
 
         # Apply our visibility
         self.visible = self.data['visible'] 
@@ -89,7 +88,7 @@ class Widget(ft.Container):
             'title': self.title,
             'directory_path': self.directory_path,
             'tag': "widget",    # Default tag, should be overwritten by child classes
-            'pin_location': "main",  
+            'pin_location': "main",     # Stick us in the main pin area by default
             'visible': True,    
             'mini_widgets': {},
             'tab_title_color': "primary",
@@ -97,6 +96,34 @@ class Widget(ft.Container):
 
         # Update existing data with any new default fields we added
         self.data.update(default_data)
+        self.save_dict()
+        return
+    
+    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
+    def repair_data(self, tag: str):
+        ''' Repairs any missing data fields in existing mini widgets '''
+
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        required_data = {
+            'title': self.title,        # Makes sure our title exists and matches
+            'directory_path': self.directory_path,      # Fix broken directory paths
+            'tag': tag,         # Fix our tag so we know what to load
+            'pin_location': "main",     # Just put us in the main pin if we're broken
+            'visible': self.visible,        # Keep our visibility state
+            'mini_widgets': {},
+            'tab_title_color': "primary",
+        }
+
+        # Update our data with any missing fields
+        self.data.update(required_data)
+        self.save_dict()
+
+        # Since we just deleted our mini widgets data, we need them all to save again
+        for mini_widget in self.mini_widgets:
+            mini_widget.save_dict()
+
         return
     
     # Called in a childs constructor to load any mini widgets that it may have

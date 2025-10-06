@@ -24,7 +24,6 @@ class Arc(MiniWidget):
         # If our character is new and not loaded, give it default data
         if not loaded:
             self.create_default_arc_data()  # Create data defaults for each chapter widget
-            self.save_dict()    # Save our data to the file
 
         # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget
         self.timeline_control = ft.GestureDetector(
@@ -53,7 +52,7 @@ class Arc(MiniWidget):
 
         self.reload_mini_widget()
 
-    # Have to save to plotline for mini widgets to function. 
+    # Called when saving our mini widget data
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file '''
 
@@ -84,8 +83,9 @@ class Arc(MiniWidget):
             'related_items': [],
         }
 
-        # Update existing data with any new default fields we added
-        self.data.update(default_arc_data)
+        # Merge default data with existing data, preserving any existing values
+        self.data = {**default_arc_data, **self.data}
+        self.save_dict()    # Save our data to the file
         return
 
     def on_hover(self, e: ft.HoverEvent):

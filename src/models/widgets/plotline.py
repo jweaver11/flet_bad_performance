@@ -138,8 +138,18 @@ class Plotline(Widget):
         def load_mini_widgets():
 
             for timeline in self.timelines.values():
+
+                for branch in timeline.branches.values():
+                    self.mini_widgets.append(branch)
+
+                for plot_point in timeline.plot_points.values():
+                    self.mini_widgets.append(plot_point)
+
                 for arc in timeline.arcs.values():
                     self.mini_widgets.append(arc)
+
+                for time_skip in timeline.time_skips.values():
+                    self.mini_widgets.append(time_skip)
 
         load_mini_widgets()
 

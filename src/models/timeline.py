@@ -32,7 +32,6 @@ class Timeline(ft.GestureDetector):
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
             self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()
         
         # Load the rest of our data from the file
         self.load_branches()
@@ -103,8 +102,9 @@ class Timeline(ft.GestureDetector):
             
         }
 
-        # Update existing data with any new default fields we added
-        self.data.update(default_timeline_data)  
+        # Merge default data with existing data, preserving any existing values
+        self.data = {**default_timeline_data, **self.data}
+        self.save_dict()
         return
     
     # Called in the constructor
@@ -129,10 +129,10 @@ class Timeline(ft.GestureDetector):
     # Called in the constructor 
     def load_arcs(self):
         ''' Loads arcs from data into self.arcs  '''
+        from models.mini_widgets.plotline.arc import Arc
         
         # Looks up our arcs in our data, then passes in that data to create a live object
         for key, data in self.data['arcs'].items():
-            from models.mini_widgets.plotline.arc import Arc
             self.arcs[key] = Arc(title=key, owner=self, page=self.p, data=data)
     
     # Called in the constructor
