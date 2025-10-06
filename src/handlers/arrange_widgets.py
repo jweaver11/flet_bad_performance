@@ -14,6 +14,7 @@ def arrange_widgets(story: Story):
         if not hasattr(obj, 'data') or not obj.data:
             return  # Skip objects without data
         
+        # TODO: Check pin location exists, this will error rn if they delete this in the datas
         pin_location = obj.data['pin_location']
 
         # Appends the new pointer to our correct pin location

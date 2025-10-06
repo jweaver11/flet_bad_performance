@@ -38,11 +38,17 @@ class Widget(ft.Container):
         # Apply our visibility
         self.visible = self.data['visible'] 
 
-        # UI elements all widgets have for their tabs and content
+        # UI ELEMENTS - Tab
+        self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
+        self.tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
+        self.tab_title_color: ft.Colors.PRIMARY = "primary"     # The color of the title in our tab and the divider under it
         self.hide_tab_icon_button = ft.IconButton()    # 'X' icon button to hide widget from workspace'
-        self.tab_title_color = ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
-        self.tab = ft.Tab()  # Tab that holds our title and hide icon
-        self.body_content_stack = ft.Stack()  # Stack that holds our content for our widget, and allows us to add our mini notes overtop
+
+        # UI ELEMENTS - Body
+        self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
+        self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
+        self.mini_widgets_container = ft.Container(expand=1)  # Control to display our mini widgets. Nests inside of self.content_row
+        self.mini_widgets_column = ft.Column(spacing=4)  # Column for our mini widgets on the side of our main content. Nests inside of self.mini_widgets_container
 
         # Load any mini widgets this object may have
         self.load_mini_widgets()
@@ -98,7 +104,6 @@ class Widget(ft.Container):
         ''' Checks all the items under the data['mini_widgets'] dictionary and creates the appropriate mini widget objects '''
 
         from models.mini_widgets.mini_note import MiniNote
-        #from models.mini_widgets.plotline import arcs...
 
         # Error handling
         if 'mini_widgets' not in self.data:
@@ -112,6 +117,16 @@ class Widget(ft.Container):
             if mini_widget['tag'] == "mini_note":
                 #self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
                 self.mini_widgets.append(MiniNote(title=key, owner=self, page=self.p, data=mini_widget))
+
+    def create_mini_note(self, title: str):
+        ''' Creates a mini note inside an image or chapter '''
+
+        from models.mini_widgets.mini_note import MiniNote
+
+        #self.mini_widgets[title] = MiniNote(title=title, owner=self, page=self.p, data=None)
+        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
+
+        self.reload_widget()
 
 
     # Called when a draggable starts dragging.
@@ -154,28 +169,29 @@ class Widget(ft.Container):
         else:
             story.workspace.reload_workspace(self.p, story)
 
-    
-
+    # Called when creating a new mini note inside a widget
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
 
         from models.mini_widgets.mini_note import MiniNote
 
-        # Create our mini note object
-        mini_note = MiniNote(
-            title=title,
-            page=self.p,
-            story=self.story,
-        )
+        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
 
-        # Add to our UI
-        self.p.update()
-
-        return mini_note
+        return
 
     # Called at end of constructor
     def reload_tab(self, story: Story):
         ''' Creates our tab for our widget that has the title and hide icon '''
+
+        # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
+        self.tabs = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            #divider_color=ft.Colors.TRANSPARENT,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+        )
 
         # Our icon button that will hide the widget when clicked in the workspace
         self.hide_tab_icon_button = ft.IconButton(    # Icon to hide the tab from the workspace area
@@ -193,7 +209,7 @@ class Widget(ft.Container):
         self.tab = ft.Tab(
 
             # Initialize the content. This will be our content of the body of the widget
-            content=ft.Stack(), 
+            #content=ft.Stack(), 
 
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
             tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations

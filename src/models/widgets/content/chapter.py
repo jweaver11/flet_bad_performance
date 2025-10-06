@@ -58,16 +58,6 @@ class Chapter(Widget):
         title = e.control.value
         self.create_mini_note(title)
         e.control.value = ""
-        self.p.update()
-
-    def create_mini_note(self, title: str):
-        ''' Creates a mini note inside an image or chapter '''
-
-        from models.mini_widgets.mini_note import MiniNote
-
-        #self.mini_widgets[title] = MiniNote(title=title, owner=self, page=self.p, data=None)
-        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
-
         self.reload_widget()
 
 
@@ -75,66 +65,49 @@ class Chapter(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
-        self.body_content_stack.controls.clear()
+        # Set the mini widgets visibility to false so we can check later if we want to add it to the page
+        self.mini_widgets_container.visible = False
+        self.content_row.controls.clear()   # Clear our content row so we can rebuild it
 
-        # Our column that will display our header filters and body of our widget
-        body = ft.Column([
-            ft.Text(f"hello from: {self.title}"),
-            ft.TextField(
-                label="Create Mini Note",
-                hint_text="Mini Note Title",
-                expand=True,
-                on_submit=self.submit_mini_note,
-            )
-        ])
-
-        # Our stack holds the body under the tab, so put it there
-        self.body_content_stack.controls.append(body)
-
-        # Column that holds our mini note controls on the right 1/3 of the widget
-        mini_widgets_column = ft.Column(
-            spacing=6,
-            #controls=self.mini_widgets.values(),   # They'll only be rendered if visible
-            controls=self.mini_widgets,   # They'll only be rendered if visible,
+        # BUILDING BODY - the inside the body container of our widget
+        self.body_container.content = ft.Column(
+            expand=True,
+            controls=[
+                ft.Text(f"hello from: {self.title}"),
+                ft.TextField(
+                    label="Create Mini Note",
+                    hint_text="Mini Note Title",
+                    expand=True,
+                    on_submit=self.submit_mini_note,
+                )
+            ]
         )
 
-        #for mini_widget in self.mini_widgets.values():
-        for mini_widget in self.mini_widgets:
-            if mini_widget.visible:
-                mini_widgets_column.expand = True
-                break
-
-        # Spacing container to give some space between our body and mini notes
-        mini_widgets_row = ft.Row(expand=True)
-
-        # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
-        spacing_container = ft.Container(expand=True, ignore_interactions=True)
-        mini_widgets_row.controls.append(spacing_container)
-        mini_widgets_row.controls.append(spacing_container)
-
-        mini_widgets_row.controls.append(mini_widgets_column)
-
-        # Add the column on top of our stack
-        self.body_content_stack.controls.append(mini_widgets_row)
+        # Add the body container to our content row
+        self.content_row.controls.append(self.body_container)
 
 
-        # Our tab content holds the stack that holds our body
-        self.tab.content=self.body_content_stack  # We add this in combo with our 'tabs' later
-
-        # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
-        content = ft.Tabs(
-            selected_index=0,
-            animation_duration=0,
-            #divider_color=ft.Colors.TRANSPARENT,
-            padding=ft.padding.all(0),
-            label_padding=ft.padding.all(0),
-            mouse_cursor=ft.MouseCursor.BASIC,
-            tabs=[self.tab]    # Gives our tab control here
-        )
+        # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
+        self.mini_widgets_column.controls = self.mini_widgets   
         
-        # Content of our widget (ft.Container) is our created 'tabs' content
-        self.content = content
+        # Add our column that we build to our mini widgets container
+        self.mini_widgets_container.content = self.mini_widgets_column
 
+        # Check if we are showing any mini widgets. If we are, add the container to our content row
+        for mini_widget in self.mini_widgets_column.controls:
+            # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
+            if mini_widget.visible:
+                self.mini_widgets_container.visible = True
+                self.content_row.controls.append(self.mini_widgets_container)
+                break
+            
+        
+        # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
+        self.tab.content = self.content_row  # We add this in combo with our 'tabs' later
+        
+        # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
+        self.tabs.tabs = [self.tab]
+        self.content = self.tabs
         self.p.update()
 
         

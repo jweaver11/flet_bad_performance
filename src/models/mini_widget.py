@@ -84,7 +84,10 @@ class MiniWidget(ft.Container):
 
         self.data['visible'] = not self.data['visible']
         self.visible = self.data['visible']
+        
         self.save_dict()
         self.p.update()
+
+        print(f"Mini widget: {self.title} visibility is now: {self.visible}")
 
         

@@ -163,12 +163,14 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.arc import Arc
 
-        self.arcs[title] = Arc(title=title, owner=self, page=self.p)
-        self.story.plotline.mini_widgets.append(self.arcs[title])
+        
 
-        self.data['arcs'][title] = self.arcs[title].data
+        self.story.plotline.mini_widgets.append(Arc(title=title, owner=self, page=self.p))
 
+        self.arcs[title] = Arc(title=title, owner=self, page=self.p, data=None)
         self.save_dict()
+
+        #self.story.plotline.mini_widgets.append(self.arcs[title])
 
         self.reload_timeline()
 
