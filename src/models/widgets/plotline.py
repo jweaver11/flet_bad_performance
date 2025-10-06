@@ -127,9 +127,18 @@ class Plotline(Widget):
             #for arc in timeline.arcs.values():
                 #self.mini_widgets[timeline.title]['arcs'][arc.title] = arc
 
-        for timeline in self.timelines.values():
-            for arc in timeline.arcs.values():
-                self.mini_widgets.append(arc)
+        # After our timeline has been created, it will have loaded its branches, plot points, arcs, and timeskips
+        # We take those, and load them into our mini widgets list, since our timeline is not a widget itself
+        # And uses them differently
+        def load_mini_widgets():
+
+            for timeline in self.timelines.values():
+                for arc in timeline.arcs.values():
+                    self.mini_widgets.append(arc)
+
+            print(self.mini_widgets)
+
+        load_mini_widgets()
 
 
 

@@ -29,8 +29,7 @@ class Widget(ft.Container):
         self.story = story  # Reference to our story object that owns this widget
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
 
-        # Declare our mini widgets dictionary
-        #self.mini_widgets = {}
+        # Declare our mini widgets list. Much easier to display the list UI than storing as a live dict
         self.mini_widgets = []
 
         # If this is a new widget (Not loaded), give it default data all widgets need
@@ -77,7 +76,8 @@ class Widget(ft.Container):
         ''' Returns required data all widgets must have '''
 
         # Error catching
-        if self.data is None:
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
             self.data = {}
 
         # Give all widgets their default data
@@ -105,6 +105,8 @@ class Widget(ft.Container):
         if 'mini_widgets' not in self.data:
             self.create_default_data()
 
+        # Loop through our mini widgets items in the dict and load them based on their tag into our mini widgets list
+        # NOTE: Plotlines store data in their timelines files, so they load mini widgets in their own model file
         for key, mini_widget in self.data['mini_widgets'].items():
 
             # Check the tag to see what type of mini widget it is, and create the appropriate object

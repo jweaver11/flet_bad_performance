@@ -1,6 +1,5 @@
 ''' Handler function for arranging our story object (widgets) to their correct pin locations '''
 
-import flet as ft
 from models.story import Story
 
 # Called at the start of the by the 'render_widgets' function.
@@ -59,6 +58,8 @@ def arrange_widgets(story: Story):
     # Called when main pin is empty or has no visible widgets. (May phase out later??)
     def steal_from_other_pins():
         ''' Steals widget one widget from other pin locations and adds it to the main pin location '''
+
+        # TODO Add check that the 'pin_location' exists in the objects data
 
 
         # If pin is NOT empty. Pin's can hold widgets that are not visible, so we check that as well

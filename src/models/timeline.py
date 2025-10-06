@@ -84,17 +84,15 @@ class Timeline(ft.GestureDetector):
 
             'color': "blue",
 
-            'branches': {},   # 'branch_title': {branch object}
+            'branches': {},   # Branches in the timeline used to seperate disconnected story events that could merge seperately
 
-            # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
-            'plot_points': {},      # 'plotpoint_title': {plotpoint object}
+            'plot_points': {},      # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
 
-            # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
-            'arcs': {},     # 'arc_title': {arc object}
+            'arcs': {},     # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
 
             # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
             # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
-            'time_skips': {},    # 'timeskip_title': {timeskip object}
+            'time_skips': {},    
 
             # Mark part of timeline as written/drawn
             
@@ -157,15 +155,23 @@ class Timeline(ft.GestureDetector):
 
         self.save_dict()
 
+        self.reload_timeline()
+        self.story.plotline.reload_widget()
+
     # Called when creating a new arc
     def create_arc(self, title: str):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.arc import Arc
 
+        self.story.plotline.mini_widgets.append(Arc(title=title, owner=self, page=self.p, data=None))
+
         self.arcs[title] = Arc(title=title, owner=self, page=self.p)
         self.data['arcs'][title] = self.arcs[title].data
 
         self.save_dict()
+
+        self.reload_timeline()
+        self.story.plotline.reload_widget()
 
     # Called when creating a new timeskip
     def create_time_skip(self, title: str):
@@ -221,6 +227,9 @@ class Timeline(ft.GestureDetector):
 
     # Called when we need to rebuild out timeline UI
     def reload_timeline(self):
+
+        # We only show branches, arcc, plotpoints, and timeskips using their UI elements, not their mini widget
+
         # Content of our Timeline (Gesture detector)
         self.content = ft.Container(
             margin=ft.margin.only(left=20, right=20),

@@ -38,7 +38,7 @@ class Content_Rail(ft.Container):
                 ft.TextField(
                     label="New Chapter Title",
                     hint_text="put title here dummy",
-                    on_submit=lambda e: self.create_chapter(e.control.value, story)
+                    on_submit=lambda e: self.submit_chapter(e.control.value, story)
                 )
             ]
         )
@@ -54,7 +54,7 @@ class Content_Rail(ft.Container):
         pass
 
     # Called when user creates a new chapter
-    def create_chapter(self, title: str, story: Story):
+    def submit_chapter(self, title: str, story: Story):
         ''' Grabs our story.type object and creates a new chapter directory inside it.
          Chapter directory can contain images, notes, and the text content for the chapter itself '''
         

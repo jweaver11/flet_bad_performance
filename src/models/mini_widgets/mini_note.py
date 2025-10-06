@@ -13,7 +13,7 @@ class MiniNote(MiniWidget):
         else:
             loaded = True
 
-        # Initialize our mini widget owner class
+        # Parent Constructor
         super().__init__(
             title=title,        # Title of our mini note
             owner=owner,      # owner widget that holds us

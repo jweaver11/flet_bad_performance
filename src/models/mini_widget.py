@@ -44,7 +44,7 @@ class MiniWidget(ft.Container):
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file '''
 
-        if self.owner.data is None:
+        if self.owner.data is None or not isinstance(self.data, dict):
             print("Error: owner data is None, cannot save mini widget data")
             return
 
@@ -55,13 +55,12 @@ class MiniWidget(ft.Container):
         self.owner.save_dict()
 
 
-
     # Called at end of constructor
     def create_default_data(self) -> dict:
         ''' Creates default data for the mini widget when no data is passed in '''
 
-        # Catch errors
-        if self.data is None:
+        # Catch errors where data is corrupted or not initialized properly/deleted from the file
+        if self.data is None or not isinstance(self.data, dict):
             self.data = {}
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten

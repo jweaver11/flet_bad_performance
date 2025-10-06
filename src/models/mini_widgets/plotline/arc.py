@@ -26,6 +26,8 @@ class Arc(MiniWidget):
             self.create_default_arc_data()  # Create data defaults for each chapter widget
             self.save_dict()    # Save our data to the file
 
+        #self.visible = self.data.get('visible', True)  # Apply our visibility, default to True if not found
+
         # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget
         self.timeline_control = ft.GestureDetector(
             on_enter=self.on_hover,
@@ -73,6 +75,9 @@ class Arc(MiniWidget):
 
         default_arc_data = {
             'title': self.title,
+            'tag': "arc",
+
+            'visible': True,    
             'description': "",
             'start_date': "",
             'end_date': "",
@@ -93,6 +98,7 @@ class Arc(MiniWidget):
         self.data['description'] = e.control.value
         self.save_dict()
 
+    # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):
         ''' Reloads our mini widget UI based on our data '''
 

@@ -71,7 +71,7 @@ class Timeline_Rail(ft.Container):
     def submit_arc(self, e, story: Story):
         ''' Creates a new arc object on the specified timeline '''
 
-        # Our plotline title is stored in the data, while the new title is from the control value
+        # Our timeline title is stored in the data, while the new title is from the control value
         timeline_title = e.control.data
         arc_title = e.control.value
 
