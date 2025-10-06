@@ -7,7 +7,7 @@ from models.widget import Widget
 class Arc(MiniWidget):
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
-        # Check if we're loading a mini note or creating a new one
+        # Check if we're loading an arc or creating a new one
         if data is None:
             loaded = False
         else:
@@ -25,8 +25,6 @@ class Arc(MiniWidget):
         if not loaded:
             self.create_default_arc_data()  # Create data defaults for each chapter widget
             self.save_dict()    # Save our data to the file
-
-        #self.visible = self.data.get('visible', True)  # Apply our visibility, default to True if not found
 
         # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget
         self.timeline_control = ft.GestureDetector(
@@ -74,10 +72,9 @@ class Arc(MiniWidget):
         ''' Gives default data for all arc objects '''
 
         default_arc_data = {
-            'title': self.title,
+            
             'tag': "arc",
-
-            'visible': True,    
+   
             'description': "",
             'start_date': "",
             'end_date': "",

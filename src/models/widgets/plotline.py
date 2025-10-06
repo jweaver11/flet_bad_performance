@@ -42,7 +42,7 @@ class Plotline(Widget):
         if len(self.timelines) == 0:
             # Create one like this so we don't call reload_widget before our UI elements are defined
             timeline_directory_path = os.path.join(self.directory_path, "timelines")
-            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, page=self.page, story=self.story, data=None)
+            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, page=self.p, story=self.story, data=None)
 
         # Set visibility from our data
         self.visible = self.data['visible']  # If we will show this widget or not

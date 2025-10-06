@@ -99,6 +99,7 @@ class Timeline_Rail(ft.Container):
                 self.reload_rail(story)  # Reload the rail to reflect the change and break the loop
                 break
 
+
     # Reload the rail whenever we need
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
@@ -126,6 +127,11 @@ class Timeline_Rail(ft.Container):
                 ]),
                
                 ft.Container(height=20),
+
+                ft.TextButton(
+                    "Show Plotline Widget", 
+                    on_click=lambda e: story.plotline.toggle_visibility(story),
+                ),
 
                 # Add more controls here as needed
             ]
