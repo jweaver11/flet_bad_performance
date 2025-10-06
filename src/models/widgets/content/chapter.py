@@ -58,7 +58,8 @@ class Chapter(Widget):
 
         from models.mini_widgets.mini_note import MiniNote
 
-        self.mini_widgets[title] = MiniNote(title=title, owner=self, page=self.p, data=None)
+        #self.mini_widgets[title] = MiniNote(title=title, owner=self, page=self.p, data=None)
+        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
 
         self.reload_widget()
 
@@ -86,10 +87,12 @@ class Chapter(Widget):
         # Column that holds our mini note controls on the right 1/3 of the widget
         mini_widgets_column = ft.Column(
             spacing=6,
-            controls=self.mini_widgets.values(),   # They'll only be rendered if visible
+            #controls=self.mini_widgets.values(),   # They'll only be rendered if visible
+            controls=self.mini_widgets,   # They'll only be rendered if visible,
         )
 
-        for mini_widget in self.mini_widgets.values():
+        #for mini_widget in self.mini_widgets.values():
+        for mini_widget in self.mini_widgets:
             if mini_widget.visible:
                 mini_widgets_column.expand = True
                 break

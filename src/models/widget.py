@@ -30,7 +30,8 @@ class Widget(ft.Container):
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
 
         # Declare our mini widgets dictionary
-        self.mini_widgets = {}
+        #self.mini_widgets = {}
+        self.mini_widgets = []
 
         # If this is a new widget (Not loaded), give it default data all widgets need
         if self.data is None:
@@ -108,7 +109,8 @@ class Widget(ft.Container):
 
             # Check the tag to see what type of mini widget it is, and create the appropriate object
             if mini_widget['tag'] == "mini_note":
-                self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
+                #self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
+                self.mini_widgets.append(MiniNote(title=key, owner=self, page=self.p, data=mini_widget))
 
 
     # Called when a draggable starts dragging.

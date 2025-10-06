@@ -116,17 +116,20 @@ class Plotline(Widget):
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading any timelines from {timelines_directory_path}: {e}")
 
-        # After we have loaded our timelines, we steal their mini widgets to show in our plotline.
-        # Timelines r not widgets, so they can't display the mini widgets themselves
-        for timeline in self.timelines.values():
+
+        #for timeline in self.timelines.values():
             # Initialize timeline entry in mini_widgets if it doesn't exist
-            if timeline.title not in self.mini_widgets:
-                self.mini_widgets[timeline.title] = {'arcs': {}}
-            elif 'arcs' not in self.mini_widgets[timeline.title]:
-                self.mini_widgets[timeline.title]['arcs'] = {}
+            #if timeline.title not in self.mini_widgets:
+                #self.mini_widgets[timeline.title] = {'arcs': {}}
+           # elif 'arcs' not in self.mini_widgets[timeline.title]:
+                #self.mini_widgets[timeline.title]['arcs'] = {}
                 
+            #for arc in timeline.arcs.values():
+                #self.mini_widgets[timeline.title]['arcs'][arc.title] = arc
+
+        for timeline in self.timelines.values():
             for arc in timeline.arcs.values():
-                self.mini_widgets[timeline.title]['arcs'][arc.title] = arc
+                self.mini_widgets.append(arc)
 
 
 
@@ -276,11 +279,17 @@ class Plotline(Widget):
             spacing=6,
             expand=True,
             #controls=self.mini_widgets.values(),   # They'll only be rendered if visible
+            controls=self.mini_widgets,   # They'll only be rendered if visible,
         )
 
         # TODO 
         # Iterate through all values in the mini widgets dict, not the keys
-        for mini_widget in self.mini_widgets.values():
+
+
+
+        
+        #for mini_widget in self.mini_widgets.values():
+        for mini_widget in self.mini_widgets:
             if mini_widget.visible:
                 mini_widgets_column.expand = True
                 break

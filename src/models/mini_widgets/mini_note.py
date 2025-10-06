@@ -1,6 +1,4 @@
-# Notes that are displayed inside of other widgets
 import flet as ft
-from models.story import Story
 from models.mini_widget import MiniWidget
 from models.widget import Widget
 
