@@ -29,9 +29,24 @@ class Timeline(ft.GestureDetector):
         self.time_skips: dict = {}
         self.connections: dict = {} # Connect points, arcs, branch, etc.???
 
-        # If no data passed in (Newly created timeline), give it default data
-        if self.data is None:
+        # Check if we loaded our mini widget or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If this is a new mini widget (Not loaded), give it default data all widgets need
+        if not loaded:
             self.create_default_data()  # Create default data if none was passed in
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_timeline_data()
+
+
+        # Apply our visibility
+        self.visible = self.data['visible']
         
         # Load the rest of our data from the file
         self.load_branches()
@@ -105,49 +120,10 @@ class Timeline(ft.GestureDetector):
         self.save_dict()
         return
     
-
-
-
-
-    # TODO: VERIFY DATA INTEGRITY AND HAS REQUIRED widget/mini widget fields to not break
-
-
-
-
-
-
+    # Called to verify loaded data
+    def verify_timeline_data(self):
+        ''' Verify loaded any missing data fields in existing timelines '''
     
-    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
-    def repair_data(self, tag: str):
-        ''' Repairs any missing data fields in existing mini widgets '''
-
-        # Error handling
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        # Make sure our widget has its required data that it needs to function
-        required_data = {
-            'title': self.title,        # Makes sure our title exists and matches
-            'directory_path': self.directory_path,      # Fix broken directory paths
-            'tag': tag,         # Fix our tag so we know what to load
-            'pin_location': "main",     # Just put us in the main pin if we're broken
-            'visible': self.visible,        # Keep our visibility state
-            'mini_widgets': {},     # Resets our mini widgets 
-            'tab_title_color': "primary",       # Default to primary color
-        }
-
-        # Update our data with any missing fields
-        self.data.update(required_data)
-        self.save_dict()
-
-        # Since we just deleted our mini widgets data, we need them all to save again
-        for mini_widget in self.mini_widgets:
-            mini_widget.save_dict()
-
-        # Merge default data with existing data, preserving any existing values
-        #self.data = {**default_timeline_data, **self.data}
-        
-        return
     
     # Called in the constructor
     def load_branches(self):

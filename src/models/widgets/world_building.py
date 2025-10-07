@@ -31,6 +31,14 @@ class World_Building(Widget):
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
             self.verify_world_building_data()
 
+        # World histories
+        self.world_maps = {}
+
+        # TODO: Show timeline that can drag and alter the map landscape based on changes
+            # EXP. City gets destroyed at year 50, that plotpoint would disappear
+
+        self.load_maps()
+
         self.reload_widget()
         
     # Called when new story is created, and no data for our world exists
@@ -45,6 +53,12 @@ class World_Building(Widget):
         # Default data for our world building widget
         default_world_building_data = {
             'tag': "world_building",  
+            'locations': {},
+            'lore': {},
+            'power_systems': {},
+            'social_systems': {},
+            'geography': {},
+            'history': {},
             'content': "",
         }
 
@@ -60,12 +74,26 @@ class World_Building(Widget):
         # Required data for all widgets and their types
         required_data_types = {
             'tag': str,
-            'content': str
+            'content': str,
+            'locations': dict,
+            'lore': dict,
+            'power_systems': dict,
+            'social_systems': dict,
+            'geography': dict,
+            'history': dict,
+            'content': str,
         }
 
         # Defaults we can use for any missing fields
         data_defaults = {
             'tag': "chapter",
+            'content': "",
+            'locations': {},
+            'lore': {},
+            'power_systems': {},
+            'social_systems': {},
+            'geography': {},
+            'history': {},
             'content': "",
         }
 
@@ -79,39 +107,49 @@ class World_Building(Widget):
         # Save our updated data
         self.save_dict()
         return
+    
+    def load_maps(self):
+        pass
 
     def reload_widget(self):
+        ''' Reloads our world building widget '''
+
+        # Worlds are maps in this case
+
+        # World building widget will use an image as a base, and overlay its content on top of that.
+        # Users can choose to create their image or use some default ones
+        # If no image is provided, start with a default circle 
+        # Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
+
+        self.mini_widgets_container.visible = False
+
         # Our column that will display our header filters and body of our widget
-        body = ft.Text(f"hello from: {self.title}")
+        self.body_container.content = ft.Text(f"hello from: {self.title}")
 
 
-        # our tab.content is the column we build above.
-        self.tab.content=body  # We add this in combo with our 'tabs' later
+        # Add the body container to our content row
+        self.content_row.controls.append(self.body_container)
 
-        # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
-        content = ft.Tabs(
-            selected_index=0,
-            animation_duration=0,
-            #divider_color=ft.Colors.TRANSPARENT,
-            padding=ft.padding.all(0),
-            label_padding=ft.padding.all(0),
-            mouse_cursor=ft.MouseCursor.BASIC,
-            tabs=[self.tab]    # Gives our tab control here
-        )
+
+        # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
+        self.mini_widgets_column.controls = self.mini_widgets   
         
-        # Content of our widget (ft.Container) is our created tabs content
-        self.content = content
+        # Add our column that we build to our mini widgets container
+        self.mini_widgets_container.content = self.mini_widgets_column
 
-
-#locations = {}
-#self.lore = {}
-#self.power_systems = {}
-##social_systems = {}
-#self.geography = {}
-
-# Description of world
-# Power systems (if any)
-# Social systems
-# Geography
-# History
-# ...
+        # Check if we are showing any mini widgets. If we are, add the container to our content row
+        for mini_widget in self.mini_widgets_column.controls:
+            # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
+            if mini_widget.visible:
+                self.mini_widgets_container.visible = True
+                self.content_row.controls.append(self.mini_widgets_container)
+                break
+            
+        
+        # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
+        self.tab.content = self.content_row  # We add this in combo with our 'tabs' later
+        
+        # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
+        self.tabs.tabs = [self.tab]
+        self.content = self.tabs
+        self.p.update()

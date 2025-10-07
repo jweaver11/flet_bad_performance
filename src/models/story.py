@@ -147,7 +147,11 @@ class Story(ft.View):
             'bottom_pin_height': 0,
 
             'created_at': None,
-            'last_modified': None
+            'last_modified': None,
+            'settings': {
+                'type': "", # Novel or comic. Affects templates and default data for new content
+                'multi_planitary': False,   # Whether the story will take place on multiple planets
+            }
         }
 
         # Update our data with any missing fields
@@ -245,6 +249,7 @@ class Story(ft.View):
             "social_systems",
             "history",
             "geography",
+            "maps",
         ]
         # Create the sub folders inside of world building
         for folder in world_building_folders:
@@ -301,7 +306,6 @@ class Story(ft.View):
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
         self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
         self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
-
 
         # Called when hovering over resizer to right of the active rail
         def show_horizontal_cursor(e: ft.HoverEvent):
