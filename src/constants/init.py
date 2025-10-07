@@ -12,9 +12,14 @@ def init_settings(page: ft.Page):
     from models.app import app
     from constants import data_paths
 
-    # Path to our settings file
-    settings_file_path = os.path.join(data_paths.settings_path, "settings.json")
+    # Path to our settings python
+    settings_file_path = os.path.join(data_paths.app_data_path, "settings.json")
 
+    # Create settings.json with empty dict if it doesn't exist
+    if not os.path.exists(settings_file_path):
+        with open(settings_file_path, "w", encoding='utf-8') as f:
+            json.dump({}, f)
+    
     try:
         # Read the JSON file
         with open(settings_file_path, "r", encoding='utf-8') as f:
@@ -31,7 +36,7 @@ def init_settings(page: ft.Page):
         settings_data = None  # If there's an error, we will create default settings
 
     # Sets our app settings to our loaded settings. If none were loaded (I.E. first launch), Settings with create its own defaults
-    app.settings = Settings(page, data_paths.settings_path, data=settings_data)
+    app.settings = Settings(page, data_paths.app_data_path, data=settings_data)
 
 
 # Called on app startup in main
@@ -42,10 +47,8 @@ def init_load_saved_stories(page: ft.Page):
     from models.app import app
     
     # Create the stories directory if it doesnt exist already
-    if not os.path.exists(data_paths.stories_directory_path):
-        os.makedirs(data_paths.stories_directory_path)
-        return  # No stories to load if we just created the directory, so return out
-
+    os.makedirs(data_paths.stories_directory_path, exist_ok=True)
+        
     # Iterate through all items in the stories directory
     for story_folder in os.listdir(data_paths.stories_directory_path):
 
@@ -57,7 +60,7 @@ def init_load_saved_stories(page: ft.Page):
             # Check every item (folder and file) in this story folder
             for item in os.listdir(story_directory):
 
-                # Check for the story json data file. If it is, we'll load our story around this ffile data
+                # Check for the story json data file. If it is, we'll load our story around this file data
                 if item.endswith(".json"):
 
                     # Set the file path to this json file so we can open it

@@ -10,7 +10,8 @@ from constants import data_paths
 
 # Class for our different story objects
 class Story(ft.View):
-    # Constructor for when new story is created
+    # Constructor Requires a Title, page reference.
+    # Optional: data (if loading) template (sci-fi, fantasy, etc.), type (novel or comic)
     def __init__(self, title: str, page: ft.Page, data: dict=None, template: str=None, type: str=None):
         # Title, page, data, and template
         
@@ -29,10 +30,7 @@ class Story(ft.View):
         # If story is new and not loaded from storage, create default data and save it
         if self.data is None:
             # Create default data for the story json file
-            self.data = self.create_default_data() 
-
-            # Save our data we just created
-            self.save_dict()    
+            self.create_default_data()    
 
             # Creates our folder structure for the new story using our template (if there is one)
             self.create_story_structure(template)  
@@ -83,6 +81,71 @@ class Story(ft.View):
         self.build_view()
 
 
+    # Called whenever there are changes in our data that need to be saved
+    def save_dict(self):
+        ''' Saves the data of our story to its JSON File, and all its folders as well '''
+        
+        # Our file path we store our data in
+        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+
+        try:
+            # Create the directory if it doesn't exist. Catches errors from users deleting folders
+            os.makedirs(self.data['directory_path'], exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:   
+                json.dump(self.data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving object to {file_path}: {e}")
+
+
+    # Called when loading a story from storage or when creating a new story
+    def create_default_data(self) -> dict:
+        ''' Loads our story data from its JSON file. If no file exists, we create one with default data '''
+
+        # Error handling
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        # Create the path to the story's directory and data JSON file
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
+
+        # Default data structure
+        default_story_data = {
+            'title': self.title,
+            'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
+            'story_data_file_path' : story_data_file_path,  # Path to our main story json file
+            'type': self.type,   # Type of story: novel or comic
+
+            'selected_rail': 'characters',
+
+            # Paths to our workspaces for easier reference later
+            'content_directory_path': os.path.join(directory_path, "content"),
+            'characters_directory_path': os.path.join(directory_path, "characters"),
+            'plotline_directory_path': os.path.join(directory_path, "plotline"),
+            'world_building_directory_path': os.path.join(directory_path, "world_building"),
+            'notes_directory_path': os.path.join(directory_path, "notes"),
+
+            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed? TBD
+
+            'top_pin_height': 0,
+            'left_pin_width': 0,
+            'main_pin_height': 0,
+            'right_pin_width': 0,
+            'bottom_pin_height': 0,
+
+            'created_at': None,
+            'last_modified': None
+        }
+
+        # Update our data with any missing fields
+        self.data.update(default_story_data)
+        self.save_dict()
+        return
+    
     # Called when a new story is created and not loaded with any data
     def create_story_structure(self, template: str=None):
         ''' Creates our story folder structure inside of our stories directory '''
@@ -154,63 +217,6 @@ class Story(ft.View):
             
         except (PermissionError, OSError) as e:
             print(f"Error saving story data: {e}")
-
-
-    # Called whenever there are changes in our data that need to be saved
-    def save_dict(self):
-        ''' Saves the data of our story to its JSON File, and all its folders as well '''
-        
-        # Our file path we store our data in
-        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
-
-        try:
-            # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            os.makedirs(self.data['directory_path'], exist_ok=True)
-            
-            # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
-                json.dump(self.data, f, indent=4)
-        
-        # Handle errors
-        except Exception as e:
-            print(f"Error saving object to {file_path}: {e}")
-
-
-    # Called when loading a story from storage or when creating a new story
-    def create_default_data(self) -> dict:
-        ''' Loads our story data from its JSON file. If no file exists, we create one with default data '''
-
-        # Create the path to the story's directory and data JSON file
-        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
-        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
-
-        # Default data structure
-        return {
-            'title': self.title,
-            'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
-            'story_data_file_path' : story_data_file_path,  # Path to our main story json file
-            'type': self.type,   # Type of story: novel or comic
-
-            'selected_rail': 'characters',
-
-            # Paths to our workspaces for easier reference later
-            'content_directory_path': os.path.join(directory_path, "content"),
-            'characters_directory_path': os.path.join(directory_path, "characters"),
-            'plotline_directory_path': os.path.join(directory_path, "plotline"),
-            'world_building_directory_path': os.path.join(directory_path, "world_building"),
-            'notes_directory_path': os.path.join(directory_path, "notes"),
-
-            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed? TBD
-
-            'top_pin_height': 0,
-            'left_pin_width': 0,
-            'main_pin_height': 0,
-            'right_pin_width': 0,
-            'bottom_pin_height': 0,
-
-            'created_at': None,
-            'last_modified': None
-        }
 
 
     # Called when new story object is created, either by program or by being loaded from storage

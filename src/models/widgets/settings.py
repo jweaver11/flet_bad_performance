@@ -1,12 +1,9 @@
 ''' Parent class for our settings widget'''
 
 import flet as ft
-import os
-#from models.app import app
 from models.story import Story
 from models.widget import Widget
-from constants.data_paths import settings_path
-import json
+
 
 # 
 # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
@@ -16,12 +13,6 @@ import json
 class Settings(Widget):
     # Constructor
     def __init__(self, page: ft.Page, directory_path: str, story: Story=None, data: dict=None):
-
-        # Check if we're loading a character or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
         
         # Constructor the parent widget class
         super().__init__(
@@ -32,12 +23,23 @@ class Settings(Widget):
             data = data,
         )
 
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
         # If our settings are new and not loaded, give it default data
         if not loaded:
             self.create_default_settings_data()  # Create data defaults for our settings widgets
-            self.save_dict()    # Save our data to the file
 
-        self.visible = self.data['visible']  # If we will show this widget or not
+        # Otherwise, verify the loaded data
+        #else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            #self.verify_widget_data("settings")
+
+        # Apply our visibility
+        self.visible = self.data['visible'] 
 
         self.reload_widget()  # Loads our settings widget UI
 
@@ -80,6 +82,7 @@ class Settings(Widget):
 
         # Update existing data with any new default fields we added
         self.data.update(default_settings_data)
+        self.save_dict()
         return
         
 

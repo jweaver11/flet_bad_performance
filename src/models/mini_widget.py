@@ -9,6 +9,7 @@ class MiniWidget(ft.Container):
     # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
 
+        # Parent constructor
         super().__init__(
             expand=True,
             border_radius=ft.border_radius.all(6),
@@ -16,14 +17,27 @@ class MiniWidget(ft.Container):
         )
            
         self.title = title  # Title of the widget that will show up on its tab
+        self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
         self.p = page   # Grabs our original page for convenience and consistency
         self.data = data    # Pass in our data when loading existing mini widgets
-        self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
 
-        # If no data is passed in (Newly created mini widget), give it default data
+        # Check if we loaded our mini widget or not
         if self.data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If this is a new mini widget (Not loaded), give it default data all widgets need
+        if not loaded:
             self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_mini_widget_data()
+
+
+
 
         # Apply our visibility
         self.visible = self.data['visible']
@@ -68,12 +82,46 @@ class MiniWidget(ft.Container):
             'title': self.title,
             'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            'is_selected': True, # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+            'is_selected': False, # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
         }
 
         # Update existing data with any new default fields we added
         self.data.update(default_data)
+        self.save_dict()
         return
+    
+    def verify_mini_widget_data(self):
+
+        print("Verifying mini widget data for ", self.title)
+        
+        # Required data for all widgets and their types
+        required_data_types = {
+            'title': str,
+            'tag': str,
+            'visible': bool,
+            'is_selected': bool,
+        }
+
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'title': self.title,
+            'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
+            'visible': True,
+            'is_selected': False,
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]
+                print(key, " missing or incorrect type, setting to default: ", self.data[key])
+            else:
+                print(key, " exists and is correct type")
+
+        # Save our updated data
+        self.save_dict()
+        return
+
     
     # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
     def repair_data(self, tag: str):

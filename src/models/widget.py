@@ -21,18 +21,29 @@ class Widget(ft.Container):
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
         )
     
+        # Required properties of all widgets
         self.title = title  # Title of our object
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
         self.directory_path = directory_path    # Path to our directory that will contain our json file
         self.story = story  # Reference to our story object that owns this widget
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
+        self.mini_widgets = []  # List that holds our mini widgets objects
 
-        # Declare our mini widgets list. Much easier to display the list UI than storing as a live dict
-        self.mini_widgets = []
+        # Check if we loaded our settings data or not
+        if self.data is None:
+            loaded = False
+        else:
+            loaded = True
 
         # If this is a new widget (Not loaded), give it default data all widgets need
-        if self.data is None:
+        if not loaded:
             self.create_default_data()  # Create default data if none was passed in
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_widget_data()
+
 
         # Apply our visibility
         self.visible = self.data['visible'] 
@@ -90,42 +101,48 @@ class Widget(ft.Container):
             'tag': "widget",    # Default tag, should be overwritten by child classes
             'pin_location': "main",     # Stick us in the main pin area by default
             'visible': True,    
-            'mini_widgets': {},
             'tab_title_color': "primary",
+            'mini_widgets': {},
         }
 
-        # Update existing data with any new default fields we added
-        self.data.update(default_data)
+        # Update our data dict with any missing fields from the defaults
+        self.data.update(default_data)  # Overwrite any missing or duplicate fields (should be no duplicates anyway)
         self.save_dict()
         return
     
-    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
-    def verify_data(self, tag: str):
-        ''' Verify loaded any missing data fields in existing mini widgets '''
+    # Called to fix any missing data fields in loaded widgets. Only fixes our missing fields above
+    def verify_widget_data(self):
+        ''' Verify loaded any missing data fields in existing widgets '''
 
-        # Error handling
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        # Make sure our widget has its required data that it needs to function
-        required_data = {
-            'title': self.title,        # Makes sure our title exists and matches
-            'directory_path': self.directory_path,      # Fix broken directory paths
-            'tag': tag,         # Fix our tag so we know what to load
-            'pin_location': "main",     # Just put us in the main pin if we're broken
-            'visible': self.visible,        # Keep our visibility state
-            'mini_widgets': {},     # Resets our mini widgets 
-            'tab_title_color': "primary",       # Default to primary color
+        # Required data for all widgets and their types
+        required_data_types = {
+            'title': str,
+            'directory_path': str,
+            'tag': str,
+            'pin_location': str,
+            'visible': bool,
+            'tab_title_color': str,
+            'mini_widgets': dict,
         }
 
-        # Update our data with any missing fields
-        self.data.update(required_data)
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'title': self.title,
+            'directory_path': self.directory_path,
+            'tag': "widget",    # Default tag, should be overwritten by child classes
+            'pin_location': "main",     # Stick us in the main pin area by default
+            'visible': True,    
+            'tab_title_color': "primary",
+            'mini_widgets': {},
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]  
+
+        # Save our updated data
         self.save_dict()
-
-        # Since we just deleted our mini widgets data, we need them all to save again
-        for mini_widget in self.mini_widgets:
-            mini_widget.save_dict()
-
         return
     
     # Called in a childs constructor to load any mini widgets that it may have
