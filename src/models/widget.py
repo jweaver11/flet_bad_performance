@@ -30,7 +30,7 @@ class Widget(ft.Container):
         self.mini_widgets = []  # List that holds our mini widgets objects
 
         # Check if we loaded our settings data or not
-        if self.data is None:
+        if data is None:
             loaded = False
         else:
             loaded = True
@@ -43,7 +43,6 @@ class Widget(ft.Container):
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
             self.verify_widget_data()
-
 
         # Apply our visibility
         self.visible = self.data['visible'] 

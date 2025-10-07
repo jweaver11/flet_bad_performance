@@ -22,7 +22,7 @@ class MiniWidget(ft.Container):
         self.data = data    # Pass in our data when loading existing mini widgets
 
         # Check if we loaded our mini widget or not
-        if self.data is None:
+        if data is None:
             loaded = False
         else:
             loaded = True
@@ -35,8 +35,6 @@ class MiniWidget(ft.Container):
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
             self.verify_mini_widget_data()
-
-
 
 
         # Apply our visibility
@@ -90,10 +88,10 @@ class MiniWidget(ft.Container):
         self.save_dict()
         return
     
+    # Called when loading a mini widget from storage
     def verify_mini_widget_data(self):
+        ''' Verifies loaded any missing data fields in existing mini widgets '''
 
-        print("Verifying mini widget data for ", self.title)
-        
         # Required data for all widgets and their types
         required_data_types = {
             'title': str,
@@ -114,35 +112,11 @@ class MiniWidget(ft.Container):
         for key, required_data_type in required_data_types.items():
             if key not in self.data or not isinstance(self.data[key], required_data_type):
                 self.data[key] = data_defaults[key]
-                print(key, " missing or incorrect type, setting to default: ", self.data[key])
-            else:
-                print(key, " exists and is correct type")
 
         # Save our updated data
         self.save_dict()
         return
 
-    
-    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
-    def repair_data(self, tag: str):
-        ''' Repairs any missing data fields in existing mini widgets '''
-
-        # Error handling
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        # Make sure our mini widget has its required data that it needs to function
-        required_data = {
-            'title': self.title,    # Fix our title if broke
-            'tag': tag,         # Fix our tag so we know what to load
-            'visible': self.visible,        # Keep our current visibility state
-            'is_selected': False,        # Just assume we're not selected
-        }
-
-        # Update our data with any missing fields
-        self.data.update(required_data)
-        self.save_dict()
-        return
 
     # Called when clicking x to hide the mini note
     def toggle_visibility(self, e):

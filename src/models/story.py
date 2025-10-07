@@ -27,15 +27,26 @@ class Story(ft.View):
         self.data = data    # Sets our data (if any) passed in. New stories just have none
         self.type = type    # Type of story, novel or comic. Affects how templates for creating new content will work
 
-        # If story is new and not loaded from storage, create default data and save it
-        if self.data is None:
+        # Check if we loaded our story data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If this is a new widget (Not loaded), give it default data all widgets need
+        if not loaded:
             # Create default data for the story json file
             self.create_default_data()    
 
             # Creates our folder structure for the new story using our template (if there is one)
             self.create_story_structure(template)  
-            
 
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_story_data()
+
+            
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar: None     # Is an extended ft.Container
         self.all_workspaces_rail: None     # Is an extended ft.Container
@@ -111,13 +122,11 @@ class Story(ft.View):
 
         # Create the path to the story's directory and data JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
-        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
 
         # Default data structure
         default_story_data = {
             'title': self.title,
             'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
-            'story_data_file_path' : story_data_file_path,  # Path to our main story json file
             'type': self.type,   # Type of story: novel or comic
 
             'selected_rail': 'characters',
@@ -146,6 +155,57 @@ class Story(ft.View):
         self.save_dict()
         return
     
+    def verify_story_data(self):
+
+        required_data_types = {
+            'title': str,
+            'directory_path': str,
+            'story_data_file_path': str,
+            'type': (str, type(None)),
+            'selected_rail': str,
+            'content_directory_path': str,
+            'characters_directory_path': str,
+            'plotline_directory_path': str,
+            'world_building_directory_path': str,
+            'notes_directory_path': str,
+            'top_pin_height': int,
+            'left_pin_width': int,
+            'main_pin_height': int,
+            'right_pin_width': int,
+            'bottom_pin_height': int,
+            'created_at': (str, type(None)),
+            'last_modified': (str, type(None)),
+        }
+
+        data_defaults = {
+            'title': self.title,
+            'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
+            'type': self.type,
+            'selected_rail': 'characters',
+            'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
+            'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
+            'plotline_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "plotline"),
+            'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
+            'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "notes"),
+            'top_pin_height': 0,
+            'left_pin_width': 0,
+            'main_pin_height': 0,
+            'right_pin_width': 0,
+            'bottom_pin_height': 0,
+            'created_at': None,
+            'last_modified': None
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]
+
+        # Save our updated data
+        self.save_dict()
+        return
+            
+
     # Called when a new story is created and not loaded with any data
     def create_story_structure(self, template: str=None):
         ''' Creates our story folder structure inside of our stories directory '''

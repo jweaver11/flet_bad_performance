@@ -11,12 +11,6 @@ from models.timeline import Timeline
 class Plotline(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
-
-        # Check if we're loading our plotline or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -27,13 +21,24 @@ class Plotline(Widget):
             data = data,    # Saves our data passed in (if there is any)
         )
 
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If our settings are new and not loaded, give it default data
+        if not loaded:
+            self.create_default_plotline_data()  # Create data defaults for our settings widgets
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_plotline_data()
+            
+
         # Our timeline controls
         self.timelines = {}
-
-        # If our plotline is new and not loaded, give it default data
-        if not loaded:
-            self.create_default_plotline_data()  # Create data defaults for our plotline widget
-            self.save_dict()    # Save our data to the file
 
         # Load our timelines from our data
         self.load_timelines()
@@ -88,6 +93,44 @@ class Plotline(Widget):
         # Update existing data with any new default fields we added
         self.data.update(default_plotline_data)
         return
+    
+    # Called to verify loaded data
+    def verify_plotline_data(self):
+        ''' Verify loaded any missing data fields in our plotline '''
+
+        # Required data for all widgets and their types
+        required_data_types = {
+            'tag': str,
+            'story_start_date': str,
+            'story_end_date': str,
+            'filters': dict,
+        }
+
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'tag': "plotline",  
+
+            # Start and end date of entire story
+            'story_start_date': "", 
+            'story_end_date': "",
+
+            'filters': {    # Filters we can apply to change the view of our plotline, while keeping the data intact
+                'show_timeskips': True,
+                'show_plot_points': True,
+                'show_arcs': True,
+            },
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]  
+
+        self.data['tag'] = "plotline"   # Make sure our tag is always correct
+
+        # Save our updated data
+        self.save_dict()
+        return
 
 
     # Function to load our timline objects from the data 
@@ -121,16 +164,6 @@ class Plotline(Widget):
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading any timelines from {timelines_directory_path}: {e}")
 
-
-        #for timeline in self.timelines.values():
-            # Initialize timeline entry in mini_widgets if it doesn't exist
-            #if timeline.title not in self.mini_widgets:
-                #self.mini_widgets[timeline.title] = {'arcs': {}}
-           # elif 'arcs' not in self.mini_widgets[timeline.title]:
-                #self.mini_widgets[timeline.title]['arcs'] = {}
-                
-            #for arc in timeline.arcs.values():
-                #self.mini_widgets[timeline.title]['arcs'][arc.title] = arc
 
         # After our timeline has been created, it will have loaded its branches, plot points, arcs, and timeskips
         # We take those, and load them into our mini widgets list, since our timeline is not a widget itself

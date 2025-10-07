@@ -18,12 +18,6 @@ class Character(Widget):
     # Constructor
     def __init__(self, name: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
 
-        # Check if we're loading a character or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
         # Parent class constructor
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
@@ -33,10 +27,21 @@ class Character(Widget):
             data = data,    # Passes in our data if we loaded it, or None if its a new character
         )
 
-        # If our character is new and not loaded, give it default data
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If our settings are new and not loaded, give it default data
         if not loaded:
-            self.create_default_character_data()    # Create data defaults for each character widget
-            self.save_dict()    # Save our data to the file 
+            self.create_default_character_data()  # Create data defaults for our settings widgets
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_character_data()
+            
         
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
@@ -68,7 +73,7 @@ class Character(Widget):
             'sex': "",
             'age': "",   
             
-            'Physical Description': {
+            'physical_description': {
                 'Race': "",
                 'Skin Color': "",
                 'Hair Color': "",   
@@ -78,7 +83,7 @@ class Character(Widget):
                 'Build': "",    
                 'Distinguishing Features': "",  # some sort of flet list
             },
-            'Family':  {
+            'family':  {
                 'Love Interest': "",    # Name of another character, or str
                 'Father': "",   # Textfield with selectable options
                 'Mother': "",    
@@ -86,27 +91,104 @@ class Character(Widget):
                 'Children': "",
                 'Ancestors': "",
             },  
-            'Trauma': "",
-            'Occupation': "",   
-            'Goals': "",    
-            'Origin': {     
-                'Birth Date': "",   
-                'Hometown': "",     
-                'Education': "",        
+            'trauma': "",
+            'occupation': "",   
+            'goals': "",    
+            'origin': {     
+                'birth_date': "",   
+                'hometown': "",     
+                'education': "",        
             },
-            
-            'Personality': "",  
-            'Backstory': "",    
-            'Abilities': "",    
-            'Dead': False,
-            'Notes' : {},  
+            'personality': "",  
+            'backstory': "",    
+            'abilities': "",    
+            'dead': False,
         }
 
         # Update existing data with any new default fields we added
         self.data.update(default_character_data)  
-
+        self.save_dict()
         return
+    
+    # Verifies our loaded data to make sure it has all the fields we need, and adds any that are missing
+    def verify_character_data(self):
+        ''' Verify loaded any missing data fields in existing characters '''
 
+        # Required data for all widgets and their types
+        required_data_types = {
+            'tag': str,
+            'tab_color': str,
+            'name_color': str,
+            'sex_color': str,
+            'morality': str,
+            'sex': str,
+            'age': str,
+            'physical_description': dict,
+            'family': dict,
+            'trauma': str,
+            'occupation': str,
+            'goals': str,
+            'origin': dict,
+            'personality': str,
+            'backstory': str,
+            'abilities': str,
+            'is_dead': bool,
+
+        }
+
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'tag': "character",  
+            'tab_color': "primary",  # Initial tab color matches color scheme
+            'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
+            'sex_color': "primary",    # Color of selected option in sex dropdown
+ 
+            'morality': "",
+            'sex': "",
+            'age': "",   
+            
+            'physical_description': {
+                'Race': "",
+                'Skin Color': "",
+                'Hair Color': "",   
+                'Eye Color': "",    
+                'Height': "",   
+                'Weight': "",   
+                'Build': "",    
+                'Distinguishing Features': "",  # some sort of flet list
+            },
+            'family':  {
+                'Love Interest': "",    # Name of another character, or str
+                'Father': "",   # Textfield with selectable options
+                'Mother': "",    
+                'Siblings': "",
+                'Children': "",
+                'Ancestors': "",
+            },  
+            'trauma': "",
+            'occupation': "",   
+            'goals': "",    
+            'origin': {     
+                'birth_date': "",   
+                'hometown': "",     
+                'education': "",        
+            },
+            'personality': "",  
+            'backstory': "",    
+            'abilities': "",    
+            'is_dead': False,
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]  
+
+        self.data['tag'] = "character"   # Make sure our tag is always correct
+
+        # Save our updated data
+        self.save_dict()
+        return
     
     # Change our tab color of widget. Accepts a flet color as parameter
     def submit_color_change(self, color):

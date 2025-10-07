@@ -9,26 +9,29 @@ from models.widget import Widget
 class Notes(Widget):
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
 
-        # Check if we're loading a note or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "notes",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
             data = data,
         )
 
-        # If our note is new and not loaded, give it default data
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If our settings are new and not loaded, give it default data
         if not loaded:
-            self.create_default_note_data()  # Create data defaults for each note widget
-            self.save_dict()    # Save our data to the file
+            self.create_default_note_data()  # Create data defaults for our settings widgets
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_note_data()
         
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
@@ -45,7 +48,6 @@ class Notes(Widget):
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_note_data = {
             'tag': "note",  
-
             "character_count": 0,
             "created_at": None,
             "last_modified": None,
@@ -54,6 +56,40 @@ class Notes(Widget):
 
         # Update existing data with any new default fields we added
         self.data.update(default_note_data)  
+        self.save_dict()
+        return
+    
+    # Called to verify loaded data
+    def verify_note_data(self):
+        ''' Verify loaded any missing data fields in existing notes '''
+
+        # Required data for all widgets and their types
+        required_data_types = {
+            'tag': str,
+            'character_count': int,
+            'created_at': str,
+            'last_modified': str,
+            'content': str
+        }
+
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'tag': "note",  
+            "character_count": 0,
+            "created_at": "",
+            "last_modified": "",
+            "content": "",
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]  
+
+        self.data['tag'] = "chapter"   # Make sure our tag is always correct
+
+        # Save our updated data
+        self.save_dict()
         return
 
     # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild

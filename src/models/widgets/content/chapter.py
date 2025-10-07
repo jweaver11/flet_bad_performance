@@ -8,12 +8,6 @@ class Chapter(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
 
-        # Check if we're loading a chapter or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-        
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
@@ -23,10 +17,21 @@ class Chapter(Widget):
             data = data,    # This gets initialized at the end of our constructor
         )
 
-        # If our character is new and not loaded, give it default data
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If our settings are new and not loaded, give it default data
         if not loaded:
-            self.create_default_chapter_data()  # Create data defaults for each chapter widget
-            self.save_dict()    # Save our data to the file
+            self.create_default_chapter_data()  # Create data defaults for our settings widgets
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_chapter_data()
+            
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
@@ -44,13 +49,40 @@ class Chapter(Widget):
         # Default data for new chapters
         default_chapter_data = {
             'tag': "chapter",
-            'visible': True,    # If this chapter is visible in the UI or not
 
             'content': "",    # Content of our chapter
         }
 
         # Update existing data with any new default fields we added
-        self.data.update(default_chapter_data)  
+        self.data.update(default_chapter_data)
+        self.save_dict()  
+        return
+    
+    # Called to verify loaded data
+    def verify_chapter_data(self):
+        ''' Verify loaded any missing data fields in existing chapters '''
+
+        # Required data for all widgets and their types
+        required_data_types = {
+            'tag': str,
+            'content': str
+        }
+
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'tag': "chapter",
+            'content': "",
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]  
+
+        self.data['tag'] = "chapter"   # Make sure our tag is always correct
+
+        # Save our updated data
+        self.save_dict()
         return
         
     

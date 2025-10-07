@@ -7,12 +7,6 @@ from models.story import Story
 class Image(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
-
-        # Check if we're loading an image or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -23,12 +17,22 @@ class Image(Widget):
             data = data,
         )
 
-        # If our character is new and not loaded, give it default data
-        if not loaded:
-            self.create_default_image_data()  # Create data defaults for each image widget
-            self.save_dict()    # Save our data to the file
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
 
-        self.visible = self.data['visible']  # If we will show this widget or not
+        # If our settings are new and not loaded, give it default data
+        if not loaded:
+            self.create_default_image_data()  # Create data defaults for our settings widgets
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+           # self.verify_chapter_data()
+           pass
+            
 
 
         # Load our widget UI on start after we have loaded our data
