@@ -37,8 +37,15 @@ class Notes(Widget):
     def create_default_note_data(self) -> dict:
         ''' Loads our data from our notes json file. If no file exists, we create one with default data, including the path '''
 
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_note_data = {
+            'tag': "note",  
+
             "character_count": 0,
             "created_at": None,
             "last_modified": None,

@@ -21,7 +21,6 @@ class Plotline(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "plotline",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
@@ -43,7 +42,7 @@ class Plotline(Widget):
         if len(self.timelines) == 0:
             # Create one like this so we don't call reload_widget before our UI elements are defined
             timeline_directory_path = os.path.join(self.directory_path, "timelines")
-            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, page=self.page, story=self.story, data=None)
+            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, page=self.p, story=self.story, data=None)
 
         # Set visibility from our data
         self.visible = self.data['visible']  # If we will show this widget or not
@@ -64,10 +63,16 @@ class Plotline(Widget):
     def create_default_plotline_data(self) -> dict:
         ''' Loads our plotline data and timelines data from our seperate timelines files inside the timelines directory '''
 
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
         # Default data for our plotline widget
         default_plotline_data = {
             
             'pin_location': "bottom",
+            'tag': "plotline",  
 
             # Start and end date of entire story
             'story_start_date': "", 
@@ -133,10 +138,18 @@ class Plotline(Widget):
         def load_mini_widgets():
 
             for timeline in self.timelines.values():
+
+                for branch in timeline.branches.values():
+                    self.mini_widgets.append(branch)
+
+                for plot_point in timeline.plot_points.values():
+                    self.mini_widgets.append(plot_point)
+
                 for arc in timeline.arcs.values():
                     self.mini_widgets.append(arc)
 
-            print(self.mini_widgets)
+                for time_skip in timeline.time_skips.values():
+                    self.mini_widgets.append(time_skip)
 
         load_mini_widgets()
 
@@ -172,6 +185,7 @@ class Plotline(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
+        # TODO:
         # When hovering over timeline or branch, make slightly brighter and thicker. Right clicking allows
         # adding/removing pp, branches, arcs, timeskips, etc.
         # Clicking brings up a mini-menu in the plotline widget to show details and allow editing
@@ -181,8 +195,11 @@ class Plotline(Widget):
         # Have a show/hide filters button in top left of widget
         # Show zoomed in time dates when zoomed in??
 
-        # Unique widget, has its child timelines hold its mini widgets
-        self.stack.controls.clear()
+        # TODO If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
+
+        # Set the mini widgets visibility to false so we can check later if we want to add it to the page
+        self.mini_widgets_container.visible = False
+        self.content_row.controls.clear()   # Clear our content row so we can rebuild it
 
         plotline_filters = []
 
@@ -261,9 +278,8 @@ class Plotline(Widget):
         )
 
 
-
         # The body that is our interactive viewer, allowing zoom in and out and moving around
-        body = ft.InteractiveViewer(
+        self.body_container.content = ft.InteractiveViewer(
             min_scale=0.1,
             max_scale=15,
             expand=True,
@@ -274,67 +290,29 @@ class Plotline(Widget):
             content=stack,
         )
 
-        # Our column that will display our header filters and body of our widget
-        column = ft.Column(
-            expand=True,
-            #alignment=ft.MainAxisAlignment.CENTER,
-            controls=[header, body]
-        )
+        # Add the body container to our content row
+        self.content_row.controls.append(self.body_container)
 
-        self.stack.controls.append(column)
-
-        # Column that holds our mini widget controls on the right 1/3 of the widget
-        mini_widgets_column = ft.Column(
-            spacing=6,
-            expand=True,
-            #controls=self.mini_widgets.values(),   # They'll only be rendered if visible
-            controls=self.mini_widgets,   # They'll only be rendered if visible,
-        )
-
-        # TODO 
-        # Iterate through all values in the mini widgets dict, not the keys
-
-
-
+        # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
+        self.mini_widgets_column.controls = self.mini_widgets   
         
-        #for mini_widget in self.mini_widgets.values():
-        for mini_widget in self.mini_widgets:
+        # Add our column that we build to our mini widgets container
+        self.mini_widgets_container.content = self.mini_widgets_column
+        
+        # Check if we are showing any mini widgets. If we are, add the container to our content row
+        for mini_widget in self.mini_widgets_column.controls:
+            # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
             if mini_widget.visible:
-                mini_widgets_column.expand = True
+                self.mini_widgets_container.visible = True
+                self.content_row.controls.append(self.mini_widgets_container)
                 break
 
-        # Spacing container to give some space between our body and mini notes
-        mini_widgets_row = ft.Row(expand=True)
-
-        # Create a spacinig container and add it so our mini notes only take up the right most 1/3 of widget
-        spacing_container = ft.Container(expand=True, ignore_interactions=True)
-        mini_widgets_row.controls.append(spacing_container)
-        mini_widgets_row.controls.append(spacing_container)
-
-        mini_widgets_row.controls.append(mini_widgets_column)
-
-        # Add the column on top of our stack
-        self.stack.controls.append(mini_widgets_row)
-
-
-        # our tab.content is the column we build above.
-        # Our tab content holds the stack that holds our body
-        self.tab.content=self.stack  # We add this in combo with our 'tabs' later
-
-        # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
-        content = ft.Tabs(
-            selected_index=0,
-            animation_duration=0,
-            #divider_color=ft.Colors.TRANSPARENT,
-            padding=ft.padding.all(0),
-            label_padding=ft.padding.all(0),
-            mouse_cursor=ft.MouseCursor.BASIC,
-            tabs=[self.tab]    # Gives our tab control here
-        )
+        # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
+        self.tab.content = self.content_row  # We add this in combo with our 'tabs' later
         
-        # Content of our widget (ft.Container) is our created tabs content
-        self.content = content
-        
+        # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
+        self.tabs.tabs = [self.tab]
+        self.content = self.tabs
         self.p.update()
         
         

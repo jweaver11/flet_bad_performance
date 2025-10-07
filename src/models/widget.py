@@ -1,7 +1,6 @@
 '''
 An extended flet container that is the parent class of all our story objects.
 Handles uniform UI, and has some functionality all objects need for easy data use.
-All objects contain a title, tag, page reference, pin location, tab color, and a file path
 '''
 
 import flet as ft
@@ -10,10 +9,11 @@ import os
 import json
 
 # TODO Show widget outline when clicked on rail as a pseudo 'focus'
+# TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
 
 class Widget(ft.Container):
-    # Constructor. all widgets require a title, tag, page reference, directory path, and story reference
-    def __init__(self, title: str, tag: str, p: ft.Page, directory_path: str, story: Story, data: dict=None):
+    # Constructor. All widgets require a title,  page reference, directory path, and story reference
+    def __init__(self, title: str, p: ft.Page, directory_path: str, story: Story, data: dict=None):
 
         # set uniformity for all widgets
         super().__init__(
@@ -21,9 +21,7 @@ class Widget(ft.Container):
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
         )
     
-        # Required parameters: title, tag, page reference, pin location, story
         self.title = title  # Title of our object
-        self.tag = tag  # Tag for logic routing and identification
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
         self.directory_path = directory_path    # Path to our directory that will contain our json file
         self.story = story  # Reference to our story object that owns this widget
@@ -35,22 +33,27 @@ class Widget(ft.Container):
         # If this is a new widget (Not loaded), give it default data all widgets need
         if self.data is None:
             self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()    # Save our data to the file if the object is new
 
         # Apply our visibility
         self.visible = self.data['visible'] 
 
+        # UI ELEMENTS - Tab
+        self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
+        self.tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
+        self.tab_title_color: ft.Colors.PRIMARY = "primary"     # The color of the title in our tab and the divider under it
+        self.hide_tab_icon_button = ft.IconButton()    # 'X' icon button to hide widget from workspace'
+
+        # UI ELEMENTS - Body
+        self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
+        self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
+        self.mini_widgets_container = ft.Container(expand=1)  # Control to display our mini widgets. Nests inside of self.content_row
+        self.mini_widgets_column = ft.Column(spacing=4)  # Column for our mini widgets on the side of our main content. Nests inside of self.mini_widgets_container
+
         # Load any mini widgets this object may have
         self.load_mini_widgets()
 
-        # Declaring UI elements that widgets will have
-        self.hide_tab_icon: ft.IconButton = ft.IconButton()  # Icon button that hides the widget from the workspace
-        self.tab_color: ft.Colors = ft.Colors("primary")  # Color of the tab text and divider
-        self.tab: ft.Tab = ft.Tab()  # Tab that holds our title and hide icon
-        self.stack: ft.Stack = ft.Stack()  # Stack that holds our content for our widget, and allows us to add our mini notes overtop
-
         # Gives our objects their uniform tabs.
-        self.create_tab(story)  # Tabs that don't need too be reloaded for color changes are only built here
+        self.reload_tab(story)  # Tabs that don't need too be reloaded for color changes are only built here
 
     # Called whenever there are changes in our data
     def save_dict(self):
@@ -84,14 +87,45 @@ class Widget(ft.Container):
         default_data = {
             'title': self.title,
             'directory_path': self.directory_path,
-            'tag': self.tag,
-            'pin_location': "main",  
+            'tag': "widget",    # Default tag, should be overwritten by child classes
+            'pin_location': "main",     # Stick us in the main pin area by default
             'visible': True,    
             'mini_widgets': {},
+            'tab_title_color': "primary",
         }
 
         # Update existing data with any new default fields we added
         self.data.update(default_data)
+        self.save_dict()
+        return
+    
+    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
+    def verify_data(self, tag: str):
+        ''' Verify loaded any missing data fields in existing mini widgets '''
+
+        # Error handling
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        # Make sure our widget has its required data that it needs to function
+        required_data = {
+            'title': self.title,        # Makes sure our title exists and matches
+            'directory_path': self.directory_path,      # Fix broken directory paths
+            'tag': tag,         # Fix our tag so we know what to load
+            'pin_location': "main",     # Just put us in the main pin if we're broken
+            'visible': self.visible,        # Keep our visibility state
+            'mini_widgets': {},     # Resets our mini widgets 
+            'tab_title_color': "primary",       # Default to primary color
+        }
+
+        # Update our data with any missing fields
+        self.data.update(required_data)
+        self.save_dict()
+
+        # Since we just deleted our mini widgets data, we need them all to save again
+        for mini_widget in self.mini_widgets:
+            mini_widget.save_dict()
+
         return
     
     # Called in a childs constructor to load any mini widgets that it may have
@@ -99,20 +133,29 @@ class Widget(ft.Container):
         ''' Checks all the items under the data['mini_widgets'] dictionary and creates the appropriate mini widget objects '''
 
         from models.mini_widgets.mini_note import MiniNote
-        #from models.mini_widgets.plotline import arcs...
 
         # Error handling
         if 'mini_widgets' not in self.data:
             self.create_default_data()
 
         # Loop through our mini widgets items in the dict and load them based on their tag into our mini widgets list
-        # NOTE: Plotlines store data in their timelines files, so they load mini widgets in their own model file
+        # NOTE: Plotlines store data in their timelines files, so they load mini widgets in their own model file.
         for key, mini_widget in self.data['mini_widgets'].items():
 
             # Check the tag to see what type of mini widget it is, and create the appropriate object
             if mini_widget['tag'] == "mini_note":
                 #self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
                 self.mini_widgets.append(MiniNote(title=key, owner=self, page=self.p, data=mini_widget))
+
+    def create_mini_note(self, title: str):
+        ''' Creates a mini note inside an image or chapter '''
+
+        from models.mini_widgets.mini_note import MiniNote
+
+        #self.mini_widgets[title] = MiniNote(title=title, owner=self, page=self.p, data=None)
+        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
+
+        self.reload_widget()
 
 
     # Called when a draggable starts dragging.
@@ -125,14 +168,14 @@ class Widget(ft.Container):
     def hover_tab(self, e):
         ''' Changes the hide icon button color slightly for more interactivity '''
 
-        self.hide_tab_icon.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
+        self.hide_tab_icon_button.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
         self.p.update()
 
     # Called when mouse stops hovering over the tab part of the widget
     def stop_hover_tab(self, e):
         ''' Reverts the color change of the hide icon button '''
 
-        self.hide_tab_icon.icon_color = ft.Colors.OUTLINE
+        self.hide_tab_icon_button.icon_color = ft.Colors.OUTLINE
         self.p.update()
 
     # Called when app clicks the hide icon in the tab
@@ -155,42 +198,39 @@ class Widget(ft.Container):
         else:
             story.workspace.reload_workspace(self.p, story)
 
-    
-
+    # Called when creating a new mini note inside a widget
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
 
         from models.mini_widgets.mini_note import MiniNote
 
-        # Create our mini note object
-        mini_note = MiniNote(
-            title=title,
-            page=self.p,
-            story=self.story,
-        )
+        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
 
-        # Add to our notes dictionary for access later
-        #self.mini_notes[title] = mini_note
-
-        # Add to our UI
-        #self.content.controls.append(mini_note)
-        self.p.update()
-
-        return mini_note
+        return
 
     # Called at end of constructor
-    def create_tab(self, story: Story):
+    def reload_tab(self, story: Story):
         ''' Creates our tab for our widget that has the title and hide icon '''
 
+        # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
+        self.tabs = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            #divider_color=ft.Colors.TRANSPARENT,
+            padding=ft.padding.all(0),
+            label_padding=ft.padding.all(0),
+            mouse_cursor=ft.MouseCursor.BASIC,
+        )
+
         # Our icon button that will hide the widget when clicked in the workspace
-        self.hide_tab_icon = ft.IconButton(    # Icon to hide the tab from the workspace area
+        self.hide_tab_icon_button = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
             on_click=lambda e: self.toggle_visibility(story),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
         )
 
-        self.tab_color =  ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
+        self.tab_title_color = ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
 
         # Tab that holds our widget title and 'body'.
         # Since this is a ft.Tab, it needs to be nested in a ft.Tabs control or it wont render.
@@ -198,7 +238,7 @@ class Widget(ft.Container):
         self.tab = ft.Tab(
 
             # Initialize the content. This will be our content of the body of the widget
-            content=ft.Stack(), 
+            #content=ft.Stack(), 
 
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
             tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
@@ -234,14 +274,14 @@ class Widget(ft.Container):
                             # The text control that holds our title of the object
                             ft.Text(
                                 weight=ft.FontWeight.BOLD, # Make the text bold
-                                color=self.tab_color,   # Set our color to the tab color
+                                color=self.tab_title_color,   # Set our color to the tab color
                                 theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
                                 value=self.title,   # Set the text to our title
                                 
                             ),
 
                             # Our icon button that hides the widget when clicked
-                            self.hide_tab_icon, 
+                            self.hide_tab_icon_button, 
                         ]
                     )
                 ),

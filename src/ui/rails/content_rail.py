@@ -48,6 +48,7 @@ class Content_Rail(ft.Container):
 
 
     def create_new_book(self, title: str, story: Story):
+        # TODO: Make it accept the type of story to give a structure for new books, seasons, etc.
         pass
 
     def create_new_season(self, title: str, story: Story):

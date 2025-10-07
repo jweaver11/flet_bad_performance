@@ -11,7 +11,7 @@ class Timeline_Rail(ft.Container):
         
         # Initialize the parent Container class first
         super().__init__()
-            
+             
         self.p = page
 
         self.reload_rail(story)
@@ -70,6 +70,7 @@ class Timeline_Rail(ft.Container):
     # When new arc is submitted
     def submit_arc(self, e, story: Story):
         ''' Creates a new arc object on the specified timeline '''
+        # TODO: Check if arc name exists
 
         # Our timeline title is stored in the data, while the new title is from the control value
         timeline_title = e.control.data
@@ -99,6 +100,7 @@ class Timeline_Rail(ft.Container):
                 self.reload_rail(story)  # Reload the rail to reflect the change and break the loop
                 break
 
+
     # Reload the rail whenever we need
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
@@ -126,6 +128,11 @@ class Timeline_Rail(ft.Container):
                 ]),
                
                 ft.Container(height=20),
+
+                ft.TextButton(
+                    "Show Plotline Widget", 
+                    on_click=lambda e: story.plotline.toggle_visibility(story),
+                ),
 
                 # Add more controls here as needed
             ]

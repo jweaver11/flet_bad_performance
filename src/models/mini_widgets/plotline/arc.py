@@ -7,7 +7,7 @@ from models.widget import Widget
 class Arc(MiniWidget):
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
-        # Check if we're loading a mini note or creating a new one
+        # Check if we're loading an arc or creating a new one
         if data is None:
             loaded = False
         else:
@@ -19,14 +19,11 @@ class Arc(MiniWidget):
             owner=owner,      # owner widget that holds us
             page=page,          # Page reference
             data=data,          # Data if we're loading an existing mini note, otherwise blank
-        )
+        ) 
 
         # If our character is new and not loaded, give it default data
         if not loaded:
             self.create_default_arc_data()  # Create data defaults for each chapter widget
-            self.save_dict()    # Save our data to the file
-
-        #self.visible = self.data.get('visible', True)  # Apply our visibility, default to True if not found
 
         # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget
         self.timeline_control = ft.GestureDetector(
@@ -55,11 +52,11 @@ class Arc(MiniWidget):
 
         self.reload_mini_widget()
 
-    # Have to save to plotline for mini widgets to function. 
+    # Called when saving our mini widget data
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file '''
 
-        if self.owner.data is None:
+        if self.owner.data is None or not isinstance(self.owner.data, dict):
             print("Error: owner data is None, cannot save mini widget data")
             return
 
@@ -74,10 +71,9 @@ class Arc(MiniWidget):
         ''' Gives default data for all arc objects '''
 
         default_arc_data = {
-            'title': self.title,
+            
             'tag': "arc",
-
-            'visible': True,    
+   
             'description': "",
             'start_date': "",
             'end_date': "",
@@ -87,8 +83,9 @@ class Arc(MiniWidget):
             'related_items': [],
         }
 
-        # Update existing data with any new default fields we added
-        self.data.update(default_arc_data)
+        # Merge default data with existing data, preserving any existing values
+        self.data = {**default_arc_data, **self.data}
+        self.save_dict()    # Save our data to the file
         return
 
     def on_hover(self, e: ft.HoverEvent):

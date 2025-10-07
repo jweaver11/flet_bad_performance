@@ -19,7 +19,6 @@ class World_Building(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            tag = "world_building",  # Tag for logic, might be phasing out later so ignore this
             p = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
@@ -38,8 +37,14 @@ class World_Building(Widget):
     def create_default_world_building_data(self):
         ''' Gives our world building widget default data it will need if none exists '''
 
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
         # Default data for our world building widget
         default_world_building_data = {
+            'tag': "world_building",  
             'content': "",
         }
 

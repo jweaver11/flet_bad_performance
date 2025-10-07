@@ -31,8 +31,7 @@ class Timeline(ft.GestureDetector):
 
         # If no data passed in (Newly created timeline), give it default data
         if self.data is None:
-            self.data = self.create_default_data()  # Create default data if none was passed in
-            self.save_dict()
+            self.create_default_data()  # Create default data if none was passed in
         
         # Load the rest of our data from the file
         self.load_branches()
@@ -66,9 +65,14 @@ class Timeline(ft.GestureDetector):
     def create_default_data(self) -> dict:
         ''' Returns a default dict data sctructure for a new timeline '''
 
-        return {
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
+        default_timeline_data = {
             'title': self.title,
-            'directory_path': self.directory_path,   # was timeline_file_path
+            'directory_path': self.directory_path,   
             'tag': "timeline",
 
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
@@ -82,6 +86,7 @@ class Timeline(ft.GestureDetector):
             'start_date': "",    # Start and end date of this particular plotline
             'end_date': "",
 
+
             'color': "blue",
 
             'branches': {},   # Branches in the timeline used to seperate disconnected story events that could merge seperately
@@ -93,10 +98,56 @@ class Timeline(ft.GestureDetector):
             # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
             # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
             'time_skips': {},    
-
-            # Mark part of timeline as written/drawn
-            
         }
+
+        # Update existing data with any new default fields we added
+        self.data.update(default_timeline_data)
+        self.save_dict()
+        return
+    
+
+
+
+
+    # TODO: VERIFY DATA INTEGRITY AND HAS REQUIRED widget/mini widget fields to not break
+
+
+
+
+
+
+    
+    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
+    def repair_data(self, tag: str):
+        ''' Repairs any missing data fields in existing mini widgets '''
+
+        # Error handling
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        # Make sure our widget has its required data that it needs to function
+        required_data = {
+            'title': self.title,        # Makes sure our title exists and matches
+            'directory_path': self.directory_path,      # Fix broken directory paths
+            'tag': tag,         # Fix our tag so we know what to load
+            'pin_location': "main",     # Just put us in the main pin if we're broken
+            'visible': self.visible,        # Keep our visibility state
+            'mini_widgets': {},     # Resets our mini widgets 
+            'tab_title_color': "primary",       # Default to primary color
+        }
+
+        # Update our data with any missing fields
+        self.data.update(required_data)
+        self.save_dict()
+
+        # Since we just deleted our mini widgets data, we need them all to save again
+        for mini_widget in self.mini_widgets:
+            mini_widget.save_dict()
+
+        # Merge default data with existing data, preserving any existing values
+        #self.data = {**default_timeline_data, **self.data}
+        
+        return
     
     # Called in the constructor
     def load_branches(self):
@@ -120,18 +171,18 @@ class Timeline(ft.GestureDetector):
     # Called in the constructor 
     def load_arcs(self):
         ''' Loads arcs from data into self.arcs  '''
+        from models.mini_widgets.plotline.arc import Arc
         
         # Looks up our arcs in our data, then passes in that data to create a live object
         for key, data in self.data['arcs'].items():
-            from models.mini_widgets.plotline.arc import Arc
             self.arcs[key] = Arc(title=key, owner=self, page=self.p, data=data)
     
     # Called in the constructor
     def load_time_skips(self):
         ''' Loads timeskips from data into self.time_skips  '''
+        from models.mini_widgets.plotline.time_skip import Time_Skip
 
         for key, data in self.data['time_skips'].items():
-            from models.mini_widgets.plotline.time_skip import Time_Skip
             self.time_skips[key] = Time_Skip(title=key, owner=self, page=self.p, data=data)
 
         return self.time_skips
@@ -150,11 +201,15 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.plot_point import Plot_Point
 
-        self.plot_points[title] = Plot_Point(title=title, owner=self, page=self.p)
-        self.data['plot_points'][title] = self.plot_points[title].data
+        new_plot_point = Plot_Point(title=title, owner=self, page=self.p, data=None)
 
+        self.plot_points[title] = new_plot_point
+        self.story.plotline.mini_widgets.append(self.plot_points[title])
+
+        # Update our data to match
         self.save_dict()
 
+        # Apply our changes in the UI
         self.reload_timeline()
         self.story.plotline.reload_widget()
 
@@ -163,15 +218,19 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.arc import Arc
 
-        self.story.plotline.mini_widgets.append(Arc(title=title, owner=self, page=self.p, data=None))
+        # Create the new arc
+        new_arc = Arc(title=title, owner=self, page=self.p, data=None)
 
-        self.arcs[title] = Arc(title=title, owner=self, page=self.p)
-        self.data['arcs'][title] = self.arcs[title].data
+        # Add our arc to our arcs dict and to the plotline mini widgets list
+        self.arcs[title] = new_arc
+        self.story.plotline.mini_widgets.append(self.arcs[title]) 
 
+        # Update our data to match
         self.save_dict()
 
+        # Apply our changes in the UI
         self.reload_timeline()
-        self.story.plotline.reload_widget()
+        self.story.plotline.reload_widget()  # New arc needs to be added to mini widgets in the UI, so we reload the widget
 
     # Called when creating a new timeskip
     def create_time_skip(self, title: str):

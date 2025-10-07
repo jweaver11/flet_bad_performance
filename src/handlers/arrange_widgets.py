@@ -14,6 +14,7 @@ def arrange_widgets(story: Story):
         if not hasattr(obj, 'data') or not obj.data:
             return  # Skip objects without data
         
+        # TODO: Check pin location exists, this will error rn if they delete this in the datas
         pin_location = obj.data['pin_location']
 
         # Appends the new pointer to our correct pin location
@@ -119,19 +120,6 @@ def arrange_widgets(story: Story):
             pass
 
 
-    # Steal from other pins if main pin is empty. 
-    # Check if empty. if yes, steal from other pins
-    if len(story.workspace.main_pin.controls) == 0:   
-        steal_from_other_pins()
-
-    # If not empty, check if any of the objects are visible
-    else:
-
-        # If all objects are invisible, steal. Otherwise do nothing
-        if all(obj.visible == False for obj in story.workspace.main_pin.controls[:]):
-          steal_from_other_pins()
-
-
     # Called when we have an object with no reference in any pin
     def add_object_to_pin(obj):
 
@@ -178,3 +166,14 @@ def arrange_widgets(story: Story):
     for note in story.notes.values():
         add_object_to_pin(note)
 
+    # Steal from other pins if main pin is empty. 
+    # Check if empty. if yes, steal from other pins
+    if len(story.workspace.main_pin.controls) == 0:   
+        steal_from_other_pins()
+
+    # If not empty, check if any of the objects are visible
+    else:
+
+        # If all objects are invisible, steal. Otherwise do nothing
+        if all(obj.visible == False for obj in story.workspace.main_pin.controls[:]):
+          steal_from_other_pins()

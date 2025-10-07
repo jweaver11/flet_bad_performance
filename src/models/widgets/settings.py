@@ -26,7 +26,6 @@ class Settings(Widget):
         # Constructor the parent widget class
         super().__init__(
             title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
-            tag = "settings",  # Tag for logic, mostly for routing it through our story object
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             story = story,
             directory_path = directory_path,
@@ -49,9 +48,15 @@ class Settings(Widget):
     def create_default_settings_data(self):
         ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
 
+        # Error catching
+        if self.data is None or not isinstance(self.data, dict):
+            # log("Data corrupted or did not exist, creating empty data dict")
+            self.data = {}
+
         # Default data for our settings widget
         default_settings_data = {
             'visible': False,   # If our settings widget is visible or not
+            'tag': "settings",  # Tag for logic, should be overwritten by child classes
             'pin_location': "main", 
             'active_story': "/",    # this works as a route for the correct story
             'is_maximized': True,   # If the window is maximized or not
