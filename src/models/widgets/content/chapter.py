@@ -31,7 +31,6 @@ class Chapter(Widget):
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
             self.verify_chapter_data()
-            
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
@@ -49,14 +48,13 @@ class Chapter(Widget):
         # Default data for new chapters
         default_chapter_data = {
             'tag': "chapter",
-
             'content': "",    # Content of our chapter
         }
 
         # Update existing data with any new default fields we added
         self.data.update(default_chapter_data)
         self.save_dict()  
-        return
+        return self.data
     
     # Called to verify loaded data
     def verify_chapter_data(self):
@@ -83,7 +81,7 @@ class Chapter(Widget):
 
         # Save our updated data
         self.save_dict()
-        return
+        return self.data
         
     
     def submit_mini_note(self, e):

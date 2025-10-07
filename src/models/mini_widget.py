@@ -86,10 +86,10 @@ class MiniWidget(ft.Container):
         # Update existing data with any new default fields we added
         self.data.update(default_data)
         self.save_dict()
-        return
+        return self.data
     
     # Called when loading a mini widget from storage
-    def verify_mini_widget_data(self):
+    def verify_mini_widget_data(self) -> dict:
         ''' Verifies loaded any missing data fields in existing mini widgets '''
 
         # Required data for all widgets and their types
@@ -115,7 +115,7 @@ class MiniWidget(ft.Container):
 
         # Save our updated data
         self.save_dict()
-        return
+        return self.data
 
 
     # Called when clicking x to hide the mini note

@@ -47,6 +47,9 @@ class Widget(ft.Container):
         # Apply our visibility
         self.visible = self.data['visible'] 
 
+        # Load any mini widgets this object may have
+        self.load_mini_widgets()
+
         # UI ELEMENTS - Tab
         self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
         self.tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
@@ -58,9 +61,6 @@ class Widget(ft.Container):
         self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
         self.mini_widgets_container = ft.Container(expand=1)  # Control to display our mini widgets. Nests inside of self.content_row
         self.mini_widgets_column = ft.Column(spacing=4)  # Column for our mini widgets on the side of our main content. Nests inside of self.mini_widgets_container
-
-        # Load any mini widgets this object may have
-        self.load_mini_widgets()
 
         # Gives our objects their uniform tabs.
         self.reload_tab(story)  # Tabs that don't need too be reloaded for color changes are only built here
@@ -107,7 +107,7 @@ class Widget(ft.Container):
         # Update our data dict with any missing fields from the defaults
         self.data.update(default_data)  # Overwrite any missing or duplicate fields (should be no duplicates anyway)
         self.save_dict()
-        return
+        return self.data
     
     # Called to fix any missing data fields in loaded widgets. Only fixes our missing fields above
     def verify_widget_data(self):
@@ -150,10 +150,6 @@ class Widget(ft.Container):
 
         from models.mini_widgets.mini_note import MiniNote
 
-        # Error handling
-        if 'mini_widgets' not in self.data:
-            self.create_default_data()
-
         # Loop through our mini widgets items in the dict and load them based on their tag into our mini widgets list
         # NOTE: Plotlines store data in their timelines files, so they load mini widgets in their own model file.
         for key, mini_widget in self.data['mini_widgets'].items():
@@ -163,6 +159,7 @@ class Widget(ft.Container):
                 #self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
                 self.mini_widgets.append(MiniNote(title=key, owner=self, page=self.p, data=mini_widget))
 
+    # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
 

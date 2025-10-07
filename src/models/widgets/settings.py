@@ -38,6 +38,7 @@ class Settings(Widget):
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
             self.verify_settings_data()
 
+
         self.reload_widget()  # Loads our settings widget UI
 
 
@@ -52,12 +53,9 @@ class Settings(Widget):
 
         # Default data for our settings widget
         default_settings_data = {
-            'visible': False,   # If our settings widget is visible or not
             'tag': "settings",  # Tag for logic, should be overwritten by child classes
-            'pin_location': "main", 
             'active_story': "/",    # this works as a route for the correct story
             'is_maximized': True,   # If the window is maximized or not
-            
             'tab_title_color': "blue",        # the tab color
             'theme_mode': "dark",       # the apps theme mode, dark or light
             'theme_color_scheme': "blue",   # the color scheme of the app
@@ -77,11 +75,12 @@ class Settings(Widget):
 
         # Update existing data with any new default fields we added
         self.data.update(default_settings_data)
+        print("Default settings data created:", self.data)
         self.save_dict()
         return
     
     # Called when settings have been loaded from a JSON file
-    def verify_settings_data(self):
+    def verify_settings_data(self) -> dict:
         ''' Verify our loaded settings data to make sure it has all the fields we need '''
 
         # Default data for our settings widget
@@ -117,7 +116,8 @@ class Settings(Widget):
             ],
             'workspaces_rail_is_collapsed': False,  
             'workspaces_rail_is_reorderable': False,  
-            'active_rail_width': 200,   
+            'active_rail_width': 200,  
+            'is_maximized': True, 
         }
 
         # Run through our keys and make sure they all exist. If not, give them default values
@@ -129,7 +129,7 @@ class Settings(Widget):
 
         # Save our updated data
         self.save_dict()
-        return
+        return self.data
             
 
     # Called when the button to reorder the workspaces is clicked

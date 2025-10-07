@@ -7,11 +7,6 @@ from models.widget import Widget
 class MiniNote(MiniWidget):
     # Constructor
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
-        # Check if we're loading a mini note or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
 
         # Parent Constructor
         super().__init__(
@@ -21,10 +16,21 @@ class MiniNote(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         )
 
-        # If our character is new and not loaded, give it default data
+        # Check if we loaded our settings data or not
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If this is a new widget (Not loaded), give it default data all widgets need
         if not loaded:
-            self.create_default_mini_note_data()  # Create data defaults for each chapter widget
-            self.save_dict()    # Save our data to the file
+            self.create_default_data()  # Create default data if none was passed in
+
+        # Otherwise, verify the loaded data
+        else:
+            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+            self.verify_mini_note_data()
+
             
 
         self.title_control = ft.TextField(
@@ -52,6 +58,34 @@ class MiniNote(MiniWidget):
 
         # Update existing data with any new default fields we added
         self.data.update(default_mini_note_data)
+        self.save_dict()
+        return self.data
+    
+    # Called to fix any missing data fields in loaded mini notes. Only fixes our missing fields above
+    def verify_widget_data(self):
+        ''' Verify loaded any missing data fields in existing mini notes '''
+
+        # Required data for all widgets and their types
+        required_data_types = {
+            'tag': str,
+            'content': str
+        }
+
+        # Defaults we can use for any missing fields
+        data_defaults = {
+            'tag': "mini_note",
+            'content': "",
+        }
+
+        # Run through our keys and make sure they all exist. If not, give them default values
+        for key, required_data_type in required_data_types.items():
+            if key not in self.data or not isinstance(self.data[key], required_data_type):
+                self.data[key] = data_defaults[key]  
+
+        self.data['tag'] = "mini_note"   # Make sure our tag is always correct
+
+        # Save our updated data
+        self.save_dict()
         return
 
 
