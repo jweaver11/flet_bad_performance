@@ -72,7 +72,7 @@ class Timeline(ft.GestureDetector):
 
         default_timeline_data = {
             'title': self.title,
-            'directory_path': self.directory_path,   # was timeline_file_path
+            'directory_path': self.directory_path,   
             'tag': "timeline",
 
             'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
@@ -86,6 +86,7 @@ class Timeline(ft.GestureDetector):
             'start_date': "",    # Start and end date of this particular plotline
             'end_date': "",
 
+
             'color': "blue",
 
             'branches': {},   # Branches in the timeline used to seperate disconnected story events that could merge seperately
@@ -97,14 +98,55 @@ class Timeline(ft.GestureDetector):
             # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
             # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
             'time_skips': {},    
-
-            # Mark part of timeline as written/drawn
-            
         }
 
-        # Merge default data with existing data, preserving any existing values
-        self.data = {**default_timeline_data, **self.data}
+        # Update existing data with any new default fields we added
+        self.data.update(default_timeline_data)
         self.save_dict()
+        return
+    
+
+
+
+
+    # TODO: VERIFY DATA INTEGRITY AND HAS REQUIRED widget/mini widget fields to not break
+
+
+
+
+
+
+    
+    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
+    def repair_data(self, tag: str):
+        ''' Repairs any missing data fields in existing mini widgets '''
+
+        # Error handling
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        # Make sure our widget has its required data that it needs to function
+        required_data = {
+            'title': self.title,        # Makes sure our title exists and matches
+            'directory_path': self.directory_path,      # Fix broken directory paths
+            'tag': tag,         # Fix our tag so we know what to load
+            'pin_location': "main",     # Just put us in the main pin if we're broken
+            'visible': self.visible,        # Keep our visibility state
+            'mini_widgets': {},     # Resets our mini widgets 
+            'tab_title_color': "primary",       # Default to primary color
+        }
+
+        # Update our data with any missing fields
+        self.data.update(required_data)
+        self.save_dict()
+
+        # Since we just deleted our mini widgets data, we need them all to save again
+        for mini_widget in self.mini_widgets:
+            mini_widget.save_dict()
+
+        # Merge default data with existing data, preserving any existing values
+        #self.data = {**default_timeline_data, **self.data}
+        
         return
     
     # Called in the constructor
@@ -138,9 +180,9 @@ class Timeline(ft.GestureDetector):
     # Called in the constructor
     def load_time_skips(self):
         ''' Loads timeskips from data into self.time_skips  '''
+        from models.mini_widgets.plotline.time_skip import Time_Skip
 
         for key, data in self.data['time_skips'].items():
-            from models.mini_widgets.plotline.time_skip import Time_Skip
             self.time_skips[key] = Time_Skip(title=key, owner=self, page=self.p, data=data)
 
         return self.time_skips
@@ -164,8 +206,10 @@ class Timeline(ft.GestureDetector):
         self.plot_points[title] = new_plot_point
         self.story.plotline.mini_widgets.append(self.plot_points[title])
 
+        # Update our data to match
         self.save_dict()
 
+        # Apply our changes in the UI
         self.reload_timeline()
         self.story.plotline.reload_widget()
 

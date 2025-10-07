@@ -79,9 +79,11 @@ class MiniWidget(ft.Container):
     def repair_data(self, tag: str):
         ''' Repairs any missing data fields in existing mini widgets '''
 
+        # Error handling
         if self.data is None or not isinstance(self.data, dict):
             self.data = {}
 
+        # Make sure our mini widget has its required data that it needs to function
         required_data = {
             'title': self.title,    # Fix our title if broke
             'tag': tag,         # Fix our tag so we know what to load

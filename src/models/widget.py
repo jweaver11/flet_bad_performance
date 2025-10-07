@@ -100,20 +100,22 @@ class Widget(ft.Container):
         return
     
     # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
-    def repair_data(self, tag: str):
-        ''' Repairs any missing data fields in existing mini widgets '''
+    def verify_data(self, tag: str):
+        ''' Verify loaded any missing data fields in existing mini widgets '''
 
+        # Error handling
         if self.data is None or not isinstance(self.data, dict):
             self.data = {}
 
+        # Make sure our widget has its required data that it needs to function
         required_data = {
             'title': self.title,        # Makes sure our title exists and matches
             'directory_path': self.directory_path,      # Fix broken directory paths
             'tag': tag,         # Fix our tag so we know what to load
             'pin_location': "main",     # Just put us in the main pin if we're broken
             'visible': self.visible,        # Keep our visibility state
-            'mini_widgets': {},
-            'tab_title_color': "primary",
+            'mini_widgets': {},     # Resets our mini widgets 
+            'tab_title_color': "primary",       # Default to primary color
         }
 
         # Update our data with any missing fields
