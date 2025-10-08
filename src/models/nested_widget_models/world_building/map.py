@@ -5,7 +5,7 @@ from models.story import Story
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
-class Timeline(ft.GestureDetector):
+class Map(ft.GestureDetector):
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
     def __init__(self, title: str, directory_path: str, page: ft.Page, story: Story, data: dict=None):
@@ -115,49 +115,6 @@ class Timeline(ft.GestureDetector):
     def verify_map_data(self):
         ''' Verify loaded any missing data fields in existing maps '''
     
-
-
-
-
-    # TODO: VERIFY DATA INTEGRITY AND HAS REQUIRED widget/mini widget fields to not break
-
-
-
-
-
-
-    
-    # Called to fix any missing data fields in existing mini widgets. Only fixes our missing fields above
-    def verify_data(self, tag: str):
-        ''' Repairs any missing data fields in existing mini widgets '''
-
-        # Error handling
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        # Make sure our widget has its required data that it needs to function
-        required_data = {
-            'title': self.title,        # Makes sure our title exists and matches
-            'directory_path': self.directory_path,      # Fix broken directory paths
-            'tag': tag,         # Fix our tag so we know what to load
-            'pin_location': "main",     # Just put us in the main pin if we're broken
-            'visible': self.visible,        # Keep our visibility state
-            'mini_widgets': {},     # Resets our mini widgets 
-            'tab_title_color': "primary",       # Default to primary color
-        }
-
-        # Update our data with any missing fields
-        self.data.update(required_data)
-        self.save_dict()
-
-        # Since we just deleted our mini widgets data, we need them all to save again
-        for mini_widget in self.mini_widgets:
-            mini_widget.save_dict()
-
-        # Merge default data with existing data, preserving any existing values
-        #self.data = {**default_timeline_data, **self.data}
-        
-        return
     
     
 

@@ -1,13 +1,17 @@
+'''
+Our widget class that displays our plot and timelines of our story.
+Our stories have one plotline, but can contain multiple timelines if doing regression/timetravel/multiverse
+Our timelines (stored in their own directory) contain branches, plot points, arcs, and timeskips
+'''
+
 import flet as ft
 import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.timeline import Timeline
+from models.nested_widget_models.plotline.timeline import Timeline
 
 
-# Class that holds our timeline object, that holds our plotlines
-# Stories generally only have one timeline, unless we want multiple timelines, regression, multiverse, etc.
 class Plotline(Widget):
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
@@ -137,7 +141,7 @@ class Plotline(Widget):
     def load_timelines(self):
         ''' Loads our timelines from our timelines directory inside our plotline directory '''
 
-        from models.timeline import Timeline
+        from models.nested_widget_models.plotline.timeline import Timeline
         # Load our timelines from our timeline directory
         timelines_directory_path = os.path.join(self.data['directory_path'], "timelines")
         

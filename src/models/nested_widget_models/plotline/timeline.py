@@ -1,3 +1,8 @@
+'''
+Our timeline object that stores plot points, branches, arcs, and time skips.
+These objects is displayed in the plotline widget, and store our mini widgets branches, plot points, arcs, and time skips.
+'''
+
 import json
 import os
 import flet as ft

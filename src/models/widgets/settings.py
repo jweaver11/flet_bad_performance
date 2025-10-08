@@ -1,13 +1,11 @@
-''' Parent class for our settings widget'''
+''' 
+Model for our settings widget. Settings widget stores app and story settings, and displays them in a tab
+A Settings object is created for every story
+'''
 
 import flet as ft
 from models.story import Story
 from models.widget import Widget
-
-
-# 
-# OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
-#
 
 
 class Settings(Widget):
@@ -276,6 +274,8 @@ class Settings(Widget):
         
         # Sets our object content to be our tab
         self.content = tab
+
+        #OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
 
 
 

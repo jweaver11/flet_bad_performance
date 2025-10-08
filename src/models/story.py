@@ -1,5 +1,7 @@
 ''' 
 Master Story class that contains data and methods for the entire story 
+Our story is an extended ft.View, meaning new routes can display the story object directly
+Stories contain metadata, ui elements, and all the widgets, as well as methods to create new widgets only
 This is a dead-end model. Imports nothing else from project (other than constants) to avoid ciruclar import
 '''
 
@@ -8,7 +10,7 @@ import os
 import json
 from constants import data_paths
 
-# Class for our different story objects
+
 class Story(ft.View):
     # Constructor Requires a Title, page reference.
     # Optional: data (if loading) template (sci-fi, fantasy, etc.), type (novel or comic)
@@ -48,18 +50,18 @@ class Story(ft.View):
 
             
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
-        self.menubar: None     # Is an extended ft.Container
-        self.all_workspaces_rail: None     # Is an extended ft.Container
-        self.active_rail: None     # Is an extended ft.Container
-        self.workspace: None       # Is an extended ft.Container
+        self.menubar: ft.Container = None     # Menu bar at top of page
+        self.all_workspaces_rail: ft.Container = None      # Rail on left side showing our 6 workspaces
+        self.active_rail: ft.Container = None    # Rail showing whichever workspace is selected
+        self.workspace: ft.Container = None        # Main workspace area where our pins display our widgets
 
         # Our widgets objects
-        self.chapters: dict = {}   
-        self.images: dict = {}
-        self.characters: dict = {}   
-        self.plotline: None   # Only one plotline obj
-        self.world_building: None  # Only one world building obj
-        self.notes: dict = {} 
+        self.chapters: dict = {}   # Chapters stored in our story
+        self.images: dict = {}  # Images stored in our story
+        self.characters: dict = {}      # Characters stored in our story
+        self.plotline: None   # Only one plotline obj that displays our timlines
+        self.world_building: None  # Only one world building obj that displays our maps
+        self.notes: dict = {}   # Notes stored in our story
 
         # Variables to store our mouse position for opening menus
         self.mouse_x: int = 0

@@ -1,10 +1,14 @@
+'''
+Parent class for mini widgets, which are extended flet containers used as information displays on the side of the parent widget
+Makes showing detailed information easier without rending and entire widget where it doesn't make sense
+'''
+
+
 import flet as ft
 from models.widget import Widget
 
 
-# Parent Class that holds our mini note objects (ft.Containers), that are held within widget objects only
-# These child objects appear inside of another widget, (from right or left) to show more detail and child information
-# Example, clicking a plotpoint, arc, etc. on a timeline brings up a mini widget
+
 class MiniWidget(ft.Container):
     # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
@@ -40,6 +44,7 @@ class MiniWidget(ft.Container):
         # Apply our visibility
         self.visible = self.data['visible']
 
+        # UI Elements
         self.title_control = ft.TextField(
             value=self.title,
             label=None,

@@ -4,6 +4,7 @@ from models.story import Story
 # Called whenever a new story is laoded
 def route_change(e: ft.RouteChangeEvent) -> Story:
     ''' Handles changing our page view based on the new route '''
+    from ui.menu_bar import create_menu_bar
 
     # Grabs our page from the event for easier reference
     page = e.page
@@ -28,9 +29,8 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     # If we have a story route that matches our new route, load it to the page views
     if new_story is not None:
         
-        # Rebuild our view each switch. This is only called to ensure things like rails being collapsed and workspace
-        # orders are properly loaded each time we switch stories
-        new_story.build_view()  
+        # Load our new stories data and builds its UI, then adds it to the page
+        new_story.startup()
         page.views.append(new_story)
 
         # Set our new title to reflect this new loaded story
@@ -41,7 +41,6 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
 
     # Otherwise, give us a blank page
     else:
-        from ui.menu_bar import create_menu_bar
         menu_bar = create_menu_bar(page)
         view = ft.View(
             "/",

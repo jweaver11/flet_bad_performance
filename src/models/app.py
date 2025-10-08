@@ -9,28 +9,24 @@ import flet as ft
 
 
 class App:
+
     # Constructor
     def __init__(self):
 
-        #from models.settings import Settings
-
         # Declares settings and workspace rail here, but we create/load them later in main
-        self.settings = None
-        #self.all_workspaces_rail = None   # All workspaces rail
+        self.settings: ft.Container = None
+        
         
         # Dict of all our stories.
         self.stories = {}
         
-        # Load existing stories from the directory
-        #self.load_stories()
         
-        # When settings is created, it uses default story if none exists
-        #self.active_story = self.stories['default_story']
 
-    # Called when app creates a new story
+    # Called when app creates a new story. Accepts our title, page reference, a template, and a type
     def create_new_story(self, title: str, page: ft.Page, template: str) -> Story:
-        ''' Creates the new story object, then saves it to a new folder WIP '''
-        #from handlers.reload_workspace import reload_workspace
+        ''' Creates the new story object and has it run its 'startup' method. Changes route so our view displays the new story '''
+
+        # TODO: Add a type to accept for novel/comic
         
         # Create a new story object and add it to our stories dict
         self.stories[title] = Story(title, page, data=None, template=template)
@@ -41,6 +37,6 @@ class App:
 
         
     
-# Sets our global app object
+# Sets our global app object that main uses and some functions call
 app = App()
 

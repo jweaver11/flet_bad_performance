@@ -89,7 +89,7 @@ def init_load_saved_stories(page: ft.Page):
 
     # Initialize and load all our stories data and UI elements
     for story in app.stories.values():
-        story.startup()
+        #story.startup()
         if story.title == app.settings.data.get('active_story', None):
             page.route = story.route    # This will call our route change function and set our story view
 
