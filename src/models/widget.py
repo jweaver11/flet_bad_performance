@@ -278,10 +278,10 @@ class Widget(ft.Container):
     def reload_widget(self):
         ''' Children build their own content of the widget here '''
 
-        # BUILDING BODY - the inside the body container of our widget
-        self.body_container.content = ft.Text(f"hello from: {self.title}"),
+        # Set the body container.content to whatever control you build in the child
+        self.body_container.content = ft.Text(f"hello from: {self.title}")  # Placeholder control if child doesn't overwrite this
             
-        # Builds the rest of the widget and handles mini widgets as well
+        # Call Render widget to handle the rest of the heavy lifting
         self.render_widget()
 
     # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets

@@ -85,6 +85,6 @@ class Notes(Widget):
 
         self.body_container.content = body
         
-
+        
         self.render_widget()
         
