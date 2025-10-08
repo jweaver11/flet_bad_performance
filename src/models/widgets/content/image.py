@@ -31,8 +31,13 @@ class Image(Widget):
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-           # self.verify_chapter_data()
-           pass
+            verify_data(
+                self,   # Pass in our own data so the function can see the actual data we loaded
+                {
+                    'tag': str,
+                },
+                tag="image"
+            )
             
 
 

@@ -69,7 +69,6 @@ class MiniNote(MiniWidget):
         self.data.update(default_mini_note_data)
         self.save_dict()
 
-        print("Mini note data: ", self.data)
         return self.data
 
 

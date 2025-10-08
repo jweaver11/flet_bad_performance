@@ -274,6 +274,48 @@ class Widget(ft.Container):
             ),                       
         )
 
+    # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
+    def reload_widget(self):
+        ''' Children build their own content of the widget here '''
+
+        # BUILDING BODY - the inside the body container of our widget
+        self.body_container.content = ft.Text(f"hello from: {self.title}"),
+            
+        # Builds the rest of the widget and handles mini widgets as well
+        self.render_widget()
+
+    # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets
+    def render_widget(self):
+        ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it'''
+
+        # Set the mini widgets visibility to false so we can check later if we want to add it to the page
+        self.mini_widgets_container.visible = False
+        self.content_row.controls.clear()   # Clear our content row so we can rebuild it
 
 
-        # TODO: Add reload widget function here, and child classes just pass in their content for the body container??
+        # Add the body container to our content row
+        self.content_row.controls.append(self.body_container)
+
+
+        # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
+        self.mini_widgets_column.controls = self.mini_widgets   
+        
+        # Add our column that we build to our mini widgets container
+        self.mini_widgets_container.content = self.mini_widgets_column
+
+        # Check if we are showing any mini widgets. If we are, add the container to our content row
+        for mini_widget in self.mini_widgets_column.controls:
+            # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
+            if mini_widget.visible:
+                self.mini_widgets_container.visible = True
+                self.content_row.controls.append(self.mini_widgets_container)
+                break
+            
+        
+        # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
+        self.tab.content = self.content_row  # We add this in combo with our 'tabs' later
+        
+        # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
+        self.tabs.tabs = [self.tab]
+        self.content = self.tabs
+        self.p.update()

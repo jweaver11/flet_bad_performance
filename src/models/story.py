@@ -161,7 +161,9 @@ class Story(ft.View):
         self.save_dict()
         return
     
+    # Called when loading a story to verify the data has everything it needs
     def verify_story_data(self):
+        ''' Verifies all keys exist and are the right type. If not, we give them default values '''
 
         required_data_types = {
             'title': str,
@@ -501,12 +503,9 @@ class Story(ft.View):
                         with open(file_path, "r", encoding='utf-8') as f:
                             # Set our data to be passed into our objects
                             content_data = json.load(f)
-
-                            print("content data loaded: \n\n", content_data, "\n\n")
                         
                         # Extract the title from the data
                         content_title = content_data.get("title", filename.replace(".json", ""))
-
 
 
                         # Check our tag to see what type of content it is, and load appropriately
@@ -532,7 +531,6 @@ class Story(ft.View):
                         print(f"Error loading content from {filename}: {e}")
 
         # Load animations -- TBD in future if possible
-        print("num chapters loaded: ", len(self.chapters))
 
 
     # Called as part of the startup method during program launch

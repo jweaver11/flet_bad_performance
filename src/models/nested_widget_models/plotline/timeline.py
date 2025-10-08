@@ -219,10 +219,15 @@ class Timeline(ft.GestureDetector):
 
         from models.mini_widgets.plotline.time_skip import Time_Skip
 
-        self.time_skips[title] = Time_Skip(title=title, owner=self, page=self.p)
-        self.data['time_skips'][title] = self.time_skips[title].data
+        new_time_skip = Time_Skip(title=title, owner=self, page=self.p, data=None)
+
+        self.time_skips[title] = new_time_skip
+        self.story.plotline.mini_widgets.append(self.time_skips[title])
 
         self.save_dict()
+
+        self.reload_timeline()
+        self.story.plotline.reload_widget()  # New timeskip needs to be added to mini
 
     # Called when deleting a plotpoint
     def delete_plot_point(self, title: str):

@@ -31,7 +31,17 @@ class Notes(Widget):
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_note_data()
+            verify_data(
+                self,   # Pass in our own data so the function can see the actual data we loaded
+                {
+                    'tag': str,
+                    'character_count': int,
+                    'created_at': str,
+                    'last_modified': str,
+                    'content': str
+                },
+                tag="note"
+            )
         
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
@@ -58,39 +68,6 @@ class Notes(Widget):
         self.data.update(default_note_data)  
         self.save_dict()
         return
-    
-    # Called to verify loaded data
-    def verify_note_data(self):
-        ''' Verify loaded any missing data fields in existing notes '''
-
-        # Required data for all widgets and their types
-        required_data_types = {
-            'tag': str,
-            'character_count': int,
-            'created_at': str,
-            'last_modified': str,
-            'content': str
-        }
-
-        # Defaults we can use for any missing fields
-        data_defaults = {
-            'tag': "note",  
-            "character_count": 0,
-            "created_at": "",
-            "last_modified": "",
-            "content": "",
-        }
-
-        # Run through our keys and make sure they all exist. If not, give them default values
-        for key, required_data_type in required_data_types.items():
-            if key not in self.data or not isinstance(self.data[key], required_data_type):
-                self.data[key] = data_defaults[key]  
-
-        self.data['tag'] = "chapter"   # Make sure our tag is always correct
-
-        # Save our updated data
-        self.save_dict()
-        return
 
     # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild
     def reload_widget(self):
@@ -105,22 +82,9 @@ class Notes(Widget):
                 ft.Text("hi from " + self.title),
             ])
         )
+
+        self.body_container.content = body
         
 
-        # our tab.content is the body of our widget that we build above.
-        self.tab.content=body   # We add this in combo with our 'tabs' later
-
-        # Sets our actual 'tabs' portion of our widget, since 'tab' needs to nest inside of 'tabs' in order to work
-        content = ft.Tabs(
-            selected_index=0,       # Since we only have one tab, we make sure it is selected
-            animation_duration=0,   # Gets rid of transition animation between tabs
-            #divider_color=ft.Colors.TRANSPARENT,
-            padding=ft.padding.all(0),  # No padding so it fills the entire container
-            label_padding=ft.padding.all(0),    # No padding around the label either
-            mouse_cursor=ft.MouseCursor.BASIC,  # Basic mouse cursor when hovering over tabs
-            tabs=[self.tab]    # Gives our tab control here
-        )
-        
-        # Content of our widget (ft.Container) is our created tabs content
-        self.content = content
+        self.render_widget()
         
