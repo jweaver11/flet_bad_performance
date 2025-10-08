@@ -7,6 +7,7 @@ import flet as ft
 from models.story import Story
 import os
 import json
+from handlers.verify_data import verify_data
 
 # TODO Show widget outline when clicked on rail as a pseudo 'focus'
 # TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
@@ -29,7 +30,7 @@ class Widget(ft.Container):
         self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
         self.mini_widgets = []  # List that holds our mini widgets objects
 
-        # Check if we loaded our settings data or not
+        # Check if we loaded our widget or created a new one
         if data is None:
             loaded = False
         else:
@@ -42,13 +43,26 @@ class Widget(ft.Container):
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_widget_data()
+            verify_data(
+                self,   # Pass in our own data so the function can see the actual data we loaded
+                {
+                    'title': str,
+                    'directory_path': str,
+                    'tag': str,
+                    'pin_location': str,
+                    'visible': bool,
+                    'tab_title_color': str,
+                    'mini_widgets': dict,
+                },
+            )
+
 
         # Apply our visibility
         self.visible = self.data['visible'] 
 
         # Load any mini widgets this object may have
         self.load_mini_widgets()
+
 
         # UI ELEMENTS - Tab
         self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
@@ -63,7 +77,7 @@ class Widget(ft.Container):
         self.mini_widgets_column = ft.Column(spacing=4)  # Column for our mini widgets on the side of our main content. Nests inside of self.mini_widgets_container
 
         # Gives our objects their uniform tabs.
-        self.reload_tab(story)  # Tabs that don't need too be reloaded for color changes are only built here
+        self.reload_tab()  # Tabs that don't need too be reloaded for color changes are only built here
 
     # Called whenever there are changes in our data
     def save_dict(self):
@@ -109,41 +123,6 @@ class Widget(ft.Container):
         self.save_dict()
         return self.data
     
-    # Called to fix any missing data fields in loaded widgets. Only fixes our missing fields above
-    def verify_widget_data(self):
-        ''' Verify loaded any missing data fields in existing widgets '''
-
-        # Required data for all widgets and their types
-        required_data_types = {
-            'title': str,
-            'directory_path': str,
-            'tag': str,
-            'pin_location': str,
-            'visible': bool,
-            'tab_title_color': str,
-            'mini_widgets': dict,
-        }
-
-        # Defaults we can use for any missing fields
-        data_defaults = {
-            'title': self.title,
-            'directory_path': self.directory_path,
-            'tag': "widget",    # Default tag, should be overwritten by child classes
-            'pin_location': "main",     # Stick us in the main pin area by default
-            'visible': True,    
-            'tab_title_color': "primary",
-            'mini_widgets': {},
-        }
-
-        # Run through our keys and make sure they all exist. If not, give them default values
-        for key, required_data_type in required_data_types.items():
-            if key not in self.data or not isinstance(self.data[key], required_data_type):
-                self.data[key] = data_defaults[key]  
-
-        # Save our updated data
-        self.save_dict()
-        return
-    
     # Called in a childs constructor to load any mini widgets that it may have
     def load_mini_widgets(self):
         ''' Checks all the items under the data['mini_widgets'] dictionary and creates the appropriate mini widget objects '''
@@ -156,7 +135,6 @@ class Widget(ft.Container):
 
             # Check the tag to see what type of mini widget it is, and create the appropriate object
             if mini_widget['tag'] == "mini_note":
-                #self.mini_widgets[key] = MiniNote(title=key, owner=self, page=self.p, data=mini_widget)
                 self.mini_widgets.append(MiniNote(title=key, owner=self, page=self.p, data=mini_widget))
 
     # Called when a new mini note is created inside a widget
@@ -200,16 +178,11 @@ class Widget(ft.Container):
         self.visible = self.data['visible']
         self.save_dict()
         self.p.update()
-            
-        # Settings doesn't have a story, so we reload all the stories workspaces instead of just the one for our widget
-        if self.title == "Settings":
-            from models.app import app
-            for story in app.stories.values():
-                story.workspace.reload_workspace(self.p, story)
 
-        # Otherwise, our widget will have a story, so we just reload that one
-        else:
-            story.workspace.reload_workspace(self.p, story)
+        #self.p.views[0].workspace.reload_workspace(self.p, story)
+            
+        
+        story.workspace.reload_workspace(self.p, story)
 
     # Called when creating a new mini note inside a widget
     def create_mini_note(self, title: str):
@@ -222,7 +195,7 @@ class Widget(ft.Container):
         return
 
     # Called at end of constructor
-    def reload_tab(self, story: Story):
+    def reload_tab(self):
         ''' Creates our tab for our widget that has the title and hide icon '''
 
         # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
@@ -238,7 +211,7 @@ class Widget(ft.Container):
         # Our icon button that will hide the widget when clicked in the workspace
         self.hide_tab_icon_button = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
-            on_click=lambda e: self.toggle_visibility(story),
+            on_click=lambda e: self.toggle_visibility(self.story),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
         )
@@ -300,3 +273,7 @@ class Widget(ft.Container):
                 ),
             ),                       
         )
+
+
+
+        # TODO: Add reload widget function here, and child classes just pass in their content for the body container??

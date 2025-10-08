@@ -26,7 +26,6 @@ def main(page: ft.Page):
     init_settings(page)
     init_load_saved_stories(page)   # Changes route to active story if there is one
 
-
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)
     page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))
     page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))

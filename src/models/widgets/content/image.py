@@ -1,6 +1,7 @@
 import flet as ft
 from models.widget import Widget
 from models.story import Story
+from handlers.verify_data import verify_data
 
 
 # Our widget class that displays images

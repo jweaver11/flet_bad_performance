@@ -25,6 +25,7 @@ class Plot_Point(MiniWidget):
         if not loaded:
             self.create_default_plot_point_data()  # Create data defaults for each chapter widget
 
+
         self.reload_mini_widget()
 
     

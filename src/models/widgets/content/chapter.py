@@ -1,6 +1,7 @@
 import flet as ft
 from models.story import Story
 from models.widget import Widget
+from handlers.verify_data import verify_data
 
 
 # Class that holds our text chapter objects

@@ -6,6 +6,7 @@ A Settings object is created for every story
 import flet as ft
 from models.story import Story
 from models.widget import Widget
+from handlers.verify_data import verify_data
 
 
 class Settings(Widget):
@@ -34,7 +35,23 @@ class Settings(Widget):
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_settings_data()
+            verify_data(
+                self,   # Pass in our own data so the function can see the actual data we loaded
+                {
+                    'tag': str,  # Tag for logic, should be overwritten by child classes
+                    'active_story': str,    # this works as a route for the correct story
+                    'tab_title_color': str,        # the tab color
+                    'theme_mode': str,       # the apps theme mode, dark or light
+                    'theme_color_scheme': str,   # the color scheme of the app
+                    'change_name_colors_based_on_morality': bool,   # If characters names change colors in char based on morality
+                    'workspaces_rail_order': list,      # Order of the workspace rail
+                    'workspaces_rail_is_collapsed': bool,  # If the all workspaces rail is collapsed or not
+                    'workspaces_rail_is_reorderable': bool,  # If the all workspaces rail is reorderable or not
+                    'active_rail_width': int,   # Width of our active rail that we can resize
+                    'is_maximized': bool,   # If the window is maximized or not
+                },
+                tag="settings"
+            )
 
 
         self.reload_widget()  # Loads our settings widget UI
@@ -76,58 +93,6 @@ class Settings(Widget):
         print("Default settings data created:", self.data)
         self.save_dict()
         return
-    
-    # Called when settings have been loaded from a JSON file
-    def verify_settings_data(self) -> dict:
-        ''' Verify our loaded settings data to make sure it has all the fields we need '''
-
-        # Default data for our settings widget
-        required_data_types = {
-            'tag': str,  # Tag for logic, should be overwritten by child classes
-            'active_story': str,    # this works as a route for the correct story
-            'tab_title_color': str,        # the tab color
-            'theme_mode': str,       # the apps theme mode, dark or light
-            'theme_color_scheme': str,   # the color scheme of the app
-            'change_name_colors_based_on_morality': bool,   # If characters names change colors in char based on morality
-            'workspaces_rail_order': list,      # Order of the workspace rail
-            'workspaces_rail_is_collapsed': bool,  # If the all workspaces rail is collapsed or not
-            'workspaces_rail_is_reorderable': bool,  # If the all workspaces rail is reorderable or not
-            'active_rail_width': int,   # Width of our active rail that we can resize
-            'is_maximized': bool,   # If the window is maximized or not
-        }
-
-        # Required data types for our settings data fields
-        data_defaults = {
-            'tag': "settings",
-            'active_story': "/",    
-            'tab_title_color': "primary",
-            'theme_mode': "dark",       
-            'theme_color_scheme': "blue",   
-            'change_name_colors_based_on_morality': True,   
-            'workspaces_rail_order': [      
-                "content",
-                "characters",
-                "plot_and_timeline",
-                "world_building",
-                "drawing_board",
-                "notes",
-            ],
-            'workspaces_rail_is_collapsed': False,  
-            'workspaces_rail_is_reorderable': False,  
-            'active_rail_width': 200,  
-            'is_maximized': True, 
-        }
-
-        # Run through our keys and make sure they all exist. If not, give them default values
-        for key, required_data_type in required_data_types.items():
-            if key not in self.data or not isinstance(self.data[key], required_data_type):
-                self.data[key] = data_defaults[key]  
-
-        self.data['tag'] = "settings"   # Make sure our tag is always correct
-
-        # Save our updated data
-        self.save_dict()
-        return self.data
             
 
     # Called when the button to reorder the workspaces is clicked

@@ -9,6 +9,7 @@ Nested in any particular way. WorldMaps CANNOT store each other or be nested.
 import flet as ft
 from models.widget import Widget
 from models.story import Story
+from handlers.verify_data import verify_data
 
 
 class World_Building(Widget):
@@ -36,7 +37,22 @@ class World_Building(Widget):
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_world_building_data()
+            verify_data(
+                self,   # Pass in our own data so the function can see the actual data we loaded
+                {
+                    'tag': str,
+                    'world_maps': dict,
+                    'content': str,
+                    'locations': dict,
+                    'lore': dict,
+                    'power_systems': dict,
+                    'social_systems': dict,
+                    'geography': dict,
+                    'history': dict,
+                    'content': str,
+                },
+                tag="world_building"
+            )
 
         # Dict of different worlds and their maps stored
         self.world_maps = {}
@@ -82,49 +98,7 @@ class World_Building(Widget):
         self.data.update(default_world_building_data)
         self.save_dict()
         return self.data
-    
-    # Called to verify loaded data
-    def verify_world_building_data(self):
-        ''' Verify loaded any missing data fields in existing chapters '''
 
-        # Required data for all widgets and their types
-        required_data_types = {
-            'tag': str,
-            'world_maps': dict,
-            'content': str,
-            'locations': dict,
-            'lore': dict,
-            'power_systems': dict,
-            'social_systems': dict,
-            'geography': dict,
-            'history': dict,
-            'content': str,
-        }
-
-        # Defaults we can use for any missing fields
-        data_defaults = {
-            'tag': "chapter",
-            'world_maps': {},
-            'content': "",
-            'locations': {},
-            'lore': {},
-            'power_systems': {},
-            'social_systems': {},
-            'geography': {},
-            'history': {},
-            'content': "",
-        }
-
-        # Run through our keys and make sure they all exist. If not, give them default values
-        for key, required_data_type in required_data_types.items():
-            if key not in self.data or not isinstance(self.data[key], required_data_type):
-                self.data[key] = data_defaults[key]  
-
-        self.data['tag'] = "world_building"   # Make sure our tag is always correct
-
-        # Save our updated data
-        self.save_dict()
-        return
     
     def load_maps(self):
         pass

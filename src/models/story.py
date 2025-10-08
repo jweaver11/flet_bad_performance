@@ -501,9 +501,13 @@ class Story(ft.View):
                         with open(file_path, "r", encoding='utf-8') as f:
                             # Set our data to be passed into our objects
                             content_data = json.load(f)
+
+                            print("content data loaded: \n\n", content_data, "\n\n")
                         
                         # Extract the title from the data
                         content_title = content_data.get("title", filename.replace(".json", ""))
+
+
 
                         # Check our tag to see what type of content it is, and load appropriately
                         if content_data.get("tag", "") == "chapter":
@@ -528,6 +532,7 @@ class Story(ft.View):
                         print(f"Error loading content from {filename}: {e}")
 
         # Load animations -- TBD in future if possible
+        print("num chapters loaded: ", len(self.chapters))
 
 
     # Called as part of the startup method during program launch

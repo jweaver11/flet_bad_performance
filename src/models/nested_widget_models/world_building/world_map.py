@@ -44,13 +44,15 @@ class WorldMap(ft.GestureDetector):
             self.verify_map_data()
 
 
+        # Store sub maps inside of folders - continents, oceans, etc.
+
         # Apply our visibility
         self.visible = self.data['visible']
 
         # Need to be able to draw maps for continents, countries, regions, dungeons, cities, etc.
         # Needs drawing functionality, as well as ability to just add locations, markers, notes
         
-
+        self.maps = {}
 
         # Load the rest of our data from the file
         
@@ -120,6 +122,7 @@ class WorldMap(ft.GestureDetector):
     # Called to verify loaded data
     def verify_map_data(self):
         ''' Verify loaded any missing data fields in existing maps '''
+        pass
     
     
     

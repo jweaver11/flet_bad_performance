@@ -10,6 +10,7 @@ import os
 from models.story import Story
 from models.widget import Widget
 from models.nested_widget_models.plotline.timeline import Timeline
+from handlers.verify_data import verify_data
 
 
 class Plotline(Widget):

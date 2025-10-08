@@ -5,11 +5,9 @@ the app will change. Everything else is built upon program launch so we can disp
 '''
 
 import flet as ft
-import json
-import os
-from models.app import app
 from models.widget import Widget
 from models.story import Story
+from handlers.verify_data import verify_data
 
 
 # Sets our Character as an extended Widget object, which is a subclass of a flet Container

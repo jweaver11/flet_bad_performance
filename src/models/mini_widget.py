@@ -6,6 +6,7 @@ Makes showing detailed information easier without rending and entire widget wher
 
 import flet as ft
 from models.widget import Widget
+from handlers.verify_data import verify_data
 
 
 
@@ -25,7 +26,7 @@ class MiniWidget(ft.Container):
         self.p = page   # Grabs our original page for convenience and consistency
         self.data = data    # Pass in our data when loading existing mini widgets
 
-        # Check if we loaded our mini widget or not
+        # Check if we loaded our mini widget or created a new one
         if data is None:
             loaded = False
         else:
@@ -38,11 +39,20 @@ class MiniWidget(ft.Container):
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_mini_widget_data()
+            verify_data(
+                self,   # Pass in our object so we can access its data and change it
+                {   # Pass in the required fields and their types
+                    'title': str,       # Title of the mini widget, should match the object title
+                    'tag': str,     # Default mini widget tag, but should be overwritten by child classes
+                    'visible': bool,        # If the widget is visible. Flet has this parameter build in, so our objects all use it
+                    'is_selected': bool,    # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+                },
+            )
 
 
         # Apply our visibility
         self.visible = self.data['visible']
+        self.is_selected = False    # Check if we are selected for ui purposes
 
         # UI Elements
         self.title_control = ft.TextField(
@@ -82,43 +92,14 @@ class MiniWidget(ft.Container):
 
         # This is default data if no file exists. If we are loading from an existing file, this is overwritten
         default_data = {
-            'title': self.title,
-            'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            'is_selected': False, # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+            'title': self.title,        
+            'tag': "",   
+            'visible': True,    
+            'is_selected': False, 
         }
 
         # Update existing data with any new default fields we added
         self.data.update(default_data)
-        self.save_dict()
-        return self.data
-    
-    # Called when loading a mini widget from storage
-    def verify_mini_widget_data(self) -> dict:
-        ''' Verifies loaded any missing data fields in existing mini widgets '''
-
-        # Required data for all widgets and their types
-        required_data_types = {
-            'title': str,
-            'tag': str,
-            'visible': bool,
-            'is_selected': bool,
-        }
-
-        # Defaults we can use for any missing fields
-        data_defaults = {
-            'title': self.title,
-            'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
-            'visible': True,
-            'is_selected': False,
-        }
-
-        # Run through our keys and make sure they all exist. If not, give them default values
-        for key, required_data_type in required_data_types.items():
-            if key not in self.data or not isinstance(self.data[key], required_data_type):
-                self.data[key] = data_defaults[key]
-
-        # Save our updated data
         self.save_dict()
         return self.data
 
