@@ -166,7 +166,6 @@ class Story(ft.View):
         required_data_types = {
             'title': str,
             'directory_path': str,
-            'story_data_file_path': str,
             'type': (str, type(None)),
             'selected_rail': str,
             'content_directory_path': str,

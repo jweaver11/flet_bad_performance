@@ -77,7 +77,7 @@ def init_load_saved_stories(page: ft.Page):
                     app.stories[story_title] = Story(story_title, page, data=story_data)
 
                     # We loaded our story inside this story folder, so break this loop
-                    break
+                    #break
                     
                 # Else, continue through the next story folder
                 else:
@@ -89,6 +89,7 @@ def init_load_saved_stories(page: ft.Page):
 
     # Initialize and load all our stories data and UI elements
     for story in app.stories.values():
+        print("story title: ", story.title)
         # Sets our active story to the page route. The route change function will load the stories data and UI
         if story.title == app.settings.data.get('active_story', None):
             page.route = story.route    # This will call our route change function and set our story view
