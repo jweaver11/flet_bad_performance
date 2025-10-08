@@ -40,6 +40,11 @@ class World_Building(Widget):
 
         # Dict of different worlds and their maps stored
         self.world_maps = {}
+        self.lore = {}
+        self.power_systems = {}
+        self.social_systems = {}
+        self.geography = {}
+
 
         # TODO: Show timeline that can drag and alter the map landscape based on changes
             # EXP. City gets destroyed at year 50, that plotpoint would disappear

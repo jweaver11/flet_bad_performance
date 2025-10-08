@@ -1,8 +1,7 @@
 '''
-A 'Map' object that is displayed in the world building widget.
-These objects are stored in 'WorldMap' objects and files, or inside of other maps
-They can represent any scale of map smaller than a world, from continents, to regions, countries, cities, dungeons, buildings, etc.
-Their data is stored in the parent most 'WorldMap' object file that contains them
+A 'WorldMap' object that is displayed in the world building widget. 
+These objects are stored in the world building widget, inside the diretory world_building/world_maps/wm_title.json.
+These objects represent a world/planet, and can contain their own locations, geography, but also sub-maps
 '''
 
 import json
@@ -12,7 +11,7 @@ from models.story import Story
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
-class Map(ft.GestureDetector):
+class WorldMap(ft.GestureDetector):
 
     # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
     def __init__(self, title: str, directory_path: str, page: ft.Page, story: Story, data: dict=None):
