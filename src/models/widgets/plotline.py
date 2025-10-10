@@ -94,7 +94,7 @@ class Plotline(Widget):
         try: 
 
             # Check every item (file) in this story folder
-            for timeline_title, timeline_data in self.data['mini_widgets']['timelines'].items():
+            for timeline_title, timeline_data in self.data['mini_widgets'].items():
 
                 # Create using the object (not the function) so we can pass in data
                 self.timelines[timeline_title] = Timeline(timeline_title, self, self.p, timeline_data) 
