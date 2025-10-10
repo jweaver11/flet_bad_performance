@@ -89,21 +89,7 @@ class Timeline(MiniWidget):
 
         # Builds/reloads our timeline UI
         self.reload_mini_widget()
-    
-    # Called when saving changes in our mini widgets data to the OWNERS json file
-    def save_dict(self):
-        ''' Saves our current data to the OWNERS json file '''
 
-        # Error Handling
-        if self.owner.data is None or not isinstance(self.data, dict):
-            print("Error: owner data is None, cannot save mini widget data")
-            return
-
-        # Grab our owner object, and update their data pertaining to this mini widget
-        self.owner.data['timelines'][self.title] = self.data
-
-        # Save our owners json file to match their data
-        self.owner.save_dict()
     
     # Called in the constructor
     def load_branches(self):
