@@ -1,23 +1,57 @@
 import flet as ft
-
+from models.mini_widget import MiniWidget
+from models.widget import Widget
+from handlers.verify_data import verify_data
 
 # Class for branches (essentiall sub-timelines) on a timeline. 
 # These branches can be connected to each other, and the parent timeline, and its child objects,
-# Where as a timeline is independent from other timeilnes completely
-class Branch(ft.GestureDetector):
+# Where as a timeline is independent from other timelines completely
+class Branch(MiniWidget):
 
-    def __init__(self, title: str, data: dict=None):
-
+    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
+    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+        
+        # Parent constructor
         super().__init__(
-            on_enter=self.on_hover,
+            title=title,        # Title of our mini note
+            owner=owner,      # owner widget that holds us
+            page=page,          # Page reference
+            data=data,          # Data if we're loading an existing mini note, otherwise blank
+        ) 
+
+        # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'start_date': str,
+                'end_date': str,
+                'color': str,
+                'plot_points_are_expanded': bool,   # If the plotpoints section is expanded
+                'arcs_are_expanded': bool,         # If the arcs section is expanded
+                'time_skips_are_expanded': bool,    # If the timeskips section is expanded
+                'plot_points': dict,      
+                'arcs': dict,   
+                'time_skips': dict,  
+            },
+            tag="branch"
         )
 
-        self.title = title  # Required, has no default
-        self.data = data    # Optional, if none given, will be created with default values
+        # Check if we loaded our mini widget or created a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
 
-        # Gives us default data if none was passed in
-        if self.data is None:
-            self.data = self.create_default_data()
+        # If not loaded, set default values. No new data here, just giving values to existing fields
+        if not loaded:
+            self.data.update({
+                'tag': "branch",    # Overwrite our tag to be branch'
+                'color': "yellow",
+                'plot_points_are_expanded': True,   # If the plotpoints section is expanded
+                'arcs_are_expanded': True,         # If the arcs section is expanded
+                'time_skips_are_expanded': True,    # If the timeskips section is expanded
+            })
+            #self.save_dict()
 
 
         self.plot_points: dict = {} # Declare plot_points dictionary
@@ -28,32 +62,6 @@ class Branch(ft.GestureDetector):
         self.load_arcs()
         self.load_time_skips()
 
-
-    def create_default_data(self):
-
-        return {
-            'title': self.title,
-            'start_date': "",
-            'end_date': "",
-
-            'color': "yellow",
-
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-
-            'plot_points_are_expanded': True,   # If the plotpoints section is expanded
-            'arcs_are_expanded': True,         # If the arcs section is expanded
-            'time_skips_are_expanded': True,    # If the timeskips section is expanded
-
-            # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
-            'plot_points': {},      # 'plotpoint_title': {plotpoint object}
-
-            # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
-            'arcs': {},     # 'arc_title': {arc object}
-
-            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
-            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
-            'time_skips': {},    # 'timeskip_title': {timeskip object}
-        }
     
 
     # Called in the constructor

@@ -1,6 +1,8 @@
 '''
 An extended flet container that is the parent class of all our story objects.
 Handles uniform UI, and has some functionality all objects need for easy data use.
+Every widget has its own json file
+Only Widgets create mini widgets
 '''
 
 import flet as ft
@@ -20,41 +22,52 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
+            data=data,  # Sets our data. NOTE. If data is None, you need to set to {} later
         )
+
+        # Sets our data empty if its none
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+        
     
         # Required properties of all widgets
         self.title = title  # Title of our object
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
         self.directory_path = directory_path    # Path to our directory that will contain our json file
         self.story = story  # Reference to our story object that owns this widget
-        self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
         self.mini_widgets = []  # List that holds our mini widgets objects
 
-        # Check if we loaded our widget or created a new one
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'title': str,
+                'directory_path': str,
+                'tag': str,
+                'pin_location': str,
+                'visible': bool,
+                'tab_title_color': str,
+                'mini_widgets': dict,
+            },
+        )
+
+        # Check if we loaded our widget or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If this is a new widget (Not loaded), give it default data all widgets need
+        # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            self.create_default_data()  # Create default data if none was passed in
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'title': str,
-                    'directory_path': str,
-                    'tag': str,
-                    'pin_location': str,
-                    'visible': bool,
-                    'tab_title_color': str,
-                    'mini_widgets': dict,
-                },
-            )
+            self.data.update({
+                'title': self.title,
+                'directory_path': self.directory_path,
+                'tag': "widget",    # Default tag, should be overwritten by child classes
+                'pin_location': "main",     # Stick us in the main pin area by default
+                'visible': True,    
+                'tab_title_color': "primary",
+            })
+            self.save_dict()
 
 
         # Apply our visibility
@@ -97,45 +110,59 @@ class Widget(ft.Container):
         # Handle errors
         except Exception as e:
             print(f"Error saving object to {file_path}: {e}")
-
-    # Called when creating a new widget, not when loading one
-    def create_default_data(self) -> dict:
-        ''' Returns required data all widgets must have '''
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-
-        # Give all widgets their default data
-        default_data = {
-            'title': self.title,
-            'directory_path': self.directory_path,
-            'tag': "widget",    # Default tag, should be overwritten by child classes
-            'pin_location': "main",     # Stick us in the main pin area by default
-            'visible': True,    
-            'tab_title_color': "primary",
-            'mini_widgets': {},
-        }
-
-        # Update our data dict with any missing fields from the defaults
-        self.data.update(default_data)  # Overwrite any missing or duplicate fields (should be no duplicates anyway)
-        self.save_dict()
-        return self.data
     
     # Called in a childs constructor to load any mini widgets that it may have
     def load_mini_widgets(self):
         ''' Checks all the items under the data['mini_widgets'] dictionary and creates the appropriate mini widget objects '''
 
         from models.mini_widgets.mini_note import MiniNote
+        from models.mini_widgets.plotline.timeline import Timeline
 
-        # Loop through our mini widgets items in the dict and load them based on their tag into our mini widgets list
-        # NOTE: Plotlines store data in their timelines files, so they load mini widgets in their own model file.
-        for key, mini_widget in self.data['mini_widgets'].items():
+        # Walks you through all dicts in the data['mini_widgets'] dict and yields the path and tag of any dict that has a tag key
+        def dict_walk_get_tag(dictionary, path=()):
+            
+            for key, value in dictionary.items():
+                current_path = path + (key,)
+                # If value is a dict, recurse
+                if isinstance(value, dict):
+                # Check if this dict has a 'tag' key
+                    if 'tag' in value:
+                        yield current_path, value['tag']
+                    else:
+                        # No tag found, recurse deeper
+                        yield from dict_walk_get_tag(value, current_path)
 
-            # Check the tag to see what type of mini widget it is, and create the appropriate object
-            if mini_widget['tag'] == "mini_note":
-                self.mini_widgets.append(MiniNote(title=key, owner=self, page=self.p, data=mini_widget))
+
+        try:
+            # Walk through our data['mini widgets'] dict and create the appropriate mini widget for each tag we find
+            for path, tag in dict_walk_get_tag(self.data.get('mini_widgets', {})):
+                #print("Path:", path, "Tag:", tag)
+
+                # Mini Notes
+                if tag == 'mini_note':
+                    
+                    mini_note_data = self.data['mini_widgets']
+                    for key in path:
+                        mini_note_data = mini_note_data[key]
+                    self.mini_widgets.append(MiniNote(title=path[-1], owner=self, page=self.p, data=mini_note_data))
+                    continue
+
+                # Timelines
+                elif tag == 'timeline':
+                    
+                    timeline_data = self.data['mini_widgets']
+                    for key in path:
+                        timeline_data = timeline_data[key]
+                    
+                    self.mini_widgets.append(Timeline(title=path[-1], owner=self, page=self.p, data=timeline_data))
+                    continue
+
+                # elif arcs, plot points, timeskips, etc... (all mini widgets)
+
+                
+        except Exception as e:
+            print(f"Error loading mini widgets for {self.title}: {e}")
+    
 
     # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):
@@ -179,9 +206,6 @@ class Widget(ft.Container):
         self.save_dict()
         self.p.update()
 
-        #self.p.views[0].workspace.reload_workspace(self.p, story)
-            
-        
         story.workspace.reload_workspace(self.p, story)
 
     # Called when creating a new mini note inside a widget

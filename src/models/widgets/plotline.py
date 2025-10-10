@@ -9,7 +9,7 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.nested_widget_models.plotline.timeline import Timeline
+from models.mini_widgets.plotline.timeline import Timeline
 from handlers.verify_data import verify_data
 
 
@@ -26,29 +26,41 @@ class Plotline(Widget):
             data = data,    # Saves our data passed in (if there is any)
         )
 
-        # Check if we loaded our settings data or not
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'tag': str,
+                'story_start_date': str,
+                'story_end_date': str,
+                'filters': dict,
+
+                # Dict of timelines in this plotline. Timelines are the only stored mini widgets in plotlines data
+                'timelines': dict,  
+            },
+            tag="plotline"
+        )
+
+        # Check if we loaded our character or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If our settings are new and not loaded, give it default data
+        # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            self.create_default_plotline_data()  # Create data defaults for our settings widgets
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'tag': str,
-                    'story_start_date': str,
-                    'story_end_date': str,
-                    'filters': dict,
+            self.data.update({
+                'pin_location': "bottom",     # Start our plotline on the bottom pin
+                'filters': {   
+                    'show_timeskips': True,
+                    'show_plot_points': True,
+                    'show_arcs': True,
                 },
-                tag="plotline"
-            )
+                'mini_widgets': {
+                    'timelines': {},
+                }
+            })
+            self.save_dict()
             
 
         # Our timeline controls
@@ -56,12 +68,6 @@ class Plotline(Widget):
 
         # Load our timelines from our data
         self.load_timelines()
-
-        # If no plotlines exist, we create a default one to get started
-        if len(self.timelines) == 0:
-            # Create one like this so we don't call reload_widget before our UI elements are defined
-            timeline_directory_path = os.path.join(self.directory_path, "timelines")
-            self.timelines["Main Timeline"] = Timeline("Main Timeline", timeline_directory_path, page=self.p, story=self.story, data=None)
 
         # Set visibility from our data
         self.visible = self.data['visible']  # If we will show this widget or not
@@ -77,70 +83,30 @@ class Plotline(Widget):
         # Load our widget UI on start after we have loaded our data
         self.reload_widget() 
 
-
-    # Called at end of constructor
-    def create_default_plotline_data(self) -> dict:
-        ''' Loads our plotline data and timelines data from our seperate timelines files inside the timelines directory '''
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-
-        # Default data for our plotline widget
-        default_plotline_data = {
-            
-            'pin_location': "bottom",
-            'tag': "plotline",  
-
-            # Start and end date of entire story
-            'story_start_date': "", 
-            'story_end_date': "",
-
-            'filters': {    # Filters we can apply to change the view of our plotline, while keeping the data intact
-                'show_timeskips': True,
-                'show_plot_points': True,
-                'show_arcs': True,
-            },
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_plotline_data)
-        return
     
     
-
-
     # Function to load our timline objects from the data 
     def load_timelines(self):
         ''' Loads our timelines from our timelines directory inside our plotline directory '''
 
-        from models.nested_widget_models.plotline.timeline import Timeline
-        # Load our timelines from our timeline directory
-        timelines_directory_path = os.path.join(self.data['directory_path'], "timelines")
+        from models.mini_widgets.plotline.timeline import Timeline
         
         try: 
 
             # Check every item (file) in this story folder
-            for item in os.listdir(timelines_directory_path):
-
-                # Set the file path to this json file so we can open it
-                file_path = os.path.join(timelines_directory_path, item)
-
-                # Read the JSON file
-                with open(file_path, "r", encoding='utf-8') as f:
-                    # Set our data to be passed into our objects
-                    timeline_data = json.load(f)
-
-                # Our story title is the same as the folder
-                timeline_title = timeline_data.get("title", file_path.replace(".json", ""))
+            for timeline_title, timeline_data in self.data['mini_widgets']['timelines'].items():
 
                 # Create using the object (not the function) so we can pass in data
-                self.timelines[timeline_title] = Timeline(timeline_title, timelines_directory_path, self.p, self.story, timeline_data)              
+                self.timelines[timeline_title] = Timeline(timeline_title, self, self.p, timeline_data) 
+
+            # If no plotlines exist, we create a default one to get started
+            if len(self.timelines) == 0:
+                print("No timelines found, creating default timeline")
+                self.timelines["Main Timeline"] = Timeline(title="Main Timeline", owner=self, page=self.p, data=None)             
                             
         # Handle errors if the path is wrong
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-            print(f"Error loading any timelines from {timelines_directory_path}: {e}")
+            print(f"Error loading timelines: {e}")
 
 
         # After our timeline has been created, it will have loaded its branches, plot points, arcs, and timeskips
@@ -162,7 +128,7 @@ class Plotline(Widget):
                 for time_skip in timeline.time_skips.values():
                     self.mini_widgets.append(time_skip)
 
-        load_mini_widgets()
+        #load_mini_widgets()
 
 
 
@@ -170,23 +136,9 @@ class Plotline(Widget):
     def create_new_timeline(self, title: str) -> Timeline:  # -> Timeline
         ''' Creates a new plotline object (branch), saves it to our live story object, and saves it to storage'''
 
-        # Check for invalid names
-        if title == "plotline":
-            print("Cannot name timeline plotline")
-            return
-        
-        # Check timeline name doesn't already exist
-        for timeline in self.timelines.values():
-            if timeline.title == title:
-                print("Plotline with that title already exists")
-                return
-        
-
-        # Set file path for our plotline
-        directory_path = os.path.join(self.story.data['plotline_directory_path'], "timelines")
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
-        self.timelines[title] = Timeline(title=title, directory_path=directory_path, page=self.p, story=self.story, data=None)
+        self.timelines[title] = Timeline(title, self, self.p, data=None)
         
         self.reload_widget()  # Reload our widget to show the new timeline
 
@@ -204,9 +156,8 @@ class Plotline(Widget):
         # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object andd all its children are gesture detectors
         # Have a show/hide filters button in top left of widget
-        # Show zoomed in time dates when zoomed in??
-
-        # TODO If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
+        # Show zoomed in time dates when zoomed in??s
+        # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
 
         plotline_filters = []
 
@@ -266,7 +217,7 @@ class Plotline(Widget):
 
         for timeline in self.timelines.values():
             if timeline.visible:
-                timelines.controls.append(timeline)
+                timelines.controls.append(timeline.timeline_control)
 
             for arc in timeline.arcs.values():
                 if arc.visible:
@@ -296,6 +247,8 @@ class Plotline(Widget):
             #on_interaction_update=lambda e: print(e),
             content=stack,
         )
+
+        print("Number of timelines in plotline: " + str(len(self.timelines)))
 
         self.render_widget()
         

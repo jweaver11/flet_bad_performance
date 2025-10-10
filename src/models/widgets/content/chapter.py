@@ -13,32 +13,21 @@ class Chapter(Widget):
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
             p = page,   # Grabs our original page for convenience and consistency
-            directory_path = directory_path,  # Path to our timeline json file
+            directory_path = directory_path,  # Path to our chapters json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
             data = data,    # This gets initialized at the end of our constructor
         )
 
-        # Check if we loaded our settings data or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If our settings are new and not loaded, give it default data
-        if not loaded:
-            self.create_default_chapter_data()  # Create data defaults for our settings widgets
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'tag': str,
-                    'content': str
-                },
-                tag="chapter"
-            )
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            object=self,   # Pass in our own data so the function can see the actual data we loaded
+            required_data={
+                'content': str,
+                'temp': str,
+                'test': str,
+            },
+            tag="chapter"
+        )
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()

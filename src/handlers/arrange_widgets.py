@@ -2,8 +2,64 @@
 
 from models.story import Story
 
-# Called at the start of the by the 'render_widgets' function.
+# Called when we drag a widget from one pin location to another
 def arrange_widgets(story: Story):
+    ''' Arranges our widgets to their correct pin locations after a change is made to their pin location.
+    Also adds widgets to their correct pin locations if they are missing from any pin location '''
+    
+    try:
+
+        # Clear all pin locations first
+        story.workspace.top_pin.controls.clear()
+        story.workspace.left_pin.controls.clear()
+        story.workspace.main_pin.controls.clear()
+        story.workspace.right_pin.controls.clear()
+        story.workspace.bottom_pin.controls.clear()
+
+        # Go through all our widgets in the story
+        for widget in story.widgets:
+
+            # Check if they are visible
+            if widget.visible == True:
+
+                # Check if widget has data and pin_location
+                if hasattr(widget, 'data') and widget.data and 'pin_location' in widget.data:
+                    pin_location = widget.data['pin_location']
+                    
+                    # Add widget to the correct pin based on its pin_location
+                    if pin_location == "top":
+                        story.workspace.top_pin.controls.append(widget)
+                    elif pin_location == "left":
+                        story.workspace.left_pin.controls.append(widget)
+                    elif pin_location == "main":
+                        story.workspace.main_pin.controls.append(widget)
+                    elif pin_location == "right":
+                        story.workspace.right_pin.controls.append(widget)
+                    elif pin_location == "bottom":
+                        story.workspace.bottom_pin.controls.append(widget)
+                        
+                else:
+                    # If no valid pin_location, default to main pin
+                    if widget not in story.workspace.main_pin.controls:
+                        print("Invalid pin location, adding to main pin")
+                        story.workspace.main_pin.controls.append(widget)
+
+            # Skip non visible widgets
+            else:
+                continue
+
+    except Exception as e:
+        print(f"Error arranging widgets: {e}")
+
+        
+
+    
+
+    
+
+# OLD OUTDATED. KEEPING JUST IN CASE
+# Called at the start of the by the 'render_widgets' function.
+def arrange_widgets_old(story: Story):
     ''' Arranges our widgets to their correct pin locations after a change is made to their pin location.
     Also adds widgets to their correct pin locations if they are missing from any pin location '''
 

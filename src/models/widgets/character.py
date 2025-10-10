@@ -20,47 +20,74 @@ class Character(Widget):
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
             p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            directory_path = directory_path,    # Directory where our json file is stored
+            directory_path = directory_path,    # Directory where our json file is stored (characters/)
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
             data = data,    # Passes in our data if we loaded it, or None if its a new character
         )
 
-        # Check if we loaded our settings data or not
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            object=self,   # Pass in our own data so the function can see the actual data we loaded
+            required_data={
+                'tag': str,
+                'tab_color': str,
+                'name_color': str,
+                'sex_color': str,
+                'morality': str,
+                'sex': str,
+                'age': str,
+                'physical_description': dict,
+                'family': dict,
+                'trauma': str,
+                'occupation': str,
+                'goals': str,
+                'origin': dict,
+                'personality': str,
+                'backstory': str,
+                'abilities': str,
+                'is_dead': bool,    # Defaults to false
+            },
+            tag="character"
+        )
+
+        # Check if we loaded our character or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If our settings are new and not loaded, give it default data
+        # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            self.create_default_character_data()  # Create data defaults for our settings widgets
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'tag': str,
-                    'tab_color': str,
-                    'name_color': str,
-                    'sex_color': str,
-                    'morality': str,
-                    'sex': str,
-                    'age': str,
-                    'physical_description': dict,
-                    'family': dict,
-                    'trauma': str,
-                    'occupation': str,
-                    'goals': str,
-                    'origin': dict,
-                    'personality': str,
-                    'backstory': str,
-                    'abilities': str,
-                    'is_dead': bool,
+            self.data.update({
+                'pin_location': "left",     # Start our characters on the left pin
+                'tab_color': "primary",  # Initial tab color matches color scheme
+                'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
+                'sex_color': "primary",    # Color of selected option in sex dropdown
+                'physical_description': {
+                    'Race': "",
+                    'Skin Color': "",
+                    'Hair Color': "",   
+                    'Eye Color': "",    
+                    'Height': "",   
+                    'Weight': "",   
+                    'Build': "",    
+                    'Distinguishing Features': "",  
                 },
-                tag="character"
-            )
+                'family':  {
+                    'Love Interest': "",    
+                    'Father': "",   
+                    'Mother': "",    
+                    'Siblings': "",
+                    'Children': "",
+                    'Ancestors': "",
+                },   
+                'origin': {     
+                    'birth_date': "",   
+                    'hometown': "",     
+                    'education': "",        
+                },
+            }) 
+            self.save_dict()
             
         
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
@@ -73,59 +100,11 @@ class Character(Widget):
     def create_default_character_data(self) -> dict:
         ''' Loads their existing data from file, or sets default data if no file exists '''
 
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-
         # Default data for new characters
-        default_character_data = {
     
-            'pin_location': "left",     # Overide default pin location of main
-            'tag': "character",  
-
-            'tab_color': "primary",  # Initial tab color matches color scheme
-            'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
-            'sex_color': "primary",    # Color of selected option in sex dropdown
- 
-            'morality': "",
-            'sex': "",
-            'age': "",   
-            
-            'physical_description': {
-                'Race': "",
-                'Skin Color': "",
-                'Hair Color': "",   
-                'Eye Color': "",    
-                'Height': "",   
-                'Weight': "",   
-                'Build': "",    
-                'Distinguishing Features': "",  # some sort of flet list
-            },
-            'family':  {
-                'Love Interest': "",    # Name of another character, or str
-                'Father': "",   # Textfield with selectable options
-                'Mother': "",    
-                'Siblings': "",
-                'Children': "",
-                'Ancestors': "",
-            },  
-            'trauma': "",
-            'occupation': "",   
-            'goals': "",    
-            'origin': {     
-                'birth_date': "",   
-                'hometown': "",     
-                'education': "",        
-            },
-            'personality': "",  
-            'backstory': "",    
-            'abilities': "",    
-            'dead': False,
-        }
 
         # Update existing data with any new default fields we added
-        self.data.update(default_character_data)  
+        
         self.save_dict()
         return
     
