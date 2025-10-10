@@ -20,17 +20,18 @@ class MiniWidget(ft.Container):
             expand=True,
             border_radius=ft.border_radius.all(6),
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
-            data=data,
+            data=data,      # Sets our data. NOTE. If data is None, you need to set to {} later
         )
+
+        # Sets our data empty to prevent errors if its none
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
            
         self.title = title  # Title of the widget that will show up on its tab
         self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
         self.p = page   # Grabs our original page for convenience and consistency
-        
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
 
-        
+
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our object so we can access its data and change it
@@ -50,12 +51,9 @@ class MiniWidget(ft.Container):
 
         # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            #print(self.data)
             self.data.update({
                 'title': self.title,        
-                'tag': "",   
-                'visible': True,    
-                'is_selected': False, 
+                'visible': True,    # Only need to specify bools if True, they default to False
             })
             self.save_dict()
 

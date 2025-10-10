@@ -7,6 +7,7 @@ from handlers.verify_data import verify_data
     
 
 class Notes(Widget):
+    # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
 
         # Initialize from our parent class 'Widget'. 
@@ -31,7 +32,7 @@ class Notes(Widget):
             tag="note"
         )
 
-        # Message to Cory: Define all your data fields above, excluding the widget included ones
+        # MESSAGE TO CORY: Define all your data fields above, excluding the widget included ones
         # If you want to give default values, see below
 
         # Check if we loaded our note or not
@@ -42,7 +43,10 @@ class Notes(Widget):
 
         # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            self.data.update({'key1': "value", 'key2': "value2"})
+            self.data.update({
+                'key1': "value", 
+                'key2': 5, 'key3': True
+            })
             self.save_dict()
 
         

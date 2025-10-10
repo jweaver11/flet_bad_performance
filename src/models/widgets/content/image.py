@@ -28,10 +28,8 @@ class Image(Widget):
         )
             
 
-
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
-
         
 
     def reload_widget(self):

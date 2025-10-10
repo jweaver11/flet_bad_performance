@@ -22,8 +22,12 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
-            data=data,
+            data=data,  # Sets our data. NOTE. If data is None, you need to set to {} later
         )
+
+        # Sets our data empty if its none
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
         
     
         # Required properties of all widgets
@@ -33,11 +37,6 @@ class Widget(ft.Container):
         self.story = story  # Reference to our story object that owns this widget
         self.mini_widgets = []  # List that holds our mini widgets objects
 
-        # Sets our data empty if its none
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
@@ -60,7 +59,6 @@ class Widget(ft.Container):
 
         # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            #print(self.data)
             self.data.update({
                 'title': self.title,
                 'directory_path': self.directory_path,

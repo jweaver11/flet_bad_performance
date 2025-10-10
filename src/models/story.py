@@ -9,6 +9,7 @@ import flet as ft
 import os
 import json
 from constants import data_paths
+from handlers.verify_data import verify_data
 
 
 class Story(ft.View):
@@ -29,24 +30,61 @@ class Story(ft.View):
         self.data = data    # Sets our data (if any) passed in. New stories just have none
         self.type = type    # Type of story, novel or comic. Affects how templates for creating new content will work
 
+        # Sets our data empty if its none
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'title': str,
+                'directory_path': str,
+                'tag': str,
+                'selected_rail': str,
+                'content_directory_path': str,
+                'characters_directory_path': str,
+                'plotline_directory_path': str,
+                'world_building_directory_path': str,
+                'notes_directory_path': str,
+                'top_pin_height': int,
+                'left_pin_width': int,
+                'main_pin_height': int,
+                'right_pin_width': int,
+                'bottom_pin_height': int,
+                'created_at': str,
+                'last_modified': str,
+                'settings': dict,
+            },
+        )
+
         # Check if we loaded our story data or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If this is a new widget (Not loaded), give it default data all widgets need
+        # If this is a new story (Not loaded), give it default data all widgets need
         if not loaded:
-            # Create default data for the story json file
-            self.create_default_data()    
+            self.data.update({
+                'title': self.title,
+                'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
+                'selected_rail': 'characters',
+                'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
+                'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
+                'plotline_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "plotline"),
+                'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
+                'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "notes"),
+                'settings': {
+                    'type': self.type, # Novel or comic. Affects templates and default data for new content
+                    'multi_planitary': False,   # Whether the story will take place on multiple planets
+                },
+            }) 
 
             # Creates our folder structure for the new story using our template (if there is one)
             self.create_story_structure(template)  
+            self.save_dict()  # Save our new data to file
 
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_story_data()
 
             
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
@@ -56,6 +94,7 @@ class Story(ft.View):
         self.workspace: ft.Container = None        # Main workspace area where our pins display our widgets
 
         # Our widgets objects
+        self.widgets: list = []   # All widgets stored in our story
         self.chapters: dict = {}   # Chapters stored in our story
         self.images: dict = {}  # Images stored in our story
         self.characters: dict = {}      # Characters stored in our story
@@ -90,6 +129,9 @@ class Story(ft.View):
         # Loads our notes from file storage
         self.load_notes()
 
+        # Everything we loaded above is a widget, but this just adds them all to self.widgets
+        self.load_widgets()
+
         # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view()
 
@@ -97,7 +139,10 @@ class Story(ft.View):
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
         ''' Saves the data of our story to its JSON File, and all its folders as well '''
-        
+
+        # Makes sure our directory path is always right. 
+        self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
+            
         # Our file path we store our data in
         file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
 
@@ -112,105 +157,6 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             print(f"Error saving object to {file_path}: {e}")
-
-
-    # Called when loading a story from storage or when creating a new story
-    def create_default_data(self) -> dict:
-        ''' Loads our story data from its JSON file. If no file exists, we create one with default data '''
-
-        # Error handling
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        # Create the path to the story's directory and data JSON file
-        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
-
-        # Default data structure
-        default_story_data = {
-            'title': self.title,
-            'directory_path': directory_path,  # Path to our parent folder that will hold our story json objects
-            'type': self.type,   # Type of story: novel or comic
-
-            'selected_rail': 'characters',
-
-            # Paths to our workspaces for easier reference later
-            'content_directory_path': os.path.join(directory_path, "content"),
-            'characters_directory_path': os.path.join(directory_path, "characters"),
-            'plotline_directory_path': os.path.join(directory_path, "plotline"),
-            'world_building_directory_path': os.path.join(directory_path, "world_building"),
-            'notes_directory_path': os.path.join(directory_path, "notes"),
-
-            #'drawing_board_directory_path': os.path.join(directory_path, "drawing_board"), # Not needed? TBD
-
-            'top_pin_height': 0,
-            'left_pin_width': 0,
-            'main_pin_height': 0,
-            'right_pin_width': 0,
-            'bottom_pin_height': 0,
-
-            'created_at': None,
-            'last_modified': None,
-            'settings': {
-                'type': "", # Novel or comic. Affects templates and default data for new content
-                'multi_planitary': False,   # Whether the story will take place on multiple planets
-            }
-        }
-
-        # Update our data with any missing fields
-        self.data.update(default_story_data)
-        self.save_dict()
-        return
-    
-    # Called when loading a story to verify the data has everything it needs
-    def verify_story_data(self):
-        ''' Verifies all keys exist and are the right type. If not, we give them default values '''
-
-        required_data_types = {
-            'title': str,
-            'directory_path': str,
-            'type': (str, type(None)),
-            'selected_rail': str,
-            'content_directory_path': str,
-            'characters_directory_path': str,
-            'plotline_directory_path': str,
-            'world_building_directory_path': str,
-            'notes_directory_path': str,
-            'top_pin_height': int,
-            'left_pin_width': int,
-            'main_pin_height': int,
-            'right_pin_width': int,
-            'bottom_pin_height': int,
-            'created_at': (str, type(None)),
-            'last_modified': (str, type(None)),
-        }
-
-        data_defaults = {
-            'title': self.title,
-            'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
-            'type': self.type,
-            'selected_rail': 'characters',
-            'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
-            'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
-            'plotline_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "plotline"),
-            'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
-            'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "notes"),
-            'top_pin_height': 0,
-            'left_pin_width': 0,
-            'main_pin_height': 0,
-            'right_pin_width': 0,
-            'bottom_pin_height': 0,
-            'created_at': None,
-            'last_modified': None
-        }
-
-        # Run through our keys and make sure they all exist. If not, give them default values
-        for key, required_data_type in required_data_types.items():
-            if key not in self.data or not isinstance(self.data[key], required_data_type):
-                self.data[key] = data_defaults[key]
-
-        # Save our updated data
-        self.save_dict()
-        return
             
 
     # Called when a new story is created and not loaded with any data
@@ -378,41 +324,6 @@ class Story(ft.View):
         self.mouse_y = e.local_y
         #print(f"Mouse at x={self.mouse_x}, y={self.mouse_y}")
 
-        
-    # Called when saving new objects to the story (characters, chapters, etc.)
-    def save_object(self, obj):
-        ''' Handles logic on where to save the new object in our live story object.
-        Whenever a new object is created, it loads its data using its given path.
-        If it has no data, it creates a new file to store data, so we don't need to save the data here.'''
-
-        print("Save object called")
-
-        # Called if we're saving a character object
-        def save_character(obj):
-            self.characters.append(obj) # Save to our characters list
-
-        # Called if saving a chapter object
-        def save_chapter(obj):
-            print(obj)  # WIP
-
-        # Handles our logic for saving objects. Checks the tag of the object to route it to correct save function
-        if hasattr(obj, 'tag'):
-
-            # Characters
-            if obj.tag == "character":
-                save_character(obj)
-
-            # Chapters
-            elif obj.tag == "chapter":
-                save_chapter(obj)
-            
-            else:
-                print("object does not have a valid tag dummy")
-
-        # If no tag exists, we do nothing
-        else:
-            print("object has no tag at all you even bigger dummy")
-
 
     # Called when deleting an object from the story (character, chapter, etc.)
 
@@ -562,7 +473,7 @@ class Story(ft.View):
                             
                         # Create our character object using our loaded data
                         self.characters[character_title] = Character(character_title, self.p, dirpath, self, character_data)
-                        
+                        self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
@@ -690,6 +601,39 @@ class Story(ft.View):
 
         #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
+    def load_widgets(self):
+        ''' Loads all our widgets (characters, chapters, notes, etc.) into our master list of widgets '''
+
+        from models.app import app
+
+        # Add all our characters to the widgets list
+        for character in self.characters.values():
+            self.widgets.append(character)
+
+        # Add all our chapters to the widgets list
+        for chapter in self.chapters.values():
+            self.widgets.append(chapter)
+
+        for image in self.images.values():
+            self.widgets.append(image)
+
+        # Add our plotline to the widgets list
+        if self.plotline is not None:
+            self.widgets.append(self.plotline)
+
+        # Add our world building to the widgets list
+        if self.world_building is not None:
+            self.widgets.append(self.world_building)
+
+        # Add all our notes to the widgets list
+        for note in self.notes.values():
+            self.widgets.append(note)
+
+        if app.settings not in self.widgets:
+            self.widgets.append(app.settings)   # Add our app settings to the widgets list so its accessible everywhere
+        
+        #print(f"Total widgets loaded for {self.title}: {len(self.widgets)}")
+
 
     # Called when the button to create a new chapter is clicked
     def create_chapter(self, title: str, directory_path: str=None):
@@ -700,9 +644,11 @@ class Story(ft.View):
 
         # If no path is passed in, construct the full file path for the chapter JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            directory_path = self.data['characters_directory_path']
+            directory_path = self.data['content_directory_path']
 
         self.chapters[title] = Chapter(title, self.p, directory_path, self)
+
+        self.widgets.append(self.chapters[title])  # Add to our master list of widgets in our story
 
         #print("Chapter created: " + self.chapters[title].title)
         self.workspace.reload_workspace(self.p, self)
