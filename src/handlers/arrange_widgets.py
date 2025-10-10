@@ -16,27 +16,37 @@ def arrange_widgets(story: Story):
         story.workspace.right_pin.controls.clear()
         story.workspace.bottom_pin.controls.clear()
 
+        # Go through all our widgets in the story
         for widget in story.widgets:
-            # Check if widget has data and pin_location
-            if hasattr(widget, 'data') and widget.data and 'pin_location' in widget.data:
-                pin_location = widget.data['pin_location']
-                
-                # Add widget to the correct pin based on its pin_location
-                if pin_location == "top":
-                    story.workspace.top_pin.controls.append(widget)
-                elif pin_location == "left":
-                    story.workspace.left_pin.controls.append(widget)
-                elif pin_location == "main":
-                    story.workspace.main_pin.controls.append(widget)
-                elif pin_location == "right":
-                    story.workspace.right_pin.controls.append(widget)
-                elif pin_location == "bottom":
-                    story.workspace.bottom_pin.controls.append(widget)
+
+            # Check if they are visible
+            if widget.visible == True:
+
+                # Check if widget has data and pin_location
+                if hasattr(widget, 'data') and widget.data and 'pin_location' in widget.data:
+                    pin_location = widget.data['pin_location']
+                    
+                    # Add widget to the correct pin based on its pin_location
+                    if pin_location == "top":
+                        story.workspace.top_pin.controls.append(widget)
+                    elif pin_location == "left":
+                        story.workspace.left_pin.controls.append(widget)
+                    elif pin_location == "main":
+                        story.workspace.main_pin.controls.append(widget)
+                    elif pin_location == "right":
+                        story.workspace.right_pin.controls.append(widget)
+                    elif pin_location == "bottom":
+                        story.workspace.bottom_pin.controls.append(widget)
+                        
+                else:
+                    # If no valid pin_location, default to main pin
+                    if widget not in story.workspace.main_pin.controls:
+                        print("Invalid pin location, adding to main pin")
+                        story.workspace.main_pin.controls.append(widget)
+
+            # Skip non visible widgets
             else:
-                # If no valid pin_location, default to main pin
-                if widget not in story.workspace.main_pin.controls:
-                    print("Invalid pin location, adding to main pin")
-                    story.workspace.main_pin.controls.append(widget)
+                continue
 
     except Exception as e:
         print(f"Error arranging widgets: {e}")

@@ -79,37 +79,23 @@ class MiniWidget(ft.Container):
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file '''
 
+        # Error Handling
         if self.owner.data is None or not isinstance(self.data, dict):
             print("Error: owner data is None, cannot save mini widget data")
             return
+        
+        # TODO: Run through all values in owners mini widgets dictionary. If tag, owner, and title match, save there
+        # -- issue when renaming mini widgets. But thats for later. Save before renaming and should be fine
 
+
+
+        # This works in widgets that only have simple mini widgets (like chapters and characters).
+        # Widgets that store mini Widgets nested in other Mini Widgets (like timelines with branches) will need to override this function
         # Grab our owner object, and update their data pertaining to this mini widget
         self.owner.data['mini_widgets'][self.title] = self.data
 
         # Save our owners json file to match their data
         self.owner.save_dict()
-
-
-    # Called at end of constructor
-    def create_default_data(self) -> dict:
-        ''' Creates default data for the mini widget when no data is passed in '''
-
-        # Catch errors where data is corrupted or not initialized properly/deleted from the file
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
-
-        # This is default data if no file exists. If we are loading from an existing file, this is overwritten
-        default_data = {
-            'title': self.title,        
-            'tag': "",   
-            'visible': True,    
-            'is_selected': False, 
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_data)
-        self.save_dict()
-        return self.data
 
 
     # Called when clicking x to hide the mini note
@@ -125,5 +111,27 @@ class MiniWidget(ft.Container):
         self.p.update()
 
         print(f"Mini widget: {self.title} visibility is now: {self.visible}")
+
+    # Called after any changes happen to the data that need to be reflected in the UI
+    def reload_mini_widget(self):
+        ''' Reloads our mini widget UI based on our data '''
+
+        # Create body content
+        self.content = ft.Column(
+            [
+                self.title_control,
+                self.content_control,
+            ],
+            expand=True,
+        )
+
+        self.render_mini_widget()
+
+    def render_mini_widget(self):
+        ''' Renders our mini widget UI based on our data '''
+
+        # Give Uniform mini titles andd styling
+
+        self.p.update()
 
         

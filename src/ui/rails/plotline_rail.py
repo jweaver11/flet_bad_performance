@@ -28,6 +28,10 @@ class Timeline_Rail(ft.Container):
                 name_is_unique = False
                 print("Plotline name already exists!")
                 break
+        
+        if title == "plotline":
+            name_is_unique = False
+            print("Plotline name cannot be 'plotline' as it is reserved!")
 
         # Make sure the name is unique before creating
         if name_is_unique:

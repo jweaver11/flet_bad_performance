@@ -94,7 +94,7 @@ class Story(ft.View):
         self.workspace: ft.Container = None        # Main workspace area where our pins display our widgets
 
         # Our widgets objects
-        self.widgets: list = []   # All widgets stored in our story
+        self.widgets: list = []   # All widgets stored in our story. Easier access to rendering pins this way
         self.chapters: dict = {}   # Chapters stored in our story
         self.images: dict = {}  # Images stored in our story
         self.characters: dict = {}      # Characters stored in our story
@@ -186,41 +186,26 @@ class Story(ft.View):
             folder_path = os.path.join(directory_path, folder)
             os.makedirs(folder_path, exist_ok=True) # Checks if they exist or not
 
-        # Create our sub folders inside of timeline
-        timelines_folder = os.path.join(directory_path, "plotline", "timelines")
-        os.makedirs(timelines_folder, exist_ok=True)
-
-        # Set our sub folders inside of world building
-        world_building_folders = [
-            "world_maps",
-        ]
-
-        # Create the sub folders inside of world building
-        for folder in world_building_folders:
-            folder_path = os.path.join(directory_path, "world_building", folder)
-            os.makedirs(folder_path, exist_ok=True)
-
         # Set our sub folders inside of notes
         notes_folders = [
             "themes",
             "quotes",
             "research",
         ]
+
         # Create the sub folders inside of notes
         for folder in notes_folders:
             folder_path = os.path.join(directory_path,  "notes", folder)
             os.makedirs(folder_path, exist_ok=True)
         
-        # Create story metadata file
-        self.data_file_path = os.path.join(directory_path, f"{self.title}.json")
-        
+
         # Create the path to the story's JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
-        story_data_file_path = os.path.join(directory_path, f"{self.title}.json")
+        story_file_path = os.path.join(directory_path, f"{self.title}.json")
         
         try:
             # Save our data to file
-            with open(story_data_file_path, "w") as f:
+            with open(story_file_path, "w") as f:
                 json.dump(self.data, f, indent=4)
             #print(f"Story data saved to {story_file_path}")
             
@@ -228,113 +213,17 @@ class Story(ft.View):
             print(f"Error saving story data: {e}")
 
 
-    # Called when new story object is created, either by program or by being loaded from storage
-    def build_view(self) -> list[ft.Control]:
-        ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
-        from ui.menu_bar import create_menu_bar
-        from ui.all_workspaces_rails import All_Workspaces_Rail
-        from ui.active_rail import Active_Rail
-        from ui.workspace import Workspace
-        from models.app import app
-
-        page = self.p
-
-        # Clear our controls in our view before building it
-        self.controls.clear()
-
-        # Create our page elements as their own pages so they can update
-        self.menubar = create_menu_bar(page, self)
-
-        # Create our rails and workspace objects
-        self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
-        self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
-        self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
-        self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
-
-        # Called when hovering over resizer to right of the active rail
-        def show_horizontal_cursor(e: ft.HoverEvent):
-            ''' Changes the cursor to horizontal when hovering over the resizer '''
-
-            e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-            e.control.update()
-
-        # Called when resizing the active rail by dragging the resizer
-        def move_active_rail_divider(e: ft.DragUpdateEvent):
-            ''' Responsible for altering the width of the active rail '''
-
-            if (e.delta_x > 0 and self.active_rail.width < page.width/2) or (e.delta_x < 0 and self.active_rail.width > 100):
-                self.active_rail.width += e.delta_x    # Apply the change to our rail
-                
-            page.update()   # Apply our changes to the rest of the page
-
-        # Called when app stops dragging the resizer to resize the active rail
-        def save_active_rail_width(e: ft.DragEndEvent):
-            ''' Saves our new width that will be loaded next time app opens the app '''
-
-            app.settings.data['active_rail_width'] = self.active_rail.width
-            app.settings.save_dict()
-            print("Active rail width: " + str(self.active_rail.width))
-
-        # The actual resizer for the active rail (gesture detector)
-        active_rail_resizer = ft.GestureDetector(
-            content=ft.Container(
-                width=10,   # Total width of the GD, so its easier to find with mouse
-                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
-                # Thin vertical divider, which is what the app will actually drag
-                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
-                padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
-            ),
-            on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
-            on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
-            on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
-        )
-
-        # Save our 2 rails, divers, and our workspace container in a row
-        row = ft.Row(
-            spacing=0,  # No space between elements
-            expand=True,  # Makes sure it takes up the entire window/screen
-
-            controls=[
-                self.all_workspaces_rail,  # Main rail of all available workspaces
-                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
-                self.active_rail,    # Rail for the selected workspace
-                active_rail_resizer,   # Divider between rail and work area
-                
-                self.workspace,    # Work area for pagelets
-            ],
-        )
-
-        # Our gesture detector that holds our row, and allows us to track our mouse position
-        gd = ft.GestureDetector(
-            content=row,
-            expand=True,
-            on_hover=self.on_hover,
-            hover_interval=100,
-        )
-
-        # Views render like columns, so we add elements top-down
-        self.controls = [self.menubar, gd]
-
-    # Called every time the mouse moves over the workspace
-    def on_hover(self, e):
-        ''' Stores our mouse positioning so we know where to open menus '''
-
-        self.mouse_x = e.local_x 
-        self.mouse_y = e.local_y
-        #print(f"Mouse at x={self.mouse_x}, y={self.mouse_y}")
-
-
-    # Called when deleting an object from the story (character, chapter, etc.)
-
     #Change to delete widget
-
     def delete_object(self, widget):
         ''' Deletes the object from our live story object and its reference in the pins.
         We then remove its storage file from our file storage as well. '''
         from models.widget import Widget
 
         print("Delete object called")
+
+        # Needs to remove the widget from self.widgets, and wherever its sub storage is (characters, chapters, etc.)
+        # Then needs to delete the file from storage as well
+        # Then reload the workspace should remove it from the UI
 
         # Called inside the delete_object method to remove the file from storage
         def delete_widget_file(widget: Widget):
@@ -362,25 +251,12 @@ class Story(ft.View):
             # Remove object from the characters list
             if widget in self.characters:
                 self.characters.remove(widget)
-    
-        # Find our objects reference in the pins and remove it
-        if hasattr(widget, 'pin_location'):
-            if widget.pin_location == "top" and widget in self.workspace.top_pin.controls:
-                self.workspace.top_pin.controls.remove(widget)
-            elif widget.pin_location == "left" and widget in self.workspace.left_pin.controls:
-                self.workspace.left_pin.controls.remove(widget)
-            elif widget.pin_location == "main" and widget in self.workspace.main_pin.controls:
-                self.workspace.main_pin.controls.remove(widget)
-            elif widget.pin_location == "right" and widget in self.workspace.right_pin.controls:
-                self.workspace.right_pin.controls.remove(widget)
-            elif widget.pin_location == "bottom" and widget in self.workspace.bottom_pin.controls:
-                self.workspace.bottom_pin.controls.remove(widget) 
-            else:
-                print("Object not found in any pin location, cannot delete")
 
         # Remove the objects storage file as well
         if hasattr(widget, 'path'):
             delete_widget_file(widget)
+
+        self.workspace.reload_workspace()
 
     # Called on story startup to load all our content objects
     def load_content(self):
@@ -646,14 +522,11 @@ class Story(ft.View):
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
             directory_path = self.data['content_directory_path']
 
+        # Save the new chapter
         self.chapters[title] = Chapter(title, self.p, directory_path, self)
-
         self.widgets.append(self.chapters[title])  # Add to our master list of widgets in our story
 
-        #print("Chapter created: " + self.chapters[title].title)
         self.workspace.reload_workspace(self.p, self)
-
-        print("num chapters: " + str(len(self.chapters)))
 
 
     # Called to create a character object
@@ -666,10 +539,10 @@ class Story(ft.View):
         # If no path is passed in, construct the full file path for the character JSON file
         if directory_path is None:
             directory_path = self.data['characters_directory_path'] # There SHOULD always be a path passed in, but this will catch errors
-
+        
+        # Save our new character
         self.characters[title] = Character(title, self.p, directory_path, self)
-
-        #print("Character created: " + character.title)
+        self.widgets.append(self.characters[title])  # Add to our master list of widgets in our story
 
         self.workspace.reload_workspace(self.p, self)
 
@@ -685,13 +558,106 @@ class Story(ft.View):
             #file_path = os.path.join(self.data['notes_directory_path'], note_filename)
 
         self.notes[title] = Notes(title, self.p, directory_path, self)
-
-        #print("Note created: " + notes.title)
+        self.widgets.append(self.notes[title])  # Add to our master list of widgets in our story
 
         self.workspace.reload_workspace(self.p, self)
 
 
-    # text field to name the note    
-    def name_note(e):
-        title = ft.Text()
-        tb1 = ft.TextField(label ="With placeholder", hint_text="Note Title")
+    # Called when new story object is created, either by program or by being loaded from storage
+    def build_view(self) -> list[ft.Control]:
+        ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
+        from ui.menu_bar import create_menu_bar
+        from ui.all_workspaces_rails import All_Workspaces_Rail
+        from ui.active_rail import Active_Rail
+        from ui.workspace import Workspace
+        from models.app import app
+
+        page = self.p
+
+        # Clear our controls in our view before building it
+        self.controls.clear()
+
+        # Create our page elements as their own pages so they can update
+        self.menubar = create_menu_bar(page, self)
+
+        # Create our rails and workspace objects
+        self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
+        self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
+        self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
+        self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
+
+        # Called when hovering over resizer to right of the active rail
+        def show_horizontal_cursor(e: ft.HoverEvent):
+            ''' Changes the cursor to horizontal when hovering over the resizer '''
+
+            e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
+            e.control.update()
+
+        # Called when resizing the active rail by dragging the resizer
+        def move_active_rail_divider(e: ft.DragUpdateEvent):
+            ''' Responsible for altering the width of the active rail '''
+
+            if (e.delta_x > 0 and self.active_rail.width < page.width/2) or (e.delta_x < 0 and self.active_rail.width > 100):
+                self.active_rail.width += e.delta_x    # Apply the change to our rail
+                
+            page.update()   # Apply our changes to the rest of the page
+
+        # Called when app stops dragging the resizer to resize the active rail
+        def save_active_rail_width(e: ft.DragEndEvent):
+            ''' Saves our new width that will be loaded next time app opens the app '''
+
+            app.settings.data['active_rail_width'] = self.active_rail.width
+            app.settings.save_dict()
+            print("Active rail width: " + str(self.active_rail.width))
+
+        # The actual resizer for the active rail (gesture detector)
+        active_rail_resizer = ft.GestureDetector(
+            content=ft.Container(
+                width=10,   # Total width of the GD, so its easier to find with mouse
+                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                # Thin vertical divider, which is what the app will actually drag
+                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
+                padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
+            ),
+            on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
+            on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
+            on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
+        )
+
+        # Save our 2 rails, divers, and our workspace container in a row
+        row = ft.Row(
+            spacing=0,  # No space between elements
+            expand=True,  # Makes sure it takes up the entire window/screen
+
+            controls=[
+                self.all_workspaces_rail,  # Main rail of all available workspaces
+                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
+
+                self.active_rail,    # Rail for the selected workspace
+                active_rail_resizer,   # Divider between rail and work area
+                
+                self.workspace,    # Work area for pagelets
+            ],
+        )
+
+        # Our gesture detector that holds our row, and allows us to track our mouse position
+        gd = ft.GestureDetector(
+            content=row,
+            expand=True,
+            on_hover=self.on_hover,
+            hover_interval=100,
+        )
+
+        # Views render like columns, so we add elements top-down
+        self.controls = [self.menubar, gd]
+
+    # Called every time the mouse moves over the workspace
+    def on_hover(self, e):
+        ''' Stores our mouse positioning so we know where to open menus '''
+
+        self.mouse_x = e.local_x 
+        self.mouse_y = e.local_y
+        #print(f"Mouse at x={self.mouse_x}, y={self.mouse_y}")
+
+
+    # Called when deleting an object from the story (character, chapter, etc.)

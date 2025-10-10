@@ -6,25 +6,66 @@ These objects is displayed in the plotline widget, and store our mini widgets br
 import json
 import os
 import flet as ft
-from models.story import Story
+from models.widget import Widget
+from models.mini_widget import MiniWidget
+from handlers.verify_data import verify_data
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
-class Timeline(ft.GestureDetector):
+class Timeline(MiniWidget):
 
-    # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
-    def __init__(self, title: str, directory_path: str, page: ft.Page, story: Story, data: dict=None):
-
-        # Initialize our flet control. Theres problems with the data if this is not done first
+    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
+    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+        
+        # Parent constructor
         super().__init__(
-            on_enter=self.on_hover,
+            title=title,        # Title of our mini note
+            owner=owner,      # owner widget that holds us
+            page=page,          # Page reference
+            data=data,          # Data if we're loading an existing mini note, otherwise blank
+        ) 
+
+
+        # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'rail_dropdown_is_expanded': bool,
+                'branches_are_expanded': bool,      # If the branches section is expanded
+                'plot_points_are_expanded': bool,   # If the plotpoints section is expanded
+                'arcs_are_expanded': bool,         # If the arcs section is expanded
+                'time_skips_are_expanded': bool,    # If the timeskips section is expanded
+                'start_date': str,    # Start and end date of this particular plotline
+                'end_date': str,
+                'color': str,
+                'branches': dict,   # Branches in the timeline used to seperate disconnected story events that could merge seperately
+                'plot_points': dict,      # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
+                'arcs': dict,     # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
+                'time_skips': dict,  
+            },
+            tag="timeline"
         )
 
-        self.title = title  # Set our title
-        self.directory_path = directory_path  # Path to our plotline json file
-        self.p = page  # Page reference for convenience
-        self.story = story  # Story object that contains this timeline
-        self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
+
+        # Check if we loaded our mini widget or created a new one
+        if data is None:
+            loaded = False
+        else:
+            loaded = True
+
+        # If not loaded, set default values. No new data here, just giving values to existing fields
+        if not loaded:
+            self.data.update({
+                'directory_path': self.owner.directory_path,   
+                'visible': True,   
+                'rail_dropdown_is_expanded': True,
+                'branches_are_expanded': True,     
+                'plot_points_are_expanded': True,   
+                'arcs_are_expanded': True,       
+                'time_skips_are_expanded': True,    
+                'color': "blue",
+            })
+            self.save_dict()
 
 
         # Create our live object dictionaries
@@ -34,24 +75,11 @@ class Timeline(ft.GestureDetector):
         self.time_skips: dict = {}
         self.connections: dict = {} # Connect points, arcs, branch, etc.???
 
-        # Check if we loaded our mini widget or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If this is a new mini widget (Not loaded), give it default data all widgets need
-        if not loaded:
-            self.create_default_data()  # Create default data if none was passed in
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_timeline_data()
-
-
         # Apply our visibility
         self.visible = self.data['visible']
+
+        # The control that shows up in the plotline widget OUTSIDE our mini widget
+        self.timeline_control: ft.GestureDetector = ft.GestureDetector() 
         
         # Load the rest of our data from the file
         self.load_branches()
@@ -60,75 +88,22 @@ class Timeline(ft.GestureDetector):
         self.load_time_skips()
 
         # Builds/reloads our timeline UI
-        self.reload_timeline()
-
-    # Called when saving changes in our timeline object to file
+        self.reload_mini_widget()
+    
+    # Called when saving changes in our mini widgets data to the OWNERS json file
     def save_dict(self):
-        ''' Saves our data dict to our json file '''
+        ''' Saves our current data to the OWNERS json file '''
 
-        file_path = os.path.join(self.directory_path, f"{self.title}.json")
+        # Error Handling
+        if self.owner.data is None or not isinstance(self.data, dict):
+            print("Error: owner data is None, cannot save mini widget data")
+            return
 
-        try:
-            # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            os.makedirs(self.directory_path, exist_ok=True)
-            
-            # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
-                json.dump(self.data, f, indent=4)
-        
-        # Handle errors
-        except Exception as e:
-            print(f"Error saving object to {file_path}: {e}")
-        
+        # Grab our owner object, and update their data pertaining to this mini widget
+        self.owner.data['timelines'][self.title] = self.data
 
-    # Called at the constructor if this is a new timeline that was not loaded
-    def create_default_data(self) -> dict:
-        ''' Returns a default dict data sctructure for a new timeline '''
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-
-        default_timeline_data = {
-            'title': self.title,
-            'directory_path': self.directory_path,   
-            'tag': "timeline",
-
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
-            'rail_dropdown_is_expanded': True,
-
-            'branches_are_expanded': True,      # If the branches section is expanded
-            'plot_points_are_expanded': True,   # If the plotpoints section is expanded
-            'arcs_are_expanded': True,         # If the arcs section is expanded
-            'time_skips_are_expanded': True,    # If the timeskips section is expanded
-
-            'start_date': "",    # Start and end date of this particular plotline
-            'end_date': "",
-
-
-            'color': "blue",
-
-            'branches': {},   # Branches in the timeline used to seperate disconnected story events that could merge seperately
-
-            'plot_points': {},      # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
-
-            'arcs': {},     # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
-
-            # Any skips or jumps in the timeline that we want to note. Good for flashbacks, previous events, etc.
-            # Stuff that doesnt happen in the main story plotline, but we want to be able to flesh it out, like backstories
-            'time_skips': {},    
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_timeline_data)
-        self.save_dict()
-        return
-    
-    # Called to verify loaded data
-    def verify_timeline_data(self):
-        ''' Verify loaded any missing data fields in existing timelines '''
-    
+        # Save our owners json file to match their data
+        self.owner.save_dict()
     
     # Called in the constructor
     def load_branches(self):
@@ -172,10 +147,15 @@ class Timeline(ft.GestureDetector):
         ''' Creates a new branch inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.branch import Branch
 
-        self.branches[title] = Branch(title=title, owner=self, page=self.p)
-        self.data['branches'][title] = self.branches[title].data
+        new_branch = Branch(title=title, owner=self, page=self.p, data=None)
+
+        self.branches[title] = new_branch
+        self.story.plotline.mini_widgets.append(self.branches[title])
 
         self.save_dict()
+
+        self.reload_timeline()
+        self.story.plotline.reload_widget()  # New branch needs to be added to mini widgets in the UI, so we reload the widget
         
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
@@ -271,12 +251,12 @@ class Timeline(ft.GestureDetector):
         # Grab local mouse to figure out x and map it to our timeline
 
     # Called when we need to rebuild out timeline UI
-    def reload_timeline(self):
+    def reload_mini_widget(self):
 
         # We only show branches, arcc, plotpoints, and timeskips using their UI elements, not their mini widget
 
         # Content of our Timeline (Gesture detector)
-        self.content = ft.Container(
+        self.timeline_control = ft.Container(
             margin=ft.margin.only(left=20, right=20),
             expand=True,
             alignment=ft.alignment.center,
