@@ -1,6 +1,7 @@
 '''
 Parent class for mini widgets, which are extended flet containers used as information displays on the side of the parent widget
 Makes showing detailed information easier without rending and entire widget where it doesn't make sense
+Mini widgets are stored in their OWNERS (Widget) json file, not their own file
 '''
 
 
@@ -19,12 +20,27 @@ class MiniWidget(ft.Container):
             expand=True,
             border_radius=ft.border_radius.all(6),
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
+            data=data,
         )
            
         self.title = title  # Title of the widget that will show up on its tab
         self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
         self.p = page   # Grabs our original page for convenience and consistency
-        self.data = data    # Pass in our data when loading existing mini widgets
+        
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our object so we can access its data and change it
+            {   # Pass in the required fields and their types
+                'title': str,       # Title of the mini widget, should match the object title
+                'tag': str,     # Default mini widget tag, but should be overwritten by child classes
+                'visible': bool,        # If the widget is visible. Flet has this parameter build in, so our objects all use it
+                'is_selected': bool,    # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+            },
+        )
 
         # Check if we loaded our mini widget or created a new one
         if data is None:
@@ -32,22 +48,16 @@ class MiniWidget(ft.Container):
         else:
             loaded = True
 
-        # If this is a new mini widget (Not loaded), give it default data all widgets need
+        # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            self.create_default_data()  # Create default data if none was passed in
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our object so we can access its data and change it
-                {   # Pass in the required fields and their types
-                    'title': str,       # Title of the mini widget, should match the object title
-                    'tag': str,     # Default mini widget tag, but should be overwritten by child classes
-                    'visible': bool,        # If the widget is visible. Flet has this parameter build in, so our objects all use it
-                    'is_selected': bool,    # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
-                },
-            )
+            #print(self.data)
+            self.data.update({
+                'title': self.title,        
+                'tag': "",   
+                'visible': True,    
+                'is_selected': False, 
+            })
+            self.save_dict()
 
 
         # Apply our visibility

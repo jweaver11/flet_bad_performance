@@ -1,8 +1,8 @@
 ''' 
 Master Story class that contains data and methods for the entire story 
 Our story is an extended ft.View, meaning new routes can display the story object directly
+The Story object creates widgets (characters, chapters, notes, etc.) objects that are stored inside of itself.
 Stories contain metadata, ui elements, and all the widgets, as well as methods to create new widgets only
-This is a dead-end model. Imports nothing else from project (other than constants) to avoid ciruclar import
 '''
 
 import flet as ft
@@ -12,10 +12,10 @@ from constants import data_paths
 
 
 class Story(ft.View):
-    # Constructor Requires a Title, page reference.
-    # Optional: data (if loading) template (sci-fi, fantasy, etc.), type (novel or comic)
+    # Constructor.
     def __init__(self, title: str, page: ft.Page, data: dict=None, template: str=None, type: str=None):
-        # Title, page, data, and template
+        # Required: title, page reference
+        # Optional: data (if loading), template (sci-fi, fantasy, etc.),
         
         # Parent constructor
         super().__init__(
@@ -68,7 +68,7 @@ class Story(ft.View):
         self.mouse_y: int = 0
 
         # Called outside of constructor to avoid circular import issues, or it would be called here
-        #self.startup() # The init_saved_stories calls this, or when a new story is created
+        #self.startup() # Called when opening our active story to load all its data and build its view
         
         
     # Called from main when our program starts up. Needs a page reference, thats why not called here
@@ -246,14 +246,9 @@ class Story(ft.View):
 
         # Set our sub folders inside of world building
         world_building_folders = [
-            "locations",
-            "lores",
-            "power_systems",
-            "social_systems",
-            "history",
-            "geography",
-            "maps",
+            "world_maps",
         ]
+
         # Create the sub folders inside of world building
         for folder in world_building_folders:
             folder_path = os.path.join(directory_path, "world_building", folder)
@@ -627,19 +622,20 @@ class Story(ft.View):
             return
         
         # Construct the path to plotline.json
-        world_json_path = os.path.join(self.data['world_building_directory_path'], 'world_building.json')
+        world_building_json_path = os.path.join(self.data['world_building_directory_path'], 'world_building.json')
 
         # Set data blank initially
         world_building_data = None
         
         # Attempt to open and read the plotline.json file. Sets our stored data if successful
         try:
-            with open(world_json_path, 'r', encoding='utf-8') as file:
+            with open(world_building_json_path, 'r', encoding='utf-8') as file:
                 world_building_data = json.load(file)
-                # You can now use plotline_data as needed
+                #print("World buliding data: \n", world_building_data)
+                
                 #print(f"Successfully loaded world data")
         except FileNotFoundError:
-            print(f"world.json not found at {world_json_path}")
+            print(f"world.json not found at {world_building_json_path}")
         
         except json.JSONDecodeError as e:
             print(f"Error parsing world_building.json: {e}")

@@ -1,18 +1,14 @@
 import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
+from handlers.verify_data import verify_data
 
 
 # Data class for arcs on a timeline - change to branch as well later??
 class Arc(MiniWidget):
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
-        # Check if we're loading an arc or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
+        
         # Parent constructor
         super().__init__(
             title=title,        # Title of our mini note
@@ -21,9 +17,21 @@ class Arc(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
 
-        # If our character is new and not loaded, give it default data
-        if not loaded:
-            self.create_default_arc_data()  # Create data defaults for each chapter widget
+        # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'content': str,
+                'description': str,
+                'start_date': str,
+                'end_date': str,
+                'events': list,       # Step by step of plot events through the arc. Call plot point??
+                'involved_characters': list,
+                'related_locations': list,
+                'related_items': list,
+            },
+            tag="arc"
+        )
 
         # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget
         self.timeline_control = ft.GestureDetector(
@@ -65,28 +73,6 @@ class Arc(MiniWidget):
 
         # Save our owners json file to match their data
         self.owner.save_dict()
-
-    # Called when creating a new arc object
-    def create_default_arc_data(self):
-        ''' Gives default data for all arc objects '''
-
-        default_arc_data = {
-            
-            'tag': "arc",
-   
-            'description': "",
-            'start_date': "",
-            'end_date': "",
-            'events': [],       # Step by step of plot events through the arc. Call plot point??
-            'involved_characters': [],
-            'related_locations': [],
-            'related_items': [],
-        }
-
-        # Merge default data with existing data, preserving any existing values
-        self.data = {**default_arc_data, **self.data}
-        self.save_dict()    # Save our data to the file
-        return
 
     def on_hover(self, e: ft.HoverEvent):
         print(e)

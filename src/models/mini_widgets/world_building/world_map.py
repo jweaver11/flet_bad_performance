@@ -4,10 +4,11 @@ These objects are stored in the world building widget, inside the diretory world
 These objects represent a world/planet, and can contain their own locations, geography, but also sub-maps
 '''
 
-import json
 import os
+import json
 import flet as ft
 from models.story import Story
+from handlers.verify_data import verify_data
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
@@ -22,35 +23,42 @@ class WorldMap(ft.GestureDetector):
         )
 
         self.title = title  # Set our title
-        self.directory_path = directory_path  # Path to our plotline json file
+        self.directory_path = directory_path  # Path to our world maps json files (world_building/world_maps/)
         self.p = page  # Page reference for convenience
         self.story = story  # Story object that contains this timeline
         self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
 
 
-        # Check if we loaded our mini widget or not
+        # Check if we loaded our settings data or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If this is a new mini widget (Not loaded), give it default data all widgets need
+        # If our settings are new and not loaded, give it default data
         if not loaded:
-            self.create_default_data()  # Create default data if none was passed in
+            self.create_default_world_map_data()  # Create data defaults for our settings widgets
 
         # Otherwise, verify the loaded data
         else:
             # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            self.verify_map_data()
+            verify_data(
+                self,   # Pass in our own data so the function can see the actual data we loaded
+                {
+                    'tag': str,            # Tag to identify what type of object this is
+                    'visible': bool,      # If this world map is visible in the world building widget
+                    'content': str,    # Content of our world map
+                },
+                tag="world_map"
+            )
 
-
-        # Store sub maps inside of folders - continents, oceans, etc.
 
         # Apply our visibility
         self.visible = self.data['visible']
 
         # Need to be able to draw maps for continents, countries, regions, dungeons, cities, etc.
         # Needs drawing functionality, as well as ability to just add locations, markers, notes
+        # Store sub maps inside of folders - continents, oceans, etc.?
         
         self.maps = {}
 
@@ -58,7 +66,7 @@ class WorldMap(ft.GestureDetector):
         
 
         # Builds/reloads our timeline UI
-        self.reload_map()
+        self.reload_world_map()
 
     # Called when saving changes in our timeline object to file
     def save_dict(self):
@@ -78,27 +86,9 @@ class WorldMap(ft.GestureDetector):
         except Exception as e:
             print(f"Error saving object to {file_path}: {e}")
         
-    
-    # Called when saving changes in our map object to file
-    def save_dict(self):
-        ''' Saves our data dict to our json file '''
-
-        file_path = os.path.join(self.directory_path, f"{self.title}.json")
-
-        try:
-            # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            os.makedirs(self.directory_path, exist_ok=True)
-            
-            # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
-                json.dump(self.data, f, indent=4)
-        
-        # Handle errors
-        except Exception as e:
-            print(f"Error saving object to {file_path}: {e}")
 
     # Called at the constructor if this is a new timeline that was not loaded
-    def create_default_data(self) -> dict:
+    def create_default_world_map_data(self) -> dict:
         ''' Returns a default dict data sctructure for a new timeline '''
 
         # Error catching
@@ -108,9 +98,9 @@ class WorldMap(ft.GestureDetector):
 
         default_map_data = {
             
-            'tag': "map",
-
-            'visible': True,    # If the widget is visible. Flet has this parameter build in, so our objects all use it
+            'tag': "world_map",
+            'visible': True,      # If this world map is visible in the world building widget
+            'content': "",    # Content of our world map
              
         }
 
@@ -119,21 +109,13 @@ class WorldMap(ft.GestureDetector):
         self.save_dict()
         return self.data
     
-    # Called to verify loaded data
-    def verify_map_data(self):
-        ''' Verify loaded any missing data fields in existing maps '''
-        pass
-    
-    
-    
 
     def on_hover(self, e: ft.HoverEvent):
         #print(e)
         pass
-        # Grab local mouse to figure out x and map it to our timeline
 
     # Called when we need to rebuild out timeline UI
-    def reload_map(self):
+    def reload_world_map(self):
 
         # We only show branches, arcc, plotpoints, and timeskips using their UI elements, not their mini widget
 

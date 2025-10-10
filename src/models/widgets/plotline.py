@@ -9,7 +9,7 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.nested_widget_models.plotline.timeline import Timeline
+from models.mini_widgets.plotline.timeline import Timeline
 from handlers.verify_data import verify_data
 
 
@@ -26,29 +26,46 @@ class Plotline(Widget):
             data = data,    # Saves our data passed in (if there is any)
         )
 
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'tag': str,
+                'story_start_date': str,
+                'story_end_date': str,
+                'filters': dict,
+            },
+            tag="plotline"
+        )
+
         # Check if we loaded our settings data or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If our settings are new and not loaded, give it default data
+        # If our settings are new and not loaded, give it default data values it wants
         if not loaded:
-            self.create_default_plotline_data()  # Create data defaults for our settings widgets
+            self.create_default_plotline_data() 
 
-        # Otherwise, verify the loaded data
+        # Check if we loaded our character or not
+        if data is None:
+            loaded = False
         else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'tag': str,
-                    'story_start_date': str,
-                    'story_end_date': str,
-                    'filters': dict,
+            loaded = True
+
+        # If not loaded, set default values. No new data here, just giving values to existing fields
+        if not loaded:
+            self.data.update({
+                'pin_location': "bottom",     # Start our plotline on the bottom pin
+                # Structure for our filters
+                'filters': {   
+                    'show_timeskips': True,
+                    'show_plot_points': True,
+                    'show_arcs': True,
                 },
-                tag="plotline"
-            )
+            })
+            self.save_dict()
             
 
         # Our timeline controls
@@ -90,14 +107,11 @@ class Plotline(Widget):
         # Default data for our plotline widget
         default_plotline_data = {
             
+            # Start at bottom
             'pin_location': "bottom",
-            'tag': "plotline",  
 
-            # Start and end date of entire story
-            'story_start_date': "", 
-            'story_end_date': "",
-
-            'filters': {    # Filters we can apply to change the view of our plotline, while keeping the data intact
+            # Structure for our filters
+            'filters': {   
                 'show_timeskips': True,
                 'show_plot_points': True,
                 'show_arcs': True,
@@ -115,7 +129,7 @@ class Plotline(Widget):
     def load_timelines(self):
         ''' Loads our timelines from our timelines directory inside our plotline directory '''
 
-        from models.nested_widget_models.plotline.timeline import Timeline
+        from models.mini_widgets.plotline.timeline import Timeline
         # Load our timelines from our timeline directory
         timelines_directory_path = os.path.join(self.data['directory_path'], "timelines")
         

@@ -10,15 +10,19 @@ def verify_data(object, required_data: dict, tag: str=None) -> bool:
 
 
     # Run through the required data keys passed in, and make sure the object has it. If not, create it
-    for key, required_data_type in required_data.items():
-        if key not in object.data or not isinstance(object.data[key], required_data_type):
-            object.data[key] = required_data[key]()
+    try:
+        for key, required_data_type in required_data.items():
+            if key not in object.data or not isinstance(object.data[key], required_data_type):
+                object.data[key] = required_data[key]()
 
-    # Ensure we update the tag for loading purposes
-    if tag is not None:
-        object.data['tag'] = tag
+        # Ensure we update the tag for loading purposes for objects not stored in their own files (mini widgets mostly)
+        if tag is not None:
+            object.data['tag'] = tag
 
-    # Save our updated data back to the file
-    object.save_dict()      
-
-    return
+        # Save our updated data back to the file
+        object.save_dict()      
+        return True
+    
+    except Exception as e:
+        print(f"Error verifying data for object {object.title}: {e}")
+        return False

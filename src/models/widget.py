@@ -1,6 +1,8 @@
 '''
 An extended flet container that is the parent class of all our story objects.
 Handles uniform UI, and has some functionality all objects need for easy data use.
+Every widget has its own json file
+Only Widgets create mini widgets
 '''
 
 import flet as ft
@@ -20,41 +22,54 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
+            data=data,
         )
+        
     
         # Required properties of all widgets
         self.title = title  # Title of our object
         self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
         self.directory_path = directory_path    # Path to our directory that will contain our json file
         self.story = story  # Reference to our story object that owns this widget
-        self.data = data    # Pass in data if loading an object, otherwise can be left blank for new objects
         self.mini_widgets = []  # List that holds our mini widgets objects
 
-        # Check if we loaded our widget or created a new one
+        # Sets our data empty if its none
+        if self.data is None or not isinstance(self.data, dict):
+            self.data = {}
+
+        
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'title': str,
+                'directory_path': str,
+                'tag': str,
+                'pin_location': str,
+                'visible': bool,
+                'tab_title_color': str,
+                'mini_widgets': dict,
+            },
+        )
+
+        # Check if we loaded our widget or not
         if data is None:
             loaded = False
         else:
             loaded = True
 
-        # If this is a new widget (Not loaded), give it default data all widgets need
+        # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
-            self.create_default_data()  # Create default data if none was passed in
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'title': str,
-                    'directory_path': str,
-                    'tag': str,
-                    'pin_location': str,
-                    'visible': bool,
-                    'tab_title_color': str,
-                    'mini_widgets': dict,
-                },
-            )
+            #print(self.data)
+            self.data.update({
+                'title': self.title,
+                'directory_path': self.directory_path,
+                'tag': "widget",    # Default tag, should be overwritten by child classes
+                'pin_location': "main",     # Stick us in the main pin area by default
+                'visible': True,    
+                'tab_title_color': "primary",
+            })
+            self.save_dict()
 
 
         # Apply our visibility
