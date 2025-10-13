@@ -3,7 +3,7 @@
 '''
 import 'package:flutter/material.dart';
 
-TODO: check/redo names here
+TODO: check/redo names here - this was built off of the example but i don't think it works here also unfinished
 class DraggableWidget extends StatelessWidget {
     const DraggableWidget({super.key});
     
@@ -21,12 +21,12 @@ class DraggableWidget extends StatelessWidget {
 TODO: add classes for "draggableExample" and "draggableExampleState"
 PSEUDO CODE/EXPLANATION 4 ME:
 Draggable<Border>(
-    data: how should look
-    child: what shows when not dragging
-    feedback: what shows when dragging
-    childWhenDragging: what shows in place of child when dragging
-    onDragStarted: what to do when drag starts
-    onDragEnd: what to do when drag ends
-    onDraggableCanceled: what to do when drag is canceled
-    onDragCompleted: what to do when drag completes)
+    data: how should look - the border
+    child: what shows when not dragging - the border
+    feedback: what shows when dragging - same but with opacity
+    childWhenDragging: what shows in place of child when dragging - empty 
+    onDragStarted: what to do when drag starts - start moving the border?
+    onDragEnd: what to do when drag ends - establish new position
+    onDraggableCanceled: what to do when drag is canceled - return to original position
+    onDragCompleted: what to do when drag completes - finalize new position
 '''
