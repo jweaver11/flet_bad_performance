@@ -54,6 +54,7 @@ class World_Building(Widget):
         self.technology = {}
         self.history = {}
 
+        # Load our live objects from our data
         self.load_world_maps()
         self.load_locations()
         self.load_lore()

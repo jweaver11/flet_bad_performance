@@ -67,15 +67,8 @@ class MiniWidget(ft.Container):
             print("Error: owner data is None, cannot save mini widget data")
             return
         
-        # TODO: Run through all values in owners mini widgets dictionary. If tag, owner, and title match, save there
-        # -- issue when renaming mini widgets. But thats for later. Save before renaming and should be fine
+        # TODO: Run through owners data, using our dictionary path. Then have it save theree
 
-
-
-        # This works in widgets that only have simple mini widgets (like chapters and characters).
-        # Widgets that store mini Widgets nested in other Mini Widgets (like timelines with branches) will need to override this function
-        # Grab our owner object, and update their data pertaining to this mini widget
-        self.owner.data['mini_widgets'][self.title] = self.data
 
         # Save our owners json file to match their data
         self.owner.save_dict()

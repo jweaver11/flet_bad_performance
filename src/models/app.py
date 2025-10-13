@@ -6,6 +6,7 @@ All other files can import this function without issues
 
 from models.story import Story
 import flet as ft
+from models.widget import Widget
 
 
 class App:
@@ -14,8 +15,7 @@ class App:
     def __init__(self):
 
         # Declares settings and workspace rail here, but we create/load them later in main
-        self.settings: ft.Container = None
-        
+        self.settings: Widget = ft.Container()
         
         # Dict of all our stories.
         self.stories = {}

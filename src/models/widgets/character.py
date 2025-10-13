@@ -76,19 +76,6 @@ class Character(Widget):
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
-
-    # Called when new character object is created.
-    def create_default_character_data(self) -> dict:
-        ''' Loads their existing data from file, or sets default data if no file exists '''
-
-        # Default data for new characters
-    
-
-        # Update existing data with any new default fields we added
-        
-        self.save_dict()
-        return
-    
     
     
     # Change our tab color of widget. Accepts a flet color as parameter

@@ -27,35 +27,18 @@ class Settings(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': str,  # Tag for logic, should be overwritten by child classes
-                'active_story': str,    # this works as a route for the correct story
-                'tab_title_color': str,        # the tab color
-                'theme_mode': str,       # the apps theme mode, dark or light
-                'theme_color_scheme': str,   # the color scheme of the app
-                'change_name_colors_based_on_morality': bool,   # If characters names change colors in char based on morality
-                'workspaces_rail_order': list,      # Order of the workspace rail
-                'workspaces_rail_is_collapsed': bool,  # If the all workspaces rail is collapsed or not
-                'workspaces_rail_is_reorderable': bool,  # If the all workspaces rail is reorderable or not
-                'active_rail_width': int,   # Width of our active rail that we can resize
-                'is_maximized': bool,   # If the window is maximized or not
-            },
-            #tag="settings"
-        )
-
-        # Check if we loaded our settings data or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If our settings are new and not loaded, give it default data values
-        if not loaded:
-            self.data.update({
                 'active_story': "/",    # this works as a route for the correct story
                 'is_maximized': True,   # If the window is maximized or not
-                'tab_title_color': "blue",        # the tab color
-                'theme_mode': "dark",       # the apps theme mode, dark or light
-                'theme_color_scheme': "blue",   # the color scheme of the app
+                'tab_title_color': "primary",        # the tab color
+                'theme_mode': "system",       # the apps theme mode, dark or light
+                'active_rail_width': 200,  # Width of our active rail that we can resize
+                'theme_color_scheme': str,   # the color scheme of the app
                 'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
+                'workspaces_rail_order': list,      # Order of the workspace rail
+                'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
+                'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
+                'active_rail_width': int,   # Width of our active rail that we can resize
+                'is_maximized': bool,   # If the window is maximized or not
                 'workspaces_rail_order': [      # Order of the workspace rail
                     "content",
                     "characters",
@@ -64,12 +47,8 @@ class Settings(Widget):
                     "drawing_board",
                     "notes",
                 ],
-                'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
-                'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
-                'active_rail_width': 200,   # Width of our active rail that we can resize
-            })
-        
-            self.save_dict()
+            },
+        )
 
 
         self.reload_widget()  # Loads our settings widget UI

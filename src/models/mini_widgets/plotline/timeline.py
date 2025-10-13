@@ -27,46 +27,25 @@ class Timeline(MiniWidget):
         ) 
 
 
-        # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+        # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "timeline",
-                'rail_dropdown_is_expanded': bool,
-                'branches_are_expanded': bool,      # If the branches section is expanded
-                'plot_points_are_expanded': bool,   # If the plotpoints section is expanded
-                'arcs_are_expanded': bool,         # If the arcs section is expanded
-                'time_skips_are_expanded': bool,    # If the timeskips section is expanded
+                'rail_dropdown_is_expanded': True,
+                'branches_are_expanded': True,      # If the branches section is expanded
+                'plot_points_are_expanded': True,   # If the plotpoints section is expanded
+                'arcs_are_expanded': True,         # If the arcs section is expanded
+                'time_skips_are_expanded': True,    # If the timeskips section is expanded
                 'start_date': str,    # Start and end date of this particular plotline
                 'end_date': str,
-                'color': str,
+                'color': "primary",
                 'branches': dict,   # Branches in the timeline used to seperate disconnected story events that could merge seperately
                 'plot_points': dict,      # Events that happen during our stories plot. Character deaths, catastrophies, major events, etc.
                 'arcs': dict,     # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
                 'time_skips': dict,  
             },
         )
-
-
-        # Check if we loaded our mini widget or created a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If not loaded, set default values. No new data here, just giving values to existing fields
-        if not loaded:
-            self.data.update({
-                'directory_path': self.owner.directory_path,   
-                'visible': True,   
-                'rail_dropdown_is_expanded': True,
-                'branches_are_expanded': True,     
-                'plot_points_are_expanded': True,   
-                'arcs_are_expanded': True,       
-                'time_skips_are_expanded': True,    
-                'color': "blue",
-            })
-            self.save_dict()
 
 
         # Create our live object dictionaries

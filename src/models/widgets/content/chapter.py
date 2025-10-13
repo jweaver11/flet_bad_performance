@@ -24,7 +24,6 @@ class Chapter(Widget):
             required_data={
                 'tag': "chapter",
                 'content': str,
-                
                 'temp': str,
                 'test': str,
             }

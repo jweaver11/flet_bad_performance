@@ -38,7 +38,7 @@ class Widget(ft.Container):
             {
                 'title': self.title,
                 'directory_path': self.directory_path,
-                #'tag': "widget",
+                'tag': "widget",
                 'pin_location': "main",
                 'visible': True,
                 'tab_title_color': "primary",

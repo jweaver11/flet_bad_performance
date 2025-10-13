@@ -34,34 +34,16 @@ class Plotline(Widget):
                 'pin_location': "bottom",     # Start our plotline on the bottom pin
                 'story_start_date': str,
                 'story_end_date': str,
-                'filters': dict,
-                'timelines': dict,  
-            },
-            
-        )
-
-        # Check if we loaded our character or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If not loaded, set default values. No new data here, just giving values to existing fields
-        if not loaded:
-            self.data.update({
-                'pin_location': "bottom",     # Start our plotline on the bottom pin
                 'filters': {   
                     'show_timeskips': True,
                     'show_plot_points': True,
                     'show_arcs': True,
                 },
-                'mini_widgets': {
-                    'timelines': {},
-                }
-            })
-            self.save_dict()
+                'timelines': dict,  
+            },
             
-
+        )
+            
         # Our timeline controls
         self.timelines = {}
 

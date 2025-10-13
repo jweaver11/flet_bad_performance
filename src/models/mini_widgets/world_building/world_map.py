@@ -8,53 +8,34 @@ import os
 import json
 import flet as ft
 from models.story import Story
+from models.mini_widget import MiniWidget
+from models.widget import Widget
 from handlers.verify_data import verify_data
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
-class WorldMap(ft.GestureDetector):
+class WorldMap(MiniWidget):
 
-    # Contsturctor. Accepts tile, file path, and optional data if plotline is beaing created from existing json file
-    def __init__(self, title: str, directory_path: str, page: ft.Page, story: Story, data: dict=None):
-
-        # Initialize our flet control. Theres problems with the data if this is not done first
+   # Constructor. Requires title, owner widget, page reference, and optional data dictionary
+    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+        
+        # Parent constructor
         super().__init__(
-            on_enter=self.on_hover,
+            title=title,        # Title of our mini note
+            owner=owner,      # owner widget that holds us
+            page=page,          # Page reference
+            data=data,          # Data if we're loading an existing mini note, otherwise blank
+            dictionary_path=""  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
+        ) 
+        
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {
+                'tag': "world_map",            # Tag to identify what type of object this is
+                'content': str,    # Content of our world map
+            },
         )
-
-        self.title = title  # Set our title
-        self.directory_path = directory_path  # Path to our world maps json files (world_building/world_maps/)
-        self.p = page  # Page reference for convenience
-        self.story = story  # Story object that contains this timeline
-        self.data = data    # Set our data. If new object, this will be None, otherwise its loaded data
-
-
-        # Check if we loaded our settings data or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If our settings are new and not loaded, give it default data
-        if not loaded:
-            self.create_default_world_map_data()  # Create data defaults for our settings widgets
-
-        # Otherwise, verify the loaded data
-        else:
-            # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
-            verify_data(
-                self,   # Pass in our own data so the function can see the actual data we loaded
-                {
-                    'tag': str,            # Tag to identify what type of object this is
-                    'visible': bool,      # If this world map is visible in the world building widget
-                    'content': str,    # Content of our world map
-                },
-                #tag="world_map"
-            )
-
-
-        # Apply our visibility
-        self.visible = self.data['visible']
 
         # Need to be able to draw maps for continents, countries, regions, dungeons, cities, etc.
         # Needs drawing functionality, as well as ability to just add locations, markers, notes
@@ -68,47 +49,6 @@ class WorldMap(ft.GestureDetector):
         # Builds/reloads our timeline UI
         self.reload_world_map()
 
-    # Called when saving changes in our timeline object to file
-    def save_dict(self):
-        ''' Saves our data dict to our json file '''
-
-        file_path = os.path.join(self.directory_path, f"{self.title}.json")
-
-        try:
-            # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            os.makedirs(self.directory_path, exist_ok=True)
-            
-            # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
-                json.dump(self.data, f, indent=4)
-        
-        # Handle errors
-        except Exception as e:
-            print(f"Error saving object to {file_path}: {e}")
-        
-
-    # Called at the constructor if this is a new timeline that was not loaded
-    def create_default_world_map_data(self) -> dict:
-        ''' Returns a default dict data sctructure for a new timeline '''
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-
-        default_map_data = {
-            
-            'tag': "world_map",
-            'visible': True,      # If this world map is visible in the world building widget
-            'content': "",    # Content of our world map
-             
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_map_data)
-        self.save_dict()
-        return self.data
-    
 
     def on_hover(self, e: ft.HoverEvent):
         #print(e)

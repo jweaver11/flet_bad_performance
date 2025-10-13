@@ -17,10 +17,11 @@ class Arc(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
 
-        # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
+        # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
+                'tag': "arc",           # Tag to identify what type of object this is
                 'content': str,
                 'description': str,
                 'start_date': str,
@@ -30,7 +31,6 @@ class Arc(MiniWidget):
                 'related_locations': list,
                 'related_items': list,
             },
-            tag="arc"
         )
 
         # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget

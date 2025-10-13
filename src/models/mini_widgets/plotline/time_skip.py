@@ -1,17 +1,13 @@
 import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
+from handlers.verify_data import verify_data
 
 
 class Time_Skip(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
-        # Check if we're loading an arc or creating a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
 
         # Parent constructor
         super().__init__(
@@ -21,9 +17,15 @@ class Time_Skip(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
 
-        # If our character is new and not loaded, give it default data
-        if not loaded:
-            self.create_default_time_skip_data()  # Create data defaults for each chapter widget
+        # Verifies this object has the required data fields, and creates them if not
+        verify_data(
+            self,   # Pass in our own data so the function can see the actual data we loaded
+            {   
+                'tag': "time_skip",           # Tag to identify what type of object this is
+                'start_date': str,
+                'end_date': str,
+            },
+        )
             
 
         self.reload_mini_widget()
@@ -41,27 +43,7 @@ class Time_Skip(MiniWidget):
 
         # Save our owners json file to match their data
         self.owner.save_dict()
-
         
-    def create_default_time_skip_data(self):
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-            
-        default_time_skip_data = {
-            'title': self.title,
-            'tag': "time_skip",
-            'start_date': "",
-            'end_date': "",
-        }
-
-        # Merge default data with existing data, preserving any existing values
-        self.data = {**default_time_skip_data, **self.data}
-        self.save_dict()    # Save our data to the file
-        return
-
     
     def on_hover(self, e: ft.HoverEvent):
         print(e)

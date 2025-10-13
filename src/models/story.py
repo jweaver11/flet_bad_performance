@@ -38,38 +38,10 @@ class Story(ft.View):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'title': str,
-                'directory_path': str,
-                'tag': str,
-                'selected_rail': str,
-                'content_directory_path': str,
-                'characters_directory_path': str,
-                'plotline_directory_path': str,
-                'world_building_directory_path': str,
-                'notes_directory_path': str,
-                'top_pin_height': int,
-                'left_pin_width': int,
-                'main_pin_height': int,
-                'right_pin_width': int,
-                'bottom_pin_height': int,
-                'created_at': str,
-                'last_modified': str,
-                'settings': dict,
-            },
-        )
-
-        # Check if we loaded our story data or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If this is a new story (Not loaded), give it default data all widgets need
-        if not loaded:
-            self.data.update({
                 'title': self.title,
                 'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
-                'selected_rail': 'characters',
+                'tag': "story",
+                'selected_rail': "characters",
                 'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
                 'plotline_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "plotline"),
@@ -80,15 +52,18 @@ class Story(ft.View):
                 'main_pin_height': 0,
                 'right_pin_width': 0,
                 'bottom_pin_height': 0,
+                'created_at': str,
+                'last_modified': str,
                 'settings': {
-                    'type': self.type, # Novel or comic. Affects templates and default data for new content
+                    'type': self.type,  # Novel or comic. Affects templates and default data for new content
                     'multi_planitary': False,   # Whether the story will take place on multiple planets
                 },
-            }) 
+            },
+        )
 
-            # Creates our folder structure for the new story using our template (if there is one)
-            self.create_story_structure(template)  
-            self.save_dict()  # Save our new data to file
+        # Stories have required structures as well, so we verify they exist or we will error out
+        # We also use this function to create most detailed structures from templates if newly created story
+        self.verify_story_structure(template)  
 
 
             
@@ -103,8 +78,8 @@ class Story(ft.View):
         self.chapters: dict = {}   # Chapters stored in our story
         self.images: dict = {}  # Images stored in our story
         self.characters: dict = {}      # Characters stored in our story
-        self.plotline: None   # Only one plotline obj that displays our timlines
-        self.world_building: None  # Only one world building obj that displays our maps
+        self.plotline: None = ft.Container()   # Only one plotline obj that displays our timlines
+        self.world_building: None = ft.Container()  # Only one world building obj that displays our maps
         self.notes: dict = {}   # Notes stored in our story
 
         # Variables to store our mouse position for opening menus
@@ -165,19 +140,14 @@ class Story(ft.View):
             
 
     # Called when a new story is created and not loaded with any data
-    def create_story_structure(self, template: str=None):
+    def verify_story_structure(self, template: str=None):
         ''' Creates our story folder structure inside of our stories directory '''
 
-        # Temp, how to use templates. Add structures
-        if template == "default":
-            # Add folders to structures
-            pass
-        
         # Sets our path to our story folder
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
 
         # Set our workspace folder structure inside our story folder
-        story_structure_folders = [
+        required_story_folders = [
             "content",
             "characters",
             "plotline",
@@ -185,11 +155,15 @@ class Story(ft.View):
             "drawing_board",
             "notes",
         ]
-        
+
         # Create the workspace folder strucutre above
-        for folder in story_structure_folders:
+        for folder in required_story_folders:
             folder_path = os.path.join(directory_path, folder)
-            os.makedirs(folder_path, exist_ok=True) # Checks if they exist or not
+            os.makedirs(folder_path, exist_ok=True)     # Checks if they exist or not, so they won't be overwritten
+            
+        # Using templates
+        if template is not None:
+            pass
 
         # Set our sub folders inside of notes
         notes_folders = [
@@ -206,18 +180,9 @@ class Story(ft.View):
 
         # Create the path to the story's JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
-        story_file_path = os.path.join(directory_path, f"{self.title}.json")
-
-        print("self.data: \n\n", self.data, "\n\n")
         
-        try:
-            # Save our data to file
-            with open(story_file_path, "w") as f:
-                json.dump(self.data, f, indent=4)
-            #print(f"Story data saved to {story_file_path}")
+        self.save_dict()
             
-        except (PermissionError, OSError) as e:
-            print(f"Error saving story data: {e}")
 
 
     #Change to delete widget
@@ -497,6 +462,7 @@ class Story(ft.View):
         for chapter in self.chapters.values():
             self.widgets.append(chapter)
 
+        # Add all our images to the widgets list
         for image in self.images.values():
             self.widgets.append(image)
 
