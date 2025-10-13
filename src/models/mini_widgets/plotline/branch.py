@@ -14,7 +14,7 @@ class Branch(MiniWidget):
         # Parent constructor
         super().__init__(
             title=title,        # Title of our mini note
-            owner=owner,      # owner widget that holds us
+            owner=owner,        # owner widget that holds us
             page=page,          # Page reference
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
@@ -22,16 +22,16 @@ class Branch(MiniWidget):
         # Verify our loaded data to make sure it has all the fields we need, and pass in our child class tag
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
-            {
-                'start_date': str,
-                'end_date': str,
-                'color': str,
+            {   
+                'start_date': str,                  # Start and end date of the branch, for timeline view
+                'end_date': str,                    # Start and end date of the branch, for timeline view
+                'color': str,                       # Color of the branch in the timeline
                 'plot_points_are_expanded': bool,   # If the plotpoints section is expanded
-                'arcs_are_expanded': bool,         # If the arcs section is expanded
+                'arcs_are_expanded': bool,          # If the arcs section is expanded
                 'time_skips_are_expanded': bool,    # If the timeskips section is expanded
-                'plot_points': dict,      
-                'arcs': dict,   
-                'time_skips': dict,  
+                'plot_points': dict,                # Dict of plot points in this branch
+                'arcs': dict,                       # Dict of arcs in this branch
+                'time_skips': dict,                 # Dict of time skips in this branch
             },
             tag="branch"
         )
@@ -45,11 +45,11 @@ class Branch(MiniWidget):
         # If not loaded, set default values. No new data here, just giving values to existing fields
         if not loaded:
             self.data.update({
-                'tag': "branch",    # Overwrite our tag to be branch'
-                'color': "yellow",
-                'plot_points_are_expanded': True,   # If the plotpoints section is expanded
-                'arcs_are_expanded': True,         # If the arcs section is expanded
-                'time_skips_are_expanded': True,    # If the timeskips section is expanded
+                'tag': "branch",                   
+                'color': "yellow",                  
+                'plot_points_are_expanded': True,   
+                'arcs_are_expanded': True,         
+                'time_skips_are_expanded': True,    
             })
             #self.save_dict()
 

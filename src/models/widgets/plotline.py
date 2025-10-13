@@ -30,15 +30,14 @@ class Plotline(Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': str,
+                'tag': "plotline",
+                'pin_location': "bottom",     # Start our plotline on the bottom pin
                 'story_start_date': str,
                 'story_end_date': str,
                 'filters': dict,
-
-                # Dict of timelines in this plotline. Timelines are the only stored mini widgets in plotlines data
                 'timelines': dict,  
             },
-            tag="plotline"
+            
         )
 
         # Check if we loaded our character or not

@@ -75,6 +75,11 @@ class Story(ft.View):
                 'plotline_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "plotline"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
                 'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "notes"),
+                'top_pin_height': 0,
+                'left_pin_width': 0,
+                'main_pin_height': 0,
+                'right_pin_width': 0,
+                'bottom_pin_height': 0,
                 'settings': {
                     'type': self.type, # Novel or comic. Affects templates and default data for new content
                     'multi_planitary': False,   # Whether the story will take place on multiple planets
@@ -202,6 +207,8 @@ class Story(ft.View):
         # Create the path to the story's JSON file
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
         story_file_path = os.path.join(directory_path, f"{self.title}.json")
+
+        print("self.data: \n\n", self.data, "\n\n")
         
         try:
             # Save our data to file

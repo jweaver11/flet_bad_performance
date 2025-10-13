@@ -22,36 +22,17 @@ class Chapter(Widget):
         verify_data(
             object=self,   # Pass in our own data so the function can see the actual data we loaded
             required_data={
+                'tag': "chapter",
                 'content': str,
+                
                 'temp': str,
                 'test': str,
-            },
-            tag="chapter"
+            }
         )
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
-
-    # Called when creating new chapter widget, not when loading one
-    def create_default_chapter_data(self) -> dict:
-        ''' Returns default data all chapter widgets will have '''
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-        
-        # Default data for new chapters
-        default_chapter_data = {
-            'tag': "chapter",
-            'content': "",    # Content of our chapter
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_chapter_data)
-        self.save_dict()  
-        return self.data
     
     def submit_mini_note(self, e):
         title = e.control.value

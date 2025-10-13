@@ -38,7 +38,7 @@ class Settings(Widget):
                 'active_rail_width': int,   # Width of our active rail that we can resize
                 'is_maximized': bool,   # If the window is maximized or not
             },
-            tag="settings"
+            #tag="settings"
         )
 
         # Check if we loaded our settings data or not

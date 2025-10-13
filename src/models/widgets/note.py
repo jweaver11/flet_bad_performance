@@ -19,35 +19,20 @@ class Notes(Widget):
             data = data,
         )
 
-        # Verifies this object has the required data fields, and creates them if not
+        # Verifies this object has the required data fields, and creates them if not.
+        # If the fields exist already, they will be skipped. Example, loaded notes have the "note" tag, so that would be skipped
+        # If you provide default types, it gives it default values, otherwise you can specify values
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': str,
+                'tag': "note",             # Tag to identify what type of object this is
+                'pin_location': "right",   # Default pin location for notes
                 'character_count': int,
                 'created_at': str,
                 'last_modified': str,
                 'content': str
             },
-            tag="note"
         )
-
-        # MESSAGE TO CORY: Define all your data fields above, excluding the widget included ones
-        # If you want to give default values, see below
-
-        # Check if we loaded our note or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If not loaded, set default values. No new data here, just giving values to existing fields
-        if not loaded:
-            self.data.update({
-                'key1': "value", 
-                'key2': 5, 'key3': True
-            })
-            self.save_dict()
 
         
         # Load our widget UI on start after we have loaded our data

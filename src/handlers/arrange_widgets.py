@@ -48,6 +48,34 @@ def arrange_widgets(story: Story):
             else:
                 continue
 
+        # If main pin is empty, steal one from other pins so we are always fullscreen
+        if len(story.workspace.main_pin.controls) == 0:
+
+            # Steal from left first
+            if len(story.workspace.left_pin.controls) > 0:
+                # Copy and delete last widget in left pin
+                widget = story.workspace.left_pin.controls.pop()
+                story.workspace.main_pin.controls.append(widget)
+            # Right pin
+            elif len(story.workspace.right_pin.controls) > 0:
+                widget = story.workspace.right_pin.controls.pop()
+                story.workspace.main_pin.controls.append(widget)
+            # Top pin
+            elif len(story.workspace.top_pin.controls) > 0:
+                widget = story.workspace.top_pin.controls.pop()
+                story.workspace.main_pin.controls.append(widget)
+            # Bottom pin
+            elif len(story.workspace.bottom_pin.controls) > 0:
+                widget = story.workspace.bottom_pin.controls.pop()
+                story.workspace.main_pin.controls.append(widget)
+            else:
+                pass
+
+            # If we stole a widget, make its data match its new location
+            if widget is not None:
+                widget.data['pin_location'] = "main"
+                widget.save_dict()
+
     except Exception as e:
         print(f"Error arranging widgets: {e}")
 
@@ -57,7 +85,7 @@ def arrange_widgets(story: Story):
 
     
 
-# OLD OUTDATED. KEEPING JUST IN CASE
+# OLD OUTDATED. KEEPING JUST IN CASE ---------------------------------------------------------------------
 # Called at the start of the by the 'render_widgets' function.
 def arrange_widgets_old(story: Story):
     ''' Arranges our widgets to their correct pin locations after a change is made to their pin location.

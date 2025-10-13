@@ -49,7 +49,7 @@ class WorldMap(ft.GestureDetector):
                     'visible': bool,      # If this world map is visible in the world building widget
                     'content': str,    # Content of our world map
                 },
-                tag="world_map"
+                #tag="world_map"
             )
 
 

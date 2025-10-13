@@ -13,7 +13,7 @@ from handlers.verify_data import verify_data
 
 class MiniWidget(ft.Container):
     # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: str, data: dict=None):
 
         # Parent constructor
         super().__init__(
@@ -22,40 +22,23 @@ class MiniWidget(ft.Container):
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
             data=data,      # Sets our data. NOTE. If data is None, you need to set to {} later
         )
-
-        # Sets our data empty to prevent errors if its none
-        if self.data is None or not isinstance(self.data, dict):
-            self.data = {}
            
         self.title = title  # Title of the widget that will show up on its tab
         self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
-        self.p = page   # Grabs our original page for convenience and consistency
+        self.p = page       # Grabs our original page for convenience and consistency
+        self.dictionary_path = dictionary_path  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
 
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our object so we can access its data and change it
-            {   # Pass in the required fields and their types
-                'title': str,       # Title of the mini widget, should match the object title
-                'tag': str,     # Default mini widget tag, but should be overwritten by child classes
-                'visible': bool,        # If the widget is visible. Flet has this parameter build in, so our objects all use it
+            {   
+                'title': self.title,    # Title of the mini widget, should match the object title
+                'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
+                'visible': True,        # If the widget is visible
                 'is_selected': bool,    # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
             },
         )
-
-        # Check if we loaded our mini widget or created a new one
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If not loaded, set default values. No new data here, just giving values to existing fields
-        if not loaded:
-            self.data.update({
-                'title': self.title,        
-                'visible': True,    # Only need to specify bools if True, they default to False
-            })
-            self.save_dict()
 
 
         # Apply our visibility

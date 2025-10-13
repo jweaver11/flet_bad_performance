@@ -30,7 +30,7 @@ class World_Building(Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': str,             # Tag to identify what type of object this is
+                'tag': "world_building",             # Tag to identify what type of object this is
                 'world_maps': dict,     # Dict of different worlds and their maps stored
                 'locations': dict,      # Dict of any locations stored in the world but not in a sub map
                 'lore': dict,           # Dict of any world lore, myths, legends, etc
@@ -39,9 +39,9 @@ class World_Building(Widget):
                 'geography': dict,      # Geography of the world
                 'technology': dict,     # Technology of the world
                 'history': dict,        # History of the world
+                'governments': dict,    # Governments of the world
                 'content': str,
             },
-            tag="world_building"        # Technically not required, but give us the tag anyway
         )
 
         # Dict of different worlds and their maps stored

@@ -29,66 +29,47 @@ class Character(Widget):
         verify_data(
             object=self,   # Pass in our own data so the function can see the actual data we loaded
             required_data={
-                'tag': str,
-                'tab_color': str,
-                'name_color': str,
-                'sex_color': str,
+                'tag': "character",
+                'pin_location': "left",     # Start our characters on the left pin
+
+                'tab_color': "primary",
+                'name_color': "primary",
+                'sex_color': "primary",
                 'morality': str,
                 'sex': str,
                 'age': str,
-                'physical_description': dict,
-                'family': dict,
+                'physical_description': {
+                    'Race': str,
+                    'Skin Color': str,
+                    'Hair Color': str,   
+                    'Eye Color': str,    
+                    'Height': str,   
+                    'Weight': str,   
+                    'Build': str,    
+                    'Distinguishing Features': str,  
+                },
+                'family':  {
+                    'Love Interest': str,    
+                    'Father': str,   
+                    'Mother': str,    
+                    'Siblings': str,
+                    'Children': str,
+                    'Ancestors': str,
+                },   
+                'origin': {     
+                    'birth_date': str,   
+                    'hometown': str,     
+                    'education': str,        
+                },
                 'trauma': str,
                 'occupation': str,
                 'goals': str,
-                'origin': dict,
                 'personality': str,
                 'backstory': str,
                 'abilities': str,
                 'is_dead': bool,    # Defaults to false
             },
-            tag="character"
         )
-
-        # Check if we loaded our character or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        # If not loaded, set default values. No new data here, just giving values to existing fields
-        if not loaded:
-            self.data.update({
-                'pin_location': "left",     # Start our characters on the left pin
-                'tab_color': "primary",  # Initial tab color matches color scheme
-                'name_color': "primary",    # Flet color based on characters status of good, evil, neutral, or N/A
-                'sex_color': "primary",    # Color of selected option in sex dropdown
-                'physical_description': {
-                    'Race': "",
-                    'Skin Color': "",
-                    'Hair Color': "",   
-                    'Eye Color': "",    
-                    'Height': "",   
-                    'Weight': "",   
-                    'Build': "",    
-                    'Distinguishing Features': "",  
-                },
-                'family':  {
-                    'Love Interest': "",    
-                    'Father': "",   
-                    'Mother': "",    
-                    'Siblings': "",
-                    'Children': "",
-                    'Ancestors': "",
-                },   
-                'origin': {     
-                    'birth_date': "",   
-                    'hometown': "",     
-                    'education': "",        
-                },
-            }) 
-            self.save_dict()
-            
         
         #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character

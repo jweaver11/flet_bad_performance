@@ -23,6 +23,7 @@ class Timeline(MiniWidget):
             owner=owner,      # owner widget that holds us
             page=page,          # Page reference
             data=data,          # Data if we're loading an existing mini note, otherwise blank
+            dictionary_path=""  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
         ) 
 
 
@@ -30,6 +31,7 @@ class Timeline(MiniWidget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
+                'tag': "timeline",
                 'rail_dropdown_is_expanded': bool,
                 'branches_are_expanded': bool,      # If the branches section is expanded
                 'plot_points_are_expanded': bool,   # If the plotpoints section is expanded
@@ -43,7 +45,6 @@ class Timeline(MiniWidget):
                 'arcs': dict,     # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
                 'time_skips': dict,  
             },
-            tag="timeline"
         )
 
 

@@ -49,7 +49,7 @@ class Map(ft.GestureDetector):
             verify_data(
                 self,   # Pass in our own data so the function can see the actual data we loaded
                 {},
-                tag="map"
+                #tag="map"
             )
 
 
