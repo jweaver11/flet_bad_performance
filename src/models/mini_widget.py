@@ -13,14 +13,14 @@ from handlers.verify_data import verify_data
 
 class MiniWidget(ft.Container):
     # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: str, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
 
         # Parent constructor
         super().__init__(
             expand=True,
             border_radius=ft.border_radius.all(6),
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
-            data=data,      # Sets our data. NOTE. If data is None, you need to set to {} later
+            data=data,      # Sets our data.
         )
            
         self.title = title  # Title of the widget that will show up on its tab
@@ -60,18 +60,36 @@ class MiniWidget(ft.Container):
 
     # Called when saving changes in our mini widgets data to the OWNERS json file
     def save_dict(self):
-        ''' Saves our current data to the OWNERS json file '''
+        ''' Saves our current data to the OWNERS json file using this objects dictionary path '''
 
         # Error Handling
         if self.owner.data is None or not isinstance(self.data, dict):
             print("Error: owner data is None, cannot save mini widget data")
             return
         
-        # TODO: Run through owners data, using our dictionary path. Then have it save theree
+        try:
+        
+            # Navigate to the correct location in the owner's data using dictionary_path
+            current_dict = self.owner.data
 
+            # Navigate through all keys except the last one
+            for key in self.dictionary_path[:-1]:
+                if key not in current_dict:
+                    current_dict[key] = {}  # Create the key if it doesn't exist
+                current_dict = current_dict[key]
+            
+            # Set our data at the final key location
+            final_key = self.dictionary_path[-1]
+            current_dict[final_key] = self.data
+            
+            print(f"Saved mini widget dict for {self.title}")
 
-        # Save our owners json file to match their data
-        self.owner.save_dict()
+            # Save our owners json file to match their data
+            self.owner.save_dict()
+
+        except Exception as e:
+            print(f"Error saving mini widget data to {self.title}: {e}")
+            return
 
 
     # Called when clicking x to hide the mini note
@@ -101,9 +119,9 @@ class MiniWidget(ft.Container):
             expand=True,
         )
 
-        self.render_mini_widget()
+        self._render_mini_widget()
 
-    def render_mini_widget(self):
+    def _render_mini_widget(self):
         ''' Renders our mini widget UI based on our data '''
 
         # Give Uniform mini titles andd styling

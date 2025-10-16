@@ -321,7 +321,7 @@ class Story(ft.View):
                             
                         # Create our character object using our loaded data
                         self.characters[character_title] = Character(character_title, self.p, dirpath, self, character_data)
-                        self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
+                        #self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
@@ -456,27 +456,33 @@ class Story(ft.View):
 
         # Add all our characters to the widgets list
         for character in self.characters.values():
-            self.widgets.append(character)
+            if character not in self.widgets:
+                self.widgets.append(character)
 
         # Add all our chapters to the widgets list
         for chapter in self.chapters.values():
-            self.widgets.append(chapter)
+            if chapter not in self.widgets:
+                self.widgets.append(chapter)
 
         # Add all our images to the widgets list
         for image in self.images.values():
-            self.widgets.append(image)
+            if image not in self.widgets:
+                self.widgets.append(image)
 
         # Add our plotline to the widgets list
         if self.plotline is not None:
-            self.widgets.append(self.plotline)
+            if self.plotline not in self.widgets:
+                self.widgets.append(self.plotline)
 
         # Add our world building to the widgets list
         if self.world_building is not None:
-            self.widgets.append(self.world_building)
+            if self.world_building not in self.widgets:
+                self.widgets.append(self.world_building)
 
         # Add all our notes to the widgets list
         for note in self.notes.values():
-            self.widgets.append(note)
+            if note not in self.widgets:
+                self.widgets.append(note)
 
         if app.settings not in self.widgets:
             self.widgets.append(app.settings)   # Add our app settings to the widgets list so its accessible everywhere
@@ -631,6 +637,3 @@ class Story(ft.View):
         self.mouse_x = e.local_x 
         self.mouse_y = e.local_y
         #print(f"Mouse at x={self.mouse_x}, y={self.mouse_y}")
-
-
-    # Called when deleting an object from the story (character, chapter, etc.)

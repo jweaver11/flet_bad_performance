@@ -75,41 +75,31 @@ class Plotline(Widget):
         try: 
 
             # Check every item (file) in this story folder
-            for timeline_title, timeline_data in self.data['mini_widgets'].items():
+            for timeline_title, timeline_data in self.data['timelines'].items():
 
                 # Create using the object (not the function) so we can pass in data
-                self.timelines[timeline_title] = Timeline(timeline_title, self, self.p, timeline_data) 
+                self.timelines[timeline_title] = Timeline(
+                    title=timeline_title, 
+                    owner=self, 
+                    page=self.p, 
+                    dictionary_path=['timelines', timeline_title],
+                    data=timeline_data
+                ) 
 
             # If no plotlines exist, we create a default one to get started
             if len(self.timelines) == 0:
                 print("No timelines found, creating default timeline")
-                self.timelines["Main Timeline"] = Timeline(title="Main Timeline", owner=self, page=self.p, data=None)             
+                self.timelines["Main Timeline"] = Timeline(
+                    title="Main Timeline", 
+                    owner=self, 
+                    page=self.p, 
+                    dictionary_path=['timelines', "Main Timeline"],
+                    data=None
+                )             
                             
         # Handle errors if the path is wrong
         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
             print(f"Error loading timelines: {e}")
-
-
-        # After our timeline has been created, it will have loaded its branches, plot points, arcs, and timeskips
-        # We take those, and load them into our mini widgets list, since our timeline is not a widget itself
-        # And uses them differently
-        def load_mini_widgets():
-
-            for timeline in self.timelines.values():
-
-                for branch in timeline.branches.values():
-                    self.mini_widgets.append(branch)
-
-                for plot_point in timeline.plot_points.values():
-                    self.mini_widgets.append(plot_point)
-
-                for arc in timeline.arcs.values():
-                    self.mini_widgets.append(arc)
-
-                for time_skip in timeline.time_skips.values():
-                    self.mini_widgets.append(time_skip)
-
-        #load_mini_widgets()
 
 
 
