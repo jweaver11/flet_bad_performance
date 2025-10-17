@@ -78,7 +78,14 @@ class Timeline(MiniWidget):
 
         # Looks up our branches in our data, then passes in that data to create a live object
         for key, data in self.data['branches'].items():
-            self.branches[key] = Branch(title=key, owner=self, page=self.p, dictionary_path=self.dictionary_path + ['branches', key], data=data)
+            self.branches[key] = Branch(
+                title=key, 
+                owner=self.owner, 
+                page=self.p, 
+                dictionary_path=self.dictionary_path + ['branches', key],
+                timeline=self,
+                data=data
+            )
             self.owner.mini_widgets.append(self.branches[key])  # Branches need to be in the owners mini widgets list to show up in the UI
     
     # Called in the constructor
@@ -105,7 +112,14 @@ class Timeline(MiniWidget):
         
         # Looks up our arcs in our data, then passes in that data to create a live object
         for key, data in self.data['arcs'].items():
-            self.arcs[key] = Arc(title=key, owner=self, page=self.p, dictionary_path=self.dictionary_path + ['arcs', key],data=data)
+            self.arcs[key] = Arc(
+                title=key, 
+                owner=self.owner, 
+                page=self.p, 
+                dictionary_path=self.dictionary_path + ['arcs', key],
+                timeline=self,
+                data=data
+            )
             self.owner.mini_widgets.append(self.arcs[key])  # Arcs need to be in the owners mini widgets list to show up in the UI
     
     # Called in the constructor
@@ -114,7 +128,14 @@ class Timeline(MiniWidget):
         from models.mini_widgets.plotline.time_skip import Time_Skip
 
         for key, data in self.data['time_skips'].items():
-            self.time_skips[key] = Time_Skip(title=key, owner=self, page=self.p, dictionary_path=self.dictionary_path + ['time_skips', key],data=data)
+            self.time_skips[key] = Time_Skip(
+                title=key, 
+                owner=self.owner, 
+                page=self.p, 
+                dictionary_path=self.dictionary_path + ['time_skips', key],
+                timeline=self,
+                data=data
+            )
             self.owner.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
     
     def create_branch(self, title: str):
@@ -124,7 +145,7 @@ class Timeline(MiniWidget):
         # Add our new Branch mini widget object to our branches dict, and to our owners mini widgets
         self.branches[title] = Branch(
             title=title, 
-            owner=self, 
+            owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['branches', title], 
             timeline=self,
@@ -164,7 +185,7 @@ class Timeline(MiniWidget):
         # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
         self.arcs[title] = Arc(
             title=title, 
-            owner=self, 
+            owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['arcs', title], 
             timeline=self,
@@ -184,9 +205,10 @@ class Timeline(MiniWidget):
         # Add our new Time Skip mini widget object to our time_skips dict, and to our owners mini widgets
         self.time_skips[title] = Time_Skip(
             title=title, 
-            owner=self, 
+            owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['time_skips', title], 
+            timeline=self,
             data=None
         )
         self.owner.mini_widgets.append(self.time_skips[title])

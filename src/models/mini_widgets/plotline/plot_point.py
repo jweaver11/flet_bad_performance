@@ -43,9 +43,6 @@ class Plot_Point(MiniWidget):
         self.reload_mini_widget()
 
 
-    def on_hover(self, e: ft.HoverEvent):
-        print(e)
-
     def reload_mini_widget(self):
 
         self.content = ft.Column(

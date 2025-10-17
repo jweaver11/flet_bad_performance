@@ -2,20 +2,25 @@ import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
+from models.mini_widgets.plotline.timeline import Timeline
 
 
 # Data class for arcs on a timeline - change to branch as well later??
 class Arc(MiniWidget):
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], timeline: Timeline, data: dict=None):
         
         # Parent constructor
         super().__init__(
             title=title,        # Title of our mini note
             owner=owner,      # owner widget that holds us
             page=page,          # Page reference
+            dictionary_path=dictionary_path,  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
+
+        # Either the timeline or the branch MUST be passed in
+        self.timeline = timeline    # The timeline this arc belongs to. Needed for certain functions
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -60,35 +65,21 @@ class Arc(MiniWidget):
 
         self.reload_mini_widget()
 
-    # Called when saving our mini widget data
-    def save_dict(self):
-        ''' Saves our current data to the OWNERS json file '''
-
-        if self.owner.data is None or not isinstance(self.owner.data, dict):
-            print("Error: owner data is None, cannot save mini widget data")
-            return
-
-        # Grab our owner object, and update their data pertaining to this mini widget
-        self.owner.data['arcs'][self.title] = self.data
-
-        # Save our owners json file to match their data
-        self.owner.save_dict()
-
-    def on_hover(self, e: ft.HoverEvent):
-        print(e)
 
     def submit_description_change(self, e):
         self.data['description'] = e.control.value
         self.save_dict()
 
-    # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):
-        ''' Reloads our mini widget UI based on our data '''
 
         self.content = ft.Column(
             [
                 self.title_control,
                 self.content_control,
+                ft.TextButton(
+                    "Delete ME", 
+                    on_click=lambda e: self.timeline.delete_arc(self)
+                ),
             ],
             expand=True,
         )

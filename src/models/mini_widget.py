@@ -63,6 +63,8 @@ class MiniWidget(ft.Container):
         ''' Saves our current data to the OWNERS json file using this objects dictionary path '''
         
         try:
+
+            print(f"Saving {self.title} to path:  ", self.dictionary_path)
         
             # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
             current_dict = self.owner.data
@@ -80,8 +82,6 @@ class MiniWidget(ft.Container):
             # Set our data at the final key location
             final_key = self.dictionary_path[-1]
             current_dict[final_key] = self.data
-            
-            print(f"Saved mini widget dict for {self.title}")
 
             # Save our owners json file to match their data
             self.owner.save_dict()
@@ -91,21 +91,22 @@ class MiniWidget(ft.Container):
             return
         
 
-
     # Called when clicking x to hide the mini note
     def toggle_visibility(self, e):
         ''' Shows or hides our mini widget, depending on current state '''
-
-        print(f"Toggling visibility for mini widget: {self.title}")
-
+       
         self.data['visible'] = not self.data['visible']
         self.visible = self.data['visible']
         
         self.save_dict()
         self.p.update()
 
-        print(f"Mini widget: {self.title} visibility is now: {self.visible}")
 
+    # Called whenever we hover over our mini widget on the right as a psuedo focus
+    def on_hover(self, e: ft.HoverEvent):
+        print(e)
+
+        
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):
         ''' Reloads our mini widget UI based on our data '''
