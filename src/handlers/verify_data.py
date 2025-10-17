@@ -1,11 +1,7 @@
 
-# Called when an object is loaded. 
+# Called when an object (Widget or Mini Widget) is loaded or created. 
 def verify_data(object, required_data: dict) -> bool:
     ''' Verifys an object's data has all required fields passed in '''
-
-    # Sets our data to an empty dict if None or not a dict, so we can add to it
-    if object.data is None or not isinstance(object.data, dict):
-        object.data = {}
 
     # Internal recursive function to handle nested dicts, typing, and values all in one
     def _verify_data(current_data: dict, required_data: dict):
@@ -35,7 +31,12 @@ def verify_data(object, required_data: dict) -> bool:
                     current_data[key] = value
         
 
+    # Main block to run our internal functio above
     try:
+        # Sets our data to an empty dict if None or not a dict, so we can add to it
+        if object.data is None or not isinstance(object.data, dict):
+            object.data = {}
+
         # Run our objects data through the recursive function, and the required data
         _verify_data(object.data, required_data)
 

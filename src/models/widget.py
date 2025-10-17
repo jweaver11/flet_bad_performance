@@ -84,6 +84,33 @@ class Widget(ft.Container):
         except Exception as e:
             print(f"Error saving widget to {file_path}: {e}") 
 
+    # Called when deleting mini widgets from this widget
+    def delete_mini_widget(self, mini_widget) -> bool:
+        ''' Calls for mini widget to delete its own data, then removes it from our mini widgets list '''
+
+        try:
+
+            # Remove from our mini widgets list
+            if mini_widget in self.mini_widgets:
+                self.mini_widgets.remove(mini_widget)
+            
+            # Reload the widget if we have to
+            if mini_widget.visible:
+                self.reload_widget()
+
+            # Also reload the active rail to reflect changes
+            self.story.active_rail.content.reload_rail(self.story) 
+
+            # Return that we succeeded
+            return True
+
+        # Errors
+        except Exception as e:
+            print(f"Error deleting mini widget {mini_widget.title} from {self.title}: {e}")
+            return False
+
+
+
     # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''

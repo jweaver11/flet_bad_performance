@@ -185,50 +185,90 @@ class Story(ft.View):
             
 
 
-    #Change to delete widget
-    def delete_widget(self, widget):
+    # Called when deleting a widget from our story
+    def delete_widget(self, widget) -> bool:
         ''' Deletes the object from our live story object and its reference in the pins.
         We then remove its storage file from our file storage as well. '''
         from models.widget import Widget
 
-        print("Delete object called")
+        print("Delete widget called")
 
-        # Needs to remove the widget from self.widgets, and wherever its sub storage is (characters, chapters, etc.)
-        # Then needs to delete the file from storage as well
-        # Then reload the workspace should remove it from the UI
 
         # Called inside the delete_object method to remove the file from storage
-        def delete_widget_file(widget: Widget):
-            ''' Grabs our objects path, and removes the associated file from storage '''
+        def _delete_widget_file(widget: Widget) -> bool:
+            ''' Deletes our widgets json file from storage. Returns true if successful, false if not '''
 
-            print("delete object from file called")
+            print("delete widget file called")
             
             try:
+                # Grab our widgets tag to see what type of object it is
+                tag = widget.data.get('tag', None)
+
+                # Check that somehow our plotline and world building didn't get accidently passed in here
+                if tag != "plotline" and tag != "world_building":
                 
-                # Check if the file exists before attempting to delete
-                if os.path.exists(widget.directory_path):
-                    file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
-                    os.remove(file_path)
-                    print(f"Successfully deleted file: {widget.path}")
-                else:
-                    print(f"File not found: {widget.path}")
+                    # Check if the file exists before attempting to delete
+                    if os.path.exists(widget.directory_path):
+                        file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
+                        os.remove(file_path)
+
+                        print(f"Successfully deleted file: {widget.directory_path}")
+                        return True
                     
+                    else:
+                        print(f"File not found: {widget.directory_path}")
+                        return False
+                    
+            # Errors
             except (OSError, IOError) as e:
                 print(f"Error deleting file {widget.title}.json: {e}")
+                return False
             except AttributeError as e:
                 print(f"Object missing required attributes (title or path): {e}")
+                return False
 
-        # Remove from characters list if it is a character
-        if hasattr(widget, 'tag') and widget.tag == "character":
-            # Remove object from the characters list
-            if widget in self.characters:
-                self.characters.remove(widget)
+        # Called if file is successfully deleted. Then we remove the widget from its live storage
+        def _delete_live_widget(widget: Widget):
+            # Grab our widgets tag to see what type of object it is
+            tag = widget.data.get('tag', None)
+            
+            # Based on its tag, it deletes it from our appropriate dict
+            if tag == "chapter":
+                if widget.title in self.chapters:
+                    del self.chapters[widget.title]
+            elif tag == "image":
+                if widget.title in self.images:
+                    del self.images[widget.title]
+            elif tag == "character":
+                if widget.title in self.characters:
+                    del self.characters[widget.title]
+            elif tag == "note":
+                if widget.title in self.notes:
+                    del self.notes[widget.title]
 
-        # Remove the objects storage file as well
-        if hasattr(widget, 'path'):
-            delete_widget_file(widget)
+            
+            # Remove from our master widgets list so it won't be rendered anymore
+            if widget in self.widgets:
+                self.widgets.remove(widget)
+        
+        # Call our internal functions above
+        try:
+            # If we can delete the file, we remove the live object
+            if _delete_widget_file(widget):
 
-        self.workspace.reload_workspace()
+                _delete_live_widget(widget)
+
+                # Reload our workspace to apply the UI Change if was needed
+                if widget.visible:
+                    self.workspace.reload_workspace(self.p, self)
+
+                print(f"Successfully deleted widget: {widget.title}")
+
+        # Errors
+        except Exception as e:
+            print(f"Error deleting widget : {e}")
+            return
+
 
     # Called on story startup to load all our content objects
     def load_content(self):

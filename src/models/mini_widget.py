@@ -89,6 +89,7 @@ class MiniWidget(ft.Container):
         except Exception as e:
             print(f"Error saving mini widget data to {self.title}: {e}")
             return
+        
 
 
     # Called when clicking x to hide the mini note
