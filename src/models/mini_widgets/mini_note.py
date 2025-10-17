@@ -7,41 +7,28 @@ from handlers.verify_data import verify_data
 # Class that holds our mini note objects inside images or chapters
 class MiniNote(MiniWidget):
     # Constructor
-    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
 
-        # Parent Constructor
+        # Parent constructor
         super().__init__(
             title=title,        # Title of our mini note
-            owner=owner,      # owner widget that holds us
+            owner=owner,      # Owner widget that holds us
             page=page,          # Page reference
+            dictionary_path=dictionary_path,  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
             data=data,          # Data if we're loading an existing mini note, otherwise blank
+        ) 
+
+        verify_data(
+            self,   # Pass in our object so we can access its data and change it
+            {   # Pass in the required fields and their types
+                'tag': "mini_note",
+                'content': str,
+                'banana': int,
+            },
+            
         )
 
-        # Check if we loaded our mini note data or not
-        if data is None:
-            loaded = False
-        else:
-            loaded = True
-
-        #print(self.data)
-        # If this is a new widget (Not loaded), give it default data all widgets need
-        if not loaded:
-            self.create_default_mini_note_data()  # Create default data if none was passed in
-
-        # Otherwise, verify the loaded data
-        else:
-            verify_data(
-                self,   # Pass in our object so we can access its data and change it
-                {   # Pass in the required fields and their types
-                    'tag': str,
-                    'content': str,
-                    'banana': int,
-                },
-                tag="mini_note"
-            )
-
             
-
         self.title_control = ft.TextField(
             value=self.title,
             label=None,
@@ -56,20 +43,6 @@ class MiniNote(MiniWidget):
 
         # Load our widget UI on start after we have loaded our data
         self.reload_mini_widget()
-
-    def create_default_mini_note_data(self) -> dict:
-        ''' Gives default data for all mini note objects and alters the tag '''
-
-        default_mini_note_data = {
-            'tag': "mini_note",  # Tag to identify this as a mini note
-            'content': "",    # Content of our mini note
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_mini_note_data)
-        self.save_dict()
-
-        return self.data
 
 
     # Called after any changes happen to the data that need to be reflected in the UI

@@ -8,7 +8,7 @@ from models.mini_widgets.plotline.timeline import Timeline
 class Time_Skip(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], timeline: Timeline, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], branch_line, data: dict=None):
 
         # Parent constructor
         super().__init__(
@@ -19,7 +19,7 @@ class Time_Skip(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
 
-        self.timeline = timeline    # The timeline this time skip belongs to. Needed for certain functions
+        self.branch_line = branch_line    # The timeline this arc belongs to. Needed for certain functions
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(

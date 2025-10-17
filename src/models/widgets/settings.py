@@ -32,12 +32,11 @@ class Settings(Widget):
                 'tab_title_color': "primary",        # the tab color
                 'theme_mode': "system",       # the apps theme mode, dark or light
                 'active_rail_width': 200,  # Width of our active rail that we can resize
-                'theme_color_scheme': str,   # the color scheme of the app
+                'theme_color_scheme': "blue",   # the color scheme of the app
                 'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
                 'workspaces_rail_order': list,      # Order of the workspace rail
                 'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
                 'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
-                'active_rail_width': int,   # Width of our active rail that we can resize
                 'is_maximized': bool,   # If the window is maximized or not
                 'workspaces_rail_order': [      # Order of the workspace rail
                     "content",
@@ -53,44 +52,6 @@ class Settings(Widget):
 
         self.reload_widget()  # Loads our settings widget UI
 
-
-    # Called when new settings object is created
-    def create_default_settings_data(self):
-        ''' Loads our settings data from the JSON file. If its first launch, we create the file with default data '''
-
-        # Error catching
-        if self.data is None or not isinstance(self.data, dict):
-            # log("Data corrupted or did not exist, creating empty data dict")
-            self.data = {}
-
-        # Default data for our settings widget
-        default_settings_data = {
-            'tag': "settings",  # Tag for logic, should be overwritten by child classes
-            'active_story': "/",    # this works as a route for the correct story
-            'is_maximized': True,   # If the window is maximized or not
-            'tab_title_color': "blue",        # the tab color
-            'theme_mode': "dark",       # the apps theme mode, dark or light
-            'theme_color_scheme': "blue",   # the color scheme of the app
-            'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
-            'workspaces_rail_order': [      # Order of the workspace rail
-                "content",
-                "characters",
-                "plot_and_timeline",
-                "world_building",
-                "drawing_board",
-                "notes",
-            ],
-            'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
-            'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
-            'active_rail_width': 200,   # Width of our active rail that we can resize
-        }
-
-        # Update existing data with any new default fields we added
-        self.data.update(default_settings_data)
-        print("Default settings data created:", self.data)
-        self.save_dict()
-        return
-            
 
     # Called when the button to reorder the workspaces is clicked
     def toggle_rail_reorderable(self):
@@ -158,29 +119,6 @@ class Settings(Widget):
             on_change=change_color_scheme_picked,
         )
 
-        # Runs when the switch toggling the color change of characters names based on morality is clicked
-        def change_name_colors_switch(e):
-            ''' Changes the name color of characters based on morality when toggled '''
-
-            # Change our data to reflect the switch state
-            self.data['change_name_colors_based_on_morality'] = e.control.value
-            self.save_dict()  
-
-            # Runs through all our characters, and updates their name color accordingly and reloads their widget
-            #for char in app.active_story.characters:  
-                #char.check_morality()
-                #char.reload_widget() 
-
-            # Reloads the rail. Its better here than running it twice for no reason in character class    
-            from ui.rails.characters_rail import reload_character_rail
-            reload_character_rail(self.p)
-
-        # The switch for toggling if characters names change colors based on morality
-        self.change_name_colors = ft.Switch(
-            label="Change characters name colors for good, evil, and neutral", 
-            value=self.data['change_name_colors_based_on_morality'],
-            on_change=change_name_colors_switch
-        )
 
         # Called when theme switch is changed. Switches from dark to light theme, or reverse
         def toggle_theme(e):
@@ -195,6 +133,16 @@ class Settings(Widget):
             elif self.data['theme_mode'] == "light":
                 self.data['theme_mode'] = "dark"
                 self.theme_button.icon = ft.Icons.LIGHT_MODE
+            
+            # Theme is set to system by default, this checks for that
+            else:  
+                
+                if self.p.theme_mode == ft.ThemeMode.DARK:
+                    self.data['theme_mode'] = "dark"
+                    self.theme_button.icon = ft.Icons.LIGHT_MODE
+                else:
+                    self.data['theme_mode'] = "light"
+                    self.theme_button.icon = ft.Icons.DARK_MODE
                
             # Save the updated settings to the JSON file, apply to the page and update
             self.save_dict()
@@ -216,7 +164,6 @@ class Settings(Widget):
                 #on_click=lambda e: story.all_workspaces_rail.toggle_rail_reorderable(),
                 on_click=lambda e: self.toggle_rail_reorderable()
             ),
-            self.change_name_colors,
             self.theme_button,
             self.color_scheme_dropdown,
         ])
@@ -237,8 +184,9 @@ class Settings(Widget):
         # Sets our object content to be our tab
         self.content = tab
 
-        #OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
+        # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
         # Option to change where certain widgets default display to in pins
+        # NOTE: Add is_first_launch check to run a tutorial
 
 
 

@@ -83,7 +83,7 @@ class Timeline(MiniWidget):
                 owner=self.owner, 
                 page=self.p, 
                 dictionary_path=self.dictionary_path + ['branches', key],
-                timeline=self,
+                timeline=self,  # Branches can't own each other, only timelines can
                 data=data
             )
             self.owner.mini_widgets.append(self.branches[key])  # Branches need to be in the owners mini widgets list to show up in the UI
@@ -99,7 +99,7 @@ class Timeline(MiniWidget):
                 title=key, 
                 owner=self.owner, 
                 page=self.p, dictionary_path=self.dictionary_path + ['plot_points', key], 
-                timeline=self,
+                branch_line=self,
                 data=data
             )
             self.owner.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
@@ -117,7 +117,7 @@ class Timeline(MiniWidget):
                 owner=self.owner, 
                 page=self.p, 
                 dictionary_path=self.dictionary_path + ['arcs', key],
-                timeline=self,
+                branch_line=self,
                 data=data
             )
             self.owner.mini_widgets.append(self.arcs[key])  # Arcs need to be in the owners mini widgets list to show up in the UI
@@ -133,7 +133,7 @@ class Timeline(MiniWidget):
                 owner=self.owner, 
                 page=self.p, 
                 dictionary_path=self.dictionary_path + ['time_skips', key],
-                timeline=self,
+                branch_line=self,
                 data=data
             )
             self.owner.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
@@ -168,7 +168,7 @@ class Timeline(MiniWidget):
             owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['plot_points', title], 
-            timeline=self,
+            branch_line=self,
             data=None
         )
         self.owner.mini_widgets.append(self.plot_points[title])
@@ -188,7 +188,7 @@ class Timeline(MiniWidget):
             owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['arcs', title], 
-            timeline=self,
+            branch_line=self,
             data=None
         )
         self.owner.mini_widgets.append(self.arcs[title])
@@ -208,7 +208,7 @@ class Timeline(MiniWidget):
             owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['time_skips', title], 
-            timeline=self,
+            branch_line=self,
             data=None
         )
         self.owner.mini_widgets.append(self.time_skips[title])
