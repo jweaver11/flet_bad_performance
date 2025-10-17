@@ -45,7 +45,7 @@ class Timeline(MiniWidget):
                 'arcs': dict,     # Arcs, like character arcs, wars, etc. Events that span more than a single point in time
                 'time_skips': dict,  
             },
-        )
+        ) 
 
 
         # Create our live object dictionaries
@@ -138,6 +138,7 @@ class Timeline(MiniWidget):
             )
             self.owner.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
     
+    # Called when creating a new branch
     def create_branch(self, title: str):
         ''' Creates a new branch inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.branch import Branch
