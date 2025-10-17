@@ -7,7 +7,7 @@ import flet as ft
 from models.app import app
 from handlers.route_change import route_change
 from constants.init import init_settings, init_load_saved_stories
-from ui.all_workspaces_rails import No_Story_Rail
+from ui.workspaces_rail import No_Story_Rail
 from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
 from ui.workspace import create_workspace

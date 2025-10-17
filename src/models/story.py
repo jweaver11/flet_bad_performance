@@ -69,7 +69,7 @@ class Story(ft.View):
             
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar: ft.Container = None     # Menu bar at top of page
-        self.all_workspaces_rail: ft.Container = None      # Rail on left side showing our 6 workspaces
+        self.workspaces_rail: ft.Container = None      # Rail on left side showing our 6 workspaces
         self.active_rail: ft.Container = None    # Rail showing whichever workspace is selected
         self.workspace: ft.Container = None        # Main workspace area where our pins display our widgets
 
@@ -120,13 +120,13 @@ class Story(ft.View):
     def save_dict(self):
         ''' Saves the data of our story to its JSON File, and all its folders as well '''
 
-        # Makes sure our directory path is always right. 
-        self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
-            
-        # Our file path we store our data in
-        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
-
         try:
+            # Makes sure our directory path is always right. 
+            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
+                
+            # Our file path we store our data in
+            file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.data['directory_path'], exist_ok=True)
             
@@ -136,7 +136,7 @@ class Story(ft.View):
         
         # Handle errors
         except Exception as e:
-            print(f"Error saving object to {file_path}: {e}")
+            print(f"Error saving story to {file_path}: {e}")
             
 
     # Called when a new story is created and not loaded with any data
@@ -186,7 +186,7 @@ class Story(ft.View):
 
 
     #Change to delete widget
-    def delete_object(self, widget):
+    def delete_widget(self, widget):
         ''' Deletes the object from our live story object and its reference in the pins.
         We then remove its storage file from our file storage as well. '''
         from models.widget import Widget
@@ -546,7 +546,7 @@ class Story(ft.View):
     def build_view(self) -> list[ft.Control]:
         ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
         from ui.menu_bar import create_menu_bar
-        from ui.all_workspaces_rails import All_Workspaces_Rail
+        from ui.workspaces_rail import Workspaces_Rail
         from ui.active_rail import Active_Rail
         from ui.workspace import Workspace
         from models.app import app
@@ -560,7 +560,7 @@ class Story(ft.View):
         self.menubar = create_menu_bar(page, self)
 
         # Create our rails and workspace objects
-        self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
+        self.workspaces_rail = Workspaces_Rail(page, self)  # Create our all workspaces rail
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
         self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
         self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
@@ -609,7 +609,7 @@ class Story(ft.View):
             expand=True,  # Makes sure it takes up the entire window/screen
 
             controls=[
-                self.all_workspaces_rail,  # Main rail of all available workspaces
+                self.workspaces_rail,  # Main rail of all available workspaces
                 ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
                 self.active_rail,    # Rail for the selected workspace
