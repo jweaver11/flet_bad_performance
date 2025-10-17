@@ -235,7 +235,7 @@ class Workspaces_Rail(ft.Container):
             self.selected_rail = story.data['selected_rail']
 
             # Has the active rail grab its new selection
-            story.active_rail.display_active_rail(self.p, story) 
+            story.active_rail.display_active_rail(story) 
 
             # Reloads our own rail to reflect icon changes
             self.reload_rail(story)  # Reload the rail to apply the new selection

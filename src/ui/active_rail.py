@@ -30,13 +30,21 @@ class Active_Rail(ft.Container):
             width=app.settings.data['active_rail_width'],  # Sets the width
         )
 
+        # Add our 6 rails here first so they maintain consitent styling and don't have to be rebuilt on switches
+        self.content_rail = Content_Rail(page, story)
+        self.characters_rail = Characters_Rail(page, story)
+        self.plotline_rail = Timeline_Rail(page, story)
+        self.world_building_rail = World_Building_Rail(page, story)
+        self.drawing_board_rail = Drawing_Board_Rail(page, story)
+        self.notes_rail = Notes_Rail(page, story)
+
         # Displays our active rail on startup
         # All other rails have reload rail functions, but this one just displays the correct one
-        self.display_active_rail(page, story)
+        self.display_active_rail(story)
 
         
     # Called when other workspaces are selected
-    def display_active_rail(self, page: ft.Page, story: Story):
+    def display_active_rail(self, story: Story):
         ''' Reloads the active rail based on the selected workspace in workspaces_rail '''
 
         # If no story is passed in, just load a rail prompting user to create a story
@@ -51,26 +59,26 @@ class Active_Rail(ft.Container):
 
             # Give us the correct rail on program startup based on our selected workspace
             if story.workspaces_rail.selected_rail == "content":
-                self.content = Content_Rail(page, story)
+                self.content = self.content_rail
 
             elif story.workspaces_rail.selected_rail == "characters":
-                self.content = Characters_Rail(page, story)
+                self.content = self.characters_rail
 
             elif story.workspaces_rail.selected_rail == "plotline":
-                self.content = Timeline_Rail(page, story)
+                self.content = self.plotline_rail
 
             elif story.workspaces_rail.selected_rail == "world_building":
-                self.content = World_Building_Rail(page, story)
+                self.content = self.world_building_rail
 
             elif story.workspaces_rail.selected_rail == "drawing_board":
-                self.content = Drawing_Board_Rail(page, story)
+                self.content = self.drawing_board_rail
 
             elif story.workspaces_rail.selected_rail == "notes":
-                self.content = Notes_Rail(page, story)
+                self.content = self.notes_rail
 
             else:
                 # Default to the content rail
-                self.content = Content_Rail(page, story)
+                self.content = self.content_rail
 
             # Update the page to reflect changes
             self.p.update()
