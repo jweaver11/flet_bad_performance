@@ -87,13 +87,15 @@ class Timeline(MiniWidget):
 
         # Looks up our plotpoints in our data, then passes in that data to create a live object
         for key, data in self.data['plot_points'].items():
+        
             self.plot_points[key] = Plot_Point(
                 title=key, 
-                owner=self, 
+                owner=self.owner, 
                 page=self.p, 
-                dictionary_path=[self.dictionary_path, 'plot_points', key],
+                dictionary_path=self.dictionary_path + ['plot_points', key],
                 data=data
             )
+            
             self.owner.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
         
     
@@ -141,11 +143,15 @@ class Timeline(MiniWidget):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.plotline.plot_point import Plot_Point
 
+        new_path = ['plot_points', title]
+        dict_path = self.dictionary_path + new_path
+
+        print("New dict path for pp:\n", dict_path)
         new_plot_point = Plot_Point(
             title=title, 
-            owner=self, 
+            owner=self.owner, 
             page=self.p, 
-            dictionary_path=[self.dictionary_path, 'plot_points', title],
+            dictionary_path=self.dictionary_path + ['plot_points', title],
             data=None
         )
 

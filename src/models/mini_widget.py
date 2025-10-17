@@ -61,21 +61,20 @@ class MiniWidget(ft.Container):
     # Called when saving changes in our mini widgets data to the OWNERS json file
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file using this objects dictionary path '''
-
-        # Error Handling
-        if self.owner.data is None or not isinstance(self.data, dict):
-            print("Error: owner data is None, cannot save mini widget data")
-            return
         
         try:
         
-            # Navigate to the correct location in the owner's data using dictionary_path
+            # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
             current_dict = self.owner.data
 
-            # Navigate through all keys except the last one
+            # Run through all keys in our list except the last one
             for key in self.dictionary_path[:-1]:
+
+                # Make sure the key exists if it doesn't already
                 if key not in current_dict:
-                    current_dict[key] = {}  # Create the key if it doesn't exist
+                    current_dict[key] = {}  
+
+                # Move into the next level of the dict, so we're not always checking from top level
                 current_dict = current_dict[key]
             
             # Set our data at the final key location

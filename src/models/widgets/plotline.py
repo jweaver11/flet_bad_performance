@@ -88,12 +88,12 @@ class Plotline(Widget):
 
             # If no plotlines exist, we create a default one to get started
             if len(self.timelines) == 0:
-                print("No timelines found, creating default timeline")
-                self.timelines["Main Timeline"] = Timeline(
-                    title="Main Timeline", 
+                #print("No timelines found, creating default timeline")
+                self.timelines["Main_Timeline"] = Timeline(
+                    title="Main_Timeline", 
                     owner=self, 
                     page=self.p, 
-                    dictionary_path=['timelines', "Main Timeline"],
+                    dictionary_path=['timelines', "Main_Timeline"],
                     data=None
                 )             
                             
@@ -109,7 +109,13 @@ class Plotline(Widget):
 
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
-        self.timelines[title] = Timeline(title, self, self.p, data=None)
+        self.timelines[title] = Timeline(
+            title, 
+            self, 
+            self.p, 
+            dictionary_path=['timelines', title],
+            data=None
+        )
         
         self.reload_widget()  # Reload our widget to show the new timeline
 

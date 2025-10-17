@@ -69,10 +69,11 @@ class Widget(ft.Container):
     def save_dict(self):
         ''' Saves our current data to the json file '''
 
-        # Print(f"Saving object data to {self.data['file_path']}")
-        file_path = os.path.join(self.directory_path, f"{self.title}.json")
-
         try:
+
+            # Set our file path
+            file_path = os.path.join(self.directory_path, f"{self.title}.json")
+
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.directory_path, exist_ok=True)
             
@@ -82,7 +83,7 @@ class Widget(ft.Container):
         
         # Handle errors
         except Exception as e:
-            print(f"Error saving object to {file_path}: {e}") 
+            print(f"Error saving widget to {file_path}: {e}") 
 
     # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):
