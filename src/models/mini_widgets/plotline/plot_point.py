@@ -2,21 +2,27 @@ import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
+from models.mini_widgets.plotline.timeline import Timeline
 
 
 # Data class for plot points on a timeline - change to branch as well later??
 class Plot_Point(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], branch_line, data: dict=None):
 
         # Parent constructor
         super().__init__(
             title=title,        # Title of our mini note
-            owner=owner,      # owner widget that holds us
+            owner=owner,      # Owner widget that holds us
             page=page,          # Page reference
+            dictionary_path=dictionary_path,  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
+
+        # Either the timeline or the branch MUST be passed in
+        self.branch_line = branch_line    # The timeline this arc belongs to. Needed for certain functions
+        
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -35,24 +41,6 @@ class Plot_Point(MiniWidget):
 
         self.reload_mini_widget()
 
-    
-    # Called when saving our mini widget data
-    def save_dict(self):
-        ''' Saves our current data to the OWNERS json file '''
-
-        if self.owner.data is None or not isinstance(self.owner.data, dict):
-            print("Error: owner data is None, cannot save mini widget data")
-            return
-
-        # Grab our owner object, and update their data pertaining to this mini widget
-        self.owner.data['plot_points'][self.title] = self.data
-
-        # Save our owners json file to match their data
-        self.owner.save_dict()
-
-
-    def on_hover(self, e: ft.HoverEvent):
-        print(e)
 
     def reload_mini_widget(self):
 
@@ -60,6 +48,10 @@ class Plot_Point(MiniWidget):
             [
                 self.title_control,
                 self.content_control,
+                ft.TextButton(
+                    "Delete ME", 
+                    on_click=lambda e: self.branch_line.delete_plot_point(self)
+                ),
             ],
             expand=True,
         )

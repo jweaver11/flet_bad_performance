@@ -53,14 +53,13 @@ class Widget(ft.Container):
         # UI ELEMENTS - Tab
         self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
         self.tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
-        self.tab_title_color: ft.Colors.PRIMARY = "primary"     # The color of the title in our tab and the divider under it
         self.hide_tab_icon_button = ft.IconButton()    # 'X' icon button to hide widget from workspace'
 
         # UI ELEMENTS - Body
-        self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
-        self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
-        self.mini_widgets_container = ft.Container(expand=1)  # Control to display our mini widgets. Nests inside of self.content_row
         self.mini_widgets_column = ft.Column(spacing=4)  # Column for our mini widgets on the side of our main content. Nests inside of self.mini_widgets_container
+        self.mini_widgets_container = ft.Container(expand=1)  # Control to display our mini widgets. Nests inside of self.content_row
+        self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
+        self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
 
         # Gives our objects their uniform tabs.
         self.reload_tab()  # Tabs that don't need too be reloaded for color changes are only built here
@@ -69,10 +68,11 @@ class Widget(ft.Container):
     def save_dict(self):
         ''' Saves our current data to the json file '''
 
-        # Print(f"Saving object data to {self.data['file_path']}")
-        file_path = os.path.join(self.directory_path, f"{self.title}.json")
-
         try:
+
+            # Set our file path
+            file_path = os.path.join(self.directory_path, f"{self.title}.json")
+
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.directory_path, exist_ok=True)
             
@@ -82,7 +82,34 @@ class Widget(ft.Container):
         
         # Handle errors
         except Exception as e:
-            print(f"Error saving object to {file_path}: {e}") 
+            print(f"Error saving widget to {file_path}: {e}") 
+
+    # Called when deleting mini widgets from this widget
+    def delete_mini_widget(self, mini_widget) -> bool:
+        ''' Calls for mini widget to delete its own data, then removes it from our mini widgets list '''
+
+        try:
+
+            # Remove from our mini widgets list
+            if mini_widget in self.mini_widgets:
+                self.mini_widgets.remove(mini_widget)
+            
+            # Reload the widget if we have to
+            if mini_widget.visible:
+                self.reload_widget()
+
+            # Also reload the active rail to reflect changes
+            self.story.active_rail.content.reload_rail(self.story) 
+
+            # Return that we succeeded
+            return True
+
+        # Errors
+        except Exception as e:
+            print(f"Error deleting mini widget {mini_widget.title} from {self.title}: {e}")
+            return False
+
+
 
     # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):
@@ -90,7 +117,15 @@ class Widget(ft.Container):
 
         from models.mini_widgets.mini_note import MiniNote
 
-        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
+        self.mini_widgets.append(
+            MiniNote(
+                title=title, 
+                owner=self, 
+                page=self.p, 
+                dictionary_path=['mini_widgets', title],
+                data=None
+            )
+            )
 
         self.reload_widget()
 
@@ -126,16 +161,6 @@ class Widget(ft.Container):
         self.p.update()
 
         story.workspace.reload_workspace(self.p, story)
-
-    # Called when creating a new mini note inside a widget
-    def create_mini_note(self, title: str):
-        ''' Creates a mini note inside an image or chapter '''
-
-        from models.mini_widgets.mini_note import MiniNote
-
-        self.mini_widgets.append(MiniNote(title=title, owner=self, page=self.p, data=None))
-
-        return
 
     # Called at end of constructor
     def reload_tab(self):
@@ -203,7 +228,7 @@ class Widget(ft.Container):
                             # The text control that holds our title of the object
                             ft.Text(
                                 weight=ft.FontWeight.BOLD, # Make the text bold
-                                color=self.tab_title_color,   # Set our color to the tab color
+                                color=self.data['tab_title_color'],   # Set our color to the tab color
                                 theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
                                 value=self.title,   # Set the text to our title
                                 

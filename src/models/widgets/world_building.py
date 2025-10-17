@@ -55,7 +55,7 @@ class World_Building(Widget):
         self.history = {}
 
         # Load our live objects from our data
-        self.load_world_maps()
+        #self.load_world_maps()
         self.load_locations()
         self.load_lore()
         self.load_power_systems()
@@ -82,14 +82,12 @@ class World_Building(Widget):
             # Create a new Map object for each map in our data
             from models.mini_widgets.world_building.map import Map
 
-            map_directory_path = os.path.join(self.directory_path, 'world_maps', map_title)
-
             self.world_maps[map_title] = Map(
                 title = map_title,
+                owner = self,
                 page = self.p,
-                directory_path = map_directory_path,
-                story = self.story,
-                data = map_data
+                data = map_data,
+                dictionary_path=['world_maps', map_title],
             )
 
 

@@ -69,7 +69,7 @@ class Story(ft.View):
             
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar: ft.Container = None     # Menu bar at top of page
-        self.all_workspaces_rail: ft.Container = None      # Rail on left side showing our 6 workspaces
+        self.workspaces_rail: ft.Container = None      # Rail on left side showing our 6 workspaces
         self.active_rail: ft.Container = None    # Rail showing whichever workspace is selected
         self.workspace: ft.Container = None        # Main workspace area where our pins display our widgets
 
@@ -120,13 +120,13 @@ class Story(ft.View):
     def save_dict(self):
         ''' Saves the data of our story to its JSON File, and all its folders as well '''
 
-        # Makes sure our directory path is always right. 
-        self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
-            
-        # Our file path we store our data in
-        file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
-
         try:
+            # Makes sure our directory path is always right. 
+            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
+                
+            # Our file path we store our data in
+            file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.data['directory_path'], exist_ok=True)
             
@@ -136,7 +136,7 @@ class Story(ft.View):
         
         # Handle errors
         except Exception as e:
-            print(f"Error saving object to {file_path}: {e}")
+            print(f"Error saving story to {file_path}: {e}")
             
 
     # Called when a new story is created and not loaded with any data
@@ -185,50 +185,90 @@ class Story(ft.View):
             
 
 
-    #Change to delete widget
-    def delete_object(self, widget):
+    # Called when deleting a widget from our story
+    def delete_widget(self, widget) -> bool:
         ''' Deletes the object from our live story object and its reference in the pins.
         We then remove its storage file from our file storage as well. '''
         from models.widget import Widget
 
-        print("Delete object called")
+        print("Delete widget called")
 
-        # Needs to remove the widget from self.widgets, and wherever its sub storage is (characters, chapters, etc.)
-        # Then needs to delete the file from storage as well
-        # Then reload the workspace should remove it from the UI
 
         # Called inside the delete_object method to remove the file from storage
-        def delete_widget_file(widget: Widget):
-            ''' Grabs our objects path, and removes the associated file from storage '''
+        def _delete_widget_file(widget: Widget) -> bool:
+            ''' Deletes our widgets json file from storage. Returns true if successful, false if not '''
 
-            print("delete object from file called")
+            print("delete widget file called")
             
             try:
+                # Grab our widgets tag to see what type of object it is
+                tag = widget.data.get('tag', None)
+
+                # Check that somehow our plotline and world building didn't get accidently passed in here
+                if tag != "plotline" and tag != "world_building":
                 
-                # Check if the file exists before attempting to delete
-                if os.path.exists(widget.directory_path):
-                    file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
-                    os.remove(file_path)
-                    print(f"Successfully deleted file: {widget.path}")
-                else:
-                    print(f"File not found: {widget.path}")
+                    # Check if the file exists before attempting to delete
+                    if os.path.exists(widget.directory_path):
+                        file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
+                        os.remove(file_path)
+
+                        print(f"Successfully deleted file: {widget.directory_path}")
+                        return True
                     
+                    else:
+                        print(f"File not found: {widget.directory_path}")
+                        return False
+                    
+            # Errors
             except (OSError, IOError) as e:
                 print(f"Error deleting file {widget.title}.json: {e}")
+                return False
             except AttributeError as e:
                 print(f"Object missing required attributes (title or path): {e}")
+                return False
 
-        # Remove from characters list if it is a character
-        if hasattr(widget, 'tag') and widget.tag == "character":
-            # Remove object from the characters list
-            if widget in self.characters:
-                self.characters.remove(widget)
+        # Called if file is successfully deleted. Then we remove the widget from its live storage
+        def _delete_live_widget(widget: Widget):
+            # Grab our widgets tag to see what type of object it is
+            tag = widget.data.get('tag', None)
+            
+            # Based on its tag, it deletes it from our appropriate dict
+            if tag == "chapter":
+                if widget.title in self.chapters:
+                    del self.chapters[widget.title]
+            elif tag == "image":
+                if widget.title in self.images:
+                    del self.images[widget.title]
+            elif tag == "character":
+                if widget.title in self.characters:
+                    del self.characters[widget.title]
+            elif tag == "note":
+                if widget.title in self.notes:
+                    del self.notes[widget.title]
 
-        # Remove the objects storage file as well
-        if hasattr(widget, 'path'):
-            delete_widget_file(widget)
+            
+            # Remove from our master widgets list so it won't be rendered anymore
+            if widget in self.widgets:
+                self.widgets.remove(widget)
+        
+        # Call our internal functions above
+        try:
+            # If we can delete the file, we remove the live object
+            if _delete_widget_file(widget):
 
-        self.workspace.reload_workspace()
+                _delete_live_widget(widget)
+
+                # Reload our workspace to apply the UI Change if was needed
+                if widget.visible:
+                    self.workspace.reload_workspace(self.p, self)
+
+                print(f"Successfully deleted widget: {widget.title}")
+
+        # Errors
+        except Exception as e:
+            print(f"Error deleting widget : {e}")
+            return
+
 
     # Called on story startup to load all our content objects
     def load_content(self):
@@ -321,7 +361,7 @@ class Story(ft.View):
                             
                         # Create our character object using our loaded data
                         self.characters[character_title] = Character(character_title, self.p, dirpath, self, character_data)
-                        self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
+                        #self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
@@ -456,27 +496,33 @@ class Story(ft.View):
 
         # Add all our characters to the widgets list
         for character in self.characters.values():
-            self.widgets.append(character)
+            if character not in self.widgets:
+                self.widgets.append(character)
 
         # Add all our chapters to the widgets list
         for chapter in self.chapters.values():
-            self.widgets.append(chapter)
+            if chapter not in self.widgets:
+                self.widgets.append(chapter)
 
         # Add all our images to the widgets list
         for image in self.images.values():
-            self.widgets.append(image)
+            if image not in self.widgets:
+                self.widgets.append(image)
 
         # Add our plotline to the widgets list
         if self.plotline is not None:
-            self.widgets.append(self.plotline)
+            if self.plotline not in self.widgets:
+                self.widgets.append(self.plotline)
 
         # Add our world building to the widgets list
         if self.world_building is not None:
-            self.widgets.append(self.world_building)
+            if self.world_building not in self.widgets:
+                self.widgets.append(self.world_building)
 
         # Add all our notes to the widgets list
         for note in self.notes.values():
-            self.widgets.append(note)
+            if note not in self.widgets:
+                self.widgets.append(note)
 
         if app.settings not in self.widgets:
             self.widgets.append(app.settings)   # Add our app settings to the widgets list so its accessible everywhere
@@ -540,7 +586,7 @@ class Story(ft.View):
     def build_view(self) -> list[ft.Control]:
         ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
         from ui.menu_bar import create_menu_bar
-        from ui.all_workspaces_rails import All_Workspaces_Rail
+        from ui.workspaces_rail import Workspaces_Rail
         from ui.active_rail import Active_Rail
         from ui.workspace import Workspace
         from models.app import app
@@ -554,7 +600,7 @@ class Story(ft.View):
         self.menubar = create_menu_bar(page, self)
 
         # Create our rails and workspace objects
-        self.all_workspaces_rail = All_Workspaces_Rail(page, self)  # Create our all workspaces rail
+        self.workspaces_rail = Workspaces_Rail(page, self)  # Create our all workspaces rail
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
         self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
         self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
@@ -603,7 +649,7 @@ class Story(ft.View):
             expand=True,  # Makes sure it takes up the entire window/screen
 
             controls=[
-                self.all_workspaces_rail,  # Main rail of all available workspaces
+                self.workspaces_rail,  # Main rail of all available workspaces
                 ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
 
                 self.active_rail,    # Rail for the selected workspace
@@ -631,6 +677,3 @@ class Story(ft.View):
         self.mouse_x = e.local_x 
         self.mouse_y = e.local_y
         #print(f"Mouse at x={self.mouse_x}, y={self.mouse_y}")
-
-
-    # Called when deleting an object from the story (character, chapter, etc.)
