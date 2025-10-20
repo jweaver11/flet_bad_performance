@@ -30,16 +30,16 @@ class World_Building(Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': "world_building",             # Tag to identify what type of object this is
-                'world_maps': dict,     # Dict of different worlds and their maps stored
-                'locations': dict,      # Dict of any locations stored in the world but not in a sub map
-                'lore': dict,           # Dict of any world lore, myths, legends, etc
-                'power_systems': dict,  # Power systems of the world
-                'social_systems': dict, # Social systems of the world
-                'geography': dict,      # Geography of the world
-                'technology': dict,     # Technology of the world
-                'history': dict,        # History of the world
-                'governments': dict,    # Governments of the world
+                'tag': "world_building",            # Tag to identify what type of object this is
+                'world_maps': dict,                 # Dict of different worlds and their maps stored
+                'locations': dict,                  # Dict of any locations stored in the world but not in a sub map
+                'lores': dict,                       # Dict of any world lore, myths, legends, etc
+                'power_systems': dict,              # Power systems of the world
+                'social_systems': dict,             # Social systems of the world
+                'geography': dict,                  # Geography of the world
+                'technology': dict,                 # Technology of the world
+                'history': dict,                    # History of the world
+                'governments': dict,                # Governments of the world
                 'content': str,
             },
         )
@@ -48,15 +48,15 @@ class World_Building(Widget):
         self.world_maps = {}
         self.locations = {}
         self.lore = {}
-        self.power_systems = {}
-        self.social_systems = {}
-        self.geography = {}
-        self.technology = {}
-        self.history = {}
+        self.power_systems = {}     # Tie to any
+        self.social_systems = {}    # Tie to countries, tribes, continents, etc
+        self.geography = {} # Tie to any
+        self.technology = {}    # Tie to any
+        self.history = {}   # Tie to any
+        self.governments = {}   # Tie to countries, tribes, etc
 
         # Load our live objects from our data
-        #self.load_world_maps()
-        self.load_locations()
+        self.load_world_maps()
         self.load_lore()
         self.load_power_systems()
         self.load_social_systems()
@@ -96,9 +96,6 @@ class World_Building(Widget):
             #print("No world maps found, creating default world map")
             self.create_world_map(title="World Map")
 
-    def load_locations(self):
-        pass
-
     def load_lore(self):
         pass
 
@@ -116,6 +113,10 @@ class World_Building(Widget):
 
     def load_history(self): 
         pass
+
+    def load_governments(self):
+        pass
+
 
     # Called when creating a new world map
     def create_world_map(self, title: str):

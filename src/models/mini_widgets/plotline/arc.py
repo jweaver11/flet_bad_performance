@@ -17,7 +17,7 @@ class Arc(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
 
-        # Either the timeline or the branch MUST be passed in
+        # The timeline or branch this arc belongs to
         self.branch_line = branch_line    # The timeline this arc belongs to. Needed for certain functions
 
         # Verifies this object has the required data fields, and creates them if not

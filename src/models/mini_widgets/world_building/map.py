@@ -19,31 +19,40 @@ from handlers.verify_data import verify_data
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
 class Map(MiniWidget):
 
-    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: str, data: dict=None):
+    # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
         
         # Parent constructor
         super().__init__(
-            title=title,        # Title of our mini note
-            owner=owner,      # owner widget that holds us
-            page=page,          # Page reference
-            data=data,          # Data if we're loading an existing mini note, otherwise blank
-            dictionary_path=""  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
+            title=title,           
+            owner=owner,        
+            page=page,              
+            data=data,              
+            dictionary_path=dictionary_path     
         ) 
 
-        
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
-            self,   # Pass in our own data so the function can see the actual data we loaded
+            self,   
             {
                 'tag': "map", 
+                'maps': dict,
             },
         )
 
         
         self.maps = {}
 
+        # The control thats displayed on the UI
+        self.ui_map = None
+
         # Load the rest of our data from the file
+        #self.load_maps()
+        #self.load_locations()
+        #self.load_lores()
+        #self.load_social_systems()
+        #self.load_history()
+        #self.load_governments()
         
 
         # Builds/reloads our timeline UI
@@ -58,7 +67,7 @@ class Map(MiniWidget):
     # Called when we need to rebuild out timeline UI
     def reload_map(self):
 
-        # We only show branches, arcc, plotpoints, and timeskips using their UI elements, not their mini widget
+        # We only show branches, arc, plotpoints, and timeskips using their UI elements, not their mini widget
 
         # Content of our Timeline (Gesture detector)
         self.content = ft.Container(

@@ -21,7 +21,8 @@ class Branch(MiniWidget):
             data=data,          # Data if we're loading an existing mini note, otherwise blank
         ) 
 
-        self.timeline = timeline    # The timeline this arc belongs to. Needed for certain functions
+        # The timeline this arc belongs to
+        self.timeline = timeline  
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -70,7 +71,7 @@ class Branch(MiniWidget):
                 owner=self.owner, 
                 page=self.p, 
                 dictionary_path=self.dictionary_path + ['branches', key],
-                timeline=self,  # Branches can't own each other, only timelines can
+                timeline=self.timeline,  # Branches can't own each other, only timelines can
                 data=data
             )
             self.owner.mini_widgets.append(self.branches[key])  # Branches need to be in the owners mini widgets list to show up in the UI
@@ -136,7 +137,7 @@ class Branch(MiniWidget):
             owner=self.owner, 
             page=self.p, 
             dictionary_path=self.dictionary_path + ['branches', title], 
-            timeline=self,
+            timeline=self.timeline,
             data=None
         )
         self.owner.mini_widgets.append(self.branches[title])

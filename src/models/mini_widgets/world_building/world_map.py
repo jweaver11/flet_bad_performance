@@ -16,15 +16,16 @@ from handlers.verify_data import verify_data
 class WorldMap(MiniWidget):
 
    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
         
         # Parent constructor
         super().__init__(
-            title=title,        # Title of our mini note
-            owner=owner,      # owner widget that holds us
-            page=page,          # Page reference
-            data=data,          # Data if we're loading an existing mini note, otherwise blank
-            dictionary_path=""  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
+            title=title,        
+            owner=owner,      
+            page=page,      
+            dictionary_path=dictionary_path,    
+            type="map",  
+            data=data,          
         ) 
         
         # Verifies this object has the required data fields, and creates them if not
