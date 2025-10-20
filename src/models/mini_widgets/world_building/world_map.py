@@ -12,8 +12,7 @@ from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
 
-# Live objects that are stored in our timeline object
-# We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
+# Our 'world map' class that is an extended map. Acts as the parent map for all other sub maps
 class WorldMap(MiniWidget):
 
    # Constructor. Requires title, owner widget, page reference, and optional data dictionary

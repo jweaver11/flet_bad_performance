@@ -2,7 +2,7 @@ import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
-from models.mini_widgets.plotline.timeline import Timeline
+#from models.mini_widgets.plotline.timeline import Timeline
 
 # Class for branches (essentiall sub-timelines) on a timeline. 
 # These branches can be connected to each other, and the parent timeline, and its child objects,
@@ -10,7 +10,7 @@ from models.mini_widgets.plotline.timeline import Timeline
 class Branch(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], timeline: Timeline, data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], timeline, data: dict=None):
         
         # Parent constructor
         super().__init__(
@@ -31,9 +31,12 @@ class Branch(MiniWidget):
                 'start_date': str,                  # Start and end date of the branch, for timeline view
                 'end_date': str,                    # Start and end date of the branch, for timeline view
                 'color': "secondary",                       # Color of the branch in the timeline
+                'is_expanded': True,                  # If the branch dropdown is expanded on the rail
+                'branches_are_expanded': True,      # If the branches section is expanded
                 'plot_points_are_expanded': True,   # If the plotpoints section is expanded
                 'arcs_are_expanded': True,          # If the arcs section is expanded
                 'time_skips_are_expanded': True,    # If the timeskips section is expanded
+                'branches': dict,                  # Dict of (sub) branches in this branch
                 'plot_points': dict,                # Dict of plot points in this branch
                 'arcs': dict,                       # Dict of arcs in this branch
                 'time_skips': dict,                 # Dict of time skips in this branch
@@ -41,19 +44,37 @@ class Branch(MiniWidget):
             },
         )
 
-
-        self.plot_points: dict = {} # Declare plot_points dictionary
+        # Declare dicts of our data types 
+        self.branches: dict = {}    
+        self.plot_points: dict = {} 
         self.arcs: dict = {}
         self.time_skips: dict = {}
 
+        self.load_branches()      
         self.load_plot_points() 
         self.load_arcs()
         self.load_time_skips()
 
         self.reload_mini_widget()
 
-    
 
+    # Called in the constructor
+    def load_branches(self):
+        ''' Loads branches from data into self.branches  '''
+        from models.mini_widgets.plotline.branch import Branch
+
+        # Looks up our branches in our data, then passes in that data to create a live object
+        for key, data in self.data['branches'].items():
+            self.branches[key] = Branch(
+                title=key, 
+                owner=self.owner, 
+                page=self.p, 
+                dictionary_path=self.dictionary_path + ['branches', key],
+                timeline=self,  # Branches can't own each other, only timelines can
+                data=data
+            )
+            self.owner.mini_widgets.append(self.branches[key])  # Branches need to be in the owners mini widgets list to show up in the UI
+    
     # Called in the constructor
     def load_plot_points(self):
         ''' Loads plotpoints from data into self.plotpoints  '''
@@ -104,6 +125,26 @@ class Branch(MiniWidget):
             )
             self.owner.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
     
+    # Called when creating a new branch
+    def create_branch(self, title: str):
+        ''' Creates a new branch inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.branch import Branch
+
+        # Add our new Branch mini widget object to our branches dict, and to our owners mini widgets
+        self.branches[title] = Branch(
+            title=title, 
+            owner=self.owner, 
+            page=self.p, 
+            dictionary_path=self.dictionary_path + ['branches', title], 
+            timeline=self,
+            data=None
+        )
+        self.owner.mini_widgets.append(self.branches[title])
+
+        # Apply our changes in the UI
+        self.reload_mini_widget()
+        self.owner.reload_widget()
+        
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
@@ -164,7 +205,27 @@ class Branch(MiniWidget):
         self.reload_mini_widget()
         self.owner.reload_widget()
 
-     # Called when deleting a plotpoint
+    # Called when deleting a branch
+    def delete_branch(self, branch):
+        ''' Deletes a branch from our timeline object, and updates the data to match '''
+
+        try:
+            # Grab our title
+            title = branch.title
+
+            # Delete from our data, our live branches dict, and from our owners mini widgets list
+            del self.data['branches'][title]
+            del self.branches[title]
+            self.owner.delete_mini_widget(branch)
+
+            # Save our changes
+            self.save_dict()
+
+        # Errors
+        except Exception as e:
+            print(f"Error deleting branch {title}: {e}")
+
+    # Called when deleting a plotpoint
     def delete_plot_point(self, plot_point):
         ''' Deletes a plotpoint from our timeline object, and updates the data to match '''
 
