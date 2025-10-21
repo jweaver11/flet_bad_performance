@@ -36,12 +36,12 @@ class Widget(ft.Container):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'title': self.title,
-                'directory_path': self.directory_path,
-                'tag': "widget",
-                'pin_location': "main",
-                'visible': True,
-                'tab_title_color': "primary",
+                'title': self.title,                        # Title of our widget  
+                'directory_path': self.directory_path,      # Directory path to the file this widget's data is stored in
+                'tag': str,                                 # Tag to identify what type of widget this is
+                'pin_location': "main",                     # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
+                'visible': True,                            # Whether this widget is visible in the workspace or not
+                'tab_title_color': "primary",               # Color of the title in the tab (primary, secondary, blue, red, etc.)
             },
         )
 
@@ -83,10 +83,13 @@ class Widget(ft.Container):
         # Handle errors
         except Exception as e:
             print(f"Error saving widget to {file_path}: {e}") 
+            print("Data that failed to save: ", self.data)
 
     # Called when deleting mini widgets from this widget
     def delete_mini_widget(self, mini_widget) -> bool:
         ''' Calls for mini widget to delete its own data, then removes it from our mini widgets list '''
+
+        # Also need to pass in the dictionary path to delete 
 
         try:
 
@@ -122,7 +125,7 @@ class Widget(ft.Container):
                 title=title, 
                 owner=self, 
                 page=self.p, 
-                dictionary_path=['mini_widgets', title],
+                dictionary_path=['mini_notes', title],
                 data=None
             )
             )

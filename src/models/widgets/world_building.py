@@ -19,11 +19,11 @@ class World_Building(Widget):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
-            title = title,  # Title of the widget that will show up on its tab
-            p = page,   # Grabs our original page for convenience and consistency
-            directory_path = directory_path,  # Path to our timeline json file
-            story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            data = data,    # Set our passed in data to our objects data
+            title = title,  
+            p = page,   
+            directory_path = directory_path,  
+            story = story,       
+            data = data,    
         )
         
         # Verifies this object has the required data fields, and creates them if not
@@ -31,17 +31,20 @@ class World_Building(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "world_building",            # Tag to identify what type of object this is
+
+                # List of different categories for organizing our world maps on the rail. (Psuedo folders)
+                'categories': list,            # Only check world maps for categories
+
                 'world_maps': dict,                 # Dict of different worlds and their maps stored
-                'locations': dict,                  # Dict of any locations stored in the world but not in a sub map
-                'lores': dict,                       # Dict of any world lore, myths, legends, etc
+                'lores': dict,                      # Dict of any world lore, myths, legends, etc
+                'history': dict,                    # History of the world
                 'power_systems': dict,              # Power systems of the world
                 'social_systems': dict,             # Social systems of the world
                 'geography': dict,                  # Geography of the world
                 'technology': dict,                 # Technology of the world
-                'history': dict,                    # History of the world
                 'governments': dict,                # Governments of the world
                 'content': str,
-            },
+            }
         )
 
         # Dict of different worlds and their maps stored
@@ -86,8 +89,8 @@ class World_Building(Widget):
                 title = map_title,
                 owner = self,
                 page = self.p,
-                data = map_data,
                 dictionary_path=['world_maps', map_title],
+                data = map_data,
             )
 
 
@@ -121,14 +124,14 @@ class World_Building(Widget):
     # Called when creating a new world map
     def create_world_map(self, title: str):
         ''' Requires a title. Creates a new world map in our live object and data'''
-        from models.mini_widgets.world_building.world_map import WorldMap
+        from models.mini_widgets.world_building.maps.world_map import WorldMap
 
         # Creates our new map object
         new_map = WorldMap(
             title=title,
-            directory_path=os.path.join(self.directory_path, 'world_maps'),
-            story=self.story,
+            owner=self,
             page=self.p,
+            dictionary_path=os.path.join(self.directory_path, 'world_maps'),
             data=None,
         )
 

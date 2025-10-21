@@ -23,8 +23,7 @@ class WorldMap(MiniWidget):
             title=title,        
             owner=owner,      
             page=page,      
-            dictionary_path=dictionary_path,    
-            type="map",  
+            dictionary_path=dictionary_path,     
             data=data,          
         ) 
         
@@ -32,8 +31,18 @@ class WorldMap(MiniWidget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': "world_map",            # Tag to identify what type of object this is
-                'content': str,    # Content of our world map
+                'tag': "world_map",             # Tag to identify what type of object this is
+
+                # List of different categories for organizing our world maps. (Psuedo folders)
+                'categories': [
+                    'continents',
+                    'oceans',
+                    'regions',
+                    'countries',
+                    'cities',
+                ],
+                
+                'content': str,                 # Content of our world map
             },
         )
 
@@ -43,7 +52,12 @@ class WorldMap(MiniWidget):
         
         self.maps = {}
 
-        # Load the rest of our data from the file
+        self.continents = {}
+        self.oceans = {}
+        self.regions = {}
+        self.countries = {}
+        self.cities = {}
+        
         
 
         # Builds/reloads our timeline UI

@@ -1,8 +1,6 @@
 '''
-A 'Map' object that is displayed in the world building widget.
-These objects are stored in 'WorldMap' objects and files, or inside of other maps
-They can represent any scale of map smaller than a world, from continents, to regions, countries, cities, dungeons, buildings, etc.
-Their data is stored in the parent most 'WorldMap' object file that contains them
+Parent map class that contains all other sub-maps, such as locations, world maps, continents, countries, regions, cities, dungeons, etc.
+Basically, anything that COULD be fleshed out visually.
 '''
 
 # TYPES OF MAPS, COUNTRIES CONTINENTS ETC. THAT CAN ADD THEIR OWN (SUB) MAPS. EXP. CONTINENT CAN ADD COUNTRIES, REGIONS, ETC
@@ -37,6 +35,12 @@ class Map(MiniWidget):
             {
                 'tag': "map", 
                 'maps': dict,
+                'category': str,                 # Category/psuedo folder this map belongs to
+                'markers': dict,
+                'locations': dict,
+                'geography': dict,                  # Geography of the world
+                'rooms': dict,
+                'notes': str,
             },
         )
 

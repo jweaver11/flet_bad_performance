@@ -26,12 +26,30 @@ class Chapter(Widget):
                 'content': str,
                 'temp': str,
                 'test': str,
+                'mini_notes': dict,
             }
         )
+
+        self.mini_notes = {}
+        self.load_mini_notes()
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
+
+    def load_mini_notes(self):
+        ''' Loads our mini notes from our data into live objects '''
+        from models.mini_widgets.mini_note import MiniNote
+
+        # Loop through our data mini notes and create live objects for each
+        for note_title, note_data in self.data['mini_notes'].items():
+            self.mini_widgets.append(MiniNote(
+                title=note_title,
+                owner=self,
+                page=self.p,
+                dictionary_path=['mini_notes', note_title],
+                data=note_data,
+            ))
     
     def submit_mini_note(self, e):
         title = e.control.value
