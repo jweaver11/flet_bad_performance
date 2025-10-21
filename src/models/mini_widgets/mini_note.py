@@ -11,12 +11,13 @@ from handlers.verify_data import verify_data
 # Class that holds our mini note objects inside images or chapters
 class MiniNote(MiniWidget):
     # Constructor
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
+    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
 
         # Parent constructor
         super().__init__(
             title=title,        
-            owner=owner,      
+            owner=owner,   
+            father=father,   
             page=page,          
             dictionary_path=dictionary_path,  
             data=data,          

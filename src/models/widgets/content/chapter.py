@@ -46,8 +46,9 @@ class Chapter(Widget):
             self.mini_widgets.append(MiniNote(
                 title=note_title,
                 owner=self,
+                father=self,
                 page=self.p,
-                dictionary_path=['mini_notes', note_title],
+                dictionary_path="mini_notes",
                 data=note_data,
             ))
     

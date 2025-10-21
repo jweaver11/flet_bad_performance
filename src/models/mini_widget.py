@@ -84,29 +84,6 @@ class MiniWidget(ft.Container):
         except Exception as e:
             print(f"Error saving mini widget data to {self.title}: {e}")
             
-        
-        '''
-        OLD METHOD:
-        # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
-        current_dict = self.owner.data
-
-        # Run through all keys in our list except the last one
-        for key in self.dictionary_path[:-1]:
-
-            # Make sure the key exists if it doesn't already
-            if key not in current_dict:
-                current_dict[key] = {}  
-
-            # Move into the next level of the dict, so we're not always checking from top level
-            current_dict = current_dict[key]
-        
-        # Set our data at the final key location
-        final_key = self.dictionary_path[-1]
-        current_dict[final_key] = self.data
-
-        # Save our owners json file to match their data
-        self.owner.save_dict()
-        '''
 
     # Called when deleting our mini widget
     def delete_dict(self):

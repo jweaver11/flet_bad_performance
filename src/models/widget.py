@@ -83,32 +83,20 @@ class Widget(ft.Container):
         except Exception as e:
             print(f"Error saving widget to {file_path}: {e}") 
             print("Data that failed to save: ", self.data)
-           
-        
-    # Called at end of constructor or when needing to load mini widgets again
-    def load_mini_widgets(self):
-        ''' Defined by child classes. Parses our data and creates new mini widget objects as needed '''
-
-        # Clear our mini widgets list to prepare for reloading
-        self.mini_widgets.clear() 
-
-        # Load here
-        return
-
 
 
     # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
-
         from models.mini_widgets.mini_note import MiniNote
 
         self.mini_widgets.append(
             MiniNote(
                 title=title, 
                 owner=self, 
+                father=self,
                 page=self.p, 
-                dictionary_path=['mini_notes', title],
+                dictionary_path="mini_notes",
                 data=None
             )
         )
