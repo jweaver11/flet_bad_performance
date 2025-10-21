@@ -63,26 +63,30 @@ class Characters_Rail(ft.Container):
     # Called on startup and when we have changes to the rail that have to be reloaded 
     def reload_rail(self, story: Story):
 
-        column = ft.Column([])
+        try:
+            column = ft.Column([])
 
-        for character in story.characters.values():
-            char_button = ft.TextButton(
-                text=character.title,
-                on_click=lambda e, char=character: char.toggle_visibility(story), # Needs this reference, idk y
+            for character in story.characters.values():
+                char_button = ft.TextButton(
+                    text=character.title,
+                    on_click=lambda e, char=character: char.toggle_visibility(story), # Needs this reference, idk y
+                )
+                column.controls.append(char_button)
+
+            column.controls.append(
+                ft.TextField(
+                    label="Create Character",
+                    hint_text="Enter character name",
+                    on_submit=self.submit_character,  # When enter is pressed
+                )
             )
-            column.controls.append(char_button)
 
-        column.controls.append(
-            ft.TextField(
-                label="Create Character",
-                hint_text="Enter character name",
-                on_submit=self.submit_character,  # When enter is pressed
-            )
-        )
+            self.content = column
 
-        self.content = column
+            self.p.update()
 
-        self.p.update()
+        except Exception as e:
+            print(f"Error reloading characters rail: {e}")
 
 
 

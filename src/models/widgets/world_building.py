@@ -95,8 +95,9 @@ class World_Building(Widget):
             self.world_maps[map_title] = Map(
                 title = map_title,
                 owner = self,
+                father=self,
                 page = self.p,
-                dictionary_path=['world_maps', map_title],
+                dictionary_path="world_maps",
                 data = map_data,
             )
 
@@ -133,10 +134,13 @@ class World_Building(Widget):
         ''' Requires a title. Creates a new world map in our live object and data'''
         from models.mini_widgets.world_building.maps.world_map import WorldMap
 
+        # Filters to hide different kinds of maps like countries, continents, oceans, cities, locations, etc
+
         # Creates our new map object
         new_map = WorldMap(
             title=title,
             owner=self,
+            father=self,
             page=self.p,
             dictionary_path=os.path.join(self.directory_path, 'world_maps'),
             data=None,
@@ -174,4 +178,4 @@ class World_Building(Widget):
         # Our column that will display our header filters and body of our widget
         self.body_container.content = ft.Text(f"hello from: {self.title}")
 
-        self.render_widget()
+        self._render_widget()

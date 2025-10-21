@@ -48,7 +48,13 @@ def main(page: ft.Page):
 
         # Create our rails inside of app so we can access it as an object and store preferences
         all_workspaces_rail = No_Story_Rail(page)  # Create our all workspaces rail
-        active_rail = Active_Rail(page)  # Container stored in story for the active rails
+        active_rail = ft.Container(
+            alignment=ft.alignment.top_center,  
+            padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
+            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+            width=app.settings.data['active_rail_width'],  
+            content=ft.Text("Create a story to get started!")
+        )
 
         # Create our workspace container to hold our widgets
         workspace = create_workspace(page)  # render our workspace containing our widgets 

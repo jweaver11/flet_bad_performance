@@ -13,7 +13,7 @@ from handlers.verify_data import verify_data
 
 class MiniWidget(ft.Container):
     # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
+    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
 
         # Parent constructor
         super().__init__(
@@ -23,10 +23,11 @@ class MiniWidget(ft.Container):
             data=data,      # Sets our data.
         )
            
-        self.title = title  # Title of the widget that will show up on its tab
-        self.owner = owner  # The widget that contains this mini widget. (Can't use parent because ft.Containers have hidden parent attribute)
-        self.p = page       # Grabs our original page for convenience and consistency
-        self.dictionary_path = dictionary_path  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
+        self.title = title                          # Title of the widget that will show up on its tab
+        self.owner = owner                   # The widget that contains this mini widget.
+        self.father = father                        # Immidiate parent object that holds us (Can't use 'parent' cuz flet)
+        self.p = page                               # Grabs our original page for convenience and consistency
+        self.dictionary_path = dictionary_path      # Path to our dict within our fathers data
 
 
         # Verifies this object has the required data fields, and creates them if not
@@ -45,12 +46,13 @@ class MiniWidget(ft.Container):
         self.visible = self.data['visible']
         self.is_selected = False    # Check if we are selected for ui purposes
 
-        # UI Elements
+        # Control for our title
         self.title_control = ft.TextField(
             value=self.title,
             label=None,
         )
 
+        # Control for our content/body
         self.content_control = ft.TextField(
             #value=self.data['content'],
             label="Body",
@@ -61,32 +63,68 @@ class MiniWidget(ft.Container):
     # Called when saving changes in our mini widgets data to the OWNERS json file
     def save_dict(self):
         ''' Saves our current data to the OWNERS json file using this objects dictionary path '''
-        
+
         try:
         
-            # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
-            current_dict = self.owner.data
+            # If our data is None (we just got deleted), we don't save ourselves to fathers data
+            if self.data is None:
+                pass
 
-            # Run through all keys in our list except the last one
-            for key in self.dictionary_path[:-1]:
+            # Otherwise, save like normal
+            else:
 
-                # Make sure the key exists if it doesn't already
-                if key not in current_dict:
-                    current_dict[key] = {}  
+                # Our data is correct, so we update our immidiate parents data to match
+                self.father.data[self.dictionary_path][self.title] = self.data
 
-                # Move into the next level of the dict, so we're not always checking from top level
-                current_dict = current_dict[key]
+            # Recursively updates the parents data until father=owner (widget), which saves to file
+            self.father.save_dict()
             
-            # Set our data at the final key location
-            final_key = self.dictionary_path[-1]
-            current_dict[final_key] = self.data
-
-            # Save our owners json file to match their data
-            self.owner.save_dict()
+            # This keeps everyones data in sync so we can infinitely nest mini widgets if we want
 
         except Exception as e:
             print(f"Error saving mini widget data to {self.title}: {e}")
-            return
+            
+        
+        '''
+        OLD METHOD:
+        # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
+        current_dict = self.owner.data
+
+        # Run through all keys in our list except the last one
+        for key in self.dictionary_path[:-1]:
+
+            # Make sure the key exists if it doesn't already
+            if key not in current_dict:
+                current_dict[key] = {}  
+
+            # Move into the next level of the dict, so we're not always checking from top level
+            current_dict = current_dict[key]
+        
+        # Set our data at the final key location
+        final_key = self.dictionary_path[-1]
+        current_dict[final_key] = self.data
+
+        # Save our owners json file to match their data
+        self.owner.save_dict()
+        '''
+
+    # Called when deleting our mini widget
+    def delete_dict(self):
+        ''' Deletes our data from all live widget/mini widget objects that we nest in, and saves the owners file '''
+        try:
+
+            # Clears our data
+            self.data = None
+
+            self.father.data[self.dictionary_path].pop(self.title, None)
+            
+            # Applies the changes up the chain
+            self.save_dict()
+
+            self.owner.delete_mini_widget(self)
+
+        except Exception as e:
+            print(f"Error deleting mini widget {self.title}: {e}")
         
 
     # Called when clicking x to hide the mini note

@@ -16,12 +16,13 @@ from handlers.verify_data import verify_data
 class WorldMap(MiniWidget):
 
    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
+    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
         
         # Parent constructor
         super().__init__(
             title=title,        
-            owner=owner,      
+            owner=owner,  
+            father=father,    
             page=page,      
             dictionary_path=dictionary_path,     
             data=data,          

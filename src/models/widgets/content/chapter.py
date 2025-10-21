@@ -77,6 +77,6 @@ class Chapter(Widget):
             ]
         )
 
-        self.render_widget()
+        self._render_widget()
 
         

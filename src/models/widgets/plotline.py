@@ -43,6 +43,9 @@ class Plotline(Widget):
             },
             
         )
+
+        # Mini widgets do NOT store any live objects that would contain their own data.
+        # Everything after this is simply UI to be rendered
             
         # Our timeline controls
         self.timelines = {}
@@ -50,8 +53,6 @@ class Plotline(Widget):
         # Load our timelines from our data
         self.load_timelines()
 
-        # Set visibility from our data
-        self.visible = self.data['visible']  # If we will show this widget or not
 
         # The UI element that will display our filters
         self.filters = ft.Row(scroll="auto")
@@ -81,8 +82,9 @@ class Plotline(Widget):
                 self.timelines[timeline_title] = Timeline(
                     title=timeline_title, 
                     owner=self, 
+                    father=self,
                     page=self.p, 
-                    dictionary_path=['timelines', timeline_title],
+                    dictionary_path="timelines",
                     data=timeline_data
                 ) 
 
@@ -92,8 +94,9 @@ class Plotline(Widget):
                 self.timelines["Main_Timeline"] = Timeline(
                     title="Main_Timeline", 
                     owner=self, 
+                    father=self,
                     page=self.p, 
-                    dictionary_path=['timelines', "Main_Timeline"],
+                    dictionary_path="timelines",
                     data=None
                 )             
                             
@@ -110,10 +113,11 @@ class Plotline(Widget):
 
         # Passes all checks, create our new plotline. We pass in no data, so plotline will use its own default data
         self.timelines[title] = Timeline(
-            title, 
-            self, 
-            self.p, 
-            dictionary_path=['timelines', title],
+            title=title, 
+            owner=self, 
+            father=self,
+            page=self.p, 
+            dictionary_path="timelines",
             data=None
         )
         
@@ -205,7 +209,7 @@ class Plotline(Widget):
 
         # Stack that holds our timeline and any plotlines that sit overtop it (may not use in future)
         stack = ft.Stack(
-            expand=True,
+            expand=True, 
             controls=[
                 plotline,
                 timelines
@@ -227,6 +231,6 @@ class Plotline(Widget):
 
         print("Number of timelines in plotline: " + str(len(self.timelines)))
 
-        self.render_widget()
+        self._render_widget()
         
         

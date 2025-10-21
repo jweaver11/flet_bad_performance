@@ -109,12 +109,10 @@ class Timeline_Rail(ft.Container):
     def reload_rail(self, story: Story) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
-
         # PLOTLINE RAIL JUST HAS ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
         # ALTERING THEM IS DONE IN THEIR MINI WIDGETS
 
-        print("Reloading timeline rail")
-        
+        print("Reloading plotline rail")
 
         # Build the content of our rail
         self.content = ft.Column(

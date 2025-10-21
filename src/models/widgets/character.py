@@ -209,7 +209,7 @@ class Character(Widget):
         # Set our content
         self.body_container.content = body
 
-        self.render_widget()
+        self._render_widget()
             
 
 

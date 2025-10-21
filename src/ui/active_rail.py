@@ -18,7 +18,7 @@ from ui.rails.notes_rail import Notes_Rail
 # Class is created in main on program startup
 class Active_Rail(ft.Container):
     # Constructor
-    def __init__(self, page: ft.Page, story: Story=None):
+    def __init__(self, page: ft.Page, story: Story):
     
         self.p = page  # Store the page reference
   
@@ -47,15 +47,7 @@ class Active_Rail(ft.Container):
     def display_active_rail(self, story: Story):
         ''' Reloads the active rail based on the selected workspace in workspaces_rail '''
 
-        # If no story is passed in, just load a rail prompting user to create a story
-        if story is None:
-
-            print("Warning: Story is None, cannot load active rail.")
-            self.content = ft.Text("Create a story to get started!")
-            self.p.update()
-
-        # Otherwise build our active rail based on the selected workspace
-        else:
+        try:
 
             # Give us the correct rail on program startup based on our selected workspace
             if story.workspaces_rail.selected_rail == "content":
@@ -82,3 +74,7 @@ class Active_Rail(ft.Container):
 
             # Update the page to reflect changes
             self.p.update()
+
+        # Errors
+        except Exception as e:
+            print(f"Error displaying active rail: {e}")

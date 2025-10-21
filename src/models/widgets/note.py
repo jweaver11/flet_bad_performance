@@ -57,5 +57,5 @@ class Notes(Widget):
         self.body_container.content = body
         
         # Build it widget function that will handle loading our mini widgets and rendering the whole thing
-        self.render_widget()
+        self._render_widget()
         

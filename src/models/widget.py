@@ -49,7 +49,6 @@ class Widget(ft.Container):
         # Apply our visibility
         self.visible = self.data['visible'] 
 
-
         # UI ELEMENTS - Tab
         self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
         self.tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
@@ -86,29 +85,12 @@ class Widget(ft.Container):
             print("Data that failed to save: ", self.data)
 
     # Called when deleting mini widgets from this widget
-    def delete_mini_widget(self, mini_widget) -> bool:
+    def delete_mini_widget(self, mini_widget):
         ''' Calls for mini widget to delete its own data, then removes it from our mini widgets list '''
 
         try:
 
-            # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
-            current_dict = self.data
-
-            # Run through all keys in our list except the last one
-            for key in mini_widget.dictionary_path[:-1]:
-
-                # Make sure the key exists if it doesn't already
-                if key not in current_dict:
-                    current_dict[key] = {}  
-
-                # Move into the next level of the dict, so we're not always checking from top level
-                current_dict = current_dict[key]
-            
-            # Set our data at the final key location
-            final_key = mini_widget.dictionary_path[-1]
-            current_dict.pop(final_key, None)  # Remove the mini widget data from our owners data dict
-
-            # Save our owners json file to match their data
+            # Our data should be correct when this is called, so just save the dict
             self.save_dict()
 
             # Remove from our mini widgets list
@@ -122,13 +104,20 @@ class Widget(ft.Container):
             # Also reload the active rail to reflect changes
             self.story.active_rail.content.reload_rail(self.story) 
 
-            # Return that we succeeded
-            return True
-
         # Errors
         except Exception as e:
             print(f"Error deleting mini widget {mini_widget.title} from {self.title}: {e}")
-            return False
+           
+        
+    # Called at end of constructor or when needing to load mini widgets again
+    def load_mini_widgets(self):
+        ''' Defined by child classes. Parses our data and creates new mini widget objects as needed '''
+
+        # Clear our mini widgets list to prepare for reloading
+        self.mini_widgets.clear() 
+
+        # Load here
+        return
 
 
 
@@ -271,10 +260,10 @@ class Widget(ft.Container):
         self.body_container.content = ft.Text(f"hello from: {self.title}")
             
         # Call Render widget to handle the rest of the heavy lifting
-        self.render_widget()
+        self._render_widget()
 
     # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets
-    def render_widget(self):
+    def _render_widget(self):
         ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it '''
 
         # Set the mini widgets visibility to false so we can check later if we want to add it to the page

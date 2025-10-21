@@ -53,7 +53,7 @@ class Image(Widget):
         # Content of our widget (ft.Container) is our created tabs content
         self.content = content
 
-        self.p.update()
+        self._render_widget()
 
 
 
