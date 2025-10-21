@@ -89,9 +89,27 @@ class Widget(ft.Container):
     def delete_mini_widget(self, mini_widget) -> bool:
         ''' Calls for mini widget to delete its own data, then removes it from our mini widgets list '''
 
-        # Also need to pass in the dictionary path to delete 
-
         try:
+
+            # Sets our temporary dict to our owners data, otherwise when changing size of dicts, we break everything
+            current_dict = self.data
+
+            # Run through all keys in our list except the last one
+            for key in mini_widget.dictionary_path[:-1]:
+
+                # Make sure the key exists if it doesn't already
+                if key not in current_dict:
+                    current_dict[key] = {}  
+
+                # Move into the next level of the dict, so we're not always checking from top level
+                current_dict = current_dict[key]
+            
+            # Set our data at the final key location
+            final_key = mini_widget.dictionary_path[-1]
+            current_dict.pop(final_key, None)  # Remove the mini widget data from our owners data dict
+
+            # Save our owners json file to match their data
+            self.save_dict()
 
             # Remove from our mini widgets list
             if mini_widget in self.mini_widgets:
@@ -128,7 +146,7 @@ class Widget(ft.Container):
                 dictionary_path=['mini_notes', title],
                 data=None
             )
-            )
+        )
 
         self.reload_widget()
 
@@ -247,17 +265,17 @@ class Widget(ft.Container):
 
     # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
     def reload_widget(self):
-        ''' Children build their own content of the widget here '''
+        ''' Children build their own content of the widget in their own reload_widget functions '''
 
         # Set the body container.content to whatever control you build in the child
-        self.body_container.content = ft.Text(f"hello from: {self.title}")  # Placeholder control if child doesn't overwrite this
+        self.body_container.content = ft.Text(f"hello from: {self.title}")
             
         # Call Render widget to handle the rest of the heavy lifting
         self.render_widget()
 
     # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets
     def render_widget(self):
-        ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it'''
+        ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it '''
 
         # Set the mini widgets visibility to false so we can check later if we want to add it to the page
         self.mini_widgets_container.visible = False

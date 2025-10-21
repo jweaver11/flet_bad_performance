@@ -104,9 +104,6 @@ class Timeline(Branch):
         self.owner.reload_widget()
         
 
-
-    
-
     def on_hover(self, e: ft.HoverEvent):
         #print(e)
         pass

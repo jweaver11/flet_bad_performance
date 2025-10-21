@@ -45,7 +45,7 @@ class Time_Skip(MiniWidget):
                 self.content_control,
                 ft.TextButton(
                     "Delete ME", 
-                    on_click=lambda e: self.branch_line.delete_time_skip(self)
+                    on_click=lambda e: self.owner.delete_mini_widget(self)
                 ),
             ],
             expand=True,

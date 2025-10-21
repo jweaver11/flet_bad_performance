@@ -206,85 +206,6 @@ class Branch(MiniWidget):
         self.reload_mini_widget()
         self.owner.reload_widget()
 
-    # Called when deleting a branch
-    def delete_branch(self, branch):
-        ''' Deletes a branch from our timeline object, and updates the data to match '''
-
-        try:
-            # Grab our title
-            title = branch.title
-
-            # Delete from our data, our live branches dict, and from our owners mini widgets list
-            del self.data['branches'][title]
-            del self.branches[title]
-            self.owner.delete_mini_widget(branch)
-
-            # Save our changes
-            self.save_dict()
-
-        # Errors
-        except Exception as e:
-            print(f"Error deleting branch {title}: {e}")
-
-    # Called when deleting a plotpoint
-    def delete_plot_point(self, plot_point):
-        ''' Deletes a plotpoint from our timeline object, and updates the data to match '''
-
-        try:
-            # Grab our title
-            title = plot_point.title
-
-            # Delete from our data, our live plotpoints dict, and from our owners mini widgets list
-            del self.data['plot_points'][title]
-            del self.plot_points[title]
-            self.owner.delete_mini_widget(plot_point)
-
-            # Save our changes
-            self.save_dict()
-                
-        # Errors
-        except Exception as e:
-            print(f"Error deleting plot point {title}: {e}")
-
-    # Called when deleting an arc
-    def delete_arc(self, arc):
-        ''' Deletes an arc from our timeline object, and updates the data to match '''
-        
-        try:
-            # Grab our title
-            title = arc.title
-
-            # Delete from our data, our live arcs dict, and from our owners mini widgets list
-            del self.data['arcs'][title]
-            del self.arcs[title]
-            self.owner.delete_mini_widget(arc)
-
-            # Save our changes
-            self.save_dict()
-        
-        # Errors
-        except Exception as e:
-            print(f"Error deleting arc {title}: {e}") 
-
-    # Called when deleting a timeskip
-    def delete_time_skip(self, time_skip):
-        ''' Deletes a timeskip from our timeline object, and updates the data to match '''
-        
-        try:
-            # Grab our title
-            title = time_skip.title
-
-            # Delete from our data, our live time_skips dict, and from our owners mini widgets list
-            del self.data['time_skips'][title]
-            del self.time_skips[title]
-            self.owner.delete_mini_widget(time_skip)
-
-            # Save our changes
-            self.save_dict()
-        
-        # Errors
-        except Exception as e:
-            print(f"Error deleting time skip {title}: {e}")
 
     def reload_mini_widget(self):
 
@@ -294,7 +215,7 @@ class Branch(MiniWidget):
                 self.content_control,
                 ft.TextButton(
                     "Delete ME", 
-                    on_click=lambda e: self.timeline.delete_branch(self)
+                    on_click=lambda e: self.owner.delete_mini_widget(self)
                 ),
             ],
             expand=True,
