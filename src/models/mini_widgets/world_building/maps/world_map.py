@@ -52,7 +52,6 @@ class WorldMap(MiniWidget):
         # Store sub maps inside of folders - continents, oceans, etc.?
         
         self.maps = {}
-
         self.continents = {}
         self.oceans = {}
         self.regions = {}

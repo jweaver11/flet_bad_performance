@@ -211,21 +211,11 @@ class Branch(MiniWidget):
 
         try:
 
-            # Call delete dict
-            # Delete from other live areas, in this case branches
+            # Remove from our live branches dict# Removes if from our branches list
+            self.branches.pop(branch.title, None)
 
-            # Deletes the sub branches (or our own if we're passed in) 
-            #branch.delete_dict()
-
-            # Deletes from 
-            #self.data.pop(branch.title, None)
-            #self.branches.pop(branch.title, None)
-
-            # Deletes the data from our owners data as well
-            #self.owner.delete_mini_widget(branch)
-            pass
-
-            # Apply our UI changes
+            # Deletes the sub branches data from all levels
+            branch.delete_dict()
 
         # Errors
         except Exception as e:

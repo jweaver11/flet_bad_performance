@@ -113,15 +113,26 @@ class MiniWidget(ft.Container):
         ''' Deletes our data from all live widget/mini widget objects that we nest in, and saves the owners file '''
         try:
 
-            # Clears our data
+            # Remove our data
             self.data = None
 
+            # Remove the data of our father (parent) widget/mini widget to match
+            # By deleting the father data manually here, it will cascade up the chain when save_dict is called
             self.father.data[self.dictionary_path].pop(self.title, None)
             
             # Applies the changes up the chain
             self.save_dict()
 
-            self.owner.delete_mini_widget(self)
+            # Applies the UI changes by removing ourselves from the mini widgets list
+            if self in self.owner.mini_widgets:
+                self.owner.mini_widgets.remove(self)
+            
+            # Reload the widget if we have to
+            if self.visible:
+                self.owner.reload_widget()
+
+            # Also reload the active rail to reflect changes
+            self.owner.story.active_rail.content.reload_rail(self.owner.story) 
 
         except Exception as e:
             print(f"Error deleting mini widget {self.title}: {e}")
