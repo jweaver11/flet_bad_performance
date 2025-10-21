@@ -105,9 +105,6 @@ class Timeline(Branch):
         
 
 
-
-   
-
     
 
     def on_hover(self, e: ft.HoverEvent):
@@ -117,8 +114,6 @@ class Timeline(Branch):
 
     # Called when we need to rebuild out timeline UI
     def reload_mini_widget(self):
-
-        # We only show branches, arc, plotpoints, and timeskips using their UI elements, not their mini widget
 
         
         self.timeline_control = ft.Container(

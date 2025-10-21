@@ -33,7 +33,14 @@ class World_Building(Widget):
                 'tag': "world_building",            # Tag to identify what type of object this is
 
                 # List of different categories for organizing our world maps on the rail. (Psuedo folders)
-                'categories': list,            # Only check world maps for categories
+                'categories': [
+                    'continents',
+                    'oceans',
+                    'regions',
+                    'countries',
+                    'cities',
+                ],            # Only check world maps for categories
+                # TODO: Have the story type add categories here
 
                 'world_maps': dict,                 # Dict of different worlds and their maps stored
                 'lores': dict,                      # Dict of any world lore, myths, legends, etc

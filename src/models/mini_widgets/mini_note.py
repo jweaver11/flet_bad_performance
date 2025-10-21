@@ -1,3 +1,7 @@
+'''
+Simple mini widget that consists of a title, and a body that is a string
+'''
+
 import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
@@ -11,24 +15,23 @@ class MiniNote(MiniWidget):
 
         # Parent constructor
         super().__init__(
-            title=title,        # Title of our mini note
-            owner=owner,      # Owner widget that holds us
-            page=page,          # Page reference
-            dictionary_path=dictionary_path,  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
-            data=data,          # Data if we're loading an existing mini note, otherwise blank
+            title=title,        
+            owner=owner,      
+            page=page,          
+            dictionary_path=dictionary_path,  
+            data=data,          
         ) 
 
         verify_data(
             self,   # Pass in our object so we can access its data and change it
-            {   # Pass in the required fields and their types
+            {   # Pass in the required fields and their types``
                 'tag': "mini_note",
                 'content': str,
-                'banana': int,
             },
-            
         )
 
-            
+
+        # UI Controls
         self.title_control = ft.TextField(
             value=self.title,
             label=None,

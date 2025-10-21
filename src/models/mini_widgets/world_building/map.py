@@ -18,7 +18,7 @@ from handlers.verify_data import verify_data
 class Map(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], data: dict=None):
+    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], type: str=None, data: dict=None):
         
         # Parent constructor
         super().__init__(
@@ -34,7 +34,8 @@ class Map(MiniWidget):
             self,   
             {
                 'tag': "map", 
-                'maps': dict,
+                'type': type,                  # Type of map - continent, country, region, city, dungeon, etc
+                'maps': dict,   # Needed????
                 'category': str,                 # Category/psuedo folder this map belongs to
                 'markers': dict,
                 'locations': dict,
@@ -45,24 +46,41 @@ class Map(MiniWidget):
         )
 
         
-        self.maps = {}
+        self.sub_maps = {}
+        self.details = {}
+
+        # Load our sub maps
+        self.load_sub_maps()
+        
+        # Load the rest of our map details and data thats not sub maps
+        self.load_details()
 
         # The control thats displayed on the UI
-        self.ui_map = None
-
-        # Load the rest of our data from the file
-        #self.load_maps()
-        #self.load_locations()
-        #self.load_lores()
-        #self.load_social_systems()
-        #self.load_history()
-        #self.load_governments()
+        self.ui_map: ft.Control = None
         
 
         # Builds/reloads our timeline UI
         self.reload_map()
+
+    # Called in constructor
+    def load_sub_maps(self):
+        ''' Loads all sub maps stored in our data into our sub_maps dict'''
+        # Change cursor to click one, highlight map in widdget
+        pass
+
+    def load_details(self):
+        ''' Loads the rest of our map details that are not sub maps into our details dict '''
+        #self.load_locations()
+        #self.load_lores()
+        #self.load_history()
+        #self.load_power_systems()
+        #self.load_technology()
+        #self.load_social_systems()
+        #self.load_governments()
+        pass
  
     
+
     def on_hover(self, e: ft.HoverEvent):
         #print(e)
         pass
@@ -71,7 +89,11 @@ class Map(MiniWidget):
     # Called when we need to rebuild out timeline UI
     def reload_map(self):
 
-        # We only show branches, arc, plotpoints, and timeskips using their UI elements, not their mini widget
+
+        # Depending on the type of map, we render the Map differently
+        # Different right click hover options to add sub maps.
+        # I.E. Continents can add countries, regions, oceans, etc.. But countries cant add continents, etc.
+        # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
 
         # Content of our Timeline (Gesture detector)
         self.content = ft.Container(
