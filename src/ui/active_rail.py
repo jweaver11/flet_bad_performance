@@ -17,6 +17,7 @@ from ui.rails.notes_rail import Notes_Rail
 
 # Class is created in main on program startup
 class Active_Rail(ft.Container):
+    
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
     

@@ -2,24 +2,25 @@
 
 import flet as ft
 from models.story import Story
+from ui.rails.rail import Rail
 
 
 # Class is created in main on program startup
-class Content_Rail(ft.Container):
+class Content_Rail(Rail):
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
-        # Initialize the parent Container class first
-        super().__init__()
-            
-        # Page reference
-        self.p = page
+        # Initialize the parent Rail class first
+        super().__init__(
+            page=page,
+            story=story
+        )
 
         # Reload the rail on start
-        self.reload_rail(story)
+        self.reload_rail()
 
     # Reload the rail whenever we need
-    def reload_rail(self, story: Story) -> ft.Control:
+    def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
         # Build the content of our rail
@@ -38,7 +39,7 @@ class Content_Rail(ft.Container):
                 ft.TextField(
                     label="New Chapter Title",
                     hint_text="put title here dummy",
-                    on_submit=lambda e: self.submit_chapter(e.control.value, story)
+                    on_submit=lambda e: self.submit_chapter(e.control.value, self.story)
                 )
             ]
         )

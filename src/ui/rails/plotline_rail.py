@@ -2,19 +2,21 @@
 
 import flet as ft
 from models.story import Story
+from ui.rails.rail import Rail
 
 
 # Class is created in main on program startup
-class Timeline_Rail(ft.Container):
+class Timeline_Rail(Rail):
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
-        # Initialize the parent Container class first
-        super().__init__()
-             
-        self.p = page
+        # Initialize the parent Rail class first
+        super().__init__(
+            page=page,
+            story=story
+        )
 
-        self.reload_rail(story)
+        self.reload_rail()
 
     # Called when user creates a new plotline
     def submit_timeline(self, title: str, story: Story):
@@ -106,7 +108,7 @@ class Timeline_Rail(ft.Container):
 
 
     # Reload the rail whenever we need
-    def reload_rail(self, story: Story) -> ft.Control:
+    def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
         # PLOTLINE RAIL JUST HAS ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
@@ -125,12 +127,12 @@ class Timeline_Rail(ft.Container):
                 ft.Row([
                     ft.TextField(
                         label="Start Date",
-                        value=str(story.plotline.data['story_start_date']),
+                        value=str(self.story.plotline.data['story_start_date']),
                         expand=True,
                     ),
                     ft.TextField(
                         label="End Date",
-                        value=str(story.plotline.data['story_end_date']),
+                        value=str(self.story.plotline.data['story_end_date']),
                         expand=True
                     ),
                 ]),
@@ -139,7 +141,7 @@ class Timeline_Rail(ft.Container):
 
                 ft.TextButton(
                     "Show Plotline Widget", 
-                    on_click=lambda e: story.plotline.toggle_visibility(story),
+                    on_click=lambda e: self.story.plotline.toggle_visibility(self.story),
                 ),
 
                 # Add more controls here as needed
@@ -151,7 +153,7 @@ class Timeline_Rail(ft.Container):
         )
 
         # Run through each plotline in the story
-        for timeline in story.plotline.timelines.values():
+        for timeline in self.story.plotline.timelines.values():
             branch_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Branches"),
                 shape=ft.RoundedRectangleBorder(),
@@ -164,7 +166,7 @@ class Timeline_Rail(ft.Container):
                 ft.TextField(
                     label="Create Branch",
                     expand=True,
-                    on_submit=lambda e: self.submit_branch(e, story),
+                    on_submit=lambda e: self.submit_branch(e, self.story),
                     data=timeline.title,
                 )
             )
@@ -185,7 +187,7 @@ class Timeline_Rail(ft.Container):
                 ft.TextField(
                     label="Create Plot Point",
                     data=timeline.title,
-                    on_submit=lambda e: self.submit_plotpoint(e, story),
+                    on_submit=lambda e: self.submit_plotpoint(e, self.story),
                     expand=True,
                 )
             )
@@ -203,7 +205,7 @@ class Timeline_Rail(ft.Container):
                 ft.TextField(
                     label="Create Arc",
                     expand=True,
-                    on_submit=lambda e: self.submit_arc(e, story),
+                    on_submit=lambda e: self.submit_arc(e, self.story),
                     data=timeline.title,
                 )
             )
@@ -220,7 +222,7 @@ class Timeline_Rail(ft.Container):
                 ft.TextField(
                     label="Create Time Skip",
                     expand=True,
-                    on_submit=lambda e: self.submit_timeskip(e, story),
+                    on_submit=lambda e: self.submit_timeskip(e, self.story),
                     data=timeline.title,
                 )
             )
@@ -293,7 +295,7 @@ class Timeline_Rail(ft.Container):
         self.content.controls.append(
             ft.GestureDetector(
                 content=ft.Text("GD"),
-                on_secondary_tap=lambda e: open_menu(story),
+                on_secondary_tap=lambda e: open_menu(self.story),
                 mouse_cursor="click",
             )
         )
@@ -302,7 +304,7 @@ class Timeline_Rail(ft.Container):
         self.content.controls.append(ft.Container(height=20))
 
         self.content.controls.append(
-            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.submit_timeline(e.control.value, story)),
+            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.submit_timeline(e.control.value, self.story)),
         )
 
         self.p.update()

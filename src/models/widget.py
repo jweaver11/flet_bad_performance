@@ -15,6 +15,7 @@ from handlers.verify_data import verify_data
 # TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
 
 class Widget(ft.Container):
+    
     # Constructor. All widgets require a title,  page reference, directory path, and story reference
     def __init__(self, title: str, p: ft.Page, directory_path: str, story: Story, data: dict=None):
 
@@ -125,7 +126,7 @@ class Widget(ft.Container):
         self.p.update()
 
     # Called when app clicks the hide icon in the tab
-    def toggle_visibility(self, story: Story):
+    def toggle_visibility(self):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
         # Set our container object to invisible - won't be rendered anywhere
@@ -134,7 +135,7 @@ class Widget(ft.Container):
         self.save_dict()
         self.p.update()
 
-        story.workspace.reload_workspace(self.p, story)
+        self.story.workspace.reload_workspace(self.p, self.story)
 
     # Called at end of constructor
     def reload_tab(self):

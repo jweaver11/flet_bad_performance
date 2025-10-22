@@ -2,25 +2,27 @@
 
 import flet as ft
 from models.story import Story
+from ui.rails.rail import Rail
 
 
 # Class for our Drawing Board rail
-class Drawing_Board_Rail(ft.Container):
+class Drawing_Board_Rail(Rail):
+
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
         # Initialize the parent Container class first
-        super().__init__()
-            
-        # Page reference
-        self.p = page
-
+        super().__init__(
+            page=page,
+            story=story
+        )
+        
         # Reload the rail on start
-        self.reload_rail(story)
+        self.reload_rail()
 
 
     # Called when changes occur that require rail to be reloaded, but the object does not need to be recreated. (More efficient)
-    def reload_rail(self, story: Story) -> ft.Control:
+    def reload_rail(self) -> ft.Control:
         ''' Reloads the drawing board rail '''
 
         # New

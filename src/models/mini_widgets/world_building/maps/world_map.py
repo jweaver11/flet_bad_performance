@@ -9,11 +9,12 @@ import json
 import flet as ft
 from models.story import Story
 from models.mini_widget import MiniWidget
+from models.mini_widgets.world_building.map import Map
 from models.widget import Widget
 from handlers.verify_data import verify_data
 
 # Our 'world map' class that is an extended map. Acts as the parent map for all other sub maps
-class WorldMap(MiniWidget):
+class WorldMap(Map):
 
    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):

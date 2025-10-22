@@ -10,9 +10,10 @@ from models.widget import Widget
 from handlers.verify_data import verify_data
 
 
-
 class MiniWidget(ft.Container):
-    # Constructor. All mini widgets require a title, owner widget, page reference, and optional data dictionary
+
+    # Constructor. All mini widgets require a title, owner widget, father (parent), page reference...
+    # Dictionary path, and optional data dictionary
     def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
 
         # Parent constructor
@@ -24,7 +25,7 @@ class MiniWidget(ft.Container):
         )
            
         self.title = title                          # Title of the widget that will show up on its tab
-        self.owner = owner                   # The widget that contains this mini widget.
+        self.owner = owner                          # The widget that contains this mini widget.
         self.father = father                        # Immidiate parent object that holds us (Can't use 'parent' cuz flet)
         self.p = page                               # Grabs our original page for convenience and consistency
         self.dictionary_path = dictionary_path      # Path to our dict within our fathers data
@@ -54,7 +55,6 @@ class MiniWidget(ft.Container):
 
         # Control for our content/body
         self.content_control = ft.TextField(
-            #value=self.data['content'],
             label="Body",
             expand=True,
             multiline=True,
