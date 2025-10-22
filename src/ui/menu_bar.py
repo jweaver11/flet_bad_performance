@@ -6,10 +6,9 @@ Holds our settings icon, feedback, and account name as well
 import flet as ft
 from models.app import app
 from models.story import Story
-#from handlers.reload_workspace import remove_drag_targets
-#from handlers.reload_workspace import reload_workspace
 
-# Called by main on program start to create our menu bar
+
+# Called in main to create menu bar if no story exists, or by a story to create menu bar for that story
 def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     
     # Placeholder events for now

@@ -50,7 +50,7 @@ class Active_Rail(ft.Container):
 
         try:
 
-            # Give us the correct rail on program startup based on our selected workspace
+            # Give us the correct rail based on our selected workspace
             if story.workspaces_rail.selected_rail == "content":
                 self.content = self.content_rail
 
