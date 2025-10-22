@@ -165,6 +165,10 @@ class Story(ft.View):
         if template is not None:
             pass
 
+        # Create sub folders inside of world building
+        maps_folder = os.path.join(directory_path, "world_building", "maps")
+        os.makedirs(maps_folder, exist_ok=True)
+
         # Set our sub folders inside of notes
         notes_folders = [
             "themes",

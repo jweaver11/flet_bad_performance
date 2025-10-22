@@ -247,6 +247,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
+                        # CAN ONLY EXPORT WIDGETS AND PSEUDO WIDGETS
                         content=ft.Text("Export", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.CLOSE),
                         style=menubar_style,

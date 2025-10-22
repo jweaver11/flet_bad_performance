@@ -1,6 +1,7 @@
 '''
-Parent map class that contains all other sub-maps, such as locations, world maps, continents, countries, regions, cities, dungeons, etc.
-Basically, anything that COULD be fleshed out visually.
+Parent map class that contains all other sub-maps, such as locations, world maps, continents, countries, cities, dungeons, etc.
+Basically, anything that COULD be fleshed out visually. Maps are special mini widgets, 
+and have their 'drawing' stored in their own files, while the rest of the data is stored normally
 '''
 
 # TYPES OF MAPS, COUNTRIES CONTINENTS ETC. THAT CAN ADD THEIR OWN (SUB) MAPS. EXP. CONTINENT CAN ADD COUNTRIES, REGIONS, ETC
@@ -46,7 +47,7 @@ class Map(MiniWidget):
             },
         )
 
-        
+        self.drawing_data = {}  # Seperate data that holds our drawing info
         self.sub_maps = {}
         self.details = {}
 
@@ -62,6 +63,33 @@ class Map(MiniWidget):
 
         # Builds/reloads our timeline UI
         self.reload_map()
+
+    # Called to save our drawing data to its file
+    def save_drawing(self):
+        ''' Saves our map drawing data to its own json file. Maps are special and get their 'drawing' saved seperately '''
+        try:
+
+            # Grab our directory path from our owner widget
+            directory_path = os.path.join(self.owner.directory_path, "maps")
+
+            # Set our file path
+            file_path = os.path.join(directory_path, f"{self.title}.json")
+
+            # Create the directory if it doesn't exist. Catches errors from users deleting folders
+            os.makedirs(directory_path, exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:   
+                json.dump(self.drawing_data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving widget to {file_path}: {e}") 
+            print("Data that failed to save: ", self.data)
+
+    # Called when loading our drawing data from its file
+    def load_drawing(self):
+        pass
 
     # Called in constructor
     def load_sub_maps(self):
