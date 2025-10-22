@@ -153,6 +153,7 @@ class Story(ft.View):
             "plotline",
             "world_building",
             "drawing_board",
+            "planning",
             "notes",
         ]
 

@@ -50,7 +50,10 @@ class Map(MiniWidget):
             },
         )
 
+        # State for drawing
         self.state = State()
+
+        self.drawing_mode = False  # Whether we are in drawing mode or not
 
         self.drawing_data = {}  # Seperate data that holds our drawing info
         self.sub_maps = {}
@@ -119,9 +122,8 @@ class Map(MiniWidget):
                     self.cp.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
             self.cp.update()
 
-        except FileNotFoundError:
-            pass
-        pass
+        except Exception as e:
+            print(f"Error loading drawing from {file_path}: {e}")
 
     # Called in constructor
     def load_sub_maps(self):

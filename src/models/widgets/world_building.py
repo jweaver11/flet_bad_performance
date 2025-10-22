@@ -31,6 +31,7 @@ class World_Building(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "world_building",            # Tag to identify what type of object this is
+                'active_map': str,                  # Title of the currently active map being displayed
 
                 # List of different categories for organizing our world maps on the rail. (Psuedo folders)
                 'categories': [

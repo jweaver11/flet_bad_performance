@@ -44,6 +44,7 @@ class Settings(Widget):
                     "plot_and_timeline",
                     "world_building",
                     "drawing_board",
+                    "planning",
                     "notes",
                 ],
             },

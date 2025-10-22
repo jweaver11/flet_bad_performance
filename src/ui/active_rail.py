@@ -12,6 +12,7 @@ from ui.rails.content_rail import Content_Rail
 from ui.rails.plotline_rail import Timeline_Rail
 from ui.rails.world_building_rail import World_Building_Rail
 from ui.rails.drawing_board_rail import Drawing_Board_Rail
+from ui.rails.planning_rail import Planning_Rail  
 from ui.rails.notes_rail import Notes_Rail
 
 
@@ -37,6 +38,7 @@ class Active_Rail(ft.Container):
         self.plotline_rail = Timeline_Rail(page, story)
         self.world_building_rail = World_Building_Rail(page, story)
         self.drawing_board_rail = Drawing_Board_Rail(page, story)
+        self.planning_rail = Planning_Rail(page, story)
         self.notes_rail = Notes_Rail(page, story)
 
         # Displays our active rail on startup
@@ -65,6 +67,9 @@ class Active_Rail(ft.Container):
 
             elif story.workspaces_rail.selected_rail == "drawing_board":
                 self.content = self.drawing_board_rail
+
+            elif story.workspaces_rail.selected_rail == "planning":
+                self.content = self.planning_rail
 
             elif story.workspaces_rail.selected_rail == "notes":
                 self.content = self.notes_rail

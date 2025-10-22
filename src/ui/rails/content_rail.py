@@ -19,9 +19,25 @@ class Content_Rail(Rail):
         # Reload the rail on start
         self.reload_rail()
 
+    def create_new_book(self, title: str, story: Story):
+        # TODO: Make it accept the type of story to give a structure for new books, seasons, etc.
+        pass
+
+    def create_new_season(self, title: str, story: Story):
+        pass
+
+    # Called when user creates a new chapter
+    def submit_chapter(self, title: str, story: Story):
+        ''' Grabs our story.type object and creates a new chapter directory inside it.
+         Chapter directory can contain images, notes, and the text content for the chapter itself '''
+        
+        # Pass in default path for now, but accepts new ones in future for organization
+        story.create_chapter(title, directory_path=story.data['content_directory_path'])
+        self.reload_rail(story)
+
     # Reload the rail whenever we need
     def reload_rail(self) -> ft.Control:
-        ''' Reloads the plot and timeline rail, useful when switching stories '''
+        ''' Reloads the content rail '''
 
         # Build the content of our rail
         self.content = ft.Column(
@@ -46,22 +62,5 @@ class Content_Rail(Rail):
 
         # Apply our update
         self.p.update()
-
-
-    def create_new_book(self, title: str, story: Story):
-        # TODO: Make it accept the type of story to give a structure for new books, seasons, etc.
-        pass
-
-    def create_new_season(self, title: str, story: Story):
-        pass
-
-    # Called when user creates a new chapter
-    def submit_chapter(self, title: str, story: Story):
-        ''' Grabs our story.type object and creates a new chapter directory inside it.
-         Chapter directory can contain images, notes, and the text content for the chapter itself '''
-        
-        # Pass in default path for now, but accepts new ones in future for organization
-        story.create_chapter(title, directory_path=story.data['content_directory_path'])
-        self.reload_rail(story)
         
 

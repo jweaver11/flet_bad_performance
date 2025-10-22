@@ -112,6 +112,21 @@ class Workspaces_Rail(ft.Container):
                 ),
             ],
         )
+        # Planning workspace rail
+        planning_rail = ft.NavigationRail(
+            height=70,  
+            bgcolor=ft.Colors.TRANSPARENT,
+            selected_index=None,
+            on_change=lambda e: self.on_workspace_change(e, story),  
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED, color=ft.Colors.PRIMARY), 
+                    selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
+                    padding=ft.padding.only(top=10, bottom=10),
+                    label="Planning", data="planning",
+                ),
+            ],
+        )
         # Notes workspace rail
         notes_rail = ft.NavigationRail(
             height=70,  
@@ -139,6 +154,8 @@ class Workspaces_Rail(ft.Container):
             world_building_rail.selected_index = 0
         elif self.selected_rail == "drawing_board":
             drawing_board_rail.selected_index = 0
+        elif self.selected_rail == "planning":
+            planning_rail.selected_index = 0
         elif self.selected_rail == "notes":
             notes_rail.selected_index = 0
 
@@ -156,6 +173,8 @@ class Workspaces_Rail(ft.Container):
                 workspaces_rail.append(world_building_rail)
             elif workspace == "drawing_board":
                 workspaces_rail.append(drawing_board_rail)
+            elif workspace == "planning":
+                workspaces_rail.append(planning_rail)
             elif workspace == "notes":
                 workspaces_rail.append(notes_rail)
 
@@ -171,6 +190,7 @@ class Workspaces_Rail(ft.Container):
             plotline_rail.destinations[0].label = None
             world_building_rail.destinations[0].label = None
             drawing_board_rail.destinations[0].label = None
+            planning_rail.destinations[0].label = None
             notes_rail.destinations[0].label = None
 
             # Set our collapsed icon buttons icon depending on collapsed state
