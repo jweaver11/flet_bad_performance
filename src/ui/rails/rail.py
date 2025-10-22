@@ -12,7 +12,9 @@ class Rail(ft.Container):
     def __init__(self, page: ft.Page, story: Story):
         
         # Initialize the parent Container class first
-        super().__init__()
+        super().__init__(
+            padding=None,
+        )
             
         # Page and story reference
         self.p = page

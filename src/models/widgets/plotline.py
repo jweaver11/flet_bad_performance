@@ -152,7 +152,7 @@ class Plotline(Widget):
 
         # Run through our plotlines and create a checkbox for each one for filtering
         for timeline in self.timelines.values():
-            #print(plotline.title, " is being shown")
+            
             plotline_filters.append(
                 ft.Checkbox(
                     label=timeline.title, 
@@ -199,10 +199,6 @@ class Plotline(Widget):
         for timeline in self.timelines.values():
             if timeline.visible:
                 timelines.controls.append(timeline.timeline_control)
-
-            for arc in timeline.arcs.values():
-                if arc.visible:
-                    timelines.controls.append(arc.timeline_control)
                 
 
         timelines.controls.append(ft.Container(expand=True))

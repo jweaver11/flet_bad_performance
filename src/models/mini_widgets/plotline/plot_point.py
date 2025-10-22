@@ -30,6 +30,7 @@ class Plot_Point(MiniWidget):
             {   
                 'tag': "plot_point",           # Tag to identify what type of object this is
                 'description': str,
+                'events': list,                 # Numbered list of events that occur at this plot point
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point

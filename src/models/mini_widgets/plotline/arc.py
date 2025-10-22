@@ -3,70 +3,172 @@ from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
 
-# Data class for arcs on a timeline - change to branch as well later??
+# Class for arcs (essentially sub-timelines that are connected) on a timeline. 
+# Arcs split off from the main timeline and can merge back in later. Exp: Characters going on different journeys that rejoin later
 class Arc(MiniWidget):
+
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], branch_line, data: dict=None):
+    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
         
         # Parent constructor
         super().__init__(
-            title=title,        # Title of our mini note
-            owner=owner,      # owner widget that holds us
-            page=page,          # Page reference
-            dictionary_path=dictionary_path,  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
-            data=data,          # Data if we're loading an existing mini note, otherwise blank
+            title=title,        
+            owner=owner,        
+            father=father,      # In this case, father is always a timeline or another arc
+            page=page,          
+            dictionary_path=dictionary_path,  
+            data=data,         
         ) 
-
-        # The timeline or branch this arc belongs to
-        self.branch_line = branch_line    # The timeline this arc belongs to. Needed for certain functions
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
-            {
-                'tag': "arc",           # Tag to identify what type of object this is
+            {   
+                'tag': "arc",                       # Tag to identify what type of object this is
+                'start_date': str,                  # Start and end date of the branch, for timeline view
+                'end_date': str,                    # Start and end date of the branch, for timeline view
+                'color': "primary",                 # Color of the branch in the timeline
+                'is_expanded': True,                # If the branch dropdown is expanded on the rail
+                'branches_are_expanded': True,      # If the branches section is expanded
+                'plot_points_are_expanded': True,   # If the plotpoints section is expanded
+                'arcs_are_expanded': True,          # If the arcs section is expanded
+                'time_skips_are_expanded': True,    # If the timeskips section is expanded
+                'plot_points': dict,                # Dict of plot points in this branch
+                'time_skips': dict,                 # Dict of time skips in this branch
+                'arcs': dict,                       # Dict of arcs in this branch
+                'connections': dict,                # Connect points, arcs, branch, etc.???
+                'rail_dropdown_is_expanded': True,  # If the rail dropdown is expanded  
                 'content': str,
                 'description': str,
-                'start_date': str,
-                'end_date': str,
-                'events': list,       # Step by step of plot events through the arc. Call plot point??
+                'events': list,                     # Step by step of plot events through the arc. Call plot point??
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
             },
         )
 
-        # The control that will be displayed on our timeline for this arc, while the arc object is a mini widget
-        self.timeline_control = ft.GestureDetector(
-            on_enter=self.on_hover,
-        )
+        # Declare dicts of our data types   
+        self.plot_points: dict = {} 
+        self.arcs: dict = {}
+        self.time_skips: dict = {}
+        self.connections: dict = {}  
 
-        # Temp testing
-        self.timeline_control = ft.TextButton(
-            text=self.title,
-            on_click=self.toggle_visibility,
-        )
-
-
-        self.title_control = ft.TextField(
-            value=self.title,
-            label=None,
-        )
-
-        self.content_control = ft.TextField(
-            #value=self.data['content'],
-            label="Body",
-            expand=True,
-            multiline=True,
-            on_change=self.submit_description_change,
-        )
+        self.load_arcs()    
+        self.load_plot_points() 
+        self.load_time_skips()
 
         self.reload_mini_widget()
 
 
-    def submit_description_change(self, e):
-        self.data['description'] = e.control.value
-        self.save_dict()
+    # Called in the constructor
+    def load_arcs(self):
+        ''' Loads branches from data into self.branches  '''
+
+        # Looks up our branches in our data, then passes in that data to create a live object
+        for key, data in self.data['arcs'].items():
+            self.arcs[key] = Arc(
+                title=key, 
+                owner=self.owner, 
+                father=self,
+                page=self.p, 
+                dictionary_path="arcs",
+                data=data
+            )
+            self.owner.mini_widgets.append(self.arcs[key])  # Branches need to be in the owners mini widgets list to show up in the UI
+    
+    # Called in the constructor
+    def load_plot_points(self):
+        ''' Loads plotpoints from data into self.plotpoints  '''
+        from models.mini_widgets.plotline.plot_point import Plot_Point
+
+        # Looks up our plotpoints in our data, then passes in that data to create a live object
+        for key, data in self.data['plot_points'].items():
+            self.plot_points[key] = Plot_Point(
+                title=key, 
+                owner=self.owner, 
+                father=self,
+                page=self.p, 
+                dictionary_path="plot_points", 
+                data=data
+            )
+            self.owner.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
+        
+    
+    # Called in the constructor
+    def load_time_skips(self):
+        ''' Loads timeskips from data into self.time_skips  '''
+        from models.mini_widgets.plotline.time_skip import Time_Skip
+
+        for key, data in self.data['time_skips'].items():
+            self.time_skips[key] = Time_Skip(
+                title=key, 
+                owner=self.owner, 
+                father=self,
+                page=self.p, 
+                dictionary_path="time_skips",
+                data=data
+            )
+            self.owner.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
+    
+    # Called when creating a new arc
+    def create_arc(self, title: str):
+        ''' Creates a new arc inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.arc import Arc
+
+        # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
+        self.arcs[title] = Arc(
+            title=title, 
+            owner=self.owner, 
+            father=self,
+            page=self.p, 
+            dictionary_path="arcs", 
+            data=None
+        )
+        self.owner.mini_widgets.append(self.arcs[title])
+
+        # Apply our changes in the UI
+        self.reload_mini_widget()
+        self.owner.reload_widget()
+        
+    # Called when creating a new plotpoint
+    def create_plot_point(self, title: str):
+        ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.plot_point import Plot_Point
+
+        # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
+        self.plot_points[title] = Plot_Point(
+            title=title, 
+            owner=self.owner, 
+            father=self,
+            page=self.p, 
+            dictionary_path="plot_points", 
+            data=None
+        )
+        self.owner.mini_widgets.append(self.plot_points[title])
+
+        # Apply our changes in the UI
+        self.reload_mini_widget()
+        self.owner.reload_widget()
+
+    # Called when creating a new timeskip
+    def create_time_skip(self, title: str):
+        ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.time_skip import Time_Skip
+
+        # Add our new Time Skip mini widget object to our time_skips dict, and to our owners mini widgets
+        self.time_skips[title] = Time_Skip(
+            title=title, 
+            owner=self.owner, 
+            father=self,
+            page=self.p, 
+            dictionary_path="time_skips", 
+            data=None
+        )
+        self.owner.mini_widgets.append(self.time_skips[title])
+
+        # Apply our changes in the UI
+        self.reload_mini_widget()
+        self.owner.reload_widget()
 
     def reload_mini_widget(self):
 
@@ -76,7 +178,7 @@ class Arc(MiniWidget):
                 self.content_control,
                 ft.TextButton(
                     "Delete ME", 
-                    on_click=lambda e: self.owner.delete_mini_widget(self)
+                    on_click=lambda e: self.delete_dict() # Pass in whatever branch it is (just self for now)
                 ),
             ],
             expand=True,

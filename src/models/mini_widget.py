@@ -2,6 +2,7 @@
 Parent class for mini widgets, which are extended flet containers used as information displays on the side of the parent widget
 Makes showing detailed information easier without rending and entire widget where it doesn't make sense
 Mini widgets are stored in their OWNERS (Widget) json file, not their own file
+Some mini widgets can have their own files IN ADDITION to normal storage, such as maps or drawings storing images
 '''
 
 
@@ -41,7 +42,6 @@ class MiniWidget(ft.Container):
                 'is_selected': bool,    # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
             },
         )
-
 
         # Apply our visibility
         self.visible = self.data['visible']
@@ -88,6 +88,7 @@ class MiniWidget(ft.Container):
     # Called when deleting our mini widget
     def delete_dict(self):
         ''' Deletes our data from all live widget/mini widget objects that we nest in, and saves the owners file '''
+
         try:
 
             # Remove our data
@@ -109,19 +110,22 @@ class MiniWidget(ft.Container):
                 self.owner.reload_widget()
 
             # Also reload the active rail to reflect changes
-            self.owner.story.active_rail.content.reload_rail(self.owner.story) 
+            self.owner.story.active_rail.content.reload_rail() 
 
+        # Catch errors
         except Exception as e:
             print(f"Error deleting mini widget {self.title}: {e}")
         
 
-    # Called when clicking x to hide the mini note
+    # Called when clicking x to hide the mini widget
     def toggle_visibility(self, e):
         ''' Shows or hides our mini widget, depending on current state '''
        
+        # Switch our visibility in data, then apply it
         self.data['visible'] = not self.data['visible']
         self.visible = self.data['visible']
         
+        # Save the switch and reflect it in the UI
         self.save_dict()
         self.p.update()
 
@@ -144,12 +148,13 @@ class MiniWidget(ft.Container):
             expand=True,
         )
 
+        # Call render function
         self._render_mini_widget()
 
     def _render_mini_widget(self):
         ''' Renders our mini widget UI based on our data '''
 
-        # Give Uniform mini titles andd styling
+        # Give Uniform mini titles and styling
 
         self.p.update()
 

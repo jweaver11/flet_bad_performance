@@ -1,18 +1,18 @@
 '''
-Our timeline object that stores plot points, branches, arcs, and time skips.
-These objects is displayed in the plotline widget, and store our mini widgets branches, plot points, arcs, and time skips.
+Our timeline object that stores plot points, arcs, and time skips.
+These objects is displayed in the plotline widget, and store our mini widgets plot points, arcs, and time skips.
 '''
 
 import json
 import os
 import flet as ft
 from models.widget import Widget
-from models.mini_widgets.plotline.branch import Branch
+from models.mini_widgets.plotline.arc import Arc
 from handlers.verify_data import verify_data
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the plotline widget, so need for this to be a flet control
-class Timeline(Branch):
+class Timeline(Arc):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
