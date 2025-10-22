@@ -154,7 +154,7 @@ class Widget(ft.Container):
         # Our icon button that will hide the widget when clicked in the workspace
         self.hide_tab_icon_button = ft.IconButton(    # Icon to hide the tab from the workspace area
             scale=0.8,
-            on_click=lambda e: self.toggle_visibility(self.story),
+            on_click=lambda e: self.toggle_visibility(),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
         )

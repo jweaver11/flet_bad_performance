@@ -13,6 +13,9 @@ import flet as ft
 from models.widget import Widget
 from models.mini_widget import MiniWidget
 from handlers.verify_data import verify_data
+from models.state import State
+import flet.canvas as cv
+from threading import Thread
 
 # Live objects that are stored in our timeline object
 # We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
@@ -47,6 +50,8 @@ class Map(MiniWidget):
             },
         )
 
+        self.state = State()
+
         self.drawing_data = {}  # Seperate data that holds our drawing info
         self.sub_maps = {}
         self.details = {}
@@ -59,6 +64,16 @@ class Map(MiniWidget):
 
         # The control thats displayed on the UI
         self.ui_map: ft.Control = None
+
+
+        self.cp = cv.Canvas(
+            content=ft.GestureDetector(
+                on_pan_start=self.pan_start,
+                on_pan_update=self.pan_update,
+                drag_interval=10,
+            ),
+            expand=True
+    )
         
 
         # Builds/reloads our timeline UI
@@ -79,8 +94,8 @@ class Map(MiniWidget):
             os.makedirs(directory_path, exist_ok=True)
             
             # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
-                json.dump(self.drawing_data, f, indent=4)
+            with open(file_path, "w") as f:   
+                json.dump(self.state.shapes, f)
         
         # Handle errors
         except Exception as e:
@@ -89,6 +104,23 @@ class Map(MiniWidget):
 
     # Called when loading our drawing data from its file
     def load_drawing(self):
+        ''' Loads our drawing from our saved map drawing file '''
+        self.cp.shapes.clear()
+        try:
+            # Grab our directory path from our owner widget
+            directory_path = os.path.join(self.owner.directory_path, "maps")
+
+            # Set our file path
+            file_path = os.path.join(directory_path, f"{self.title}.json")
+
+            with open(file_path, "r") as f:
+                coords = json.load(f)
+                for x1, y1, x2, y2 in coords:
+                    self.cp.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
+            self.cp.update()
+
+        except FileNotFoundError:
+            pass
         pass
 
     # Called in constructor
@@ -115,6 +147,20 @@ class Map(MiniWidget):
         pass
         # Grab local mouse to figure out x and map it to our timeline
 
+
+    async def pan_start(self, e: ft.DragStartEvent):
+        self.state.x, self.state.y = e.local_x, e.local_y
+
+    async def pan_update(self, e: ft.DragUpdateEvent):
+        def draw_line():
+            line = cv.Line(self.state.x, self.state.y, e.local_x, e.local_y,
+                           paint=ft.Paint(stroke_width=3))
+            self.cp.shapes.append(line)
+            self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
+            self.cp.update()
+            self.state.x, self.state.y = e.local_x, e.local_y
+        Thread(target=draw_line, daemon=True).start()
+
     # Called when we need to rebuild out timeline UI
     def reload_map(self):
 
@@ -125,19 +171,13 @@ class Map(MiniWidget):
         # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
 
         # Content of our Timeline (Gesture detector)
-        self.content = ft.Container(
-            margin=ft.margin.only(left=20, right=20),
-            expand=True,
-            alignment=ft.alignment.center,
-            content=ft.Column(
-                expand=True,
-                alignment=ft.MainAxisAlignment.CENTER,
-                controls=[
-                    #ft.Text(plotline.title, color=ft.Colors.WHITE, size=16),
-                    ft.Divider(color=ft.Colors.with_opacity(0.4, ft.Colors.BLUE), thickness=2),
-                ],
-            )
-        )
+        self.content = ft.Column([
+            self.cp,
+            ft.Row([
+                ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_drawing()),
+                ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_drawing())
+            ])
+        ])
     
 
 

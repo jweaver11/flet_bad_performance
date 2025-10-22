@@ -141,7 +141,7 @@ class Timeline_Rail(Rail):
 
                 ft.TextButton(
                     "Show Plotline Widget", 
-                    on_click=lambda e: self.story.plotline.toggle_visibility(self.story),
+                    on_click=lambda e: self.story.plotline.toggle_visibility(),
                 ),
 
                 # Add more controls here as needed
