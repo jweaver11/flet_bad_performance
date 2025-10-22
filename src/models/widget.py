@@ -1,5 +1,5 @@
 '''
-An extended flet container that is the parent class of all our story objects.
+An extended flet container that is the parent class of all our story objects. A widget is essentially a tab
 Handles uniform UI, and has some functionality all objects need for easy data use.
 Every widget has its own json file
 Only Widgets create mini widgets

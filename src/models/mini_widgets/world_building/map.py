@@ -6,6 +6,7 @@ and have their 'drawing' stored in their own files, while the rest of the data i
 
 # TYPES OF MAPS, COUNTRIES CONTINENTS ETC. THAT CAN ADD THEIR OWN (SUB) MAPS. EXP. CONTINENT CAN ADD COUNTRIES, REGIONS, ETC
 # BLANK NO TEMPLATE MAPS EXIST AS WELL
+# ADD DUPLICATE OPTION AS WELL
 
 import os
 import json
@@ -166,11 +167,13 @@ class Map(MiniWidget):
     # Called when we need to rebuild out timeline UI
     def reload_map(self):
 
-
         # Depending on the type of map, we render the Map differently
         # Different right click hover options to add sub maps.
         # I.E. Continents can add countries, regions, oceans, etc.. But countries cant add continents, etc.
         # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
+        # Option to be in edit mode (drawing mode), view mode, or dragging mode to move around its parent map
+        # Make it so that maps 'mini widget' shows inside of the map...
+        # If two+ maps open at same time, both their mini widgets can be shown at same time
 
         # Content of our Timeline (Gesture detector)
         self.content = ft.Column([

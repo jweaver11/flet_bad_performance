@@ -47,6 +47,8 @@ class World_Building_Rail(Rail):
     def reload_rail(self) -> ft.Control:
         ''' Reloads the world building rail '''
 
+        # Button to 'Create New World'
+
         column = ft.Column(
             spacing=0,
             expand=True,

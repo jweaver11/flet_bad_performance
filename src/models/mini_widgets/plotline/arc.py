@@ -51,8 +51,9 @@ class Arc(MiniWidget):
         self.plot_points: dict = {} 
         self.arcs: dict = {}
         self.time_skips: dict = {}
-        self.connections: dict = {}  
+        self.connections: dict = {}  # Needed????
 
+        # Loads our three mini widgets into their dicts
         self.load_arcs()    
         self.load_plot_points() 
         self.load_time_skips()

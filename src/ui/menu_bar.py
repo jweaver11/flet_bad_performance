@@ -8,6 +8,11 @@ from models.app import app
 from models.story import Story
 
 
+
+# CREATING NEW STORY ALLOWS USER OPTION TO CREATE BLANK,
+# OR SELECT FROM TEMPLATE OPTIONS, TYPES, REGRESSION, ETC
+
+
 # Called in main to create menu bar if no story exists, or by a story to create menu bar for that story
 def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     
