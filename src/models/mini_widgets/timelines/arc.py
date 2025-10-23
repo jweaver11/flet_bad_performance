@@ -177,6 +177,7 @@ class Arc(MiniWidget):
 
         
         # Needs to show the owner
+        # Distinct plot arc vs character arc??
 
         self.content = ft.Column(
             [

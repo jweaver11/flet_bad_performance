@@ -38,6 +38,9 @@ class Timeline(Widget):
                     'show_plot_points': True,
                     'show_arcs': True,
                 },        
+                'information_display': {
+                    'visibility': True,
+                },
                 'start_date': str,                  # Start and end date of the branch, for timeline view
                 'end_date': str,                    # Start and end date of the branch, for timeline view
                 'color': "primary",                 # Color of the branch in the timeline
@@ -264,7 +267,6 @@ class Timeline(Widget):
             content=ft.Column(
                 expand=True,
                 controls=[
-                    header,
                     ft.Container(expand=True,),
                     ft.Divider(color=ft.Colors.with_opacity(0.5, ft.Colors.BLUE), thickness=2),
                     ft.Container(expand=True,),
@@ -274,7 +276,7 @@ class Timeline(Widget):
 
 
         # The body that is our interactive viewer, allowing zoom in and out and moving around
-        self.body_container.content = ft.InteractiveViewer(
+        interactive_viewer = ft.InteractiveViewer(
             min_scale=0.1,
             max_scale=15,
             expand=True,
@@ -284,6 +286,11 @@ class Timeline(Widget):
             #on_interaction_update=lambda e: print(e),
             content=timeline,
         )
+
+        self.body_container.content = ft.Column([
+            header,
+            interactive_viewer
+        ])
 
         self._render_widget()
     

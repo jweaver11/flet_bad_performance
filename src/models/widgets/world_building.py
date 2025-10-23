@@ -56,11 +56,6 @@ class World_Building(Widget):
             }
         )
 
-        # self.information
-
-        # List of maps currently being displayed on the main widget
-        self.displayed_maps: list = []
-
         # Dict of different worlds and their maps stored
         self.world_maps = {}
         self.locations = {}
@@ -192,6 +187,10 @@ class World_Building(Widget):
             # EXP. City gets destroyed at year 50, that plotpoint would disappear
         # Option to expand map to add more continents, regions, etc
         # Option for mini widget/widgets to display even when no map is shown
+
+
+        # MAPS USE TREE VIEW FORMAT, ANY MAP CAN FIT IN ANY OTHER MAP, NO RESTRICTIONS. THEY ARE WIDGETS WITH 2 FILES,
+        # ONE FOR IMAGE, ONE FOR DATA. THEY CAN STORE OTHER MAPS IN THEIR DATA
 
 
 

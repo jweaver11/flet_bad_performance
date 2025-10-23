@@ -102,13 +102,14 @@ class Map(MiniWidget):
     # Called to save our drawing data to its file
     def save_drawing(self):
         ''' Saves our map drawing data to its own json file. Maps are special and get their 'drawing' saved seperately '''
+
         try:
 
             # Grab our directory path from our owner widget
             directory_path = os.path.join(self.owner.directory_path, "maps")
 
             # Set our file path
-            file_path = os.path.join(directory_path, f"{self.title}.json")
+            file_path = os.path.join(directory_path, f"{self.title}_drawing.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(directory_path, exist_ok=True)
@@ -120,7 +121,7 @@ class Map(MiniWidget):
         # Handle errors
         except Exception as e:
             print(f"Error saving widget to {file_path}: {e}") 
-            print("Data that failed to save: ", self.data)
+            print("Data that failed to save: ", self.state.shapes)
 
     # Called when loading our drawing data from its file
     def load_drawing(self):
