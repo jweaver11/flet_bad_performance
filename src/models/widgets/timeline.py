@@ -70,18 +70,6 @@ class Timeline(Widget):
         self.load_time_skips()
         
         #self.mini_widget = MiniWidget()
-
-        # The control that shows up in the plotline widget OUTSIDE our mini widget
-        self.timeline_control: ft.GestureDetector = ft.GestureDetector() 
-
-
-        # The UI element that will display our filters
-        self.filters = ft.Row(scroll="auto")
-
-        # UI elements
-        self.filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
-        self.filter_arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.filter_arcs.value))
-        self.reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))
         
 
         # Builds/reloads our timeline UI
@@ -219,21 +207,33 @@ class Timeline(Widget):
         # Show zoomed in time dates when zoomed in??s
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
 
-        plotline_filters = []
+        #plotline_filters = []
+
+        # The control that shows up in the plotline widget OUTSIDE our mini widget
+        self.timeline_control: ft.GestureDetector = ft.GestureDetector() 
+
+
+        # The UI element that will display our filters
+        filters = ft.Row(scroll="auto")
+
+        # UI elements
+        filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
+        filter_arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.filter_arcs.value))
+        reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))
 
         # Header that shows our filter options, as well as what plotlines are visible
         # Add reset zoom button later
         header = ft.Row(
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
-            controls=[self.filter_plot_points, self.filter_arcs],
+            controls=[filter_plot_points, filter_arcs],
         )
 
 
-        plotline_filters.append(self.reset_zoom_button)
+        filters.controls.append(reset_zoom_button)
             
         # Add our plotlines as filters to our header
-        header.controls.extend(plotline_filters)
+        header.controls.append(filters)
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our plotlines that that will display timeskips, etc. 
@@ -243,6 +243,7 @@ class Timeline(Widget):
             content=ft.Column(
                 expand=True,
                 controls=[
+                    header,
                     ft.Container(expand=True,),
                     ft.Divider(color=ft.Colors.with_opacity(0.5, ft.Colors.BLUE), thickness=2),
                     ft.Container(expand=True,),

@@ -37,60 +37,169 @@ class Timelines_Rail(Rail):
             # Calls story function to create a new plotline
             self.story.create_timeline(title)
 
-
-    def submit_arc(self, e):
-        ''' Creates a new arc object on the specified timeline '''
+    # Called when new arc is submitted 
+    def submit_arc(self, e, parent):
+        ''' Creates a new arc on the parent arc or timeline '''
 
         # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
         arc_title = e.control.value
 
         # Go through each timeline until we find the right one
-        for timeline in self.story.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_arc(arc_title)
-                print(f"New arc created on the {timeline_title} timeline. Name: {arc_title} ")
-                break
+        for arc in parent.arcs.values():
+            if arc.title == arc_title:
+                print("Arc name already exists!")
+                return
+            
+        # Otherwise create the arc
+        parent.create_arc(arc_title)
+        print(f"New arc created on the {parent.title} arc or timeline. Name: {arc_title} ")
+                
         
 
     # When new plotpoint is submitted
-    def submit_plotpoint(self, e):
-        # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
-        plotpoint_title = e.control.value
+    def submit_plotpoint(self, e, parent):
+        ''' Creates a new plotpoint on the parent arc or timeline '''
+        
+        plot_point_title = e.control.value
 
         # Go through each timeline until we find the right one
-        for timeline in self.story.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_plot_point(plotpoint_title)
-                print(f"New plotpoint created on the {timeline_title} timeline. Name: {plotpoint_title} ")
-                break
+        for plot_point in parent.plot_points.values():
+            if plot_point.title == plot_point_title:
+                print("Arc name already exists!")
+                return
+            
+        # Otherwise create the arc
+        parent.create_plot_point(plot_point_title)
+        print(f"New arc created on the {parent.title} arc or timeline. Name: {plot_point_title} ")
 
     # Called when new timeskip is submitted
-    def submit_timeskip(self, e):
-        ''' Creates a new timeskip object on the specified timeline '''
+    def submit_timeskip(self, e, parent):
+        ''' Creates a new timeskip on the parent arc or timeline '''
 
-        # Our plotline title is stored in the data, while the new title is from the control value
-        timeline_title = e.control.data
-        timeskip_title = e.control.value
+        time_skip_title = e.control.value
 
         # Go through each timeline until we find the right one
-        for timeline in self.story.timelines.values():
-            if timeline.title == timeline_title:
-                timeline.create_time_skip(timeskip_title)
-                print(f"New timeskip created on the {timeline_title} timeline Name: {timeskip_title} ")
-                break
+        for time_skip in parent.time_skips.values():
+            if time_skip.title == time_skip_title:
+                print("Arc name already exists!")
+                return
+            
+        # Otherwise create the timeskip
+        parent.create_time_skip(time_skip_title)
+        print(f"New arc created on the {parent.title} arc or timeline. Name: {time_skip_title} ")
 
 
     # Reload the rail whenever we need
     def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
+        from models.mini_widgets.plotline.arc import Arc
+        from models.widgets.timeline import Timeline
 
         # PLOTLINE RAIL JUST HAS ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
         # ALTERING THEM IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
 
-        # Build the content of our rail
+
+        # Called recursively to load arcs, plotpoints, and timeskips of either a timeline or arc
+        def _load_timeline_or_arc_data(parent, parent_expansion_tile: ft.ExpansionTile):    
+            ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
+
+            # Create an expansion tile for our plotpoints, time skips, and arcs
+            plot_points_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Plot Points"), 
+                shape=ft.RoundedRectangleBorder(),
+                controls=[ft.Container(height=6)]
+            )   
+            time_skips_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Time Skips"), 
+                shape=ft.RoundedRectangleBorder(),
+                controls=[ft.Container(height=6)]
+            )
+            arcs_expansion_tile = ft.ExpansionTile(
+                title=ft.Text("Arcs") if isinstance(parent, Timeline) else ft.Text("Sub-Arcs"),
+                shape=ft.RoundedRectangleBorder(),
+                controls=[
+                    ft.Container(height=6),
+                ]
+            )
+        
+
+            # Go through our plotpoints from our parent arc or timeline
+            for plot_point in parent.plot_points.values():
+
+                # Add each plot point to the expansion tile
+                plot_points_expansion_tile.controls.append(
+                    ft.Text(plot_point.title),
+                )
+
+
+            # Go through our timeskips from our parent arc or timeline
+            for time_skip in parent.time_skips.values():
+
+                # Add each timeskip to the expansion tile
+                time_skips_expansion_tile.controls.append(
+                    ft.Text(time_skip.title),
+                )
+            
+
+            # Go through all the sub arcs held in our parent arc or timeline
+            for sub_arc in parent.arcs.values():
+
+                # Create a new parent expansion tile we'll need for recursion
+                sub_arc_expansion_tile = ft.ExpansionTile(
+                    title=ft.Text(sub_arc.title),
+                    shape=ft.RoundedRectangleBorder(),
+                    controls=[
+                        ft.Container(height=6),
+                    ]
+                )
+
+                # Add the new parent expansion tile to our current parents expansion tile controls
+                arcs_expansion_tile.controls.append(sub_arc_expansion_tile)
+                
+                # Recursively load them, passing in our new parent and parent expansion tile
+                _load_timeline_or_arc_data(parent=sub_arc, parent_expansion_tile=sub_arc_expansion_tile)
+                
+
+            # Add text field to create new plot points 
+            plot_points_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Plot Point",
+                    data=timeline.title,
+                    on_submit=lambda e: self.submit_plotpoint(e, parent),
+                    expand=True,
+                )
+            )
+
+            # Add text field to create new time skips
+            time_skips_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Time Skip",
+                    expand=True,
+                    on_submit=lambda e: self.submit_timeskip(e, parent),
+                    data=timeline.title,
+                )
+            )
+
+            # Add text field to create new sub arcs
+            arcs_expansion_tile.controls.append(
+                ft.TextField(
+                    label="Create Arc" if isinstance(parent, Timeline) else "Create Sub-Arc",
+                    expand=True,
+                    on_submit=lambda e: self.submit_arc(e, parent),
+                    data=parent.title,
+                )
+            )
+
+            # Add our three expansion tiles to the parent expansion tile
+            parent_expansion_tile.controls.append(plot_points_expansion_tile)
+            parent_expansion_tile.controls.append(time_skips_expansion_tile)
+            parent_expansion_tile.controls.append(arcs_expansion_tile)
+
+
+            
+
+        # Set our content to be a column for a top down view
         self.content = ft.Column(
             spacing=0,
             expand=True,
@@ -99,89 +208,27 @@ class Timelines_Rail(Rail):
             controls=[],
         )
 
-        # Run through each plotline in the story
+        # Run through each timeline in the story
         for timeline in self.story.timelines.values():
 
-            arcs_expansion_tile = ft.ExpansionTile(
-                title=ft.Text("Arcs"),
-                shape=ft.RoundedRectangleBorder(),
-            )
-            for arc in timeline.arcs.values():
-                arcs_expansion_tile.controls.append(
-                    ft.Text(arc.title),
-                )
-            arcs_expansion_tile.controls.append(
-                ft.TextField(
-                    label="Create Arc",
-                    expand=True,
-                    on_submit=lambda e: self.submit_arc(e),
-                    data=timeline.title,
-                )
-            )
-
-            # Create an expansion tile for our plotpoints
-            plot_points_expansion_tile = ft.ExpansionTile(
-                title=ft.Text("Plot Points"),
-                shape=ft.RoundedRectangleBorder(),
-            )
-            # Run through each plotpoint, and add it to our plotpoints expansion tile
-            for plotpoint in timeline.plot_points.values():
-                plot_points_expansion_tile.controls.append(
-                    ft.Text(plotpoint.title)
-                )
-            # Add a text field at bottom to create new plotpoints
-            plot_points_expansion_tile.controls.append(
-                ft.TextField(
-                    label="Create Plot Point",
-                    data=timeline.title,
-                    on_submit=lambda e: self.submit_plotpoint(e),
-                    expand=True,
-                )
-            )
-            # TODO button that when pressed makes a textfield visible and autofocused when inputting plotpoint name
-
-            time_skips_expansion_tile = ft.ExpansionTile(
-                title=ft.Text("Time Skips"),
-                shape=ft.RoundedRectangleBorder(),
-            )
-            for time_skip in timeline.time_skips.values():
-                time_skips_expansion_tile.controls.append(
-                    ft.Text(time_skip.title)
-                )
-            time_skips_expansion_tile.controls.append(
-                ft.TextField(
-                    label="Create Time Skip",
-                    expand=True,
-                    on_submit=lambda e: self.submit_timeskip(e),
-                    data=timeline.title,
-                )
-            )
-
-            # Build our view for this plotline
-            list_view = ft.ExpansionTile(
+            # Create an expansion tile for our timeline
+            timeline_expansion_tile = ft.ExpansionTile(
                 shape=ft.RoundedRectangleBorder(),  # Get rid of edges of expansion tile
-                
-                #expand=True,
-                #spacing=5,
-                #padding=ft.padding.all(10),
-                #auto_scroll=True,
                 title=ft.Text(timeline.title),  # Set the title of expansion tile to the plotline
                 controls=[
                     ft.Container(height=6), # Spacing
-                    ft.Row([    # Add start date and end date text fields
+                    ft.Row([ 
                         ft.TextField(label="Start Date", value=str(timeline.data['start_date']), expand=True),
                         ft.TextField(label="End Date", value=str(timeline.data['end_date']), expand=True),
                     ]),
-
-                    arcs_expansion_tile,    # Add our arcs expansion tile we built above
-
-                    plot_points_expansion_tile,   # Add our plotpoints expansion tile we built above
-
-                    time_skips_expansion_tile,
                 ]
             )
 
-            self.content.controls.append(list_view)
+            # Take our data, and add it to the rail under each timeline
+            _load_timeline_or_arc_data(parent=timeline, parent_expansion_tile=timeline_expansion_tile)
+
+            # Add our expansion tile to the rail content
+            self.content.controls.append(timeline_expansion_tile)
             self.content.controls.append(ft.Container(height=10))
 
 

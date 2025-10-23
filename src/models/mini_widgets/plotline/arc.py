@@ -128,6 +128,7 @@ class Arc(MiniWidget):
 
         # Apply our changes in the UI
         self.reload_mini_widget()
+        self.owner.story.active_rail.content.reload_rail()
         self.owner.reload_widget()
         
     # Called when creating a new plotpoint
@@ -148,6 +149,7 @@ class Arc(MiniWidget):
 
         # Apply our changes in the UI
         self.reload_mini_widget()
+        self.owner.story.active_rail.content.reload_rail()
         self.owner.reload_widget()
 
     # Called when creating a new timeskip
@@ -168,6 +170,7 @@ class Arc(MiniWidget):
 
         # Apply our changes in the UI
         self.reload_mini_widget()
+        self.owner.story.active_rail.content.reload_rail()
         self.owner.reload_widget()
 
     def reload_mini_widget(self):
