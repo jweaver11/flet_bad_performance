@@ -41,7 +41,7 @@ class Settings(Widget):
                 'workspaces_rail_order': [      # Order of the workspace rail
                     "content",
                     "characters",
-                    "plot_and_timeline",
+                    "timelines",
                     "world_building",
                     "drawing_board",
                     "planning",

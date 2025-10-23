@@ -47,8 +47,8 @@ class Arc(MiniWidget):
         )
 
         # Declare dicts of our data types   
-        self.plot_points: dict = {} 
         self.arcs: dict = {}
+        self.plot_points: dict = {} 
         self.time_skips: dict = {}
         self.connections: dict = {}  # Needed????
 

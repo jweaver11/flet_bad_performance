@@ -7,10 +7,10 @@ import flet as ft
 from models.app import app
 from handlers.route_change import route_change
 from constants.init import init_settings, init_load_saved_stories
-from ui.workspaces_rail import No_Story_Rail
 from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
 from ui.workspace import create_workspace
+from ui.workspaces_rail import Workspaces_Rail
 
 
 
@@ -47,7 +47,7 @@ def main(page: ft.Page):
 
 
         # Create our rails inside of app so we can access it as an object and store preferences
-        all_workspaces_rail = No_Story_Rail(page)  # Create our all workspaces rail
+        all_workspaces_rail = Workspaces_Rail(page)  # Create our all workspaces rail
         active_rail = ft.Container(
             alignment=ft.alignment.top_center,  
             padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
@@ -98,7 +98,7 @@ def main(page: ft.Page):
         menubar = create_menu_bar(page)   
 
         # Create our rails inside of app so we can access it as an object and store preferences
-        all_workspaces_rail = No_Story_Rail(page)  # Create our all workspaces rail
+        all_workspaces_rail = Workspaces_Rail(page)  # Create our all workspaces rail
         active_rail = Active_Rail(page)  # Container stored in story for the active rails
 
         # Create our workspace container to hold our widgets

@@ -59,8 +59,8 @@ class Timeline(Widget):
         ) 
 
         # Declare dicts of our data types   
-        self.plot_points: dict = {} 
         self.arcs: dict = {}
+        self.plot_points: dict = {} 
         self.time_skips: dict = {}
         self.connections: dict = {}  # Needed????
         
@@ -92,7 +92,6 @@ class Timeline(Widget):
     def reload_widget(self):
 
         # Right clicking arc or plotpoints opens multiple mini widgets at the same time
-
         
         # TODO:
         # When hovering over timeline or branch, make slightly brighter and thicker. Right clicking allows

@@ -6,7 +6,7 @@ from ui.rails.rail import Rail
 
 
 # Class is created in main on program startup
-class Timeline_Rail(Rail):
+class Timelines_Rail(Rail):
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
@@ -96,6 +96,7 @@ class Timeline_Rail(Rail):
 
         # PLOTLINE RAIL JUST HAS ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
         # ALTERING THEM IS DONE IN THEIR MINI WIDGETS
+        # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
 
         # Build the content of our rail
         self.content = ft.Column(
@@ -104,10 +105,6 @@ class Timeline_Rail(Rail):
             scroll="auto",
             alignment=ft.MainAxisAlignment.START,
             controls=[
-                ft.TextButton(
-                    "Show Plotline Widget", 
-                    on_click=lambda e: self.story.plotline.toggle_visibility(),
-                ),
                 ft.Text("Timelines:")
                 # Add more controls here as needed
             ]
