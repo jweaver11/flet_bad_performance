@@ -63,6 +63,11 @@ class Timeline(Widget):
         self.plot_points: dict = {} 
         self.time_skips: dict = {}
         self.connections: dict = {}  # Needed????
+
+        # Loads our three mini widgets into their dicts
+        self.load_arcs()
+        self.load_plot_points()
+        self.load_time_skips()
         
         #self.mini_widget = MiniWidget()
 
@@ -80,6 +85,116 @@ class Timeline(Widget):
         
 
         # Builds/reloads our timeline UI
+        self.reload_widget()
+
+    # Called in the constructor
+    def load_arcs(self):
+        ''' Loads branches from data into self.branches  '''
+
+        # Looks up our branches in our data, then passes in that data to create a live object
+        for key, data in self.data['arcs'].items():
+            self.arcs[key] = Arc(
+                title=key, 
+                owner=self, 
+                father=self,
+                page=self.p, 
+                dictionary_path="arcs",
+                data=data
+            )
+            self.mini_widgets.append(self.arcs[key])  # Branches need to be in the owners mini widgets list to show up in the UI
+    
+    # Called in the constructor
+    def load_plot_points(self):
+        ''' Loads plotpoints from data into self.plotpoints  '''
+        from models.mini_widgets.plotline.plot_point import Plot_Point
+
+        # Looks up our plotpoints in our data, then passes in that data to create a live object
+        for key, data in self.data['plot_points'].items():
+            self.plot_points[key] = Plot_Point(
+                title=key, 
+                owner=self, 
+                father=self,
+                page=self.p, 
+                dictionary_path="plot_points", 
+                data=data
+            )
+            self.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
+        
+    
+    # Called in the constructor
+    def load_time_skips(self):
+        ''' Loads timeskips from data into self.time_skips  '''
+        from models.mini_widgets.plotline.time_skip import Time_Skip
+
+        for key, data in self.data['time_skips'].items():
+            self.time_skips[key] = Time_Skip(
+                title=key, 
+                owner=self, 
+                father=self,
+                page=self.p, 
+                dictionary_path="time_skips",
+                data=data
+            )
+            self.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
+    
+    # Called when creating a new arc
+    def create_arc(self, title: str):
+        ''' Creates a new arc inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.arc import Arc
+
+        # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
+        self.arcs[title] = Arc(
+            title=title, 
+            owner=self, 
+            father=self,
+            page=self.p, 
+            dictionary_path="arcs", 
+            data=None
+        )
+        self.mini_widgets.append(self.arcs[title])
+
+        # Apply our changes in the UI
+        self.story.active_rail.content.reload_rail()
+        self.reload_widget()
+        
+    # Called when creating a new plotpoint
+    def create_plot_point(self, title: str):
+        ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.plot_point import Plot_Point
+
+        # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
+        self.plot_points[title] = Plot_Point(
+            title=title, 
+            owner=self, 
+            father=self,
+            page=self.p, 
+            dictionary_path="plot_points", 
+            data=None
+        )
+        self.mini_widgets.append(self.plot_points[title])
+
+        # Apply our changes in the UI
+        self.story.active_rail.content.reload_rail()
+        self.reload_widget()
+
+    # Called when creating a new timeskip
+    def create_time_skip(self, title: str):
+        ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
+        from models.mini_widgets.plotline.time_skip import Time_Skip
+
+        # Add our new Time Skip mini widget object to our time_skips dict, and to our owners mini widgets
+        self.time_skips[title] = Time_Skip(
+            title=title, 
+            owner=self, 
+            father=self,
+            page=self.p, 
+            dictionary_path="time_skips", 
+            data=None
+        )
+        self.mini_widgets.append(self.time_skips[title])
+
+        # Apply our changes in the UI
+        self.story.active_rail.content.reload_rail()
         self.reload_widget()
    
 
