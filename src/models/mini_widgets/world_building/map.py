@@ -18,6 +18,8 @@ One for normal map widget data, and one for their drawings
 # EXPAMPLE: City gets destroyed at year 50, that city would reflect that change
 # Option to expand map to add more continents, regions, etc
 # Option for mini widget/widgets to display even when no map is shown
+# When hovering over a map, display it on the rail as well so we can see where new sub maps would
+# Have least amount of map data, while world maps have the most????
 
 import os
 import json
@@ -62,25 +64,23 @@ class Map(MiniWidget):
             },
         )
 
-        # State for drawing
+        # State used for drawing
         self.state = State()
 
         self.drawing_mode = False  # Whether we are in drawing mode or not
 
-        self.drawing_data = {}  # Seperate data that holds our drawing info
-        self.sub_maps = {}
+        self.maps = {}
         self.details = {}
 
-        # Load our sub maps
+        # Load our maps that are held within this amp
         self.load_sub_maps()
         
         # Load the rest of our map details and data thats not sub maps
         self.load_details()
 
-        # The control thats displayed on the UI
-        self.ui_map: ft.Control = None
+        
 
-
+        # The Visual Canvas map for drawing
         self.cp = cv.Canvas(
             content=ft.GestureDetector(
                 on_pan_start=self.pan_start,
@@ -89,11 +89,6 @@ class Map(MiniWidget):
             ),
             expand=True
         )
-
-
-        # The mini widget for our map object
-        #self.information_display = MiniWidget()
-        
         
 
         # Builds/reloads our timeline UI
@@ -109,7 +104,7 @@ class Map(MiniWidget):
             directory_path = os.path.join(self.owner.directory_path, "maps")
 
             # Set our file path
-            file_path = os.path.join(directory_path, f"{self.title}_drawing.json")
+            file_path = os.path.join(directory_path, f"{self.title}.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(directory_path, exist_ok=True)
@@ -126,7 +121,9 @@ class Map(MiniWidget):
     # Called when loading our drawing data from its file
     def load_drawing(self):
         ''' Loads our drawing from our saved map drawing file '''
+
         self.cp.shapes.clear()
+
         try:
             # Grab our directory path from our owner widget
             directory_path = os.path.join(self.owner.directory_path, "maps")
@@ -134,19 +131,23 @@ class Map(MiniWidget):
             # Set our file path
             file_path = os.path.join(directory_path, f"{self.title}.json")
 
+            # Load the data from the file
             with open(file_path, "r") as f:
                 coords = json.load(f)
                 for x1, y1, x2, y2 in coords:
                     self.cp.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
+
+            # Apply the loaded drawing
             self.cp.update()
 
+        # Handle errors
         except Exception as e:
             print(f"Error loading drawing from {file_path}: {e}")
 
     # Called in constructor
     def load_sub_maps(self):
         ''' Loads all sub maps stored in our data into our sub_maps dict'''
-        # Change cursor to click one, highlight map in widdget
+        # Change cursor to click one, highlight map in widget
         pass
 
     def load_details(self):
@@ -183,9 +184,8 @@ class Map(MiniWidget):
 
     # Called when we need to rebuild out timeline UI
     def reload_map(self):
+        ''' Rebuilds/reloads our map UI '''
 
-        # Depending on the type of map, we render the Map differently
-        # Different right click hover options to add sub maps.
         # I.E. Continents can add countries, regions, oceans, etc.. But countries cant add continents, etc.
         # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
         # Option to be in edit mode (drawing mode), view mode, or dragging mode to move around its parent map

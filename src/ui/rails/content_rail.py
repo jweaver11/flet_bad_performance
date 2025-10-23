@@ -39,6 +39,10 @@ class Content_Rail(Rail):
     def reload_rail(self) -> ft.Control:
         ''' Reloads the content rail '''
 
+        # Depending on story type, we can have different content creation options
+        # Creating a chapter for comics creates a folder to store images and drawings
+        # Creating a chapter for novels creates a text document for writing, and allows
+
         # Build the content of our rail
         self.content = ft.Column(
             controls=[

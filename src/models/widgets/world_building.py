@@ -31,8 +31,8 @@ class World_Building(Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': "world_building",            # Tag to identify what type of object this is
-                'displayed_maps': list,                  # Title of the currently active map being displayed
+                'tag': "world_building",            
+                'displayed_maps': list,                  # List of the maps displayed in the widget
 
                 # List of different categories for organizing our world maps on the rail. (Psuedo folders)
                 'categories': [
@@ -41,7 +41,8 @@ class World_Building(Widget):
                     'regions',
                     'countries',
                     'cities',
-                ],            # Only check world maps for categories
+                ],           
+                 
                 # TODO: Have the story type add categories here
 
                 'world_maps': dict,                 # Dict of different worlds and their maps stored
@@ -75,6 +76,8 @@ class World_Building(Widget):
         self.load_geography()
         self.load_technology()
         self.load_history()
+
+        # Drawing controls here. Not sure if need to be stored or how do that yet
 
         self.reload_widget()
     

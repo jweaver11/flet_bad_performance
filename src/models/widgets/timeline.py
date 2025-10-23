@@ -16,7 +16,7 @@ from handlers.verify_data import verify_data
 class Timeline(Widget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
         
         # Parent constructor
         super().__init__(

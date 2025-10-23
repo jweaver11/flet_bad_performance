@@ -43,11 +43,20 @@ class World_Building_Rail(Rail):
         self.story.world_building.reload_widget()
         self.reload_rail()
 
+    def show_world(self, story: Story):
+        ''' Shows the world building widget '''
+
+        if story.world_building is not None:
+            story.world_building.toggle_visibility()
+
     # Called when changes occur that require rail to be reloaded, but the object does not need to be recreated. (More efficient)
     def reload_rail(self) -> ft.Control:
         ''' Reloads the world building rail '''
 
         # Button to 'Create New World'
+        # TODO: Option to create new world map depending on if multiplanetory or not
+        # Reads the maps categories for each level, and adds them to a list of categories. Then displays them in the rail
+        # This is how we get semi tree view for maps and pass categories in.
 
         column = ft.Column(
             spacing=0,
@@ -83,11 +92,5 @@ class World_Building_Rail(Rail):
 
         # Apply the update
         self.p.update()
-
-    def show_world(self, story: Story):
-        ''' Shows the world building widget '''
-
-        if story.world_building is not None:
-            story.world_building.toggle_visibility()
     
         

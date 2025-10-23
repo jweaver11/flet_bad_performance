@@ -29,6 +29,9 @@ class WorldMap(Map):
             data=data,          
         ) 
         
+
+        # Have the most amount of data, while maps have the least????
+        
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
