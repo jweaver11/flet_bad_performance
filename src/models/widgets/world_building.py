@@ -56,6 +56,8 @@ class World_Building(Widget):
             }
         )
 
+        # self.information
+
         # List of maps currently being displayed on the main widget
         self.displayed_maps: list = []
 
@@ -78,11 +80,6 @@ class World_Building(Widget):
         self.load_geography()
         self.load_technology()
         self.load_history()
-
-        # TODO: Show timeline that can drag and alter the map landscape based on changes
-            # EXP. City gets destroyed at year 50, that plotpoint would disappear
-        # Option to expand map to add more continents, regions, etc
-        # Option for mini widget/widgets to display even when no map is shown
 
         self.reload_widget()
     
@@ -173,13 +170,6 @@ class World_Building(Widget):
     def reload_widget(self):
         ''' Reloads our world building widget '''
 
-        # Worlds are maps in this case
-
-        # World building widget will use an image as a base, and overlay its content on top of that.
-        # Users can choose to create their image or use some default ones
-        # If no image is provided, start with a default circle 
-        # Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
-
         # Our column that will display our header filters and body of our widget
         self.body_container.content = ft.Text(f"hello from: {self.title}")
 
@@ -188,10 +178,20 @@ class World_Building(Widget):
 
 
 
-
+        # Users can choose to create their image or use some default ones
+        # Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
 
         # TODO: Make it so the maps are rendered in the body of the widget
-        # Should be able to see multiple maps at once, and their mini widget info displays as well
+        # Should be able to see multiple maps at once, and their mini widget info displays as 
+        # MAPS ARE WIDGETS, THAT STORE THEIR OTHER MAPS HOWEVER I SEE FIT (CONTINENTS, COUNTRIES, CITIES, DUNGEONS, ROOMS, ETC, OR JUST MAPS {})
+        # THEY HAVE A SAVE DICT METHOD AND UPDATE DICT METHOD THAT WOULD WORK LIKE THE MW SAVE DICT TO UPDATE PARENT MAPS
+        # THEY ALSO HAVE THEIR OWN FILES TO STORE THEIR IMAGES
+
+
+        # TODO: Show timeline that can drag and alter the map landscape based on changes
+            # EXP. City gets destroyed at year 50, that plotpoint would disappear
+        # Option to expand map to add more continents, regions, etc
+        # Option for mini widget/widgets to display even when no map is shown
 
 
 

@@ -407,7 +407,7 @@ class Story(ft.View):
                         #self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                        print(f"Error loading character from {filename}: {e}")
+                        print(f"Error loading timeline from {filename}: {e}")
             
         
         # Create our plotline object with no data if story is new, or loaded data if it exists already

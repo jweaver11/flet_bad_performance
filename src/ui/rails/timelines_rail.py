@@ -92,7 +92,7 @@ class Timelines_Rail(Rail):
     # Reload the rail whenever we need
     def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
-        from models.mini_widgets.plotline.arc import Arc
+        from models.mini_widgets.timelines.arc import Arc
         from models.widgets.timeline import Timeline
 
         # PLOTLINE RAIL JUST HAS ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED

@@ -43,6 +43,7 @@ class Widget(ft.Container):
                 'pin_location': "main",                     # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
                 'visible': True,                            # Whether this widget is visible in the workspace or not
                 'tab_title_color': "primary",               # Color of the title in the tab (primary, secondary, blue, red, etc.)
+                'mini_widgets_location': "right",           # Side of the widget the mini widgets show up on (left or right)
             },
         )
 

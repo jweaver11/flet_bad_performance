@@ -1,12 +1,23 @@
 '''
 Parent map class that contains all other sub-maps, such as locations, world maps, continents, countries, cities, dungeons, etc.
-Basically, anything that COULD be fleshed out visually. Maps are special mini widgets, 
-and have their 'drawing' stored in their own files, while the rest of the data is stored normally
+Basically, anything that COULD be fleshed out visually. Maps are special widgets, and get two files
+One for normal map widget data, and one for their drawings
 '''
 
 # TYPES OF MAPS, COUNTRIES CONTINENTS ETC. THAT CAN ADD THEIR OWN (SUB) MAPS. EXP. CONTINENT CAN ADD COUNTRIES, REGIONS, ETC
 # BLANK NO TEMPLATE MAPS EXIST AS WELL
 # ADD DUPLICATE OPTION AS WELL
+# Users can choose to create their image or use some default ones
+# Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
+# TODO: Make it so the maps are rendered in the body of the widget
+# Should be able to see multiple maps at once, and their mini widget info displays as 
+# MAPS ARE WIDGETS, THAT STORE THEIR OTHER MAPS HOWEVER I SEE FIT (CONTINENTS, COUNTRIES, CITIES, DUNGEONS, ROOMS, ETC, OR JUST MAPS {})
+# THEY HAVE A SAVE DICT METHOD AND UPDATE DICT METHOD THAT WOULD WORK LIKE THE MW SAVE DICT TO UPDATE PARENT MAPS
+# THEY ALSO HAVE THEIR OWN FILES TO STORE THEIR IMAGES
+# Show timeline that can drag and alter the map landscape based on changes
+# EXPAMPLE: City gets destroyed at year 50, that city would reflect that change
+# Option to expand map to add more continents, regions, etc
+# Option for mini widget/widgets to display even when no map is shown
 
 import os
 import json
@@ -18,8 +29,8 @@ from models.state import State
 import flet.canvas as cv
 from threading import Thread
 
-# Live objects that are stored in our timeline object
-# We read data from this object, but it is displayed in the timeline widget, so need for this to be a flet control
+
+
 class Map(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
@@ -77,7 +88,12 @@ class Map(MiniWidget):
                 drag_interval=10,
             ),
             expand=True
-    )
+        )
+
+
+        # The mini widget for our map object
+        #self.information_display = MiniWidget()
+        
         
 
         # Builds/reloads our timeline UI

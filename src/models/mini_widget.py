@@ -79,7 +79,7 @@ class MiniWidget(ft.Container):
             # Recursively updates the parents data until father=owner (widget), which saves to file
             self.father.save_dict()
             
-            # This keeps everyones data in sync so we can infinitely nest mini widgets if we want
+            # This keeps everyones data in sync so we can infinitely nest mini widgets if we want, like for arcs in timelines
 
         except Exception as e:
             print(f"Error saving mini widget data to {self.title}: {e}")

@@ -79,7 +79,7 @@ class Arc(MiniWidget):
     # Called in the constructor
     def load_plot_points(self):
         ''' Loads plotpoints from data into self.plotpoints  '''
-        from models.mini_widgets.plotline.plot_point import Plot_Point
+        from models.mini_widgets.timelines.plot_point import Plot_Point
 
         # Looks up our plotpoints in our data, then passes in that data to create a live object
         for key, data in self.data['plot_points'].items():
@@ -97,7 +97,7 @@ class Arc(MiniWidget):
     # Called in the constructor
     def load_time_skips(self):
         ''' Loads timeskips from data into self.time_skips  '''
-        from models.mini_widgets.plotline.time_skip import Time_Skip
+        from models.mini_widgets.timelines.time_skip import Time_Skip
 
         for key, data in self.data['time_skips'].items():
             self.time_skips[key] = Time_Skip(
@@ -113,7 +113,7 @@ class Arc(MiniWidget):
     # Called when creating a new arc
     def create_arc(self, title: str):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
-        from models.mini_widgets.plotline.arc import Arc
+        from models.mini_widgets.timelines.arc import Arc
 
         # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
         self.arcs[title] = Arc(
@@ -134,7 +134,7 @@ class Arc(MiniWidget):
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
-        from models.mini_widgets.plotline.plot_point import Plot_Point
+        from models.mini_widgets.timelines.plot_point import Plot_Point
 
         # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
         self.plot_points[title] = Plot_Point(
@@ -155,7 +155,7 @@ class Arc(MiniWidget):
     # Called when creating a new timeskip
     def create_time_skip(self, title: str):
         ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
-        from models.mini_widgets.plotline.time_skip import Time_Skip
+        from models.mini_widgets.timelines.time_skip import Time_Skip
 
         # Add our new Time Skip mini widget object to our time_skips dict, and to our owners mini widgets
         self.time_skips[title] = Time_Skip(
@@ -174,6 +174,9 @@ class Arc(MiniWidget):
         self.owner.reload_widget()
 
     def reload_mini_widget(self):
+
+        
+        # Needs to show the owner
 
         self.content = ft.Column(
             [

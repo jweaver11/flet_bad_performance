@@ -5,7 +5,7 @@ from handlers.verify_data import verify_data
 from models.widgets.timeline import Timeline
 
 
-# Data class for plot points on a timeline - change to branch as well later??
+# Plotpoint mini widget object that appear on timelines and arcs
 class Plot_Point(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
