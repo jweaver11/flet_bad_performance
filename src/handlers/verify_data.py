@@ -33,8 +33,8 @@ def verify_data(object, required_data: dict) -> bool:
                 # Make sure the key doesn't already exist so we don't override it
                 if key not in current_data:
                     current_data[key] = value
-                    
-                # Special case for 'tag' key to always set the value
+                
+                # Special case for overwriting defaults 'tag' key to always set the value
                 elif key == 'tag':
                     current_data[key] = value
         

@@ -44,7 +44,7 @@ class Story(ft.View):
                 'selected_rail': "characters",
                 'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
-                'plotline_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "plotline"),
+                'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
                 'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "notes"),
                 'top_pin_height': 0,
@@ -78,7 +78,7 @@ class Story(ft.View):
         self.chapters: dict = {}   # Chapters stored in our story
         self.images: dict = {}  # Images stored in our story
         self.characters: dict = {}      # Characters stored in our story
-        self.plotline: None = ft.Container()   # Only one plotline obj that displays our timlines
+        self.timelines: dict = {}   # Only one plotline obj that displays our timlines
         self.world_building: None = ft.Container()  # Only one world building obj that displays our maps
         self.notes: dict = {}   # Notes stored in our story
 
@@ -101,7 +101,7 @@ class Story(ft.View):
         self.load_characters()
 
         # Loads our timeline from file storage, which holds our timelines
-        self.load_plotline()
+        self.load_timelines()
 
         # Load our world building objects from file storage
         self.load_world_building()
@@ -150,7 +150,7 @@ class Story(ft.View):
         required_story_folders = [
             "content",
             "characters",
-            "plotline",
+            "timelines",
             "world_building",
             "drawing_board",
             "planning",
@@ -374,42 +374,51 @@ class Story(ft.View):
         
 
     # Called on story startup to create our plotline object.
-    def load_plotline(self):
+    def load_timelines(self):
         ''' Creates our timeline object, which in turn loads all our plotlines from storage '''
-
-        from models.widgets.plotline import Plotline
+        from models.widgets.timeline import Timeline
  
         # Check if the plotline folder directory exists. Creates it if it doesn't. 
         # Handles errors on startup if people delete this folder, otherwise uneccessary
-        if not os.path.exists(self.data['plotline_directory_path']):
+        if not os.path.exists(self.data['timelines_directory_path']):
             #print("Plotline folder does not exist, creating it.")
-            os.makedirs(self.data['plotline_directory_path'])    
+            os.makedirs(self.data['timelines_directory_path'])    
             return
         
-        # Construct the path to plotline.json
-        plotline_json_path = os.path.join(self.data['plotline_directory_path'], 'plotline.json')
+        # Iterate through all files in the timelines folder
+        for dirpath, dirnames, filenames in os.walk(self.data['timelines_directory_path']):
+            for filename in filenames:
 
-        # Set data blank initially
-        plotline_data = None
-        
-        # Attempt to open and read the plotline.json file. Sets our stored data if successful
-        try:
-            with open(plotline_json_path, 'r', encoding='utf-8') as file:
-                plotline_data = json.load(file)
-              
-                #print(f"Successfully loaded plotline data: {plotline_data}")
-        except FileNotFoundError:
-            print(f"plotline.json not found at {plotline_json_path}")
-            
-        except json.JSONDecodeError as e:
-            print(f"Error parsing plotline.json: {e}")
-           
-        except Exception as e:
-            print(f"Unexpected error reading plotline.json: {e}")
+                # All our objects are stored as JSON
+                if filename.endswith(".json"):
+                    file_path = os.path.join(dirpath, filename)   
+                    #print("dirpath = ", dirpath)
+                    
+                    try:
+                        # Read the JSON file
+                        with open(file_path, "r", encoding='utf-8') as f:
+                            timeline_data = json.load(f)
+                        
+                        # Extract the title from the data
+                        timeline_title = timeline_data.get("title", filename.replace(".json", ""))    
+                            
+                        # Create our timeline object using our loaded data
+                        self.timelines[timeline_title] = Timeline(timeline_title, self.p, dirpath, self, timeline_data)
+                        #self.widgets.append(self.characters[character_title])  # Add to our master list of widgets in our story
+                    # Handle errors if the path is wrong
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                        print(f"Error loading character from {filename}: {e}")
             
         
         # Create our plotline object with no data if story is new, or loaded data if it exists already
-        self.plotline = Plotline("Plotline", self.p, self.data['plotline_directory_path'], self, plotline_data)
+        if len(self.timelines) == 0:
+            self.timelines["Main_Timeline"] = Timeline(
+                title="Main_Timeline", 
+                page=self.p, 
+                directory_path=dirpath, 
+                story=self, 
+                data=None
+            )
 
        
     # Called on story startup to load all our world building widget
@@ -515,9 +524,9 @@ class Story(ft.View):
                 self.widgets.append(image)
 
         # Add our plotline to the widgets list
-        if self.plotline is not None:
-            if self.plotline not in self.widgets:
-                self.widgets.append(self.plotline)
+        for timeline in self.timelines.values():
+            if timeline not in self.widgets:
+                self.widgets.append(timeline)
 
         # Add our world building to the widgets list
         if self.world_building is not None:
@@ -535,7 +544,7 @@ class Story(ft.View):
         #print(f"Total widgets loaded for {self.title}: {len(self.widgets)}")
 
 
-    # Called when the button to create a new chapter is clicked
+    # Called to create a new chapter
     def create_chapter(self, title: str, directory_path: str=None):
         ''' Creates a new chapter object, saves it to our live story object, and saves it to storage'''
         print("Create chapter called")
@@ -550,10 +559,11 @@ class Story(ft.View):
         self.chapters[title] = Chapter(title, self.p, directory_path, self)
         self.widgets.append(self.chapters[title])  # Add to our master list of widgets in our story
 
+        self.active_rail.content.reload_rail()
         self.workspace.reload_workspace(self.p, self)
 
 
-    # Called to create a character object
+    # Called to create a new character
     def create_character(self, title: str, directory_path: str=None):
         ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
         #print("Create character called")
@@ -568,6 +578,24 @@ class Story(ft.View):
         self.characters[title] = Character(title, self.p, directory_path, self)
         self.widgets.append(self.characters[title])  # Add to our master list of widgets in our story
 
+        self.active_rail.content.reload_rail()
+        self.workspace.reload_workspace(self.p, self)
+
+    # Called to create a timeline object
+    def create_timeline(self, title: str):
+        ''' Creates a new timeline and updates the UI. Doesn't need a directory path since its always the same '''
+        from models.widgets.timeline import Timeline
+
+        dirpath = self.data['timelines_directory_path']
+        self.timelines[title] = Timeline(
+            title=title, 
+            page=self.p, 
+            directory_path=dirpath, 
+            story=self, 
+            data=None
+        )
+
+        self.active_rail.content.reload_rail()
         self.workspace.reload_workspace(self.p, self)
 
 

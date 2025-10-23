@@ -114,7 +114,7 @@ class Timeline_Rail(Rail):
         )
 
         # Run through each plotline in the story
-        for timeline in self.story.plotline.timelines.values():
+        for timeline in self.story.timelines.values():
 
             arcs_expansion_tile = ft.ExpansionTile(
                 title=ft.Text("Arcs"),

@@ -2,7 +2,7 @@ import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
-from models.mini_widgets.plotline.timeline import Timeline
+from models.widgets.timeline import Timeline
 
 
 class Time_Skip(MiniWidget):

@@ -9,13 +9,14 @@ import json
 import os
 from models.story import Story
 from models.widget import Widget
-from models.mini_widgets.plotline.timeline import Timeline
+from models.widgets.timeline import Timeline
 from handlers.verify_data import verify_data
 
 
 class Plotline(Widget):
+
     # Constructor
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
         
         # Initialize from our parent class 'Widget'. 
         super().__init__(
@@ -43,7 +44,7 @@ class Plotline(Widget):
             },
             
         )
-
+ 
         # Mini widgets do NOT store any live objects that would contain their own data.
         # Everything after this is simply UI to be rendered
             
@@ -71,7 +72,7 @@ class Plotline(Widget):
     def load_timelines(self):
         ''' Loads our timelines from our timelines directory inside our plotline directory '''
 
-        from models.mini_widgets.plotline.timeline import Timeline
+        from models.widgets.timeline import Timeline
         
         try: 
 

@@ -32,7 +32,7 @@ class World_Building(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "world_building",            # Tag to identify what type of object this is
-                'active_map': str,                  # Title of the currently active map being displayed
+                'displayed_maps': list,                  # Title of the currently active map being displayed
 
                 # List of different categories for organizing our world maps on the rail. (Psuedo folders)
                 'categories': [
@@ -184,6 +184,17 @@ class World_Building(Widget):
         self.body_container.content = ft.Text(f"hello from: {self.title}")
 
         self._render_widget()
+
+
+
+
+
+
+        # TODO: Make it so the maps are rendered in the body of the widget
+        # Should be able to see multiple maps at once, and their mini widget info displays as well
+
+
+
 
     # Called at end of reload_widget
     def _render_widget(self):
