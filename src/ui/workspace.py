@@ -104,15 +104,15 @@ class Workspace(ft.Container):
 
 
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
-        #self.reload_workspace(page, story) 
+        #self.reload_workspace() 
 
     # Called when we need to reload our workspace content, especially after pin drags
-    def reload_workspace(self, page: ft.Page, story: Story):
+    def reload_workspace(self):
         ''' Reloads our workspace content by clearing and re-adding our 5 pin locations to the master row '''
 
         from handlers.arrange_widgets import arrange_widgets
 
-        arrange_widgets(story)
+        arrange_widgets(self.story)
 
         # Change our cursor when we hover over a resizer (divider). Either vertical or horizontal
         def show_vertical_cursor(e: ft.HoverEvent):
@@ -212,8 +212,8 @@ class Workspace(ft.Container):
         # Main pin is rendered as a tab control, so we won't use dividers and will use different logic
         visible_main_controls = [control for control in self.main_pin.controls if getattr(control, 'visible', True)]
         if len(visible_main_controls) > 1:
-            # Get the selected tab index from the story object, default to 0
-            selected_tab_index = getattr(story, 'selected_main_tab_index', 0)
+            # Get the selected tab index from the self.story object, default to 0
+            selected_tab_index = getattr(self.story, 'selected_main_tab_index', 0)
             # Ensure the index is within bounds
             if selected_tab_index >= len(visible_main_controls):
                 selected_tab_index = 0
@@ -241,7 +241,7 @@ class Workspace(ft.Container):
         # Updates the size of our pin in the story object
         def move_top_pin_divider(e: ft.DragUpdateEvent):
             #print("move top pin divider called")
-            if (e.delta_y > 0 and self.top_pin.height < page.height/2) or (e.delta_y < 0 and self.top_pin.height > 200):
+            if (e.delta_y > 0 and self.top_pin.height < self.p.height/2) or (e.delta_y < 0 and self.top_pin.height > 200):
                 self.top_pin.height += e.delta_y
                 self.top_pin_drag_target.content.height = self.top_pin.height  # Update the drag target height to match the pin height
             formatted_top_pin.update()
@@ -249,8 +249,8 @@ class Workspace(ft.Container):
             self.master_stack.update()
         def save_top_pin_height(e: ft.DragEndEvent):
             #print("save top pin height called")
-            story.data['top_pin_height'] = self.top_pin.height
-            story.save_dict()
+            self.story.data['top_pin_height'] = self.top_pin.height
+            self.story.save_dict()
             
 
         # The control that holds our divider, which we drag to resize the top pin
@@ -269,15 +269,15 @@ class Workspace(ft.Container):
         # Left pin reisizer method and variable
         def move_left_pin_divider(e: ft.DragUpdateEvent):
             #print("move left pin divider called")
-            if (e.delta_x > 0 and self.left_pin.width < page.width/2) or (e.delta_x < 0 and self.left_pin.width > 200):
+            if (e.delta_x > 0 and self.left_pin.width < self.p.width/2) or (e.delta_x < 0 and self.left_pin.width > 200):
                 self.left_pin.width += e.delta_x
             formatted_left_pin.update()
             self.widgets.update()
             self.master_stack.update()
         def save_left_pin_width(e: ft.DragEndEvent):
             #print("save left pin width called")
-            story.data['left_pin_width'] = self.left_pin.width
-            story.save_dict()
+            self.story.data['left_pin_width'] = self.left_pin.width
+            self.story.save_dict()
         left_pin_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,
@@ -295,15 +295,15 @@ class Workspace(ft.Container):
         # Right pin resizer method and variable
         def move_right_pin_divider(e: ft.DragUpdateEvent):
             #print("move right pin divider called")
-            if (e.delta_x < 0 and self.right_pin.width < page.width/2) or (e.delta_x > 0 and self.right_pin.width > 200):
+            if (e.delta_x < 0 and self.right_pin.width < self.p.width/2) or (e.delta_x > 0 and self.right_pin.width > 200):
                 self.right_pin.width -= e.delta_x
             formatted_right_pin.update()
             self.widgets.update()
             self.master_stack.update()
         def save_right_pin_width(e: ft.DragEndEvent):
             print("save right pin width called")    
-            story.data['right_pin_width'] = self.right_pin.width
-            story.save_dict()
+            self.story.data['right_pin_width'] = self.right_pin.width
+            self.story.save_dict()
         right_pin_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,
@@ -319,15 +319,15 @@ class Workspace(ft.Container):
         # Bottom pin resizer method and variable
         def move_bottom_pin_divider(e: ft.DragUpdateEvent):
             #print("move bottom pin divider called")
-            if (e.delta_y < 0 and self.bottom_pin.height < page.height/2) or (e.delta_y > 0 and self.bottom_pin.height > 200):
+            if (e.delta_y < 0 and self.bottom_pin.height < self.p.height/2) or (e.delta_y > 0 and self.bottom_pin.height > 200):
                 self.bottom_pin.height -= e.delta_y
             formatted_bottom_pin.update()
             self.widgets.update()
             self.master_stack.update()
         def save_bottom_pin_height(e: ft.DragEndEvent):
             print("save bottom pin height called")
-            story.data['bottom_pin_height'] = self.bottom_pin.height
-            story.save_dict()
+            self.story.data['bottom_pin_height'] = self.bottom_pin.height
+            self.story.save_dict()
         bottom_pin_resizer = ft.GestureDetector(
             content=ft.Container(
                 height=10,
@@ -421,7 +421,7 @@ class Workspace(ft.Container):
         # Set the master_stack as the content of this container
         self.content = self.master_stack
         
-        page.update()
+        self.p.update()
 
     # When a draggable starts dragging, we add our drag targets to the master stack
     def show_pin_drag_targets(self):
@@ -494,7 +494,7 @@ class Workspace(ft.Container):
 
         from handlers.arrange_widgets import arrange_widgets
         arrange_widgets(self.story)       # Re-arrange our widgets held in the story object
-        self.reload_workspace(self.p, self.story)  # Re-render the widgets to reflect the new pin location
+        self.reload_workspace()  # Re-render the widgets to reflect the new pin location
         
         print("top pin accepted")
 
@@ -523,7 +523,7 @@ class Workspace(ft.Container):
 
         from handlers.arrange_widgets import arrange_widgets
         arrange_widgets(self.story)       
-        self.reload_workspace(self.p, self.story) 
+        self.reload_workspace() 
         
         print("left pin accepted")
 
@@ -551,7 +551,7 @@ class Workspace(ft.Container):
         
         from handlers.arrange_widgets import arrange_widgets
         arrange_widgets(self.story)       
-        self.reload_workspace(self.p, self.story) 
+        self.reload_workspace() 
         
         print("main pin accepted")
 
@@ -579,7 +579,7 @@ class Workspace(ft.Container):
 
         from handlers.arrange_widgets import arrange_widgets
         arrange_widgets(self.story)       
-        self.reload_workspace(self.p, self.story)  
+        self.reload_workspace()  
         
         print("right pin accepted")
 
@@ -606,9 +606,7 @@ class Workspace(ft.Container):
 
         from handlers.arrange_widgets import arrange_widgets
         arrange_widgets(self.story)       
-        self.reload_workspace(self.p, self.story)  
-        
-        print("bottom pin accepted")
+        self.reload_workspace()  
         
 
 

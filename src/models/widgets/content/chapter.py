@@ -23,6 +23,7 @@ class Chapter(Widget):
             object=self,   # Pass in our own data so the function can see the actual data we loaded
             required_data={
                 'tag': "chapter",
+                'summary': str,     # Summary of what will happen in the chapter
                 'content': str,
                 'temp': str,
                 'test': str,

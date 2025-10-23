@@ -135,7 +135,7 @@ class Widget(ft.Container):
         self.save_dict()
         self.p.update()
 
-        self.story.workspace.reload_workspace(self.p, self.story)
+        self.story.workspace.reload_workspace()
 
     # Called at end of constructor
     def reload_tab(self):

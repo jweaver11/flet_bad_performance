@@ -23,8 +23,8 @@ class Image(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': str,
-            },
-            tag="image"
+                'summary': str,     # Summary of what will happen in the chapter
+            }
         )
             
 

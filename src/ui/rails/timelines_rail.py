@@ -19,28 +19,23 @@ class Timelines_Rail(Rail):
         self.reload_rail()
 
     # Called when user creates a new plotline
-    def submit_timeline(self, title: str,):
+    def submit_timeline(self, title: str):
         ''' Creates a new timeline inside of the current story '''
 
         # Check if name is unique
         name_is_unique = True
 
-        for timeline in self.story.plotline.timelines.values():
+        for timeline in self.story.timelines.values():
             if timeline.title == title:
                 name_is_unique = False
                 print("Plotline name already exists!")
                 break
-        
-        if title == "plotline":
-            name_is_unique = False
-            print("Plotline name cannot be 'plotline' as it is reserved!")
 
         # Make sure the name is unique before creating
         if name_is_unique:
 
             # Calls story function to create a new plotline
-            self.story.plotline.create_new_timeline(title)
-            self.reload_rail(self.story)
+            self.story.create_timeline(title)
 
 
     def submit_arc(self, e):
@@ -55,7 +50,6 @@ class Timelines_Rail(Rail):
             if timeline.title == timeline_title:
                 timeline.create_arc(arc_title)
                 print(f"New arc created on the {timeline_title} timeline. Name: {arc_title} ")
-                self.reload_rail()     # Reload the rail to reflect the change and break the loop
                 break
         
 
@@ -70,7 +64,6 @@ class Timelines_Rail(Rail):
             if timeline.title == timeline_title:
                 timeline.create_plot_point(plotpoint_title)
                 print(f"New plotpoint created on the {timeline_title} timeline. Name: {plotpoint_title} ")
-                self.reload_rail(story)     # Reload the rail to reflect the change and break the loop
                 break
 
     # Called when new timeskip is submitted
@@ -86,7 +79,6 @@ class Timelines_Rail(Rail):
             if timeline.title == timeline_title:
                 timeline.create_time_skip(timeskip_title)
                 print(f"New timeskip created on the {timeline_title} timeline Name: {timeskip_title} ")
-                self.reload_rail(story)  # Reload the rail to reflect the change and break the loop
                 break
 
 
@@ -104,10 +96,7 @@ class Timelines_Rail(Rail):
             expand=True,
             scroll="auto",
             alignment=ft.MainAxisAlignment.START,
-            controls=[
-                ft.Text("Timelines:")
-                # Add more controls here as needed
-            ]
+            controls=[],
         )
 
         # Run through each plotline in the story
@@ -243,7 +232,7 @@ class Timelines_Rail(Rail):
         self.content.controls.append(ft.Container(height=20))
 
         self.content.controls.append(
-            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.submit_timeline(e.control.value, self.story)),
+            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.submit_timeline(e.control.value)),
         )
 
         self.p.update()

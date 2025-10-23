@@ -560,7 +560,7 @@ class Story(ft.View):
         self.widgets.append(self.chapters[title])  # Add to our master list of widgets in our story
 
         self.active_rail.content.reload_rail()
-        self.workspace.reload_workspace(self.p, self)
+        self.workspace.reload_workspace()
 
 
     # Called to create a new character
@@ -579,7 +579,7 @@ class Story(ft.View):
         self.widgets.append(self.characters[title])  # Add to our master list of widgets in our story
 
         self.active_rail.content.reload_rail()
-        self.workspace.reload_workspace(self.p, self)
+        self.workspace.reload_workspace()
 
     # Called to create a timeline object
     def create_timeline(self, title: str):
@@ -587,16 +587,12 @@ class Story(ft.View):
         from models.widgets.timeline import Timeline
 
         dirpath = self.data['timelines_directory_path']
-        self.timelines[title] = Timeline(
-            title=title, 
-            page=self.p, 
-            directory_path=dirpath, 
-            story=self, 
-            data=None
-        )
+
+        self.timelines[title] = Timeline(title, self.p, dirpath, self)
+        self.widgets.append(self.timelines[title])  # Add to our master list of widgets in our story
 
         self.active_rail.content.reload_rail()
-        self.workspace.reload_workspace(self.p, self)
+        self.workspace.reload_workspace()
 
 
     # Called to create a note object
@@ -612,7 +608,8 @@ class Story(ft.View):
         self.notes[title] = Notes(title, self.p, directory_path, self)
         self.widgets.append(self.notes[title])  # Add to our master list of widgets in our story
 
-        self.workspace.reload_workspace(self.p, self)
+        self.active_rail.content.reload_rail()
+        self.workspace.reload_workspace()
 
 
     # Called when new story object is created, either by program or by being loaded from storage
@@ -636,7 +633,7 @@ class Story(ft.View):
         self.workspaces_rail = Workspaces_Rail(page, self)  # Create our all workspaces rail
         self.active_rail = Active_Rail(page, self)  # Container stored in story for the active rails
         self.workspace = Workspace(page, self)  # Reference to our workspace object for pin locations
-        self.workspace.reload_workspace(page, self)  # Load our workspace here instead of in the workspace constructor
+        self.workspace.reload_workspace()  # Load our workspace here instead of in the workspace constructor
 
         # Called when hovering over resizer to right of the active rail
         def show_horizontal_cursor(e: ft.HoverEvent):
