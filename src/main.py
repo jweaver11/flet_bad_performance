@@ -7,10 +7,8 @@ import flet as ft
 from models.app import app
 from handlers.route_change import route_change
 from constants.init import init_settings, init_load_saved_stories
-from ui.active_rail import Active_Rail
 from ui.menu_bar import create_menu_bar
 from ui.workspace import create_workspace
-from ui.workspaces_rail import Workspaces_Rail
 
 
 
@@ -45,17 +43,6 @@ def main(page: ft.Page):
         
         menubar = create_menu_bar(page)   
 
-
-        # Create our rails inside of app so we can access it as an object and store preferences
-        all_workspaces_rail = Workspaces_Rail(page)  # Create our all workspaces rail
-        active_rail = ft.Container(
-            alignment=ft.alignment.top_center,  
-            padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
-            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-            width=app.settings.data['active_rail_width'],  
-            content=ft.Text("Create a story to get started!")
-        )
-
         # Create our workspace container to hold our widgets
         workspace = create_workspace(page)  # render our workspace containing our widgets 
         #workspace.alignment = ft.MainAxisAlignment.CENTER
@@ -66,11 +53,6 @@ def main(page: ft.Page):
             expand=True,  # Makes sure it takes up the entire window/screen
 
             controls=[
-                all_workspaces_rail,  # Main rail of all available workspaces
-                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
-                active_rail,    # Rail for the selected workspace
-                active_rail_divider,   # Divider between rail and work area
                 
                 workspace,    # Work area for pagelets
             ],
@@ -97,10 +79,6 @@ def main(page: ft.Page):
         
         menubar = create_menu_bar(page)   
 
-        # Create our rails inside of app so we can access it as an object and store preferences
-        all_workspaces_rail = Workspaces_Rail(page)  # Create our all workspaces rail
-        active_rail = Active_Rail(page)  # Container stored in story for the active rails
-
         # Create our workspace container to hold our widgets
         workspace = create_workspace(page)  # render our workspace containing our widgets 
 
@@ -110,11 +88,6 @@ def main(page: ft.Page):
             expand=True,  # Makes sure it takes up the entire window/screen
 
             controls=[
-                all_workspaces_rail,  # Main rail of all available workspaces
-                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
-                active_rail,    # Rail for the selected workspace
-                active_rail_divider,   # Divider between rail and work area
                 
                 workspace,    # Work area for pagelets
             ],
@@ -131,17 +104,6 @@ def main(page: ft.Page):
         )
         
         return view
-
-
-
-    # The divider to the right of the active rail
-    active_rail_divider = ft.Container(
-        width=10,   # Total width of the GD, so its easier to find with mouse
-        bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
-        # Thin vertical divider, which is what the app will actually drag
-        content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
-        padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
-    )
        
 
     # If we loaded our stories, and there is no active story, we load 1 of 2 views

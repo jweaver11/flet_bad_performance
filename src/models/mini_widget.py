@@ -139,6 +139,8 @@ class MiniWidget(ft.Container):
     def reload_mini_widget(self):
         ''' Reloads our mini widget UI based on our data '''
 
+        # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
+
         # Create body content
         self.content = ft.Column(
             [

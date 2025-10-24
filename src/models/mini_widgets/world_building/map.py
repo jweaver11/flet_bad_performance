@@ -37,12 +37,13 @@ class Map(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
     def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, type: str=None, data: dict=None):
+        # Add map type parameter for world map, continent, country, region, city, dungeon, etc????
         
         # Parent constructor
         super().__init__(
             title=title,           
             owner=owner, 
-            father=father,       
+            father=father,       # In this case, father is either a parent map or the world building widget
             page=page,              
             data=data,              
             dictionary_path=dictionary_path     
@@ -53,13 +54,15 @@ class Map(MiniWidget):
             self,   
             {
                 'tag': "map", 
-                'type': type,                  # Type of map - continent, country, region, city, dungeon, etc
-                'maps': dict,   # Needed????
-                'category': str,                 # Category/psuedo folder this map belongs to
+                'type': type,                   # Type of map - continent, country, region, city, dungeon, etc
+                'map_is_visible': True,         # Whether the map is visible in the world building widget or not
+                'maps': dict,                   # Sub maps contained within this map
+                'map_category': str,            # Category/psuedo folder this map belongs to
+                'categories': list,             # List of sub categories contained within this map. This allows for nested categories that are empty
                 'markers': dict,
                 'locations': dict,
-                'geography': dict,                  # Geography of the world
-                'rooms': dict,
+                'geography': dict,              # Geography of the world
+                'rooms': dict,                  
                 'notes': str,
             },
         )
@@ -68,8 +71,12 @@ class Map(MiniWidget):
         self.state = State()
 
         self.drawing_mode = False  # Whether we are in drawing mode or not
+        self.dragging_mode = False  # Whether we are in dragging mode or not. Used to drag around on top of parent map
 
+        # Dict of our sub maps
         self.maps = {}
+
+
         self.details = {}
 
         # Load our maps that are held within this amp
@@ -81,7 +88,7 @@ class Map(MiniWidget):
         
 
         # The Visual Canvas map for drawing
-        self.cp = cv.Canvas(
+        self.map = cv.Canvas(
             content=ft.GestureDetector(
                 on_pan_start=self.pan_start,
                 on_pan_update=self.pan_update,
@@ -89,10 +96,67 @@ class Map(MiniWidget):
             ),
             expand=True
         )
+
+
+        self.display = self.reload_map()    # Make into an interactive viewer
         
 
         # Builds/reloads our timeline UI
         self.reload_map()
+
+        # Reloads the information display of the map
+        self.reload_mini_widget()
+
+    # Called in constructor
+    def load_sub_maps(self):
+        ''' Loads all sub maps stored in our data into our sub_maps dict'''
+
+        try: 
+            # Run through our maps saved in the maps dict
+            for map_title, map_data in self.data['maps'].items():
+
+                # Create a new map object
+                self.maps[map_title] = Map(
+                    title=map_title,
+                    owner=self.owner,       # Our world building widget
+                    father=self,
+                    page=self.p,
+                    dictionary_path="maps",
+                    data=map_data,
+                )
+                # Add it to our mini widgets list
+                self.owner.mini_widgets.append(self.maps[map_title])
+
+        # Catch errors
+        except Exception as e:
+            print(f"Error loading maps for the world building widget: {e}")
+
+    # Called when loading our drawing data from its file
+    def load_drawing(self):
+        ''' Loads our drawing from our saved map drawing file '''
+
+        # Clear existing shapes we might have
+        self.map.shapes.clear()
+
+        try:
+            # Grab our directory path from our owner widget
+            directory_path = os.path.join(self.owner.directory_path, "maps")
+
+            # Set our file path
+            file_path = os.path.join(directory_path, f"{self.title}.json")
+
+            # Load the data from the file
+            with open(file_path, "r") as f:
+                coords = json.load(f)
+                for x1, y1, x2, y2 in coords:
+                    self.map.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
+
+            # Apply the loaded drawing
+            self.map.update()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error loading drawing from {file_path}: {e}")
 
     # Called to save our drawing data to its file
     def save_drawing(self):
@@ -118,38 +182,6 @@ class Map(MiniWidget):
             print(f"Error saving widget to {file_path}: {e}") 
             print("Data that failed to save: ", self.state.shapes)
 
-    # Called when loading our drawing data from its file
-    def load_drawing(self):
-        ''' Loads our drawing from our saved map drawing file '''
-
-        self.cp.shapes.clear()
-
-        try:
-            # Grab our directory path from our owner widget
-            directory_path = os.path.join(self.owner.directory_path, "maps")
-
-            # Set our file path
-            file_path = os.path.join(directory_path, f"{self.title}.json")
-
-            # Load the data from the file
-            with open(file_path, "r") as f:
-                coords = json.load(f)
-                for x1, y1, x2, y2 in coords:
-                    self.cp.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
-
-            # Apply the loaded drawing
-            self.cp.update()
-
-        # Handle errors
-        except Exception as e:
-            print(f"Error loading drawing from {file_path}: {e}")
-
-    # Called in constructor
-    def load_sub_maps(self):
-        ''' Loads all sub maps stored in our data into our sub_maps dict'''
-        # Change cursor to click one, highlight map in widget
-        pass
-
     def load_details(self):
         ''' Loads the rest of our map details that are not sub maps into our details dict '''
         #self.load_locations()
@@ -161,6 +193,32 @@ class Map(MiniWidget):
         #self.load_governments()
         pass
  
+    def create_map(self, title: str, category: str=None):
+
+        # Creates our new map object
+        new_map = Map(
+            title=title,
+            owner=self,
+            father=self,
+            page=self.p,
+            dictionary_path="maps",
+            data=None,
+        )
+
+        # Creates the new map object and saves its data
+        self.maps[title] = new_map
+        self.owner.mini_widgets.append(self.maps[title])
+
+        # Save our new maps data
+        self.data['maps'][title] = self.maps[title].data
+        self.save_dict()
+
+        # Reload our widget and rail to show the new map
+        self.owner.reload_widget()
+
+        # Catches error if creating default world map on program startup, where UI is not created yet
+        if self.owner.story.active_rail is not None:
+            self.owner.story.active_rail.content.reload_rail()
     
 
     def on_hover(self, e: ft.HoverEvent):
@@ -176,30 +234,37 @@ class Map(MiniWidget):
         def draw_line():
             line = cv.Line(self.state.x, self.state.y, e.local_x, e.local_y,
                            paint=ft.Paint(stroke_width=3))
-            self.cp.shapes.append(line)
+            self.map.shapes.append(line)
             self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
-            self.cp.update()
+            self.map.update()
             self.state.x, self.state.y = e.local_x, e.local_y
         Thread(target=draw_line, daemon=True).start()
 
     # Called when we need to rebuild out timeline UI
-    def reload_map(self):
+    def reload_map(self) -> ft.Control:       # Make it return an interactive viewer??
         ''' Rebuilds/reloads our map UI '''
 
-        # I.E. Continents can add countries, regions, oceans, etc.. But countries cant add continents, etc.
-        # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
-        # Option to be in edit mode (drawing mode), view mode, or dragging mode to move around its parent map
         # Make it so that maps 'mini widget' shows inside of the map...
         # If two+ maps open at same time, both their mini widgets can be shown at same time
 
-        # Content of our Timeline (Gesture detector)
-        self.content = ft.Column([
-            self.cp,
+        # Display of our map (Gesture detector)
+        display = ft.Column([
+            self.map,
             ft.Row([
                 ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_drawing()),
                 ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_drawing())
             ])
         ])
+
+        display_container = ft.Container(
+            content=display,
+            expand=True,
+            bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.PURPLE),
+        )
+
+        self.p.update()
+
+        return display_container
     
 
 

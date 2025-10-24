@@ -9,6 +9,7 @@ Nested in any particular way. WorldMaps CANNOT store each other or be nested.
 import os
 import flet as ft
 from models.widget import Widget
+from models.mini_widgets.world_building.map import Map
 from models.story import Story
 from handlers.verify_data import verify_data
 
@@ -45,7 +46,6 @@ class World_Building(Widget):
                  
                 # TODO: Have the story type add categories here
 
-                'world_maps': dict,                 # Dict of different worlds and their maps stored
                 'lores': dict,                      # Dict of any world lore, myths, legends, etc
                 'history': dict,                    # History of the world
                 'power_systems': dict,              # Power systems of the world
@@ -54,11 +54,15 @@ class World_Building(Widget):
                 'technology': dict,                 # Technology of the world
                 'governments': dict,                # Governments of the world
                 'content': str,
+                'maps': dict,                       # All maps contained within this world building widget
             }
         )
 
+        # List of our maps (map.map) visuals displayed in the widget
+        self.displayed_maps: list = []
+
         # Dict of different worlds and their maps stored
-        self.world_maps = {}
+        self.maps = {}
         self.locations = {}
         self.lore = {}
         self.power_systems = {}     # Tie to any
@@ -69,7 +73,7 @@ class World_Building(Widget):
         self.governments = {}   # Tie to countries, tribes, etc
 
         # Load our live objects from our data
-        self.load_world_maps()
+        self.load_maps()
         self.load_lore()
         self.load_power_systems()
         self.load_social_systems()
@@ -83,29 +87,38 @@ class World_Building(Widget):
     
 
     # Called in constructor
-    def load_world_maps(self):
+    def load_maps(self):
         ''' Loads our world maps from our dict into our live object '''
         
+        try: 
+            # Run through our maps saved in the maps dict
+            for map_title, map_data in self.data['maps'].items():
 
-        for map_title, map_data in self.data['world_maps'].items():
+                # Create a new map object
+                self.maps[map_title] = Map(
+                    title=map_title,
+                    owner=self,
+                    father=self,
+                    page=self.p,
+                    dictionary_path="maps",
+                    data=map_data,
+                )
 
-            # Create a new Map object for each map in our data
-            from models.mini_widgets.world_building.map import Map
+                # Add the map to our displayed maps list if it visible there
+                if self.maps[map_title].data.get('map_is_visible', True):
+                    self.displayed_maps.append(self.maps[map_title].display)
 
-            self.world_maps[map_title] = Map(
-                title = map_title,
-                owner = self,
-                father=self,
-                page = self.p,
-                dictionary_path="world_maps",
-                data = map_data,
-            )
+                # Add it to our mini widgets list
+                self.mini_widgets.append(self.maps[map_title])
 
+            # If we have no maps, create a default one to get started
+            if len(self.maps) == 0:
+                #print("No world maps found, creating default world map")
+                self.create_map(title="World Map")
 
-        # If we have no world maps, create a default one to get started
-        if len(self.world_maps) == 0:
-            #print("No world maps found, creating default world map")
-            self.create_world_map(title="World Map")
+        # Catch errors
+        except Exception as e:
+            print(f"Error loading maps for the world building widget: {e}")
 
     def load_lore(self):
         pass
@@ -129,27 +142,27 @@ class World_Building(Widget):
         pass
 
 
-    # Called when creating a new world map
-    def create_world_map(self, title: str):
+    # Called when creating a new map
+    def create_map(self, title: str, category: str=None):
         ''' Requires a title. Creates a new world map in our live object and data'''
-        from models.mini_widgets.world_building.maps.world_map import WorldMap
-
-        # Filters to hide different kinds of maps like countries, continents, oceans, cities, locations, etc
 
         # Creates our new map object
-        new_map = WorldMap(
+        new_map = Map(
             title=title,
             owner=self,
             father=self,
             page=self.p,
-            dictionary_path=os.path.join(self.directory_path, 'world_maps'),
+            dictionary_path="maps",
             data=None,
         )
 
-
         # Creates the new map object and saves its data
-        self.world_maps[title] = new_map
-        self.data['world_maps'][title] = self.world_maps[title].data
+        self.maps[title] = new_map
+        self.displayed_maps.append(self.maps[title].display)
+        self.mini_widgets.append(self.maps[title])
+
+        # Save our new maps data
+        self.data['maps'][title] = self.maps[title].data
         self.save_dict()
 
         # Reload our widget and rail to show the new map
@@ -160,16 +173,15 @@ class World_Building(Widget):
             self.story.active_rail.content.reload_rail()
 
 
-
-
     def on_hover(self, e: ft.HoverEvent):
         pass
 
     def reload_widget(self):
         ''' Reloads our world building widget '''
 
-        # Our column that will display our header filters and body of our widget
-        self.body_container.content = ft.Text(f"hello from: {self.title}")
+        row = ft.Row()
+        row.controls.extend(self.displayed_maps)
+        self.body_container.content = row
 
         self._render_widget()
 
@@ -194,6 +206,7 @@ class World_Building(Widget):
 
         # MAPS USE TREE VIEW FORMAT, ANY MAP CAN FIT IN ANY OTHER MAP, NO RESTRICTIONS. THEY ARE WIDGETS WITH 2 FILES,
         # ONE FOR IMAGE, ONE FOR DATA. THEY CAN STORE OTHER MAPS IN THEIR DATA
+        # Change cursor to click icon, highlight map in widget
 
 
 

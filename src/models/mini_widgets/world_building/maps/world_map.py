@@ -75,7 +75,7 @@ class WorldMap(Map):
     # Called when we need to rebuild out timeline UI
     def reload_world_map(self):
 
-        # We only show branches, arcc, plotpoints, and timeskips using their UI elements, not their mini widget
+        
 
         # Content of our Timeline (Gesture detector)
         self.content = ft.Container(

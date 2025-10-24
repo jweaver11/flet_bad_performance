@@ -56,6 +56,7 @@ class Story(ft.View):
                     'multi_planitary': False,       # Whether the story will take place on multiple planets
                     'multi_timelines': False,       # Whether the story will have multiple timelines (regression, multiverse, etc.)
                 },
+                'is_new_story': True,      # Whether this story is newly created or loaded from storage
             },
         )
 
@@ -116,6 +117,10 @@ class Story(ft.View):
         # Builds our view (menubar, rails, workspace) and adds it to the page
         self.build_view()
 
+        # After the story has been loaded, make sure this is no longer a new story
+        self.data['is_new_story'] = False 
+        self.save_dict()
+
 
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):
@@ -143,6 +148,8 @@ class Story(ft.View):
     # Called when a new story is created and not loaded with any data
     def verify_story_structure(self, template: str=None):
         ''' Creates our story folder structure inside of our stories directory '''
+
+        is_new_story = self.data.get('is_new_story', True)
 
         # Sets our path to our story folder
         directory_path = os.path.join(data_paths.stories_directory_path, self.title)
@@ -184,7 +191,7 @@ class Story(ft.View):
             os.makedirs(folder_path, exist_ok=True)
         
         # Create the path to the story's JSON file
-        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+        directory_path = os.path.join(data_paths.stories_directory_path, self.title)   
         
         # Save our data
         self.save_dict()
@@ -430,7 +437,7 @@ class Story(ft.View):
             return
         
         # Construct the path to plotline.json
-        world_building_json_path = os.path.join(self.data['world_building_directory_path'], 'world_building.json')
+        world_building_json_path = os.path.join(self.data['world_building_directory_path'], 'World_Building.json')
 
         # Set data blank initially
         world_building_data = None
@@ -442,18 +449,20 @@ class Story(ft.View):
                 #print("World buliding data: \n", world_building_data)
                 
                 #print(f"Successfully loaded world data")
-        except FileNotFoundError:
-            print(f"world.json not found at {world_building_json_path}")
-        
-        except json.JSONDecodeError as e:
-            print(f"Error parsing world_building.json: {e}")
             
         except Exception as e:
-            print(f"Unexpected error reading world.json: {e}")
+            pass
+            #print(f"Unexpected error reading world.json: {e}")
           
         
         # Create our world object with no data if story is new, or loaded data if it exists already
-        self.world_building = World_Building("World_Building", self.p, self.data['world_building_directory_path'], self, world_building_data)
+        self.world_building = World_Building(
+            "World_Building", 
+            self.p, 
+            self.data['world_building_directory_path'], 
+            self, 
+            world_building_data
+        )
 
 
 

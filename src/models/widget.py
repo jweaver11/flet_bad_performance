@@ -130,13 +130,19 @@ class Widget(ft.Container):
     def toggle_visibility(self):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
-        # Set our container object to invisible - won't be rendered anywhere
-        self.data['visible'] = not self.data['visible']
-        self.visible = self.data['visible']
-        self.save_dict()
-        self.p.update()
+        try:
 
-        self.story.workspace.reload_workspace()
+            # Change our visibility data, save it, then apply it
+            self.data['visible'] = not self.data['visible']
+            self.save_dict()
+            self.visible = self.data['visible']
+            self.p.update()
+
+            self.story.workspace.reload_workspace()
+
+        # Catch errors
+        except Exception as e:
+            print(f"Error toggling visibility of widget {self.title}. (Story is probably none): {e}")
 
     # Called at end of constructor
     def reload_tab(self):

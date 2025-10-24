@@ -18,36 +18,11 @@ class World_Building_Rail(Rail):
         # Reload the rail on start
         self.reload_rail()
 
-    def create_map(self):
-        ''' Creates a new world building map '''
-        from models.mini_widgets.world_building.map import Map
-
-        title = "New Map"
-
-        # Create a new map mini widget
-        new_map = Map(
-            title=title,
-            owner=self.story.world_building,
-            father=self.story.world_building,
-            page=self.p,
-            dictionary_path="world_maps",
-            data=None,
-        )
-
-        self.story.world_building.world_maps[title] = new_map
-
-        self.story.world_building.mini_widgets.append(new_map)
-
-
-        # Reload the rail to show the new map
-        self.story.world_building.reload_widget()
-        self.reload_rail()
-
-    def show_world(self, story: Story):
+    def show_world(self):
         ''' Shows the world building widget '''
 
-        if story.world_building is not None:
-            story.world_building.toggle_visibility()
+        if self.story.world_building is not None:
+            self.story.world_building.toggle_visibility()
 
     # Called when changes occur that require rail to be reloaded, but the object does not need to be recreated. (More efficient)
     def reload_rail(self) -> ft.Control:
@@ -66,24 +41,24 @@ class World_Building_Rail(Rail):
                 ft.Text("From the story: "),
                 ft.Text(self.story.title),
                 ft.TextButton(
-                    "Show world",
-                    on_click=lambda e: self.show_world(self.story)
-                    
+                    "Show world building widget",
+                    on_click=lambda e: self.show_world() 
                 ),
+
 
                 # Add more controls here as needed
             ]
         )
 
-        for map in self.story.world_building.world_maps.values():
+        for map in self.story.world_building.maps.values():
             column.controls.append(
                 ft.Text(map.title)
             )
 
         column.controls.append(
-            ft.TextButton(
-                "Create new map",
-                on_click=lambda e: self.create_map()
+            ft.TextField(
+                label="Create new map",
+                on_submit=lambda e: self.story.world_building.create_map(title=e.control.value)
             )
         )
 
