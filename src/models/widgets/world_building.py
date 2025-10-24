@@ -58,9 +58,6 @@ class World_Building(Widget):
             }
         )
 
-        # List of our maps (map.map) visuals displayed in the widget
-        self.displayed_maps: list = []
-
         # Dict of different worlds and their maps stored
         self.maps = {}
         self.locations = {}
@@ -103,10 +100,6 @@ class World_Building(Widget):
                     dictionary_path="maps",
                     data=map_data,
                 )
-
-                # Add the map to our displayed maps list if it visible there
-                if self.maps[map_title].data.get('map_is_visible', True):
-                    self.displayed_maps.append(self.maps[map_title].display)
 
                 # Add it to our mini widgets list
                 self.mini_widgets.append(self.maps[map_title])
@@ -158,7 +151,6 @@ class World_Building(Widget):
 
         # Creates the new map object and saves its data
         self.maps[title] = new_map
-        self.displayed_maps.append(self.maps[title].display)
         self.mini_widgets.append(self.maps[title])
 
         # Save our new maps data
@@ -180,7 +172,14 @@ class World_Building(Widget):
         ''' Reloads our world building widget '''
 
         row = ft.Row()
-        row.controls.extend(self.displayed_maps)
+        
+        for map in self.maps.values():
+            if map.data.get('is_displayed', False):
+                map.display = map.reload_map()
+                row.controls.append(map.display)
+
+
+
         self.body_container.content = row
 
         self._render_widget()

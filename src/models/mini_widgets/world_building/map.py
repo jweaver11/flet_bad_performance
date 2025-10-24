@@ -55,7 +55,7 @@ class Map(MiniWidget):
             {
                 'tag': "map", 
                 'type': type,                   # Type of map - continent, country, region, city, dungeon, etc
-                'map_is_visible': True,         # Whether the map is visible in the world building widget or not
+                'is_displayed': True,           # Whether the map is visible in the world building widget or not
                 'maps': dict,                   # Sub maps contained within this map
                 'map_category': str,            # Category/psuedo folder this map belongs to
                 'categories': list,             # List of sub categories contained within this map. This allows for nested categories that are empty
@@ -152,7 +152,8 @@ class Map(MiniWidget):
                     self.map.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
 
             # Apply the loaded drawing
-            self.map.update()
+            #self.map.update()
+            self.p.update()
 
         # Handle errors
         except Exception as e:
@@ -236,7 +237,8 @@ class Map(MiniWidget):
                            paint=ft.Paint(stroke_width=3))
             self.map.shapes.append(line)
             self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
-            self.map.update()
+            #self.map.update()
+            self.p.update()
             self.state.x, self.state.y = e.local_x, e.local_y
         Thread(target=draw_line, daemon=True).start()
 
@@ -261,8 +263,7 @@ class Map(MiniWidget):
             expand=True,
             bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.PURPLE),
         )
-
-        self.p.update()
+        
 
         return display_container
     

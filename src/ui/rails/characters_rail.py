@@ -72,7 +72,7 @@ class Characters_Rail(Rail):
             for character in self.story.characters.values():
                 char_button = ft.TextButton(
                     text=character.title,
-                    on_click=lambda e, char=character: char.toggle_visibility(self.story), # Needs this reference, idk y
+                    on_click=lambda e, char=character: char.toggle_visibility(), # Needs this reference, idk y
                 )
                 column.controls.append(char_button)
 
