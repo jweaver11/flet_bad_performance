@@ -11,27 +11,25 @@ import os
 import json
 from handlers.verify_data import verify_data
 
-# TODO Show widget outline when clicked on rail as a pseudo 'focus'
-# TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
 
 class Widget(ft.Container):
     
     # Constructor. All widgets require a title,  page reference, directory path, and story reference
     def __init__(self, title: str, p: ft.Page, directory_path: str, story: Story, data: dict=None):
 
-        # set uniformity for all widgets
+        # Sets uniformity for all widgets
         super().__init__(
             expand=True, 
-            bgcolor=ft.Colors.TRANSPARENT,  # Makes it invisible
-            data=data,  # Sets our data. NOTE. If data is None, you need to set to {} later
+            bgcolor=ft.Colors.TRANSPARENT, 
+            data=data,  # Sets our data. 
         )
     
         # Required properties of all widgets
-        self.title = title  # Title of our object
-        self.p = p   # Grabs a page reference for updates (page.update breaks when widget is removed then re-added to the page)
-        self.directory_path = directory_path    # Path to our directory that will contain our json file
-        self.story = story  # Reference to our story object that owns this widget
-        self.mini_widgets = []  # List that holds our mini widgets objects
+        self.title = title  #                        Title of our object
+        self.p = p                                  # Grabs a page reference for updates
+        self.directory_path = directory_path        # Path to our directory that will contain our json file
+        self.story = story                          # Reference to our story object that owns this widget
+        self.mini_widgets = []                      # List that holds our mini widgets objects
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -50,6 +48,9 @@ class Widget(ft.Container):
 
         # Apply our visibility
         self.visible = self.data['visible'] 
+
+        # Tracks variable to see if we should outline the widget where it is displayed
+        self.is_selected = False
 
         # UI ELEMENTS - Tab
         self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
@@ -147,6 +148,8 @@ class Widget(ft.Container):
     # Called at end of constructor
     def reload_tab(self):
         ''' Creates our tab for our widget that has the title and hide icon '''
+
+        # TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
 
         # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
         self.tabs = ft.Tabs(

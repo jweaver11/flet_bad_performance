@@ -36,7 +36,16 @@ from threading import Thread
 class Map(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, type: str=None, data: dict=None):
+    def __init__(
+            self, 
+            title: str, 
+            owner: Widget, 
+            father, 
+            page: ft.Page, 
+            dictionary_path: str, 
+            category: str = None, 
+            data: dict = None
+        ):
         # Add map type parameter for world map, continent, country, region, city, dungeon, etc????
         
         # Parent constructor
@@ -54,16 +63,21 @@ class Map(MiniWidget):
             self,   
             {
                 'tag': "map", 
-                'type': type,                   # Type of map - continent, country, region, city, dungeon, etc
                 'is_displayed': True,           # Whether the map is visible in the world building widget or not
                 'maps': dict,                   # Sub maps contained within this map
-                'map_category': str,            # Category/psuedo folder this map belongs to
-                'categories': list,             # List of sub categories contained within this map. This allows for nested categories that are empty
+                'map_category': category,       # Category/psuedo folder this map belongs to
                 'markers': dict,
                 'locations': dict,
                 'geography': dict,              # Geography of the world
                 'rooms': dict,                  
                 'notes': str,
+
+                'categories': {                     # Categories for organizing our maps on the rail
+                    'category_name': {
+                        'title': str,               # Title of the category
+                        'is_expanded': bool,        # Whether the category is expanded or collapsed
+                    },
+                },
             },
         )
 
@@ -152,7 +166,7 @@ class Map(MiniWidget):
                     self.map.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
 
             # Apply the loaded drawing
-            #self.map.update()
+            #self.map.update() # OLD
             self.p.update()
 
         # Handle errors
@@ -252,10 +266,13 @@ class Map(MiniWidget):
         # Display of our map (Gesture detector)
         display = ft.Column([
             self.map,
-            ft.Row([
-                ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_drawing()),
-                ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_drawing())
-            ])
+            ft.Row(
+                expand=True,
+                controls=[
+                    ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_drawing()),
+                    ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_drawing())
+                ]
+            )
         ])
 
         display_container = ft.Container(

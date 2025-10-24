@@ -33,16 +33,36 @@ class World_Building(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "world_building",            
-                'displayed_maps': list,                  # List of the maps displayed in the widget
+                'displayed_maps': list,              # List of the maps displayed in the widget
 
-                # List of different categories for organizing our world maps on the rail. (Psuedo folders)
-                'categories': [
-                    'continents',
-                    'oceans',
-                    'regions',
-                    'countries',
-                    'cities',
-                ],           
+                'categories': {                     # List of different categories for organizing our world maps on the rail. (Psuedo folders)
+                    'category_name': {
+                        'title': str,               # Title of the category
+                        'is_expanded': bool,        # Whether the category is expanded or collapsed
+                    },
+                    'continents': {
+                        'title': str,
+                        'is_expanded': bool,
+                    },
+                    'oceans': {
+                        'title': str,
+                        'is_expanded': bool,
+                    },
+                    'regions': {
+                        'title': str,
+                        'is_expanded': bool,
+                    },
+                    'countries': {
+                        'title': str,
+                        'is_expanded': bool,
+                    },
+                    'cities': {
+                        'title': str,
+                        'is_expanded': bool,
+                    },
+                        
+                    
+                },           
                  
                 # TODO: Have the story type add categories here
 
@@ -168,16 +188,17 @@ class World_Building(Widget):
     def on_hover(self, e: ft.HoverEvent):
         pass
 
+    # Called to reload our widget UI
     def reload_widget(self):
         ''' Reloads our world building widget '''
 
-        row = ft.Row()
+        row = ft.Row(expand=True)
         
+        # Add our maps that are displayed currently
         for map in self.maps.values():
             if map.data.get('is_displayed', False):
-                map.display = map.reload_map()
+                #map.display = map.reload_map()
                 row.controls.append(map.display)
-
 
 
         self.body_container.content = row

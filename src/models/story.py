@@ -543,6 +543,7 @@ class Story(ft.View):
             if note not in self.widgets:
                 self.widgets.append(note)
 
+        # Add our settings to the widget list as well
         if app.settings not in self.widgets:
             self.widgets.append(app.settings)   # Add our app settings to the widgets list so its accessible everywhere
         
