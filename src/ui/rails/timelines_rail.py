@@ -105,9 +105,9 @@ class Timelines_Rail(Rail):
             ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
 
             # Create an expansion tile for our plotpoints, time skips, and arcs
-            plot_points_expansion_tile = Timeline_Expansion_Tile("Plot Points")
-            time_skips_expansion_tile = Timeline_Expansion_Tile("Time Skips")
-            arcs_expansion_tile = Timeline_Expansion_Tile("Arcs")
+            plot_points_expansion_tile = Timeline_Expansion_Tile("Plot Points", .8)
+            time_skips_expansion_tile = Timeline_Expansion_Tile("Time Skips", .8)
+            arcs_expansion_tile = Timeline_Expansion_Tile("Arcs", .8)
         
 
             # Go through our plotpoints from our parent arc or timeline

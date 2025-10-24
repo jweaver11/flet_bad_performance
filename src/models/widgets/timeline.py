@@ -79,7 +79,8 @@ class Timeline(Widget):
         self.load_plot_points()
         self.load_time_skips()
         
-
+        # UI elements
+        self.timeline_control: ft.GestureDetector = ft.GestureDetector()
         
 
         # Builds/reloads our timeline UI
@@ -210,10 +211,16 @@ class Timeline(Widget):
         self.reload_widget()
    
 
-    def on_hover(self, e: ft.HoverEvent):
-        #print(e)
-        pass
+    def on_enter(self, e: ft.HoverEvent):
+        print("hover")
+        e.control.content.opacity = 1
+        self.p.update()
         # Grab local mouse to figure out x and map it to our timeline
+
+    def on_exit(self, e: ft.HoverEvent):
+        print("leave")
+        e.control.content.opacity = 0.7
+        self.p.update()
 
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):
@@ -232,15 +239,41 @@ class Timeline(Widget):
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
 
         #timelines_filters = []
+        '''
+        Psuedocode for the timline control:
 
-        # The control that shows up in the timelines widget OUTSIDE our mini widget
-        self.timeline_control: ft.GestureDetector = ft.GestureDetector() 
+        Generate the gesture detector for the timeline control.
+        Each gesture detector should only
+        - Add the plot points and timeskips based on start/end dates of the events and timeline (Also use x axis possibly??)
+        - Iterate through arcs and...
+        - Find where arcs need to offshoot baseed on start date, add vertical divider there
+        - Add curved horizontal divider for duration of the arc
+        
+
+        '''
+
+        # The actual timeline control shown in our widget
+        self.timeline_control = ft.GestureDetector(
+            expand=True,
+            on_exit=self.on_exit,
+            on_enter=self.on_enter,
+            mouse_cursor=ft.MouseCursor.CLICK,
+            content=ft.Row(
+                spacing=0,
+                controls=[
+                    ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=4),
+                    ft.Container(expand=True, padding=None, content=ft.Divider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=4)),
+                    ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=4),
+                ]
+            )
+        )
 
 
         # The UI element that will display our filters
         filters = ft.Row(scroll="auto")
 
         # UI elements
+        # Filter to show check marks across timeline as markings for years/months
         filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
         filter_arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.filter_arcs.value))
         reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))
@@ -268,7 +301,7 @@ class Timeline(Widget):
                 expand=True,
                 controls=[
                     ft.Container(expand=True,),
-                    ft.Divider(color=ft.Colors.with_opacity(0.5, ft.Colors.BLUE), thickness=2),
+                    self.timeline_control,
                     ft.Container(expand=True,),
                 ]
             )
