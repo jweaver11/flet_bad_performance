@@ -32,6 +32,7 @@ class World_Building_Rail(Rail):
         # TODO: Option to create new world map depending on if multiplanetory or not
         # Reads the maps categories for each level, and adds them to a list of categories. Then displays them in the rail
         # This is how we get semi tree view for maps and pass categories in.
+        # Users can only create categories, maps, and markers on existing maps on the rail?
 
         column = ft.Column(
             spacing=0,

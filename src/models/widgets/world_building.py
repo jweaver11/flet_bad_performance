@@ -33,9 +33,8 @@ class World_Building(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "world_building",            
-                'displayed_maps': list,              # List of the maps displayed in the widget
 
-                'categories': {                     # List of different categories for organizing our world maps on the rail. (Psuedo folders)
+                'sub_categories': {                     # List of different categories for organizing our world maps on the rail. (Psuedo folders)
                     'category_name': {
                         'title': str,               # Title of the category
                         'is_expanded': bool,        # Whether the category is expanded or collapsed
@@ -60,11 +59,9 @@ class World_Building(Widget):
                         'title': str,
                         'is_expanded': bool,
                     },
-                        
-                    
+                    # TODO: Have the story type add categories here
                 },           
                  
-                # TODO: Have the story type add categories here
 
                 'lores': dict,                      # Dict of any world lore, myths, legends, etc
                 'history': dict,                    # History of the world
@@ -84,10 +81,10 @@ class World_Building(Widget):
         self.lore = {}
         self.power_systems = {}     # Tie to any
         self.social_systems = {}    # Tie to countries, tribes, continents, etc
-        self.geography = {} # Tie to any
-        self.technology = {}    # Tie to any
-        self.history = {}   # Tie to any
-        self.governments = {}   # Tie to countries, tribes, etc
+        self.geography = {}         # Tie to any
+        self.technology = {}        # Tie to any
+        self.history = {}           # Tie to any
+        self.governments = {}       # Tie to countries, tribes, etc
 
         # Load our live objects from our data
         self.load_maps()
@@ -210,6 +207,7 @@ class World_Building(Widget):
 
         # Users can choose to create their image or use some default ones
         # Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
+        # Add drag target to accept maps from rail into this rail
 
         # TODO: Make it so the maps are rendered in the body of the widget
         # Should be able to see multiple maps at once, and their mini widget info displays as 

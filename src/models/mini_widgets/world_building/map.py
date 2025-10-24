@@ -1,25 +1,14 @@
 '''
-Parent map class that contains all other sub-maps, such as locations, world maps, continents, countries, cities, dungeons, etc.
-Basically, anything that COULD be fleshed out visually. Maps are special widgets, and get two files
-One for normal map widget data, and one for their drawings
+The map class for all maps inside of the world_building widget
+Maps are extended mini widgets, with their 'display' being to view of the map, and their mini widget being the map info display
+Maps save like normal mini widgets, but have their own drawing data saved in the /maps folder.
 '''
 
-# TYPES OF MAPS, COUNTRIES CONTINENTS ETC. THAT CAN ADD THEIR OWN (SUB) MAPS. EXP. CONTINENT CAN ADD COUNTRIES, REGIONS, ETC
 # BLANK NO TEMPLATE MAPS EXIST AS WELL
 # ADD DUPLICATE OPTION AS WELL
-# Users can choose to create their image or use some default ones
-# Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
-# TODO: Make it so the maps are rendered in the body of the widget
-# Should be able to see multiple maps at once, and their mini widget info displays as 
-# MAPS ARE WIDGETS, THAT STORE THEIR OTHER MAPS HOWEVER I SEE FIT (CONTINENTS, COUNTRIES, CITIES, DUNGEONS, ROOMS, ETC, OR JUST MAPS {})
-# THEY HAVE A SAVE DICT METHOD AND UPDATE DICT METHOD THAT WOULD WORK LIKE THE MW SAVE DICT TO UPDATE PARENT MAPS
-# THEY ALSO HAVE THEIR OWN FILES TO STORE THEIR IMAGES
-# Show timeline that can drag and alter the map landscape based on changes
-# EXPAMPLE: City gets destroyed at year 50, that city would reflect that change
-# Option to expand map to add more continents, regions, etc
-# Option for mini widget/widgets to display even when no map is shown
+# Users can choose to create their image or use some default ones, or upload their own
 # When hovering over a map, display it on the rail as well so we can see where new sub maps would
-# Have least amount of map data, while world maps have the most????
+
 
 import os
 import json
@@ -37,16 +26,18 @@ class Map(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
     def __init__(
-            self, 
-            title: str, 
-            owner: Widget, 
-            father, 
-            page: ft.Page, 
-            dictionary_path: str, 
-            category: str = None, 
-            data: dict = None
-        ):
-        # Add map type parameter for world map, continent, country, region, city, dungeon, etc????
+        self, 
+        title: str, 
+        owner: Widget, 
+        father, 
+        page: ft.Page, 
+        dictionary_path: str, 
+        category: str = None, 
+        data: dict = None
+    ):
+        
+        # Supported categories: World map, continent, region, ocean, country, city, dungeon, room, none.
+        
         
         # Parent constructor
         super().__init__(
@@ -65,14 +56,14 @@ class Map(MiniWidget):
                 'tag': "map", 
                 'is_displayed': True,           # Whether the map is visible in the world building widget or not
                 'maps': dict,                   # Sub maps contained within this map
-                'map_category': category,       # Category/psuedo folder this map belongs to
-                'markers': dict,
+                'category': category,           # Category/psuedo folder this map belongs to
+                'markers': dict,                # Markers placed on the map
                 'locations': dict,
                 'geography': dict,              # Geography of the world
                 'rooms': dict,                  
                 'notes': str,
 
-                'categories': {                     # Categories for organizing our maps on the rail
+                'sub_categories': {                     # Categories for organizing our maps on the rail
                     'category_name': {
                         'title': str,               # Title of the category
                         'is_expanded': bool,        # Whether the category is expanded or collapsed
@@ -84,7 +75,10 @@ class Map(MiniWidget):
         # State used for drawing
         self.state = State()
 
+        # Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
         self.drawing_mode = False  # Whether we are in drawing mode or not
+
+
         self.dragging_mode = False  # Whether we are in dragging mode or not. Used to drag around on top of parent map
 
         # Dict of our sub maps
