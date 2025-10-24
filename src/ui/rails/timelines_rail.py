@@ -3,6 +3,7 @@
 import flet as ft
 from models.story import Story
 from ui.rails.rail import Rail
+from styles.styles import Timeline_Expansion_Tile
 
 
 # Class is created in main on program startup
@@ -15,7 +16,7 @@ class Timelines_Rail(Rail):
             page=page,
             story=story
         )
-
+ 
         self.reload_rail()
 
     # Called when user creates a new plotline
@@ -92,10 +93,9 @@ class Timelines_Rail(Rail):
     # Reload the rail whenever we need
     def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
-        from models.mini_widgets.timelines.arc import Arc
         from models.widgets.timeline import Timeline
 
-        # PLOTLINE RAIL JUST HAS ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
+        # TIMELINES RAIL ONLY HAS THE ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
         # ALTERING THEM IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
 
@@ -105,23 +105,9 @@ class Timelines_Rail(Rail):
             ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
 
             # Create an expansion tile for our plotpoints, time skips, and arcs
-            plot_points_expansion_tile = ft.ExpansionTile(
-                title=ft.Text("Plot Points"), 
-                shape=ft.RoundedRectangleBorder(),
-                controls=[ft.Container(height=6)]
-            )   
-            time_skips_expansion_tile = ft.ExpansionTile(
-                title=ft.Text("Time Skips"), 
-                shape=ft.RoundedRectangleBorder(),
-                controls=[ft.Container(height=6)]
-            )
-            arcs_expansion_tile = ft.ExpansionTile(
-                title=ft.Text("Arcs") if isinstance(parent, Timeline) else ft.Text("Sub-Arcs"),
-                shape=ft.RoundedRectangleBorder(),
-                controls=[
-                    ft.Container(height=6),
-                ]
-            )
+            plot_points_expansion_tile = Timeline_Expansion_Tile("Plot Points")
+            time_skips_expansion_tile = Timeline_Expansion_Tile("Time Skips")
+            arcs_expansion_tile = Timeline_Expansion_Tile("Arcs")
         
 
             # Go through our plotpoints from our parent arc or timeline
@@ -146,13 +132,7 @@ class Timelines_Rail(Rail):
             for sub_arc in parent.arcs.values():
 
                 # Create a new parent expansion tile we'll need for recursion
-                sub_arc_expansion_tile = ft.ExpansionTile(
-                    title=ft.Text(sub_arc.title),
-                    shape=ft.RoundedRectangleBorder(),
-                    controls=[
-                        ft.Container(height=6),
-                    ]
-                )
+                sub_arc_expansion_tile = Timeline_Expansion_Tile(sub_arc.title)
 
                 # Add the new parent expansion tile to our current parents expansion tile controls
                 arcs_expansion_tile.controls.append(sub_arc_expansion_tile)
@@ -192,6 +172,7 @@ class Timelines_Rail(Rail):
             )
 
             # Add our three expansion tiles to the parent expansion tile
+
             parent_expansion_tile.controls.append(plot_points_expansion_tile)
             parent_expansion_tile.controls.append(time_skips_expansion_tile)
             parent_expansion_tile.controls.append(arcs_expansion_tile)
@@ -212,17 +193,7 @@ class Timelines_Rail(Rail):
         for timeline in self.story.timelines.values():
 
             # Create an expansion tile for our timeline
-            timeline_expansion_tile = ft.ExpansionTile(
-                shape=ft.RoundedRectangleBorder(),  # Get rid of edges of expansion tile
-                title=ft.Text(timeline.title),  # Set the title of expansion tile to the plotline
-                controls=[
-                    ft.Container(height=6), # Spacing
-                    ft.Row([ 
-                        ft.TextField(label="Start Date", value=str(timeline.data['start_date']), expand=True),
-                        ft.TextField(label="End Date", value=str(timeline.data['end_date']), expand=True),
-                    ]),
-                ]
-            )
+            timeline_expansion_tile = Timeline_Expansion_Tile(title=timeline.title, scale=1.0)
 
             # Take our data, and add it to the rail under each timeline
             _load_timeline_or_arc_data(parent=timeline, parent_expansion_tile=timeline_expansion_tile)
@@ -230,6 +201,11 @@ class Timelines_Rail(Rail):
             # Add our expansion tile to the rail content
             self.content.controls.append(timeline_expansion_tile)
             self.content.controls.append(ft.Container(height=10))
+
+            # If theres only one timeline, no need to add the parent expansion to the page
+            if len(self.story.timelines) == 1:
+                self.content.controls = timeline_expansion_tile.controls
+                break
 
 
         def open_menu(story: Story):
@@ -265,7 +241,7 @@ class Timelines_Rail(Rail):
             self.p.update()
 
             
-        
+        self.content.controls.append(ft.Container(height=50))
 
         self.content.controls.append(
             ft.GestureDetector(
