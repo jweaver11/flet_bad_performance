@@ -13,6 +13,7 @@ import os
 import json
 import flet as ft
 from models.widget import Widget
+from models.mini_widgets.world_building.map_information_display import Map_Information_Display
 from models.story import Story
 from handlers.verify_data import verify_data
 from models.state import State
@@ -54,6 +55,7 @@ class Map(Widget):
             {
                 'tag': "map", 
                 'father': father,               # Parent map this map belongs to. None if top level map
+                'information_display': {'visibility': True},   # Info display mini widget visibility
                 'category': category,           # Category/psuedo folder this map belongs to
                 'is_displayed': True,           # Whether the map is visible in the world building widget or not
                 'sub_maps': list,               # Sub maps contained within this map
@@ -104,6 +106,17 @@ class Map(Widget):
 
         # The display container for our map
         self.display: ft.InteractiveViewer = None
+
+        self.information_display = Map_Information_Display(
+            title=self.title,
+            owner=self,                     # Our map is the owner of this mini widget
+            father=self,                    # Our map is also the father of this mini widget
+            page=self.p,
+            dictionary_path="information_display",
+            data=None
+        )
+
+        self.mini_widgets.append(self.information_display)
 
         # Load our maps that are held within this amp
         #self.load_sub_maps()
@@ -247,8 +260,8 @@ class Map(Widget):
             ft.Row(
                 expand=True,
                 controls=[
-                    ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_drawing()),
-                    ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_drawing())
+                    ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_display()),
+                    ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_display())
                 ]
             )
         ])

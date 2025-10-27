@@ -38,9 +38,7 @@ class Timeline(Widget):
                     'show_plot_points': True,
                     'show_arcs': True,
                 },        
-                'information_display': {
-                    'visibility': True,
-                },
+                'information_display': {'visibility': True},
                 'start_date': str,                  # Start and end date of the branch, for timeline view
                 'end_date': str,                    # Start and end date of the branch, for timeline view
                 'color': "primary",                 # Color of the branch in the timeline

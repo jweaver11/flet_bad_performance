@@ -11,30 +11,23 @@ Since maps could have hundreds of sub-maps, we give them each their own file to 
 # When hovering over a map, display it on the rail as well so we can see where new sub maps would
 
 
-import os
-import json
 import flet as ft
 from models.widget import Widget
 from models.mini_widget import MiniWidget
-from handlers.verify_data import verify_data
-from models.state import State
-import flet.canvas as cv
-from threading import Thread
 
 
 
 class Map_Information_Display(MiniWidget):
 
-    # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
+    # Constructor.
     def __init__(
         self, 
         title: str, 
-        owner: Widget, 
-        father, 
+        owner: Widget,                  # The owner is always our map owner
+        father,                         # Our father is always our map owner as well    
         page: ft.Page, 
-        dictionary_path: str, 
-        category: str = None, 
-        data: dict = None
+        dictionary_path: str,           # Not used, but its required so just whatever works
+        data: dict = None               # No data is used here, so NEVER reference it. Use self.owner.data instead
     ):
         
         # Supported categories: World map, continent, region, ocean, country, city, dungeon, room, none.
@@ -44,43 +37,39 @@ class Map_Information_Display(MiniWidget):
         super().__init__(
             title=title,           
             owner=owner, 
-            father=father,       # In this case, father is either a parent map or the world building widget
+            father=father,       
             page=page,              
             data=data,              
             dictionary_path=dictionary_path     
         ) 
 
-        # Verifies this object has the required data fields, and creates them if not
-        verify_data(
-            self,   
-            {
-                'tag': "map_information_display", 
-                'is_displayed': True,           # Whether the map is visible in the world building widget or not
-                'maps': dict,                   # Sub maps contained within this map
-                'category': category,           # Category/psuedo folder this map belongs to
-                'markers': dict,                # Markers placed on the map
-                'locations': dict,
-                'geography': dict,              # Geography of the world
-                'rooms': dict,                  
-                'notes': str,
-
-                'position': {               # Our position on our parent map
-                    'x': 0,                    
-                    'y': 0,                     
-                },
-
-                'sub_categories': {                     # Categories for organizing our maps on the rail
-                    'category_name': {
-                        'title': str,               # Title of the category
-                        'is_expanded': bool,        # Whether the category is expanded or collapsed
-                    },
-                },
-            },
-        )
+        # Set our visibility based on our owners data
+        self.visible = self.owner.data['information_display']['visibility']
 
 
         # Reloads the information display of the map
         self.reload_mini_widget()
+
+    # Called when saving changes to our timeline object
+    def save_dict(self):
+        ''' Overwrites standard mini widget save and save our timelines data instead '''
+        try:
+            self.owner.save_dict()
+        except Exception as e:
+            print(f"Error saving map information display data to {self.owner.title}: {e}")
+
+
+    # Called when toggling our visibility
+    def toggle_visibility(self, e):
+        ''' Custom toggles our visibility for our information display '''
+
+        # Update our visibility (stored in owners data)
+        self.owner.data['information_display']['visibility'] = not self.owner.data['information_display']['visibility']
+        self.visible = self.owner.data['information_display']['visibility']
+        self.owner.save_dict()
+
+        # Apply the update
+        self.p.update()
 
 
     def on_hover(self, e: ft.HoverEvent):

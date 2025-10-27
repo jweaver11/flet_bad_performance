@@ -44,17 +44,17 @@ class Story(ft.View):
                 'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
                 'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "notes"),
-                'top_pin_height': 0,
-                'left_pin_width': 0,
-                'main_pin_height': 0,
-                'right_pin_width': 0,
-                'bottom_pin_height': 0,
+                'top_pin_height': int,
+                'left_pin_width': int,
+                'main_pin_height': int,
+                'right_pin_width': int,
+                'bottom_pin_height': int,
                 'created_at': str,
                 'last_modified': str,
                 'settings': {
-                    'type': self.type,              # Novel or comic. Affects templates and default data for new content
-                    'multi_planitary': False,       # Whether the story will take place on multiple planets
-                    'multi_timelines': False,       # Whether the story will have multiple timelines (regression, multiverse, etc.)
+                    'type': self.type,             # Novel or comic. Affects templates and default data for new content
+                    'multi_planetary': bool,       # Whether the story will take place on multiple planets
+                    'multi_timelines': bool,       # Whether the story will have multiple timelines (regression, multiverse, etc.)
                 },
                 'is_new_story': True,      # Whether this story is newly created or loaded from storage
             },
@@ -152,57 +152,70 @@ class Story(ft.View):
     def verify_story_structure(self, template: str=None):
         ''' Creates our story folder structure inside of our stories directory '''
 
-        is_new_story = self.data.get('is_new_story', True)
+        try:
 
-        # Sets our path to our story folder
-        directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+            is_new_story = self.data.get('is_new_story', True)
 
-        # Set our workspace folder structure inside our story folder
-        required_story_folders = [
-            "content",
-            "characters",
-            "timelines",
-            "world_building",
-            "drawing_board",
-            "planning",
-            "notes",
-        ]
+            # Sets our path to our story folder
+            directory_path = os.path.join(data_paths.stories_directory_path, self.title)
 
-        # Create the workspace folder strucutre above
-        for folder in required_story_folders:
-            folder_path = os.path.join(directory_path, folder)
-            os.makedirs(folder_path, exist_ok=True)     # Checks if they exist or not, so they won't be overwritten
+            # Set our workspace folder structure inside our story folder
+            required_story_folders = [
+                "content",
+                "characters",
+                "timelines",
+                "world_building",
+                "drawing_board",
+                "planning",
+                "notes",
+            ]
+
+            # Create the workspace folder strucutre above
+            for folder in required_story_folders:
+                folder_path = os.path.join(directory_path, folder)
+                os.makedirs(folder_path, exist_ok=True)     # Checks if they exist or not, so they won't be overwritten
+                
+            # Using templates
+            if template is not None:
+                pass
+
+            # Create our folder to store our maps data files and their drawings
+            maps_folders = [
+                "maps",
+                #"displays",
+            ]
+            for folder in maps_folders:
+                folder_path = os.path.join(directory_path, "world_building", folder)
+                os.makedirs(folder_path, exist_ok=True)
+
+            # Set our sub folders inside of notes
+            notes_folders = [
+                "themes",
+                "quotes",
+                "research",
+            ]
+
+            # Create the sub folders inside of notes
+            for folder in notes_folders:
+                folder_path = os.path.join(directory_path, "notes", folder)
+                os.makedirs(folder_path, exist_ok=True)
             
-        # Using templates
-        if template is not None:
-            pass
+            # Create the path to the story's JSON file
+            directory_path = os.path.join(data_paths.stories_directory_path, self.title) 
 
-        # Create our folder to store our maps data files and their drawings
-        maps_folders = [
-            "maps",
-            #"displays",
-        ]
-        for folder in maps_folders:
-            folder_path = os.path.join(directory_path, "world_building", folder)
-            os.makedirs(folder_path, exist_ok=True)
 
-        # Set our sub folders inside of notes
-        notes_folders = [
-            "themes",
-            "quotes",
-            "research",
-        ]
 
-        # Create the sub folders inside of notes
-        for folder in notes_folders:
-            folder_path = os.path.join(directory_path, "notes", folder)
-            os.makedirs(folder_path, exist_ok=True)
-        
-        # Create the path to the story's JSON file
-        directory_path = os.path.join(data_paths.stories_directory_path, self.title)   
-        
-        # Save our data
-        self.save_dict()
+            if self.data['settings']['multi_planetary']:
+                # If multiplanetary, create the worlds folder
+                worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps", "worlds")
+                os.makedirs(worlds_folder_path, exist_ok=True)
+            
+            # Save our data
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error verifying/creating story structure for {self.title}: {e}")
             
 
 
@@ -658,13 +671,20 @@ class Story(ft.View):
         self.active_rail.content.reload_rail()
         self.workspace.reload_workspace()
 
+    # Called to create a map object
     def create_map(self, title: str, directory_path: str=None, father: str=None, category: str=None):
         ''' Creates a new map object, saves it to our live story object, and saves it to storage'''
         from models.widgets.world_building.map import Map
 
         # Path to where all our maps are stored
         if directory_path is None:
-            directory_path = os.path.join(self.data['world_building_directory_path'], "maps")
+
+            # If multi planetary, save it in our worlds folder
+            if self.data['settings']['multi_planitary']:
+                directory_path = os.path.join(self.data['world_building_directory_path'], "maps", "worlds")
+            # Otherwise just save it in the maps folder
+            else:
+                directory_path = os.path.join(self.data['world_building_directory_path'], "maps")
 
         # Create our new map object in our maps dict
         self.maps[title] = Map(
@@ -676,7 +696,9 @@ class Story(ft.View):
             category=category,
             data=None
         )
-        self.widgets.append(self.maps[title])  # Add to our master list of widgets in our story
+
+        # Add to our master list of widgets in our story
+        self.widgets.append(self.maps[title]) 
 
         # Reload our UI's
         self.active_rail.content.reload_rail()
