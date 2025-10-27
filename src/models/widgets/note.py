@@ -13,7 +13,7 @@ class Notes(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            p = page,   # Grabs our original page for convenience and consistency
+            page = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our notes json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
             data = data,

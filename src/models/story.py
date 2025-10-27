@@ -79,6 +79,7 @@ class Story(ft.View):
         self.characters: dict = {}      # Characters in the story
         self.timelines: dict = {}       # Timelines for our story
         self.world_building: None       # World building widget that contains our maps, lore, governments, history, etc
+        self.maps: dict = {}            # Maps created inside of world building
         self.notes: dict = {}           # Notes stored in our story
 
         # Store all our widgets above in a master list for easier rendering in the UI
@@ -107,6 +108,8 @@ class Story(ft.View):
 
         # Load our world building objects from file storage
         self.load_world_building()
+
+        self.load_maps()
 
         # Loads our notes from file storage
         self.load_notes()
@@ -174,9 +177,14 @@ class Story(ft.View):
         if template is not None:
             pass
 
-        # Create our folder to store our maps drawings
-        maps_folder = os.path.join(directory_path, "world_building", "maps")
-        os.makedirs(maps_folder, exist_ok=True)
+        # Create our folder to store our maps data files and their drawings
+        maps_folders = [
+            "maps",
+            #"displays",
+        ]
+        for folder in maps_folders:
+            folder_path = os.path.join(directory_path, "world_building", folder)
+            os.makedirs(folder_path, exist_ok=True)
 
         # Set our sub folders inside of notes
         notes_folders = [
@@ -427,14 +435,12 @@ class Story(ft.View):
     def load_world_building(self):
         ''' Loads our world object from storage, or creates a new one if it doesn't exist '''
 
-        from models.widgets.world_building import World_Building
+        from models.widgets.world_building.world_building import World_Building
  
         # Check if the plotline folder exists. Creates it if it doesn't. 
-        # Handles errors on startup if people delete this folder, otherwise uneccessary
         if not os.path.exists(self.data['world_building_directory_path']):
             #print("Plotline folder does not exist, creating it.")
             os.makedirs(self.data['world_building_directory_path'])    
-            return
         
         # Construct the path to plotline.json
         world_building_json_path = os.path.join(self.data['world_building_directory_path'], 'World_Building.json')
@@ -451,8 +457,7 @@ class Story(ft.View):
                 #print(f"Successfully loaded world data")
             
         except Exception as e:
-            pass
-            #print(f"Unexpected error reading world.json: {e}")
+            print("Error loading world building data: ", e)
           
         
         # Create our world object with no data if story is new, or loaded data if it exists already
@@ -463,6 +468,55 @@ class Story(ft.View):
             self, 
             world_building_data
         )
+
+    # Called in constructor
+    def load_maps(self):
+        ''' Loads our world maps from our dict into our live object '''
+        from models.widgets.world_building.map import Map
+        
+        try: 
+            
+            # Set the directory path to our maps
+            map_dir_path = os.path.join(self.data['world_building_directory_path'], "maps")
+            
+            # Make sure it exists to handle errors
+            if not os.path.exists(map_dir_path):
+                os.makedirs(map_dir_path)    
+                return
+            
+            # Iterate through all files in our maps folder
+            for dirpath, dirnames, filenames in os.walk(map_dir_path):
+                for filename in filenames:
+
+                    # Go through our files, and don't include the display files
+                    if filename.endswith(".json") and not filename.endswith("_display.json"):
+                        file_path = os.path.join(dirpath, filename)   
+                        #print("dirpath = ", dirpath)
+                        
+                        try:
+                            # Read the JSON file
+                            with open(file_path, "r", encoding='utf-8') as f:
+                                map_data = json.load(f)
+                            
+                            # Extract the title from the data
+                            map_title = map_data.get("title", filename.replace(".json", ""))    
+                                
+                            # Create our timeline object using our loaded data
+                            self.maps[map_title] = Map(map_title, self.p, dirpath, self, map_data)
+                            
+                        # Handle errors if the path is wrong
+                        except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
+                            print(f"Error loading map from {filename}: {e}")
+                
+            
+            # If we have no maps, create a default one to get started
+            if len(self.maps) == 0:
+                #print("No world maps found, creating default world map")
+                self.create_map(title="World Map", father=None, category="world")
+
+        # Catch errors
+        except Exception as e:
+            print(f"Error loading maps: {e}")
 
 
 
@@ -510,7 +564,6 @@ class Story(ft.View):
 
     def load_widgets(self):
         ''' Loads all our widgets (characters, chapters, notes, etc.) into our master list of widgets '''
-
         from models.app import app
 
         # Add all our characters to the widgets list
@@ -537,6 +590,11 @@ class Story(ft.View):
         if self.world_building is not None:
             if self.world_building not in self.widgets:
                 self.widgets.append(self.world_building)
+
+        # Add all our maps to the widgets list
+        for map in self.maps.values():
+            if map not in self.widgets:
+                self.widgets.append(map)
 
         # Add all our notes to the widgets list
         for note in self.notes.values():
@@ -600,17 +658,27 @@ class Story(ft.View):
         self.active_rail.content.reload_rail()
         self.workspace.reload_workspace()
 
-    def create_map(self, title: str, directory_path: str=None):
+    def create_map(self, title: str, directory_path: str=None, father: str=None, category: str=None):
         ''' Creates a new map object, saves it to our live story object, and saves it to storage'''
-        from models.mini_widgets.world_building.map import Map
+        from models.widgets.world_building.map import Map
 
-        # If no path is passed in, construct the full file path for the map JSON file
-        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            directory_path = self.data['maps_directory_path']
+        # Path to where all our maps are stored
+        if directory_path is None:
+            directory_path = os.path.join(self.data['world_building_directory_path'], "maps")
 
-        self.maps[title] = Map(title, self.p, directory_path, self)
+        # Create our new map object in our maps dict
+        self.maps[title] = Map(
+            title=title, 
+            page=self.p, 
+            directory_path=directory_path, 
+            story=self,
+            father=father,
+            category=category,
+            data=None
+        )
         self.widgets.append(self.maps[title])  # Add to our master list of widgets in our story
 
+        # Reload our UI's
         self.active_rail.content.reload_rail()
         self.workspace.reload_workspace()
 

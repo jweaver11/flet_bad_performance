@@ -9,7 +9,6 @@ Nested in any particular way. WorldMaps CANNOT store each other or be nested.
 import os
 import flet as ft
 from models.widget import Widget
-from models.mini_widgets.world_building.map import Map
 from models.story import Story
 from handlers.verify_data import verify_data
 
@@ -22,7 +21,7 @@ class World_Building(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  
-            p = page,   
+            page = page,   
             directory_path = directory_path,  
             story = story,       
             data = data,    
@@ -71,23 +70,23 @@ class World_Building(Widget):
                 'technology': dict,                 # Technology of the world
                 'governments': dict,                # Governments of the world
                 'content': str,
-                'maps': dict,                       # All maps contained within this world building widget
             }
         )
 
         # Dict of different worlds and their maps stored
-        self.maps = {}
+        #self.maps = {}
+
         self.locations = {}
         self.lore = {}
-        self.power_systems = {}     # Tie to any
-        self.social_systems = {}    # Tie to countries, tribes, continents, etc
-        self.geography = {}         # Tie to any
-        self.technology = {}        # Tie to any
-        self.history = {}           # Tie to any
-        self.governments = {}       # Tie to countries, tribes, etc
+        self.power_systems = {}         # Tie to any
+        self.social_systems = {}        # Tie to countries, tribes, continents, etc
+        self.geography = {}             # Tie to any
+        self.technology = {}            # Tie to any
+        self.history = {}               # Tie to any
+        self.governments = {}           # Tie to countries, tribes, etc
 
         # Load our live objects from our data
-        self.load_maps()
+        #self.load_maps()
         self.load_lore()
         self.load_power_systems()
         self.load_social_systems()
@@ -99,36 +98,6 @@ class World_Building(Widget):
 
         self.reload_widget()
     
-
-    # Called in constructor
-    def load_maps(self):
-        ''' Loads our world maps from our dict into our live object '''
-        
-        try: 
-            # Run through our maps saved in the maps dict
-            for map_title, map_data in self.data['maps'].items():
-
-                # Create a new map object
-                self.maps[map_title] = Map(
-                    title=map_title,
-                    owner=self,
-                    father=self,
-                    page=self.p,
-                    dictionary_path="maps",
-                    data=map_data,
-                )
-
-                # Add it to our mini widgets list
-                self.mini_widgets.append(self.maps[map_title])
-
-            # If we have no maps, create a default one to get started
-            if len(self.maps) == 0:
-                #print("No world maps found, creating default world map")
-                self.create_map(title="World Map")
-
-        # Catch errors
-        except Exception as e:
-            print(f"Error loading maps for the world building widget: {e}")
 
     def load_lore(self):
         pass
@@ -152,35 +121,6 @@ class World_Building(Widget):
         pass
 
 
-    # Called when creating a new map
-    def create_map(self, title: str, category: str=None):
-        ''' Requires a title. Creates a new world map in our live object and data'''
-
-        # Creates our new map object
-        new_map = Map(
-            title=title,
-            owner=self,
-            father=self,
-            page=self.p,
-            dictionary_path="maps",
-            data=None,
-        )
-
-        # Creates the new map object and saves its data
-        self.maps[title] = new_map
-        self.mini_widgets.append(self.maps[title])
-
-        # Save our new maps data
-        self.data['maps'][title] = self.maps[title].data
-        self.save_dict()
-
-        # Reload our widget and rail to show the new map
-        self.reload_widget()
-
-        # Catches error if creating default world map on program startup, where UI is not created yet
-        if self.story.active_rail is not None:
-            self.story.active_rail.content.reload_rail()
-
 
     def on_hover(self, e: ft.HoverEvent):
         pass
@@ -188,17 +128,9 @@ class World_Building(Widget):
     # Called to reload our widget UI
     def reload_widget(self):
         ''' Reloads our world building widget '''
-
-        row = ft.Row(expand=True)
         
-        # Add our maps that are displayed currently
-        for map in self.maps.values():
-            if map.data.get('is_displayed', False):
-                #map.display = map.reload_map()
-                row.controls.append(map.display)
 
-
-        self.body_container.content = row
+        self.body_container.content = ft.Text("Hellow from World Building Widget")
 
         self._render_widget()
 
@@ -219,7 +151,6 @@ class World_Building(Widget):
         # TODO: Show timeline that can drag and alter the map landscape based on changes
             # EXP. City gets destroyed at year 50, that plotpoint would disappear
         # Option to expand map to add more continents, regions, etc
-        # Option for mini widget/widgets to display even when no map is shown
 
 
         # MAPS USE TREE VIEW FORMAT, ANY MAP CAN FIT IN ANY OTHER MAP, NO RESTRICTIONS. THEY ARE WIDGETS WITH 2 FILES,

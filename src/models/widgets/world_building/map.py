@@ -1,7 +1,6 @@
 '''
-The map class for all maps inside of the world_building widget
-Maps are extended mini widgets, with their 'display' being to view of the map, and their mini widget being the map info display
-Maps save like normal mini widgets, but have their own drawing data saved in the /maps folder.
+The map class for all maps inside our story
+Maps are widgets that have their own drawing canvas, and info display. they can contain nested sub maps as well.
 '''
 
 # BLANK NO TEMPLATE MAPS EXIST AS WELL
@@ -14,7 +13,7 @@ import os
 import json
 import flet as ft
 from models.widget import Widget
-from models.mini_widget import MiniWidget
+from models.story import Story
 from handlers.verify_data import verify_data
 from models.state import State
 import flet.canvas as cv
@@ -22,17 +21,17 @@ from threading import Thread
 
 
 
-class Map(MiniWidget):
+class Map(Widget):
 
     # Constructor. Requires title, owner widget, page reference, world map owner, and optional data dictionary
     def __init__(
         self, 
         title: str, 
-        owner: Widget, 
-        father, 
         page: ft.Page, 
-        dictionary_path: str, 
-        category: str = None, 
+        directory_path: str, 
+        story: Story,
+        father: str = None,                     # Parent map this map belongs to. None if top level map
+        category: str = None,                   # Type of map this is (world map, continent, country, city, dungeon, room, etc)
         data: dict = None
     ):
         
@@ -42,31 +41,37 @@ class Map(MiniWidget):
         # Parent constructor
         super().__init__(
             title=title,           
-            owner=owner, 
-            father=father,       # In this case, father is either a parent map or the world building widget
-            page=page,              
-            data=data,              
-            dictionary_path=dictionary_path     
+            page=page,                         
+            directory_path=directory_path, 
+            story=story,
+            data=data,  
         ) 
+
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   
             {
                 'tag': "map", 
-                'is_displayed': True,           # Whether the map is visible in the world building widget or not
-                'maps': dict,                   # Sub maps contained within this map
+                'father': father,               # Parent map this map belongs to. None if top level map
                 'category': category,           # Category/psuedo folder this map belongs to
+                'is_displayed': True,           # Whether the map is visible in the world building widget or not
+                'sub_maps': list,               # Sub maps contained within this map
                 'markers': dict,                # Markers placed on the map
                 'locations': dict,
                 'geography': dict,              # Geography of the world
                 'rooms': dict,                  
                 'notes': str,
 
+                'position': {               # Our position on our parent map
+                    'x': 0,                    
+                    'y': 0,                     
+                },
+
                 'sub_categories': {                     # Categories for organizing our maps on the rail
                     'category_name': {
-                        'title': str,               # Title of the category
-                        'is_expanded': bool,        # Whether the category is expanded or collapsed
+                        'title': str,                   # Title of the category
+                        'is_expanded': bool,            # Whether the category is expanded or collapsed
                     },
                 },
             },
@@ -82,18 +87,10 @@ class Map(MiniWidget):
         self.dragging_mode = False  # Whether we are in dragging mode or not. Used to drag around on top of parent map
 
         # Dict of our sub maps
-        self.maps = {}
+        self.maps: list = []
 
 
         self.details = {}
-
-        # Load our maps that are held within this amp
-        self.load_sub_maps()
-        
-        # Load the rest of our map details and data thats not sub maps
-        self.load_details()
-
-        
 
         # The Visual Canvas map for drawing
         self.map = cv.Canvas(
@@ -105,15 +102,27 @@ class Map(MiniWidget):
             expand=True
         )
 
+        # The display container for our map
+        self.display: ft.InteractiveViewer = None
 
-        self.display = self.reload_map()    # Make into an interactive viewer
+        # Load our maps that are held within this amp
+        #self.load_sub_maps()
+        
+        # Load the rest of our map details and data thats not sub maps
+        self.load_details()
+
+        # Load our drawing/display
+        self.load_display()
         
 
-        # Builds/reloads our timeline UI
-        self.reload_map()
-
         # Reloads the information display of the map
-        self.reload_mini_widget()
+        self.reload_widget()
+
+
+    # Store their data in their own files, so lets make them widgets
+    # Their map dict is now list, and contains the title of their sub maps, not the data
+
+
 
     # Called in constructor
     def load_sub_maps(self):
@@ -126,61 +135,60 @@ class Map(MiniWidget):
                 # Create a new map object
                 self.maps[map_title] = Map(
                     title=map_title,
-                    owner=self.owner,       # Our world building widget
+                    owner=self,       # Our world building widget
                     father=self,
                     page=self.p,
                     dictionary_path="maps",
                     data=map_data,
                 )
                 # Add it to our mini widgets list
-                self.owner.mini_widgets.append(self.maps[map_title])
+                self.mini_widgets.append(self.maps[map_title])
 
         # Catch errors
         except Exception as e:
-            print(f"Error loading maps for the world building widget: {e}")
+            print(f"Error loading maps for the : {e}")
 
     # Called when loading our drawing data from its file
-    def load_drawing(self):
+    def load_display(self):
         ''' Loads our drawing from our saved map drawing file '''
 
         # Clear existing shapes we might have
         self.map.shapes.clear()
 
         try:
-            # Grab our directory path from our owner widget
-            directory_path = os.path.join(self.owner.directory_path, "maps")
 
             # Set our file path
-            file_path = os.path.join(directory_path, f"{self.title}.json")
+            filename = os.path.join(self.directory_path, f"{self.title}_display.json")
+
+            # Check if file exists, if not create it with empty data
+            if not os.path.exists(filename):
+                with open(filename, "w") as f:
+                    json.dump({}, f)    
 
             # Load the data from the file
-            with open(file_path, "r") as f:
+            with open(filename, "r") as f:
                 coords = json.load(f)
                 for x1, y1, x2, y2 in coords:
                     self.map.shapes.append(cv.Line(x1, y1, x2, y2, paint=ft.Paint(stroke_width=3)))
 
-            # Apply the loaded drawing
-            #self.map.update() # OLD
+            # Update the page to reflect loaded drawing
             self.p.update()
 
         # Handle errors
         except Exception as e:
-            print(f"Error loading drawing from {file_path}: {e}")
+            print(f"Error loading display from {filename}: {e}")
 
     # Called to save our drawing data to its file
-    def save_drawing(self):
+    def save_display(self):
         ''' Saves our map drawing data to its own json file. Maps are special and get their 'drawing' saved seperately '''
 
         try:
 
-            # Grab our directory path from our owner widget
-            directory_path = os.path.join(self.owner.directory_path, "maps")
-
             # Set our file path
-            file_path = os.path.join(directory_path, f"{self.title}.json")
+            file_path = os.path.join(self.directory_path, f"{self.title}_display.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            os.makedirs(directory_path, exist_ok=True)
+            os.makedirs(self.directory_path, exist_ok=True)
             
             # Save the data to the file (creates file if doesnt exist)
             with open(file_path, "w") as f:   
@@ -202,33 +210,6 @@ class Map(MiniWidget):
         #self.load_governments()
         pass
  
-    def create_map(self, title: str, category: str=None):
-
-        # Creates our new map object
-        new_map = Map(
-            title=title,
-            owner=self,
-            father=self,
-            page=self.p,
-            dictionary_path="maps",
-            data=None,
-        )
-
-        # Creates the new map object and saves its data
-        self.maps[title] = new_map
-        self.owner.mini_widgets.append(self.maps[title])
-
-        # Save our new maps data
-        self.data['maps'][title] = self.maps[title].data
-        self.save_dict()
-
-        # Reload our widget and rail to show the new map
-        self.owner.reload_widget()
-
-        # Catches error if creating default world map on program startup, where UI is not created yet
-        if self.owner.story.active_rail is not None:
-            self.owner.story.active_rail.content.reload_rail()
-    
 
     def on_hover(self, e: ft.HoverEvent):
         #print(e)
@@ -251,11 +232,14 @@ class Map(MiniWidget):
         Thread(target=draw_line, daemon=True).start()
 
     # Called when we need to rebuild out timeline UI
-    def reload_map(self) -> ft.Control:       # Make it return an interactive viewer??
+    def reload_widget(self):       
         ''' Rebuilds/reloads our map UI '''
 
         # Make it so that maps 'mini widget' shows inside of the map...
         # If two+ maps open at same time, both their mini widgets can be shown at same time
+        # We render our map and all the markers, then go through our 'sub maps', find their data, and render them on top as well
+        # - Sub maps only have the title still, we don't save their data
+        # -- Recursively go through rendering sub maps on top of parent map
 
         # Display of our map (Gesture detector)
         display = ft.Column([
@@ -274,9 +258,12 @@ class Map(MiniWidget):
             expand=True,
             bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.PURPLE),
         )
-        
 
-        return display_container
+        self.display = display_container
+
+        self.body_container.content = self.display
+
+        self._render_widget()
     
 
 

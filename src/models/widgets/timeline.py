@@ -21,7 +21,7 @@ class Timeline(Widget):
         # Parent constructor
         super().__init__(
             title = title,  
-            p = page,   
+            page = page,   
             directory_path = directory_path, 
             story = story,     
             data = data,  

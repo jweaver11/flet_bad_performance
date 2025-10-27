@@ -15,7 +15,7 @@ from handlers.verify_data import verify_data
 class Widget(ft.Container):
     
     # Constructor. All widgets require a title,  page reference, directory path, and story reference
-    def __init__(self, title: str, p: ft.Page, directory_path: str, story: Story, data: dict=None):
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
 
         # Sets uniformity for all widgets
         super().__init__(
@@ -26,7 +26,7 @@ class Widget(ft.Container):
     
         # Required properties of all widgets
         self.title = title  #                        Title of our object
-        self.p = p                                  # Grabs a page reference for updates
+        self.p = page                               # Grabs a page reference for updates
         self.directory_path = directory_path        # Path to our directory that will contain our json file
         self.story = story                          # Reference to our story object that owns this widget
         self.mini_widgets = []                      # List that holds our mini widgets objects

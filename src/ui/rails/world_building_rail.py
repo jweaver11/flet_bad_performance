@@ -18,7 +18,7 @@ class World_Building_Rail(Rail):
         # Reload the rail on start
         self.reload_rail()
 
-    def show_world(self):
+    def show_world_building_widget(self):
         ''' Shows the world building widget '''
 
         if self.story.world_building is not None:
@@ -33,6 +33,7 @@ class World_Building_Rail(Rail):
         # Reads the maps categories for each level, and adds them to a list of categories. Then displays them in the rail
         # This is how we get semi tree view for maps and pass categories in.
         # Users can only create categories, maps, and markers on existing maps on the rail?
+        # Use the world building widget to create the categories of stuff on the rail, and have a maps as well.
 
         column = ft.Column(
             spacing=0,
@@ -43,7 +44,7 @@ class World_Building_Rail(Rail):
                 ft.Text(self.story.title),
                 ft.TextButton(
                     "Show world building widget",
-                    on_click=lambda e: self.show_world() 
+                    on_click=lambda e: self.show_world_building_widget() 
                 ),
 
 
@@ -51,15 +52,16 @@ class World_Building_Rail(Rail):
             ]
         )
 
-        for map in self.story.world_building.maps.values():
+        for map in self.story.maps.values():
+            column.controls.append(ft.Container(height=4))
             column.controls.append(
-                ft.Text(map.title)
+                ft.Text(map.title),
             )
 
         column.controls.append(
             ft.TextField(
                 label="Create new map",
-                on_submit=lambda e: self.story.world_building.create_map(title=e.control.value)
+                on_submit=lambda e: self.story.create_map(title=e.control.value)
             )
         )
 
