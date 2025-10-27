@@ -109,6 +109,7 @@ class Content_Rail(Rail):
             for file_name in files:
 
                 # Need to get rid fof extentions for file names
+                # ^^^^^^^^^^^^^^^^^^^^^^^^
 
                 # Add them to parent expansion tile if one exists, otherwise just add it to the rail
                 if parent_expansion_tile is not None:
