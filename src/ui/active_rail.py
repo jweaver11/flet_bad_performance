@@ -39,7 +39,6 @@ class Active_Rail(ft.Container):
         self.world_building_rail = World_Building_Rail(page, story)
         self.drawing_board_rail = Drawing_Board_Rail(page, story)
         self.planning_rail = Planning_Rail(page, story)
-        self.notes_rail = Notes_Rail(page, story)
 
         # Displays our active rail on startup
         # All other rails have reload rail functions, but this one just displays the correct one
@@ -70,9 +69,6 @@ class Active_Rail(ft.Container):
 
             elif story.workspaces_rail.selected_rail == "planning":
                 self.content = self.planning_rail
-
-            elif story.workspaces_rail.selected_rail == "notes":
-                self.content = self.notes_rail
 
             else:
                 # Default to the content rail

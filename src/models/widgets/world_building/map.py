@@ -249,7 +249,7 @@ class Map(Widget):
         ''' Rebuilds/reloads our map UI '''
 
         # Make it so that maps 'mini widget' shows inside of the map...
-        # If two+ maps open at same time, both their mini widgets can be shown at same time
+        # Multiple mini widgets able to be shown at same time
         # We render our map and all the markers, then go through our 'sub maps', find their data, and render them on top as well
         # - Sub maps only have the title still, we don't save their data
         # -- Recursively go through rendering sub maps on top of parent map

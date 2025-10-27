@@ -76,6 +76,20 @@ class Map_Information_Display(MiniWidget):
         #print(e)
         pass
     
+    # Called when reloading our mini widget UI
+    def reload_mini_widget(self):
+
+        self.content = ft.Column(
+            [
+                self.title_control,
+                self.content_control,
+
+                ft.TextButton("Hide me", on_click=self.toggle_visibility),
+            ],
+            expand=True,
+        )
+
+        self.p.update()
 
 
 

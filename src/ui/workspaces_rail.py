@@ -127,21 +127,6 @@ class Workspaces_Rail(ft.Container):
                 ),
             ],
         )
-        # Notes workspace rail
-        notes_rail = ft.NavigationRail(
-            height=70,  
-            bgcolor=ft.Colors.TRANSPARENT,
-            selected_index=None,
-            on_change=lambda e: self.on_workspace_change(e, story),  
-            destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED, color=ft.Colors.PRIMARY), 
-                    selected_icon=ft.Icon(ft.Icons.STICKY_NOTE_2, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    label="Notes", data="notes",
-                ),
-            ],
-        )
 
         # Reads our selected workspace from ourself, and toggles the correct workspace selection icon
         if self.selected_rail == "content":
@@ -156,8 +141,6 @@ class Workspaces_Rail(ft.Container):
             drawing_board_rail.selected_index = 0
         elif self.selected_rail == "planning":
             planning_rail.selected_index = 0
-        elif self.selected_rail == "notes":
-            notes_rail.selected_index = 0
 
 
         # Goes through our workspace order, and adds the correct control to our list for the rail
@@ -175,8 +158,6 @@ class Workspaces_Rail(ft.Container):
                 workspaces_rail.append(drawing_board_rail)
             elif workspace == "planning":
                 workspaces_rail.append(planning_rail)
-            elif workspace == "notes":
-                workspaces_rail.append(notes_rail)
 
 
         # If we're collapsed...
@@ -191,7 +172,6 @@ class Workspaces_Rail(ft.Container):
             world_building_rail.destinations[0].label = None
             drawing_board_rail.destinations[0].label = None
             planning_rail.destinations[0].label = None
-            notes_rail.destinations[0].label = None
 
             # Set our collapsed icon buttons icon depending on collapsed state
             collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED

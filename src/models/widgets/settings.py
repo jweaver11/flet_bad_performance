@@ -45,7 +45,6 @@ class Settings(Widget):
                     "world_building",
                     "drawing_board",
                     "planning",
-                    "notes",
                 ],
             },
         )
