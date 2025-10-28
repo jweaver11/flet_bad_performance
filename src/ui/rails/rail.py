@@ -13,7 +13,8 @@ class Rail(ft.Container):
         
         # Initialize the parent Container class first
         super().__init__(
-            padding=None,
+            #padding=None,
+            padding=ft.Padding(10, 0, 0, 0),        # Adds padding left to match divider on the right
         )
             
         # Page and story reference

@@ -74,6 +74,8 @@ class Content_Rail(Rail):
 
         # Load our content directory data into the rail
         load_directory_data(
+            page=self.p,
+            story=self.story,
             directory=self.story.data['content_directory_path'],
             column=self.content
         )

@@ -6,11 +6,14 @@ When called initially when there is no parent dropdown, a column is provided ins
 
 import flet as ft
 import os
+from models.story import Story
 from styles.tree_view_styles import Tree_View_Expansion_Tile
 from styles.tree_view_styles import Tree_View_Item
 
 
 def load_directory_data(
+    page: ft.Page,                                        # Page reference for overlays if needed    
+    story: Story,                                         # Story reference for any story related data
     directory: str,                                       # The directory to load data from
     parent_expansion_tile: ft.ExpansionTile = None,       # Optional parent expansion tile for when recursively called
     column: ft.Column = None,                             # Optional parent column to add elements too when not starting inside a tile
@@ -48,10 +51,14 @@ def load_directory_data(
             capital_dir_path = directory_name.capitalize()
 
             # Create the expansion tile here
-            new_expansion_tile = Tree_View_Expansion_Tile(title=capital_dir_path)
+            new_expansion_tile = Tree_View_Expansion_Tile(
+                title=capital_dir_path
+            )
 
             # Recursively go through this directory as well to load its data, and any sub directories
             load_directory_data(
+                page=page,
+                story=story,
                 directory=full_path,
                 parent_expansion_tile=new_expansion_tile
             )
@@ -71,6 +78,8 @@ def load_directory_data(
 
             item = Tree_View_Item(
                 title=capitalize_name,
+                story=story,
+                page=page,
                 on_exit=lambda e: print(f"exited hover over {capitalize_name}"),
             )        
 
