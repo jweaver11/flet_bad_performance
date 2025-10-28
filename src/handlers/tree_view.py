@@ -49,14 +49,19 @@ def load_directory_data(
             # Set the path and give us the capitalized name
             full_path = os.path.join(directory, directory_name)
             capital_dir_path = directory_name.capitalize()
+            
+            # Now use escaped_path to lookup in categories
+            color = story.data['categories'].get(full_path, {}).get('color', 'primary')
+            
+            
 
             # Create the expansion tile here
             new_expansion_tile = Tree_View_Directory(
                 title=capital_dir_path,
                 story=story,
                 page=page,
+                color=color,
                 father=dir_dropdown if dir_dropdown is not None else None,
-                on_exit=lambda e: print(f"exited hover over {capital_dir_path}"),
             )
 
             # Recursively go through this directory as well to load its data, and any sub directories

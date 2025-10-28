@@ -66,6 +66,9 @@ class Characters_Rail(Rail):
     # Called on startup and when we have changes to the rail that have to be reloaded 
     def reload_rail(self):
 
+        # Also be a tree view. Main, side, background
+        # Split into good/neutral/evil in each category
+
         try:
             column = ft.Column([])
 

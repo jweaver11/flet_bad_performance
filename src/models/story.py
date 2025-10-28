@@ -56,6 +56,14 @@ class Story(ft.View):
                     'multi_planetary': bool,       # Whether the story will take place on multiple planets
                     'multi_timelines': bool,       # Whether the story will have multiple timelines (regression, multiverse, etc.)
                 },
+                
+                # Dict of all our categories INSIDE of basic story structure (content, characters, timelines)
+                'categories': {
+                    'path': {
+                        'name': str,        # Name of category
+                        'color': str        # Color of that folder
+                    }
+                },            # The Key is the path, since all will be unique. Also contains name and color
                 'is_new_story': True,      # Whether this story is newly created or loaded from storage
             },
         )
@@ -63,8 +71,6 @@ class Story(ft.View):
         # Stories have required structures as well, so we verify they exist or we will error out
         # We also use this function to create most detailed structures from templates if newly created story
         self.verify_story_structure(template)  
-
-
             
         # Declare our UI elements before we create them later. They are stored as objects so we can reload them when needed
         self.menubar: ft.Container = None     # Menu bar at top of page
@@ -114,9 +120,6 @@ class Story(ft.View):
 
         # Loads our maps from file storage
         self.load_maps()
-
-        # Loads our notes from file storage
-        #self.load_notes()
 
         # Everything we loaded above is a widget, but this just adds them all to self.widgets
         self.load_widgets()
@@ -173,8 +176,12 @@ class Story(ft.View):
                 "planning",
             ]
 
-            # Create notes folder
+            # Create notes folder and gives it a category entry 
             os.makedirs(self.data['notes_directory_path'], exist_ok=True)  
+            self.data['categories'][self.data['notes_directory_path']] = {
+                'name': "notes",
+                'color': "orange",
+            }
 
             # Create the workspace folder strucutre above
             for folder in required_story_folders:
@@ -194,6 +201,8 @@ class Story(ft.View):
                 folder_path = os.path.join(directory_path, "world_building", folder)
                 os.makedirs(folder_path, exist_ok=True)
 
+
+
             # Set our sub folders inside of notes
             notes_folders = [
                 "themes",
@@ -205,6 +214,12 @@ class Story(ft.View):
             for folder in notes_folders:
                 folder_path = os.path.join(directory_path, "content", "notes", folder)
                 os.makedirs(folder_path, exist_ok=True)
+
+                # Add this folder as a category in the story data so we can save stuff like colors
+                self.data['categories'][os.path.join(self.data['notes_directory_path'], folder)] = {
+                    'name': folder,
+                    'color': "orange",
+                }
             
             # Create the path to the story's JSON file
             directory_path = os.path.join(data_paths.stories_directory_path, self.title) 

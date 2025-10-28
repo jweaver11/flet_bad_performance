@@ -8,7 +8,7 @@ class Tree_View_Directory(ft.GestureDetector):
         title: str,         # Title of this item
         story: Story,       # Story reference for mouse positions
         page: ft.Page,      # Page reference for overlay menu
-        on_exit,
+        color: str = None,
         father: 'Tree_View_Directory' = None,
     ):
         
@@ -16,6 +16,9 @@ class Tree_View_Directory(ft.GestureDetector):
         self.story = story
         self.p = page
         self.father = father
+        self.color = color
+
+        print(f"Color inside of tree view directory {title}:", color)
 
 
         self.expansion_tile = ft.ExpansionTile(
@@ -24,7 +27,7 @@ class Tree_View_Directory(ft.GestureDetector):
             dense=True,
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),
-            leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=ft.Colors.ORANGE),
+            leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=color if color is not None else "primary"),
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             #shape=ft.RoundedRectangleBorder(),
