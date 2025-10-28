@@ -27,7 +27,7 @@ class Timeline_Expansion_Tile(ft.ExpansionTile):
 
 
 # The controls for timelines inside the timeline widget
-class Timeline_Control(ft.GestureDetector):
+class Timeline_Item(ft.GestureDetector):
     def __init__(self, on_enter, on_exit, axis):
 
         # Set our content based on axis

@@ -7,17 +7,17 @@ When called initially when there is no parent dropdown, a column is provided ins
 import flet as ft
 import os
 from models.story import Story
-from styles.tree_view_styles import Tree_View_Expansion_Tile
-from styles.tree_view_styles import Tree_View_Item
+from styles.tree_view_styles import Tree_View_Directory
+from styles.tree_view_styles import Tree_View_File
 
 
 def load_directory_data(
     page: ft.Page,                                        # Page reference for overlays if needed    
     story: Story,                                         # Story reference for any story related data
     directory: str,                                       # The directory to load data from
-    parent_expansion_tile: ft.ExpansionTile = None,       # Optional parent expansion tile for when recursively called
+    dir_dropdown: Tree_View_Directory = None,             # Optional parent expansion tile for when recursively called
     column: ft.Column = None,                             # Optional parent column to add elements too when not starting inside a tile
-    # Only parent_expansion_tile OR column should be provided, but one is required
+    # Only dir_dropdown OR column should be provided, but one is required
 ) -> ft.Control:
 
     try: 
@@ -51,8 +51,12 @@ def load_directory_data(
             capital_dir_path = directory_name.capitalize()
 
             # Create the expansion tile here
-            new_expansion_tile = Tree_View_Expansion_Tile(
-                title=capital_dir_path
+            new_expansion_tile = Tree_View_Directory(
+                title=capital_dir_path,
+                story=story,
+                page=page,
+                father=dir_dropdown if dir_dropdown is not None else None,
+                on_exit=lambda e: print(f"exited hover over {capital_dir_path}"),
             )
 
             # Recursively go through this directory as well to load its data, and any sub directories
@@ -60,23 +64,25 @@ def load_directory_data(
                 page=page,
                 story=story,
                 directory=full_path,
-                parent_expansion_tile=new_expansion_tile
+                dir_dropdown=new_expansion_tile
             )
 
             # Add our expansion tile for the directory to its parent, or the column if top most directory
-            if parent_expansion_tile is not None:
-                parent_expansion_tile.controls.append(new_expansion_tile)
+            if dir_dropdown is not None:
+                dir_dropdown.content.controls.append(new_expansion_tile)
             else:
                 column.controls.append(new_expansion_tile)
 
         # Now go through our files
         for file_name in files:
+
+            # Open the file path, read the tag to pass in 
             
             # Get rid of the extension and capitalize the name
             name = os.path.splitext(file_name)[0]      
             capitalize_name = name.capitalize()
 
-            item = Tree_View_Item(
+            item = Tree_View_File(
                 title=capitalize_name,
                 story=story,
                 page=page,
@@ -84,14 +90,14 @@ def load_directory_data(
             )        
 
             # Add them to parent expansion tile if one exists, otherwise just add it to the column
-            if parent_expansion_tile is not None:
-                parent_expansion_tile.controls.append(item)
+            if dir_dropdown is not None:
+                dir_dropdown.content.controls.append(item)
             else: 
                 column.controls.append(item)
             pass
 
         # Return the parent expansion tile or column depending on what was provided
-        return parent_expansion_tile if parent_expansion_tile is not None else column
+        return dir_dropdown if dir_dropdown is not None else column
     
     # Handle errors
     except Exception as e:

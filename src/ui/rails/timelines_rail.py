@@ -3,7 +3,7 @@
 import flet as ft
 from models.story import Story
 from ui.rails.rail import Rail
-from styles.styles import Timeline_Expansion_Tile
+from styles.timeline_styles import Timeline_Expansion_Tile
 
 
 # Class is created in main on program startup
