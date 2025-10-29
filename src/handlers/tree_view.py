@@ -20,6 +20,9 @@ def load_directory_data(
     column: ft.Column = None,                             # Optional parent column to add elements too when not starting inside a tile
     # Only dir_dropdown OR column should be provided, but one is required
 ) -> ft.Control:
+    
+    def _canon_path(p: str) -> str:
+        return os.path.normcase(os.path.normpath(p))
 
     try: 
 
@@ -51,17 +54,21 @@ def load_directory_data(
             full_path = os.path.join(directory, directory_name)
             capital_dir_path = directory_name.capitalize()
             
-            # Now use escaped_path to lookup in categories
-            color = story.data['folders'].get(full_path, {}).get('color', 'primary')
-            
-            
+            # Build a normalized map of folder metadata once per call in order to get the call
+            folders_meta = { _canon_path(k): v for k, v in story.data.get('folders', {}).items() }
+
+            # Set our data to pass in for the folder
+            color = folders_meta.get(_canon_path(full_path), {}).get('color', "primary")
+            is_expanded = folders_meta.get(_canon_path(full_path), {}).get('is_expanded', False)
 
             # Create the expansion tile here
             new_expansion_tile = Tree_View_Directory(
+                directory_path=full_path,
                 title=capital_dir_path,
                 story=story,
                 page=page,
                 color=color,
+                is_expanded=is_expanded,
                 father=dir_dropdown if dir_dropdown is not None else None,
             )
 
@@ -82,23 +89,18 @@ def load_directory_data(
         # Now go through our files
         for file_name in files:
 
-            # Open the file path, read the tag to pass in 
-            
             # Get rid of the extension and capitalize the name
-            name = os.path.splitext(file_name)[0]      
-            capitalize_name = name.capitalize()
+            name = os.path.splitext(file_name)[0]    
 
-            # Read the file name to get the tag, and pass in to change the icon
-            with open(os.path.join(directory, file_name), 'r', encoding='utf-8') as file:
-                data = json.load(file)
-                tag = data.get('tag', None)
+            # Find our widget based on the filename
+            for widget in story.widgets:
+                if widget.title == name and widget.directory_path == os.path.join(directory):  
+                    widget = widget
+                    break
 
+            # Create the file item
             item = Tree_View_File(
-                title=capitalize_name,
-                story=story,
-                page=page,
-                tag=tag,
-                on_exit=lambda e: print(f"exited hover over {capitalize_name}"),
+                widget,
             )        
 
             # Add them to parent expansion tile if one exists, otherwise just add it to the column

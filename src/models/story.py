@@ -15,9 +15,14 @@ from handlers.verify_data import verify_data
 
 class Story(ft.View):
     # Constructor.
-    def __init__(self, title: str, page: ft.Page, data: dict=None, template: str=None, type: str=None):
-        # Required: title, page reference
-        # Optional: data (if loading), template (sci-fi, fantasy, etc.), type (novel, comic, etc.)
+    def __init__(
+            self, 
+            title: str,             # Title of our story
+            page: ft.Page,          # Page reference for updating UI elements
+            data: dict=None,        # Data to load our story with (if any)
+            template: str=None,     # Template to use when creating new story (sci-fi, fantasy, etc.)
+            type: str=None          # Type of story (novel, comic, etc.)
+        ):
         
         # Parent constructor
         super().__init__(
@@ -44,7 +49,7 @@ class Story(ft.View):
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
                 'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
-                'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content", "notes"),
+                'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content", "Notes"),
                 'top_pin_height': int,
                 'left_pin_width': int,
                 'main_pin_height': int,
@@ -61,9 +66,10 @@ class Story(ft.View):
                 
                 # Dict of all our categories INSIDE of basic story structure (content, characters, timelines)
                 'folders': {
-                    'path': {               # Path to the category folder (used as the key, since all will be unique)
-                        'name': str,        # Name of category just in case
-                        'color': str        # Color of that folder
+                    'path': {                   # Path to the category folder (used as the key, since all will be unique)
+                        'name': str,            # Name of category just in case
+                        'color': str,            # Color of that folder
+                        'is_expanded': True     # Whether this folder is expanded in the tree view
                     }
                 },            
                 'is_new_story': True,      # Whether this story is newly created or loaded from storage
@@ -178,15 +184,15 @@ class Story(ft.View):
                 "planning",
             ]
 
-            self.create_folder(
-                directory_path=self.data['notes_directory_path'], 
-                name="Notes"
-            )
-
             # Create the workspace folder strucutre above
             for folder in required_story_folders:
                 folder_path = os.path.join(directory_path, folder)
                 os.makedirs(folder_path, exist_ok=True)     # Checks if they exist or not, so they won't be overwritten
+
+            self.create_folder(
+                directory_path=self.data['notes_directory_path'], 
+                name="Notes"
+            )
                 
             # Using templates
             if template is not None:
@@ -203,14 +209,14 @@ class Story(ft.View):
 
             # Set our sub folders inside of notes
             notes_folders = [
-                "themes",
-                "quotes",
-                "research",
+                "Themes",
+                "Quotes",
+                "Research",
             ]
 
             # Create the sub folders inside of notes
             for folder in notes_folders:
-                folder_path = os.path.join(directory_path, "content", "notes", folder)
+                folder_path = os.path.join(directory_path, "content", "Notes", folder)
 
                 # Creates the sub folder using out path above
                 self.create_folder(
@@ -242,10 +248,10 @@ class Story(ft.View):
 
         try:
             # Make the folder in our storage if it doesn't already exist
-            os.makedirs(self.data['notes_directory_path'], exist_ok=True) 
+            os.makedirs(directory_path, exist_ok=True) 
 
             # Add this folder to our folders data so we can save stuff like colors
-            self.data['folders'].setdefault(directory_path, {'name': name, 'color': "primary"})
+            self.data['folders'].setdefault(directory_path, {'name': name, 'color': "primary", 'is_expanded': True})
 
         # Handle errors
         except Exception as e:
@@ -265,6 +271,23 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             print(f"Error deleting folder: {e}")
+
+    # Called when changing folder metadata, like color or is expanded or not
+    def change_folder_data(self, directory_path: str, key: str, value):
+        ''' Changes our folder metadata inside of our story data '''
+
+        try:
+            # Check if the folder exists in our data
+            if directory_path in self.data['folders']:
+                self.data['folders'][directory_path][key] = value
+                self.save_dict()
+                print("Changed folder data:", directory_path, key, value)
+            else:
+                print(f"Folder {directory_path} not found in story data.")
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing folder data: {e}")
 
             
 

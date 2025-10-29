@@ -1,14 +1,18 @@
 import flet as ft
 from models.story import Story
+from models.widget import Widget
 
 # Expansion tile for all sub directories (folders) in a directory
 class Tree_View_Directory(ft.GestureDetector):
 
-    def __init__(self, 
-        title: str,         # Title of this item
-        story: Story,       # Story reference for mouse positions
-        page: ft.Page,      # Page reference for overlay menu
-        color: str = None,
+    def __init__(
+        self, 
+        directory_path: str,            # Full path to this directory
+        title: str,                     # Title of this item
+        story: Story,                   # Story reference for mouse positions
+        page: ft.Page,                  # Page reference for overlay menu
+        is_expanded: bool = False,      # Whether this directory is expanded or not
+        color: str = "primary",
         father: 'Tree_View_Directory' = None,
 
         # Optinos passed in by child classes
@@ -16,11 +20,13 @@ class Tree_View_Directory(ft.GestureDetector):
         menu_options: list = None,      # Options to show when right clicking a directory
     ):
         
+        self.directory_path = directory_path
         self.title = title
         self.story = story
         self.p = page
         self.father = father
         self.color = color
+        self.is_expanded = is_expanded  
 
         #print(f"Color inside of tree view directory {title}:", color)
 
@@ -29,15 +35,17 @@ class Tree_View_Directory(ft.GestureDetector):
             title=ft.Text(value=title, weight=ft.FontWeight.BOLD, text_align="left"),
             #text_color="primary",
             dense=True,
+            initially_expanded=is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),
-            leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=color if color is not None else "primary"),
+            leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=color),
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             #shape=ft.RoundedRectangleBorder(),
             #controls=[ft.Container(height=6)],
             bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
+            on_change=lambda e: self.toggle_expand()
         )
 
         super().__init__(
@@ -46,6 +54,15 @@ class Tree_View_Directory(ft.GestureDetector):
             on_exit=self.on_stop_hover,
             content = self.expansion_tile,
         )
+
+    def toggle_expand(self):
+        self.is_expanded = not self.is_expanded
+        self.story.change_folder_data(
+            directory_path=self.directory_path,
+            key='is_expanded',
+            value=self.is_expanded
+        )
+
 
     def on_hover(self, e):
         self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.WHITE)
@@ -65,71 +82,89 @@ class Tree_View_File(ft.GestureDetector):
 
     def __init__(
         self, 
-        title: str,         # Title of this item
-        story: Story,       # Story reference for mouse positions
-        page: ft.Page,      # Page reference for overlay menu
-        on_exit,
-        tag: str = None,    # Optional tag to pass in for file type identification, so we can change icon 
-        father: Tree_View_Directory = None,   
+        widget: Widget, 
     ):
         
-        self.title = title
-        self.story = story
-        self.p = page
-        self.father = father
+        # Set our widget reference and tag
+        self.widget = widget
+        tag = widget.data.get('tag', None)
+
+        capital_title = widget.title.capitalize()
 
         if tag is None:
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+            icon = ft.Icons.DESCRIPTION_OUTLINED
 
         elif tag == "note":
-            self.icon = ft.Icons.STICKY_NOTE_2_OUTLINED
+            icon = ft.Icons.STICKY_NOTE_2_OUTLINED
 
         elif tag == "chapter":
-            self.icon = ft.Icons.BOOK_OUTLINED
+            icon = ft.Icons.BOOK_OUTLINED
 
-        self.text_style = ft.TextStyle(
+        else:
+            icon = ft.Icons.DESCRIPTION_OUTLINED
+
+        # Set our text style
+        text_style = ft.TextStyle(
             size=14,
             color=ft.Colors.PRIMARY,
             #font_family="Consolas",
             weight=ft.FontWeight.BOLD,
         )
 
+        # Get icon color from widget data if it exists
+        icon_color = widget.data.get('rail_icon_color', 'primary')
+
         super().__init__(
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
             on_secondary_tap = self.open_menu,
-            content = ft.Container(expand=True, content=ft.Row([ft.Icon(self.icon, color="primary"), ft.Text(value=title, style=self.text_style)], expand=True)),
+            on_tap = lambda e: self.widget.focus(),
+
+            content = ft.Container(
+                expand=True, 
+                padding=ft.Padding(5, 2, 5, 2),
+                content=ft.Row(
+                    expand=True,
+                    controls=[
+                        ft.Icon(icon, color=icon_color), 
+                        ft.Text(value=capital_title, style=text_style),
+                    ],
+                ),
+            ),
+
             mouse_cursor = ft.MouseCursor.CLICK
         )
 
     # Called when hovering mouse over a tree view item
     def on_hover(self, e):
         self.content.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
-        self.p.update()
+        self.widget.p.update()
 
     def on_stop_hover(self, e):
         self.content.bgcolor = ft.Colors.TRANSPARENT
-        self.p.update()
+        self.widget.p.update()
 
     def open_menu(self, e):
+
+        print("Opening menu for widget:", self.widget.title)
             
         #print(f"Open menu at x={story.mouse_x}, y={story.mouse_y}")
 
         def close_menu(e):
-            self.p.overlay.clear()
-            self.p.update()
+            self.widget.p.overlay.clear()
+            self.widget.p.update()
         
         menu = ft.Container(
-            left=self.story.mouse_x,     # Positions the menu at the mouse location
-            top=self.story.mouse_y,
-            border_radius=ft.border_radius.all(6),
+            left=self.widget.story.mouse_x,     # Positions the menu at the mouse location
+            top=self.widget.story.mouse_y,
+            border_radius=ft.border_radius.all(4),
             bgcolor=ft.Colors.ON_SECONDARY,
             padding=2,
             alignment=ft.alignment.center,
             content=ft.Column([
-                ft.TextButton("Option 1"),
-                ft.TextButton("Option 2"),
-                ft.TextButton("Option 3"),
+                ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+                ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+                ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
             ]),
         )
         outside_detector = ft.GestureDetector(
@@ -138,10 +173,10 @@ class Tree_View_File(ft.GestureDetector):
             on_secondary_tap=close_menu,
         )
 
-        self.p.overlay.append(outside_detector)
-        self.p.overlay.append(menu)
+        self.widget.p.overlay.append(outside_detector)
+        self.widget.p.overlay.append(menu)
         
-        self.p.update()
+        self.widget.p.update()
 
 
 

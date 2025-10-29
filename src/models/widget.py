@@ -15,21 +15,30 @@ from handlers.verify_data import verify_data
 class Widget(ft.Container):
     
     # Constructor. All widgets require a title,  page reference, directory path, and story reference
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict=None):
+    def __init__(
+            self, 
+            title: str,             # Title of our object
+            page: ft.Page,          # Grabs a page reference for updates
+            directory_path: str,    # Path to our directory that will contain our json file
+            story: Story,           # Reference to our story object that owns this widget
+            data: dict=None
+        ):
 
         # Sets uniformity for all widgets
         super().__init__(
             expand=True, 
             bgcolor=ft.Colors.TRANSPARENT, 
-            data=data,  # Sets our data. 
+            data=data,                              # Sets our data. 
         )
     
-        # Required properties of all widgets
-        self.title = title  #                        Title of our object
-        self.p = page                               # Grabs a page reference for updates
-        self.directory_path = directory_path        # Path to our directory that will contain our json file
-        self.story = story                          # Reference to our story object that owns this widget
-        self.mini_widgets = []                      # List that holds our mini widgets objects
+        # Set our parameters
+        self.title = title                          
+        self.p = page                               
+        self.directory_path = directory_path        
+        self.story = story    
+
+        # Declare our mini widgets list                      
+        self.mini_widgets: list = []                     
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -40,7 +49,8 @@ class Widget(ft.Container):
                 'tag': str,                                 # Tag to identify what type of widget this is
                 'pin_location': "main",                     # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
                 'visible': True,                            # Whether this widget is visible in the workspace or not
-                'tab_title_color': "primary",               # Color of the title in the tab (primary, secondary, blue, red, etc.)
+                'tab_title_color': "primary",               # Color of the title in the tab
+                'rail_icon_color': "primary",               # Color of the icon on the rail 
                 'mini_widgets_location': "right",           # Side of the widget the mini widgets show up on (left or right)
             },
         )
@@ -50,7 +60,7 @@ class Widget(ft.Container):
         self.visible = self.data['visible'] 
 
         # Tracks variable to see if we should outline the widget where it is displayed
-        self.is_selected = False
+        self.focused = False
 
         # UI ELEMENTS - Tab
         self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
@@ -127,12 +137,40 @@ class Widget(ft.Container):
         self.hide_tab_icon_button.icon_color = ft.Colors.OUTLINE
         self.p.update()
 
+    # Called when widget is selected on a rail or workspace
+    def focus(self):
+        ''' Focuses the widget in the workspace if it is not already visible '''
+
+        try:
+            # If we're not focused already, run our logic
+            if not self.focused:
+
+                # If we're note visible, make us visible
+                if not self.visible:
+                    self.data['visible'] = True
+                    self.save_dict()
+                    self.visible = self.data['visible']
+
+                # Apply our focus stuff
+                # Apply our focused tab UI outline around widget
+
+                # Apply to the UI
+                self.p.update()
+                self.story.workspace.reload_workspace()
+
+            # We are focused, do nothing
+            else:
+                pass
+
+        # Catch errors
+        except Exception as e:
+            print(f"Error focusing widget {self.title}.  {e}")
+
     # Called when app clicks the hide icon in the tab
     def toggle_visibility(self):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
         try:
-
             # Change our visibility data, save it, then apply it
             self.data['visible'] = not self.data['visible']
             self.save_dict()

@@ -109,8 +109,13 @@ class Content_Rail(Rail):
             column=content
         )
 
+        # Gesture detector to put on top of stack on the rail to pop open menus on right click
+        gd = ft.GestureDetector(
+            expand=True,
+            on_secondary_tap=self.open_menu,
+        )
 
-        content.controls.append(ft.Container(expand=True))
+        content.controls.append(gd)
 
         content.controls.append(
             ft.TextField(
@@ -128,21 +133,7 @@ class Content_Rail(Rail):
             )
         )
 
-        # Gesture detector to put on top of stack on the rail to pop open menus on right click
-        gd = ft.GestureDetector(
-            expand=True,
-            on_secondary_tap=self.open_menu,
-        )
-
-        stack = ft.Stack(
-            expand=True,
-            controls=[
-                content,
-                gd
-            ]
-        )
-
-        self.content = stack
+        self.content = content
 
         
         # Apply our update
