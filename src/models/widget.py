@@ -30,6 +30,9 @@ class Widget(ft.Container):
             bgcolor=ft.Colors.TRANSPARENT, 
             data=data,                              # Sets our data. 
         )
+
+        # Make sure it capital
+        title = title.capitalize()
     
         # Set our parameters
         self.title = title                          

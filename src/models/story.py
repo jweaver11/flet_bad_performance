@@ -88,13 +88,13 @@ class Story(ft.View):
 
         # Our widgets objects
         self.chapters: dict = {}        # Text based chapeters only
+        self.notes: dict = {}           # Notes stored in our story
         self.images: dict = {}          # Images imported in to be used in the story, or just as reference
         self.drawings: dict = {}        # Drawings by the user for comic chapters
         self.characters: dict = {}      # Characters in the story
         self.timelines: dict = {}       # Timelines for our story
         self.world_building: None       # World building widget that contains our maps, lore, governments, history, etc
         self.maps: dict = {}            # Maps created inside of world building
-        self.notes: dict = {}           # Notes stored in our story
 
         # Store all our widgets above in a master list for easier rendering in the UI
         self.widgets: list = []    

@@ -24,6 +24,8 @@ class MiniWidget(ft.Container):
             bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
             data=data,      # Sets our data.
         )
+
+        title = title.capitalize()
            
         self.title = title                          # Title of the widget that will show up on its tab
         self.owner = owner                          # The widget that contains this mini widget.
