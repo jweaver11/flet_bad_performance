@@ -12,7 +12,7 @@ class Image(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            p = page,   # Grabs our original page for convenience and consistency
+            page = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our timeline json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
             data = data,
@@ -22,9 +22,9 @@ class Image(Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': str,
-            },
-            tag="image"
+                'tag': "image",
+                'summary': str,     # Summary of what will happen in the chapter
+            }
         )
             
 
@@ -53,7 +53,7 @@ class Image(Widget):
         # Content of our widget (ft.Container) is our created tabs content
         self.content = content
 
-        self.p.update()
+        self._render_widget()
 
 
 

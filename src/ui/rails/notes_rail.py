@@ -2,25 +2,26 @@
 
 import flet as ft
 from models.story import Story
+from ui.rails.rail import Rail
 
 
 # Class for our Drawing Board rail
-class Notes_Rail(ft.Container):
+class Notes_Rail(Rail):
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
-        # Initialize the parent Container class first
-        super().__init__()
-            
-        # Page reference
-        self.p = page
+        # Initialize the parent Rail class first
+        super().__init__(
+            page=page,
+            story=story
+        )
 
         # Reload the rail on start
-        self.reload_rail(story)
+        self.reload_rail()
 
 
     # Called when changes occur that require rail to be reloaded, but the object does not need to be recreated. (More efficient)
-    def reload_rail(self, story: Story) -> ft.Control:
+    def reload_rail(self) -> ft.Control:
         ''' Reloads the Notes rail '''
 
         # Build the content of our rail
@@ -30,10 +31,10 @@ class Notes_Rail(ft.Container):
             controls=[
                 ft.Text("Notes Rail"),
                 ft.Text("From the story: "),
-                ft.Text(story.title),
+                ft.Text(self.story.title),
                 ft.TextButton(
                     "Create Note",
-                    on_click=lambda e: story.create_note("note_title")
+                    on_click=lambda e: self.story.create_note("note_title")
                 ),
                 ft.TextButton(
                     "View Notes",

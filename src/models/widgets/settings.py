@@ -16,7 +16,7 @@ class Settings(Widget):
         # Constructor the parent widget class
         super().__init__(
             title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
-            p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+            page = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             story = story,
             directory_path = directory_path,
             data = data,
@@ -41,10 +41,10 @@ class Settings(Widget):
                 'workspaces_rail_order': [      # Order of the workspace rail
                     "content",
                     "characters",
-                    "plot_and_timeline",
+                    "timelines",
                     "world_building",
                     "drawing_board",
-                    "notes",
+                    "planning",
                 ],
             },
         )

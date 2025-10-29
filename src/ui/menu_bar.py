@@ -6,10 +6,14 @@ Holds our settings icon, feedback, and account name as well
 import flet as ft
 from models.app import app
 from models.story import Story
-#from handlers.reload_workspace import remove_drag_targets
-#from handlers.reload_workspace import reload_workspace
 
-# Called by main on program start to create our menu bar
+
+
+# CREATING NEW STORY ALLOWS USER OPTION TO CREATE BLANK,
+# OR SELECT FROM TEMPLATE OPTIONS, TYPES, REGRESSION, ETC
+
+
+# Called in main to create menu bar if no story exists, or by a story to create menu bar for that story
 def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     
     # Placeholder events for now
@@ -248,6 +252,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
+                        # CAN ONLY EXPORT WIDGETS AND PSEUDO WIDGETS
                         content=ft.Text("Export", weight=ft.FontWeight.BOLD),
                         leading=ft.Icon(ft.Icons.CLOSE),
                         style=menubar_style,
@@ -288,16 +293,6 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         ], 
     )
 
-    # Called when the settings icon on the right side of the menubar is clicked
-    def settings_clicked(story: Story):
-        ''' Toggles the visibility of the settings widget in the menubar '''
-        print("Settings clicked")
-
-        if app.settings.data['visible']:
-            app.settings.toggle_visibility(story)
-        else:
-            app.settings.toggle_visibility(story)
-
 
         
     # Return our formatted menubar
@@ -315,7 +310,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
 
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
-                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: settings_clicked(story)),   # Settings button
+                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: app.settings.toggle_visibility()),   # Settings button
                 ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
             ]
         )

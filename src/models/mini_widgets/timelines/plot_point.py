@@ -2,26 +2,24 @@ import flet as ft
 from models.mini_widget import MiniWidget
 from models.widget import Widget
 from handlers.verify_data import verify_data
-from models.mini_widgets.plotline.timeline import Timeline
+from models.widgets.timeline import Timeline
 
 
-# Data class for plot points on a timeline - change to branch as well later??
+# Plotpoint mini widget object that appear on timelines and arcs
 class Plot_Point(MiniWidget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, page: ft.Page, dictionary_path: list[str], branch_line, data: dict=None):
+    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
 
         # Parent constructor
         super().__init__(
-            title=title,        # Title of our mini note
-            owner=owner,      # Owner widget that holds us
-            page=page,          # Page reference
-            dictionary_path=dictionary_path,  # Path to our dict WITHIN the owners json file. Mini widgets are stored in their owners file, not their own file
-            data=data,          # Data if we're loading an existing mini note, otherwise blank
+            title=title,        
+            owner=owner,        
+            father=father,      # In this case, father is always a timeline or another arc
+            page=page,          
+            dictionary_path=dictionary_path,  
+            data=data,    
         ) 
-
-        # Either the timeline or the branch MUST be passed in
-        self.branch_line = branch_line    # The timeline this arc belongs to. Needed for certain functions
         
 
         # Verifies this object has the required data fields, and creates them if not
@@ -30,6 +28,7 @@ class Plot_Point(MiniWidget):
             {   
                 'tag': "plot_point",           # Tag to identify what type of object this is
                 'description': str,
+                'events': list,                 # Numbered list of events that occur at this plot point
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
@@ -50,7 +49,7 @@ class Plot_Point(MiniWidget):
                 self.content_control,
                 ft.TextButton(
                     "Delete ME", 
-                    on_click=lambda e: self.branch_line.delete_plot_point(self)
+                    on_click=lambda e: self.owner.delete_mini_widget(self)
                 ),
             ],
             expand=True,

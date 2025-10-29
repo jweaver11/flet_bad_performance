@@ -19,7 +19,7 @@ class Character(Widget):
         # Parent class constructor
         super().__init__(
             title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
-            p = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+            page = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
             directory_path = directory_path,    # Directory where our json file is stored (characters/)
             story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
             data = data,    # Passes in our data if we loaded it, or None if its a new character
@@ -209,7 +209,7 @@ class Character(Widget):
         # Set our content
         self.body_container.content = body
 
-        self.render_widget()
+        self._render_widget()
             
 
 

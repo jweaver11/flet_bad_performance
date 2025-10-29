@@ -1,7 +1,10 @@
 
 # Called when an object (Widget or Mini Widget) is loaded or created. 
 def verify_data(object, required_data: dict) -> bool:
-    ''' Verifys an object's data has all required fields passed in '''
+    ''' 
+    Verifys an object's data has all required fields passed in. 
+    Objects MUST have a save_dict() method, and a data attribute thats a dict.
+    '''
 
     # Internal recursive function to handle nested dicts, typing, and values all in one
     def _verify_data(current_data: dict, required_data: dict):
@@ -26,13 +29,19 @@ def verify_data(object, required_data: dict) -> bool:
             
             # Otherwise, we just set the value
             else:
+
                 # Make sure the key doesn't already exist so we don't override it
                 if key not in current_data:
                     current_data[key] = value
+                
+                # Special case for overwriting defaults 'tag' key to always set the value
+                elif key == 'tag':
+                    current_data[key] = value
         
 
-    # Main block to run our internal functio above
+    # Main block to run our internal function above
     try:
+
         # Sets our data to an empty dict if None or not a dict, so we can add to it
         if object.data is None or not isinstance(object.data, dict):
             object.data = {}
@@ -44,7 +53,7 @@ def verify_data(object, required_data: dict) -> bool:
         object.save_dict()      
         return True
     
-    # Catch any errors and print them
+    # Catch errors
     except Exception as e:
         print(f"Error verifying data for object {object.title}: {e}")
         return False

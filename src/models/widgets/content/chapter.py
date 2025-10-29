@@ -12,7 +12,7 @@ class Chapter(Widget):
         # Initialize from our parent class 'Widget'. 
         super().__init__(
             title = title,  # Title of the widget that will show up on its tab
-            p = page,   # Grabs our original page for convenience and consistency
+            page = page,   # Grabs our original page for convenience and consistency
             directory_path = directory_path,  # Path to our chapters json file
             story = story,       # Saves our story object that this widget belongs to, so we can access it later
             data = data,    # This gets initialized at the end of our constructor
@@ -23,15 +23,35 @@ class Chapter(Widget):
             object=self,   # Pass in our own data so the function can see the actual data we loaded
             required_data={
                 'tag': "chapter",
+                'summary': str,     # Summary of what will happen in the chapter
                 'content': str,
                 'temp': str,
                 'test': str,
+                'mini_notes': dict,
             }
         )
+
+        self.mini_notes = {}
+        self.load_mini_notes()
 
         # Load our widget UI on start after we have loaded our data
         self.reload_widget()
 
+
+    def load_mini_notes(self):
+        ''' Loads our mini notes from our data into live objects '''
+        from models.mini_widgets.mini_note import MiniNote
+
+        # Loop through our data mini notes and create live objects for each
+        for note_title, note_data in self.data['mini_notes'].items():
+            self.mini_widgets.append(MiniNote(
+                title=note_title,
+                owner=self,
+                father=self,
+                page=self.p,
+                dictionary_path="mini_notes",
+                data=note_data,
+            ))
     
     def submit_mini_note(self, e):
         title = e.control.value
@@ -59,6 +79,6 @@ class Chapter(Widget):
             ]
         )
 
-        self.render_widget()
+        self._render_widget()
 
         

@@ -1,4 +1,4 @@
-''' Notes Model for the story object only. Displays in its own widget'''
+''' Class for the Notes widget. Displays as its own tab for easy access to pinning '''
 
 import flet as ft
 from models.story import Story
@@ -6,16 +6,17 @@ from models.widget import Widget
 from handlers.verify_data import verify_data
     
 
-class Notes(Widget):
+class Note(Widget):
+
     # Constructor
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
 
         # Initialize from our parent class 'Widget'. 
         super().__init__(
-            title = title,  # Title of the widget that will show up on its tab
-            p = page,   # Grabs our original page for convenience and consistency
-            directory_path = directory_path,  # Path to our notes json file
-            story = story,       # Saves our story object that this widget belongs to, so we can access it later
+            title = title,                      # Title of the note
+            page = page,                        # Grabs our original page for convenience and consistency
+            directory_path = directory_path,    # Path to our notes json file
+            story = story,                      # Reference to our story object
             data = data,
         )
 
@@ -56,6 +57,6 @@ class Notes(Widget):
         # Assign the body_container content as whatever view you have built in the widget
         self.body_container.content = body
         
-        # Build it widget function that will handle loading our mini widgets and rendering the whole thing
-        self.render_widget()
+        # Build in widget function that will handle loading our mini widgets and rendering the whole thing
+        self._render_widget()
         
