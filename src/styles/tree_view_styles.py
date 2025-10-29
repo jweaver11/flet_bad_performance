@@ -125,10 +125,30 @@ class Tree_View_File(ft.GestureDetector):
         # Standard popup menu options all files/widgets have
         self.menu_options = [
             ft.TextButton(content=ft.Text("Rename", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), on_click=self.rename_clicked),
-            ft.TextButton(content=ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+            ft.PopupMenuButton(
+                expand=True,
+                tooltip="",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.GREY_300),
+                    ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), 
+                ]),
+                items=[
+                    ft.PopupMenuItem(text="Primary", on_click=lambda e: self.change_icon_color("primary")),
+                    ft.PopupMenuItem(text="Red", on_click=lambda e: self.change_icon_color("red")),
+                    ft.PopupMenuItem(text="Orange", on_click=lambda e: self.change_icon_color("orange")),
+                    ft.PopupMenuItem(text="Yellow", on_click=lambda e: self.change_icon_color("yellow")),
+                    ft.PopupMenuItem(text="Green", on_click=lambda e: self.change_icon_color("green")),
+                    ft.PopupMenuItem(text="Blue", on_click=lambda e: self.change_icon_color("blue")),
+                    ft.PopupMenuItem(text="Purple", on_click=lambda e: self.change_icon_color("purple")),
+                    ft.PopupMenuItem(text="Pink", on_click=lambda e: self.change_icon_color("pink")),
+                    ft.PopupMenuItem(text="Brown", on_click=lambda e: self.change_icon_color("brown")),
+                    ft.PopupMenuItem(text="Grey", on_click=lambda e: self.change_icon_color("grey")),
+                ],
+            ),
             ft.TextButton(content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
         ]
 
+        # Parent constructor
         super().__init__(
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
@@ -150,6 +170,24 @@ class Tree_View_File(ft.GestureDetector):
             mouse_cursor = ft.MouseCursor.CLICK
         )
 
+    # Called when a color option is clicked on popup menu to change icon color
+    def change_icon_color(self, color: str):
+        ''' Passes in our kwargs to the widget, and applies the updates '''
+
+        # Change the data
+        self.widget.change_data({'rail_icon_color': color})
+
+
+        # Pass in data correctly
+        # See if color updated correctly
+
+
+
+        
+        # Change our icon to match, apply the update
+        self.content.content.controls[0].color = color
+        self.widget.p.update()
+
     # Called when hovering mouse over a tree view item
     def on_hover(self, e):
         self.content.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
@@ -166,15 +204,22 @@ class Tree_View_File(ft.GestureDetector):
         is_unique = True
         submitting = False
 
+        # Grab our current name for comparison
         current_name = self.widget.title
 
         # Called when clicking outside the input field to cancel renaming
         def _cancel_rename(e):
             ''' Puts our name back to static and unalterable '''
+
+            # Grab our submitting state
             nonlocal submitting
 
+            # Since this auto calls on submit, we need to check. If it is cuz of a submit, do nothing
             if submitting:
+                submitting = not submitting     # Change submit status to False so we can de-select the textbox
                 return
+            
+            # Otherwise we're not submitting (just clicking off the textbox), so we cancel the rename
             else:
 
                 self.content.content.controls[1] = ft.Text(
@@ -187,80 +232,85 @@ class Tree_View_File(ft.GestureDetector):
                 )
                 self.widget.p.update()
 
-        # Called when submitting the new name
+        # Called everytime a change in textbox occurs
         def _name_check(e):
-            # Grab our name
-            name = e.control.value
+            ''' Checks if the name is unique within its type of widget '''
 
+            # Grab the new name, and tag
+            name = e.control.value
             tag = self.widget.data.get('tag', None)
+
+            # Nonlocal variables
             nonlocal is_unique
             nonlocal submitting
 
+            # Set submitting to false, and unique to True
             submitting = False
-
             is_unique = True
 
-
-            print("Tag inside of name check:", tag)
-            print("Name inside of name check:", name)
 
             # Check our widgets tag, and then check for uniqueness accordingly
             if tag is not None:
 
-                # Not sure how, but it grabs the title as the objects so whatevs it works
+                # Chapters check (Not sure how, but it grabs the title as the objects so whatevs it works)
                 if tag == "chapter":
                     for chapter in self.widget.story.chapters:
                         if chapter == name and chapter != current_name:
                             is_unique = False
 
+                # Notes
                 elif tag == "note":
                     for note in self.widget.story.notes:
-                        if note == name and note != self.widget:
+                        if note == name and note != current_name:
                             is_unique = False
 
+                # Characters
                 elif tag == "character":
                     for character in self.widget.story.characters:
-                        if character == name and character != self.widget:
+                        if character == name and character != current_name:
                             is_unique = False
 
+                # Maps
                 elif tag == "maps":
                     for map_widget in self.widget.story.maps:
-                        if map_widget == name and map_widget != self.widget:
+                        if map_widget == name and map_widget != current_name:
                             is_unique = False
 
-            # Give us error text if not unique
+            # Give us our error text if not unique
             if not is_unique:
                 e.control.error_text = "Name already exists"
             else:
                 e.control.error_text = None
 
-            print("Is unique:", is_unique)
-
             # Apply the update
             self.widget.p.update()
 
+        # Called when submitting our textfield.
         def _submit_name(e):
+            ''' Checks that we're unique and renames the widget if so. on_blur is auto called after this, so we handle that as well '''
 
             # Get our name and check if its unique
             name = e.control.value
+
+            # Non local variables
             nonlocal is_unique
             nonlocal text_field
             nonlocal submitting
+
+            # Set submitting to True
             submitting = True
 
-           
-
-            # If it is, call the rename function
+            # If it is, call the rename function. It will do everything else
             if is_unique:
                 self.widget.rename(name)
                 
             # Otherwise make sure we show our error
             else:
                 text_field.error_text = "Name already exists"
-                text_field.focus()
+                text_field.focus()                                  # Auto focus the textfield
                 self.widget.p.update()
                 
-
+        # Our text field that our functions use for renaming and referencing
         text_field = ft.TextField(
             value=self.capital_title,
             expand=True,
@@ -278,17 +328,16 @@ class Tree_View_File(ft.GestureDetector):
         self.widget.p.update()
 
         
-
+    # Called when we right click our object on the tree view
     def open_menu(self, e):
+        ''' Pops open our options on the screen at the mouse location '''
 
-        print("Opening menu for widget:", self.widget.title)
-            
-        #print(f"Open menu at x={story.mouse_x}, y={story.mouse_y}")
-
+        # Called clicking outside the menu to close it
         def close_menu(e):
             self.widget.p.overlay.clear()
             self.widget.p.update()
         
+        # Our container that contains a column of our options. Need to use container for positioning
         menu = ft.Container(
             left=self.widget.story.mouse_x,     # Positions the menu at the mouse location
             top=self.widget.story.mouse_y,
@@ -298,15 +347,17 @@ class Tree_View_File(ft.GestureDetector):
             alignment=ft.alignment.center,
             content=ft.Column(controls=self.menu_options),
         )
+
+        # Outside gesture detector to close the menu when clicking outside the menu container
         outside_detector = ft.GestureDetector(
             expand=True,
             on_tap=close_menu,
             on_secondary_tap=close_menu,
         )
 
+        # Overlay is a stack, so add the detector, then the menu container
         self.widget.p.overlay.append(outside_detector)
         self.widget.p.overlay.append(menu)
-        
         self.widget.p.update()
 
 

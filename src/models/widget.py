@@ -100,6 +100,20 @@ class Widget(ft.Container):
             print(f"Error saving widget to {file_path}: {e}") 
             print("Data that failed to save: ", self.data)
 
+    # Called for little data changes
+    def change_data(self, **kwargs):
+        ''' Changes a key/value pair in our data and saves the json file '''
+
+        try:
+            for key, value in kwargs.items():
+                self.data.update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
+
     # Called usually when renaming, and we need to delete the old file
     def delete_file(self, old_file_path: str):
         ''' Deletes our widget's json file from the directory. Useful for renaming '''
