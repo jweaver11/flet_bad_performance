@@ -84,6 +84,9 @@ class Content_Rail(Rail):
         # Creating a chapter for novels creates a text document for writing, and allows
         # Right clicking allows to create, upload, delete, rename
         # -- Create allows new categories (One folder), books/seasons (multiple folders), chapter, note, drawing, etc.
+        
+        # Drag a file/category to move it into another folder/category
+        # -- Needs to highlight the category its hovering above
                  
 
         # Build the content of our rail

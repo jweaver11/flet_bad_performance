@@ -30,10 +30,15 @@ class Tree_View_Directory(ft.GestureDetector):
 
         #print(f"Color inside of tree view directory {title}:", color)
 
+        folder_options = [
+            ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+            ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+            ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+        ]
+
 
         self.expansion_tile = ft.ExpansionTile(
             title=ft.Text(value=title, weight=ft.FontWeight.BOLD, text_align="left"),
-            #text_color="primary",
             dense=True,
             initially_expanded=is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
@@ -41,8 +46,6 @@ class Tree_View_Directory(ft.GestureDetector):
             leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=color),
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
-            #shape=ft.RoundedRectangleBorder(),
-            #controls=[ft.Container(height=6)],
             bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand()
@@ -83,13 +86,16 @@ class Tree_View_File(ft.GestureDetector):
     def __init__(
         self, 
         widget: Widget, 
+        menu_options: list = None
     ):
         
         # Set our widget reference and tag
         self.widget = widget
+        self.menu_options = menu_options
+
         tag = widget.data.get('tag', None)
 
-        capital_title = widget.title.capitalize()
+        self.capital_title = widget.title.capitalize()
 
         if tag is None:
             icon = ft.Icons.DESCRIPTION_OUTLINED
@@ -114,6 +120,15 @@ class Tree_View_File(ft.GestureDetector):
         # Get icon color from widget data if it exists
         icon_color = widget.data.get('rail_icon_color', 'primary')
 
+        
+    
+        # Standard popup menu options all files/widgets have
+        self.menu_options = [
+            ft.TextButton(content=ft.Text("Rename", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), on_click=self.rename_clicked),
+            ft.TextButton(content=ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+            ft.TextButton(content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+        ]
+
         super().__init__(
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
@@ -127,7 +142,7 @@ class Tree_View_File(ft.GestureDetector):
                     expand=True,
                     controls=[
                         ft.Icon(icon, color=icon_color), 
-                        ft.Text(value=capital_title, style=text_style),
+                        ft.Text(value=self.capital_title, style=text_style),
                     ],
                 ),
             ),
@@ -143,6 +158,39 @@ class Tree_View_File(ft.GestureDetector):
     def on_stop_hover(self, e):
         self.content.bgcolor = ft.Colors.TRANSPARENT
         self.widget.p.update()
+
+    # Called when rename button is clicked
+    def rename_clicked(self, e):
+
+        # Called when clicking outside the input field to cancel renaming
+        def _cancel_rename(e):
+            ''' Puts our name back to static and unalterable '''
+
+            self.content.content.controls[1] = ft.Text(
+                value=self.capital_title,
+                style=ft.TextStyle(
+                    size=14,
+                    color=ft.Colors.PRIMARY,
+                    weight=ft.FontWeight.BOLD,
+                )
+            )
+            self.widget.p.update()
+
+        # Replaces our name text with a text field for renaming
+        self.content.content.controls[1] = ft.TextField(
+            value=self.capital_title,
+            expand=True,
+            autofocus=True,
+            on_submit=lambda e: self.widget.rename(e.control.value),
+            on_blur=_cancel_rename,
+            error_text="Name already exists"
+        )
+
+        # Clears our popup menu button and applies to the UI
+        self.widget.p.overlay.clear()
+        self.widget.p.update()
+
+        
 
     def open_menu(self, e):
 
@@ -161,11 +209,7 @@ class Tree_View_File(ft.GestureDetector):
             bgcolor=ft.Colors.ON_SECONDARY,
             padding=2,
             alignment=ft.alignment.center,
-            content=ft.Column([
-                ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-                ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-                ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-            ]),
+            content=ft.Column(controls=self.menu_options),
         )
         outside_detector = ft.GestureDetector(
             expand=True,

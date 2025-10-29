@@ -97,6 +97,34 @@ class Widget(ft.Container):
             print(f"Error saving widget to {file_path}: {e}") 
             print("Data that failed to save: ", self.data)
 
+    # Called usually when renaming, and we need to delete the old file
+    def delete_file(self, old_file_path: str):
+        ''' Deletes our widget's json file from the directory. Useful for renaming '''
+
+        try:
+            # Delete the file if it exists
+            if os.path.exists(old_file_path):
+                os.remove(old_file_path)
+            else:
+                print(f"File {old_file_path} does not exist, cannot delete.")
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error deleting widget file at {old_file_path}: {e}")
+
+    # Called when renaming a widget
+    def rename(self, title: str):
+        ''' Renames our widget in live title, data, and json file '''
+
+        old_file_path = os.path.join(self.directory_path, f"{self.title}.json")     # Path to old file before rename
+        self.delete_file(old_file_path)                                             # Delete the old file
+
+        self.title = title                              # Update our live title
+        self.data['title'] = self.title                 # Update our data title
+        self.save_dict()                                # Save our data to the json file
+        self.reload_tab()                               # Reload our tab widget to reflect changes
+        self.story.active_rail.content.reload_rail()    # Reload our rail to reflect changes
+
 
     # Called when a new mini note is created inside a widget
     def create_mini_note(self, title: str):

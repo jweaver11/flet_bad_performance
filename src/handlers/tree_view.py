@@ -23,6 +23,19 @@ def load_directory_data(
     
     def _canon_path(p: str) -> str:
         return os.path.normcase(os.path.normpath(p))
+    
+    # Options that all folders and files/widgets using tree view will have. Like rename, delete
+    folder_options = [
+        ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+        ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+        ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+    ]
+
+    file_options = [
+        ft.TextButton(content=ft.Text("Rename", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+        ft.TextButton(content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+        ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+    ]
 
     try: 
 
@@ -101,6 +114,7 @@ def load_directory_data(
             # Create the file item
             item = Tree_View_File(
                 widget,
+                menu_options=file_options
             )        
 
             # Add them to parent expansion tile if one exists, otherwise just add it to the column
