@@ -6,6 +6,7 @@ When called initially when there is no parent dropdown, a column is provided ins
 
 import flet as ft
 import os
+import json
 from models.story import Story
 from styles.tree_view_styles import Tree_View_Directory
 from styles.tree_view_styles import Tree_View_File
@@ -51,7 +52,7 @@ def load_directory_data(
             capital_dir_path = directory_name.capitalize()
             
             # Now use escaped_path to lookup in categories
-            color = story.data['categories'].get(full_path, {}).get('color', 'primary')
+            color = story.data['folders'].get(full_path, {}).get('color', 'primary')
             
             
 
@@ -87,10 +88,16 @@ def load_directory_data(
             name = os.path.splitext(file_name)[0]      
             capitalize_name = name.capitalize()
 
+            # Read the file name to get the tag, and pass in to change the icon
+            with open(os.path.join(directory, file_name), 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                tag = data.get('tag', None)
+
             item = Tree_View_File(
                 title=capitalize_name,
                 story=story,
                 page=page,
+                tag=tag,
                 on_exit=lambda e: print(f"exited hover over {capitalize_name}"),
             )        
 

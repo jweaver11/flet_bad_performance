@@ -34,7 +34,6 @@ class Content_Rail(Rail):
         
         # Pass in default path for now, but accepts new ones in future for organization
         story.create_chapter(title, directory_path=story.data['content_directory_path'])
-        self.reload_rail()
 
     # Called when creating a new note
     def submit_note(self, title: str, story: Story):
@@ -42,7 +41,6 @@ class Content_Rail(Rail):
         
         # Pass in default path for now, but accepts new ones in future for organization
         story.create_note(title, directory_path=story.data['notes_directory_path'])
-        self.reload_rail()
 
     def open_menu(self, e):
             

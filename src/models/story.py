@@ -7,6 +7,7 @@ Stories contain metadata, ui elements, and all the widgets, as well as methods t
 
 import flet as ft
 import os
+import shutil
 import json
 from constants import data_paths
 from handlers.verify_data import verify_data
@@ -51,6 +52,7 @@ class Story(ft.View):
                 'bottom_pin_height': int,
                 'created_at': str,
                 'last_modified': str,
+
                 'settings': {
                     'type': self.type,             # Novel or comic. Affects templates and default data for new content
                     'multi_planetary': bool,       # Whether the story will take place on multiple planets
@@ -58,12 +60,12 @@ class Story(ft.View):
                 },
                 
                 # Dict of all our categories INSIDE of basic story structure (content, characters, timelines)
-                'categories': {
-                    'path': {
-                        'name': str,        # Name of category
+                'folders': {
+                    'path': {               # Path to the category folder (used as the key, since all will be unique)
+                        'name': str,        # Name of category just in case
                         'color': str        # Color of that folder
                     }
-                },            # The Key is the path, since all will be unique. Also contains name and color
+                },            
                 'is_new_story': True,      # Whether this story is newly created or loaded from storage
             },
         )
@@ -176,12 +178,10 @@ class Story(ft.View):
                 "planning",
             ]
 
-            # Create notes folder and gives it a category entry 
-            os.makedirs(self.data['notes_directory_path'], exist_ok=True)  
-            self.data['categories'][self.data['notes_directory_path']] = {
-                'name': "notes",
-                'color': "orange",
-            }
+            self.create_folder(
+                directory_path=self.data['notes_directory_path'], 
+                name="Notes"
+            )
 
             # Create the workspace folder strucutre above
             for folder in required_story_folders:
@@ -201,8 +201,6 @@ class Story(ft.View):
                 folder_path = os.path.join(directory_path, "world_building", folder)
                 os.makedirs(folder_path, exist_ok=True)
 
-
-
             # Set our sub folders inside of notes
             notes_folders = [
                 "themes",
@@ -213,24 +211,23 @@ class Story(ft.View):
             # Create the sub folders inside of notes
             for folder in notes_folders:
                 folder_path = os.path.join(directory_path, "content", "notes", folder)
-                os.makedirs(folder_path, exist_ok=True)
 
-                # Add this folder as a category in the story data so we can save stuff like colors
-                self.data['categories'][os.path.join(self.data['notes_directory_path'], folder)] = {
-                    'name': folder,
-                    'color': "orange",
-                }
+                # Creates the sub folder using out path above
+                self.create_folder(
+                    directory_path=folder_path, 
+                    name=folder
+                )
+                
             
             # Create the path to the story's JSON file
             directory_path = os.path.join(data_paths.stories_directory_path, self.title) 
 
 
 
-
+            # If multiplanetary, create the worlds folder
             if self.data['settings']['multi_planetary']:
-                # If multiplanetary, create the worlds folder
-                worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps", "worlds")
-                os.makedirs(worlds_folder_path, exist_ok=True)
+                worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps", "Worlds")
+                self.create_folder(worlds_folder_path, "Worlds")
             
             # Save our data
             self.save_dict()
@@ -238,8 +235,38 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             print(f"Error verifying/creating story structure for {self.title}: {e}")
-            
 
+    # Called when a new folder/category is created.
+    def create_folder(self, directory_path: str, name: str):
+        ''' Creates a new category inside of our story structure for content organization '''
+
+        try:
+            # Make the folder in our storage if it doesn't already exist
+            os.makedirs(self.data['notes_directory_path'], exist_ok=True) 
+
+            # Add this folder to our folders data so we can save stuff like colors
+            self.data['folders'].setdefault(directory_path, {'name': name, 'color': "primary"})
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error creating folder: {e}")
+        
+    # Called when deleting a folder/category from our story
+    def delete_folder(self, directory_path: str):
+        ''' Deletes a category from our story structure '''
+
+        try:
+            # Delete the folder from storage
+            shutil.rmtree(directory_path)
+
+            # Remove it from data
+            self.data['folders'].pop(directory_path, None)
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error deleting folder: {e}")
+
+            
 
     # Called when deleting a widget from our story
     def delete_widget(self, widget) -> bool:
@@ -378,6 +405,11 @@ class Story(ft.View):
                     # Handle errors if the path is wrong
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading content from {filename}: {e}")
+
+
+    
+
+        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
         # Load animations -- TBD in future if possible
 
@@ -541,7 +573,14 @@ class Story(ft.View):
                             map_title = map_data.get("title", filename.replace(".json", ""))    
                                 
                             # Create our timeline object using our loaded data
-                            self.maps[map_title] = Map(map_title, self.p, dirpath, self, map_data)
+                            self.maps[map_title] = Map(
+                                title=map_title, 
+                                page=self.p, 
+                                directory_path=dirpath, 
+                                story=self, 
+                                data=map_data
+                            )
+                            
                             
                         # Handle errors if the path is wrong
                         except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
@@ -557,49 +596,6 @@ class Story(ft.View):
         except Exception as e:
             print(f"Error loading maps: {e}")
 
-
-
-    # Called on story startup to load all our notes objects
-    def load_notes(self):
-        ''' Loads all our note objects stored in the notes directory path'''
-
-        from models.widgets.content.note import Note
-
-        # Check if the notes folder exists. Creates it if it doesn't. Handles errors on startup
-        if not os.path.exists(self.data['notes_directory_path']):
-            #print("Characters folder does not exist, creating it.")
-            os.makedirs(self.data['notes_directory_path'])    
-            return
-        
-        # Iterate through all files in the characters folder
-        #for filename in os.listdir(data_paths.characters_path):
-        for dirpath, dirnames, filenames in os.walk(self.data['notes_directory_path']):
-            for filename in filenames:
-
-                # All our objects are stored as JSON
-                if filename.endswith(".json"):
-
-                    file_path = os.path.join(dirpath, filename)     # Pass in whatever our directory is (have not tested)
-
-                    # Set data none initially
-                    note_data = None
-                    
-                    try:
-                        # Read the JSON file
-                        with open(file_path, "r", encoding='utf-8') as f:
-                            note_data = json.load(f)
-                        
-                        # Extract the title from the data
-                        note_title = note_data.get("title", filename.replace(".json", ""))
-
-                        self.notes[note_title] = Note(note_title, self.p, dirpath, self, note_data)
-                        #print(self.notes[note_title].title)      
-                    
-                    # Handle errors if the path is wrong
-                    except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
-                        print(f"Error loading notes from {filename}: {e}")
-
-        #print(f"Total characters loaded for {self.title}: {len(self.characters)}")
 
     def load_widgets(self):
         ''' Loads all our widgets (characters, chapters, notes, etc.) into our master list of widgets '''
@@ -661,6 +657,22 @@ class Story(ft.View):
         # Save the new chapter
         self.chapters[title] = Chapter(title, self.p, directory_path, self)
         self.widgets.append(self.chapters[title])  # Add to our master list of widgets in our story
+
+        self.active_rail.content.reload_rail()
+        self.workspace.reload_workspace()
+
+    # Called to create a note object
+    def create_note(self, title: str, directory_path: str=None):
+        ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
+        from models.widgets.content.note import Note
+
+        # If no path is passed in, construct the full file path for the note JSON file
+        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
+            directory_path = self.data['notes_directory_path']
+            #file_path = os.path.join(self.data['notes_directory_path'], note_filename)
+
+        self.notes[title] = Note(title, self.p, directory_path, self)
+        self.widgets.append(self.notes[title])  # Add to our master list of widgets in our story
 
         self.active_rail.content.reload_rail()
         self.workspace.reload_workspace()
@@ -730,22 +742,6 @@ class Story(ft.View):
         self.active_rail.content.reload_rail()
         self.workspace.reload_workspace()
 
-
-    # Called to create a note object
-    def create_note(self, title: str, directory_path: str=None):
-        ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
-        from models.widgets.content.note import Note
-
-        # If no path is passed in, construct the full file path for the note JSON file
-        if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            directory_path = self.data['notes_directory_path']
-            #file_path = os.path.join(self.data['notes_directory_path'], note_filename)
-
-        self.notes[title] = Note(title, self.p, directory_path, self)
-        self.widgets.append(self.notes[title])  # Add to our master list of widgets in our story
-
-        self.active_rail.content.reload_rail()
-        self.workspace.reload_workspace()
 
 
     # Called when new story object is created, either by program or by being loaded from storage

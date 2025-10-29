@@ -10,6 +10,10 @@ class Tree_View_Directory(ft.GestureDetector):
         page: ft.Page,      # Page reference for overlay menu
         color: str = None,
         father: 'Tree_View_Directory' = None,
+
+        # Optinos passed in by child classes
+        buttons: list = None,           # Buttons to attach to the right side of the tile
+        menu_options: list = None,      # Options to show when right clicking a directory
     ):
         
         self.title = title
@@ -18,7 +22,7 @@ class Tree_View_Directory(ft.GestureDetector):
         self.father = father
         self.color = color
 
-        print(f"Color inside of tree view directory {title}:", color)
+        #print(f"Color inside of tree view directory {title}:", color)
 
 
         self.expansion_tile = ft.ExpansionTile(
@@ -44,7 +48,7 @@ class Tree_View_Directory(ft.GestureDetector):
         )
 
     def on_hover(self, e):
-        self.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
+        self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.WHITE)
         if self.father is not None:
             self.father.content.bgcolor = ft.Colors.TRANSPARENT
         self.p.update()
@@ -67,13 +71,21 @@ class Tree_View_File(ft.GestureDetector):
         on_exit,
         tag: str = None,    # Optional tag to pass in for file type identification, so we can change icon 
         father: Tree_View_Directory = None,   
-
     ):
         
         self.title = title
         self.story = story
         self.p = page
         self.father = father
+
+        if tag is None:
+            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+
+        elif tag == "note":
+            self.icon = ft.Icons.STICKY_NOTE_2_OUTLINED
+
+        elif tag == "chapter":
+            self.icon = ft.Icons.BOOK_OUTLINED
 
         self.text_style = ft.TextStyle(
             size=14,
@@ -86,7 +98,7 @@ class Tree_View_File(ft.GestureDetector):
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
             on_secondary_tap = self.open_menu,
-            content = ft.Container(expand=True, content=ft.Row([ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED, color="primary"), ft.Text(value=title, style=self.text_style)], expand=True)),
+            content = ft.Container(expand=True, content=ft.Row([ft.Icon(self.icon, color="primary"), ft.Text(value=title, style=self.text_style)], expand=True)),
             mouse_cursor = ft.MouseCursor.CLICK
         )
 
