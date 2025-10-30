@@ -43,6 +43,41 @@ class Content_Rail(Rail):
         story.create_note(title, directory_path=story.data['notes_directory_path'])
 
     def open_menu(self, e):
+
+        def _get_menu_options() -> list[ft.Control]:
+
+            def _create_category_clicked(e):
+                pass
+
+            def _create_chapter_clicked(e):
+                pass
+
+            def _create_note_clicked(e):
+                pass
+
+            return [
+                ft.TextButton(
+                    on_click=_create_category_clicked,
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.FOLDER_OPEN),
+                        ft.Text("New Category"),
+                    ])
+                ),
+                ft.TextButton(
+                    on_click=_create_chapter_clicked,
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.BOOK),
+                        ft.Text("New Chapter"),
+                    ])
+                ),
+                ft.TextButton(
+                    on_click=_create_note_clicked,
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED),
+                        ft.Text("New Note"),
+                    ])
+                ),
+            ]
             
         #print(f"Open menu at x={story.mouse_x}, y={story.mouse_y}")
 
@@ -57,11 +92,7 @@ class Content_Rail(Rail):
             bgcolor=ft.Colors.ON_SECONDARY,
             padding=2,
             alignment=ft.alignment.center,
-            content=ft.Column([
-                ft.TextButton("Option 1"),
-                ft.TextButton("Option 2"),
-                ft.TextButton("Option 3"),
-            ]),
+            content=ft.Column(controls=_get_menu_options()),
         )
         outside_detector = ft.GestureDetector(
             expand=True,
