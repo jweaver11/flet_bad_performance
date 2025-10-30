@@ -119,7 +119,7 @@ def load_directory_data(
             # Create the file item
             item = Tree_View_File(
                 widget,
-                menu_options=file_options
+                additional_menu_options=file_options
             )        
 
             # Add them to parent expansion tile if one exists, otherwise just add it to the column
