@@ -115,7 +115,7 @@ class Widget(ft.Container):
             print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
 
     # Called usually when renaming, and we need to delete the old file
-    def delete_file(self, old_file_path: str):
+    def delete_file(self, old_file_path: str) -> bool:
         ''' Deletes our widget's json file from the directory. Useful for renaming '''
 
         try:
@@ -125,9 +125,12 @@ class Widget(ft.Container):
             else:
                 print(f"File {old_file_path} does not exist, cannot delete.")
 
+            return True
+
         # Handle errors
         except Exception as e:
             print(f"Error deleting widget file at {old_file_path}: {e}")
+            return False
 
     # Called when renaming a widget
     def rename(self, title: str):
@@ -139,6 +142,10 @@ class Widget(ft.Container):
         self.title = title                              # Update our live title
         self.data['title'] = self.title                 # Update our data title
         self.save_dict()                                # Save our data to the json file
+
+        # Remove from our live dict wherever we are stored
+        
+        
         self.reload_tab()                               # Reload our tab widget to reflect changes
         self.story.active_rail.content.reload_rail()    # Reload our rail to reflect changes
 

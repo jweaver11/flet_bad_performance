@@ -300,34 +300,6 @@ class Story(ft.View):
         print("Delete widget called")
 
 
-        # Called inside the delete_object method to remove the file from storage
-        def _delete_widget_file(widget: Widget) -> bool:
-            ''' Deletes our widgets json file from storage. Returns true if successful, false if not '''
-
-            print("delete widget file called")
-            
-            try:
-                    
-                # Check if the file exists before attempting to delete
-                if os.path.exists(widget.directory_path):
-                    file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
-                    os.remove(file_path)
-
-                    print(f"Successfully deleted file: {widget.directory_path}")
-                    return True
-                
-                else:
-                    print(f"File not found: {widget.directory_path}")
-                    return False
-                    
-            # Errors
-            except (OSError, IOError) as e:
-                print(f"Error deleting file {widget.title}.json: {e}")
-                return False
-            except AttributeError as e:
-                print(f"Object missing required attributes (title or path): {e}")
-                return False
-
         # Called if file is successfully deleted. Then we remove the widget from its live storage
         def _delete_live_widget(widget: Widget):
             # Grab our widgets tag to see what type of object it is
@@ -355,13 +327,17 @@ class Story(ft.View):
         # Call our internal functions above
         try:
             # If we can delete the file, we remove the live object
-            if _delete_widget_file(widget):
+            file_path = os.path.join(widget.directory_path, f"{widget.title}.json")
+            if widget.delete_file(file_path):
 
                 _delete_live_widget(widget)
 
                 # Reload our workspace to apply the UI Change if was needed
                 if widget.visible:
-                    self.workspace.reload_workspace(self.p, self)
+                    self.workspace.reload_workspace()
+
+                self.active_rail.content.reload_rail()
+                self.close_menu()
 
                 print(f"Successfully deleted widget: {widget.title}")
 
@@ -767,10 +743,14 @@ class Story(ft.View):
 
 
     # Called clicking outside the menu to close it
-    def close_menu(self, e):
+    def close_menu(self, e=None):
         ''' Closes our right click menu when clicking outside of it '''
-        self.p.overlay.clear()
-        self.p.update()
+        try:
+            self.p.overlay.clear()
+            self.p.update()
+
+        except Exception as e:
+            print(f"Error closing menu: {e}")
 
     # Called when we right click our object on the tree view
     def open_menu(self, menu_options: list):
