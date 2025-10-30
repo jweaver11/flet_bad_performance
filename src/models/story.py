@@ -766,6 +766,38 @@ class Story(ft.View):
         self.workspace.reload_workspace()
 
 
+    # Called clicking outside the menu to close it
+    def close_menu(self, e):
+        ''' Closes our right click menu when clicking outside of it '''
+        self.p.overlay.clear()
+        self.p.update()
+
+    # Called when we right click our object on the tree view
+    def open_menu(self, menu_options: list):
+        ''' Pops open our menu options when right clicking an object on a rail '''
+        
+        # Our container that contains a column of our options. Need to use container for positioning
+        menu = ft.Container(
+            left=self.mouse_x,     # Positions the menu at the mouse location
+            top=self.mouse_y,
+            border_radius=ft.border_radius.all(4),
+            bgcolor=ft.Colors.ON_SECONDARY,
+            padding=2,
+            #alignment=ft.alignment.center,
+            content=ft.Column(controls=menu_options),
+        )
+
+        # Outside gesture detector to close the menu when clicking outside the menu container
+        outside_detector = ft.GestureDetector(
+            expand=True,
+            on_tap=self.close_menu,
+            on_secondary_tap=self.close_menu,
+        )
+
+        # Overlay is a stack, so add the detector, then the menu container
+        self.p.overlay.append(outside_detector)
+        self.p.overlay.append(menu)
+        self.p.update()
 
     # Called when new story object is created, either by program or by being loaded from storage
     def build_view(self) -> list[ft.Control]:

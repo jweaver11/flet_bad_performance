@@ -86,12 +86,12 @@ class Tree_View_File(ft.GestureDetector):
     def __init__(
         self, 
         widget: Widget, 
-        menu_options: list = None
+        additional_menu_options: list = None
     ):
         
         # Set our widget reference and tag
         self.widget = widget
-        self.menu_options = menu_options
+        self.additional_menu_options = additional_menu_options
 
         tag = widget.data.get('tag', None)
 
@@ -120,28 +120,11 @@ class Tree_View_File(ft.GestureDetector):
         # Get icon color from widget data if it exists
         self.icon_color = widget.data.get('rail_icon_color', 'primary')
 
-        
-    
-        # Standard popup menu options all files/widgets have
-        self.menu_options = [
-            ft.TextButton(content=ft.Text("Rename", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), on_click=self.rename_clicked),
-            ft.PopupMenuButton(
-                expand=True,
-                tooltip="",
-                content=ft.Row([
-                    ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.GREY_300),
-                    ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), 
-                ]),
-                items=self.get_colors()
-            ),
-            ft.TextButton(content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-        ]
-
         # Parent constructor
         super().__init__(
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
-            on_secondary_tap = self.open_menu,
+            on_secondary_tap = lambda e: self.widget.story.open_menu(self.get_menu_options()),
             on_tap = lambda e: self.widget.focus(),
 
             content = ft.Container(
@@ -159,7 +142,7 @@ class Tree_View_File(ft.GestureDetector):
             mouse_cursor = ft.MouseCursor.CLICK
         )
 
-    def get_colors(self) -> list[ft.Control]:
+    def get_color_options(self) -> list[ft.Control]:
         ''' Returns a list of all available colors for icon changing '''
 
         # Called when a color option is clicked on popup menu to change icon color
@@ -172,8 +155,10 @@ class Tree_View_File(ft.GestureDetector):
             
             # Change our icon to match, apply the update
             self.reload()
-            #self.close_menu(None)
+            self.widget.p.update()
+            #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
+        # List of available colors
         colors = [
             "primary",
             "red",
@@ -187,7 +172,10 @@ class Tree_View_File(ft.GestureDetector):
             "grey",
         ]
 
+        # List for our colors when formatted
         color_controls = [] 
+
+        # Create our controls for our color options
         for color in colors:
             color_controls.append(
                 ft.PopupMenuItem(
@@ -206,6 +194,44 @@ class Tree_View_File(ft.GestureDetector):
     def on_stop_hover(self, e):
         self.content.bgcolor = ft.Colors.TRANSPARENT
         self.widget.p.update()
+
+    def get_menu_options(self) -> list[ft.Control]:
+        menu_options = [
+            ft.TextButton(
+                expand=True,
+                on_click=self.rename_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
+                    ft.Text(
+                        "Rename", 
+                        weight=ft.FontWeight.BOLD, 
+                        color=ft.Colors.GREY_300
+                    ), 
+                ]),
+            ),
+            ft.PopupMenuButton(
+                expand=True,
+                tooltip="",
+                padding=ft.Padding(10,0,0,0),
+                content=ft.Row(
+                    expand=True,
+                    #spacing=0,
+                    controls=[
+                        ft.Container(),   # Spacer
+                        ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
+                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), 
+                    ]
+                ),
+                items=self.get_color_options()
+            ),
+            ft.TextButton(
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
+                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300, expand=True),
+                ]),
+            ),
+        ]
+        return menu_options
 
     # Called when rename button is clicked
     def rename_clicked(self, e):
@@ -335,40 +361,6 @@ class Tree_View_File(ft.GestureDetector):
 
         # Clears our popup menu button and applies to the UI
         self.widget.p.overlay.clear()
-        self.widget.p.update()
-
-    
-    # Called clicking outside the menu to close it
-    def close_menu(self, e):
-        self.widget.p.overlay.clear()
-        self.widget.p.update()
-
-        
-    # Called when we right click our object on the tree view
-    def open_menu(self, e):
-        ''' Pops open our options on the screen at the mouse location '''
-        
-        # Our container that contains a column of our options. Need to use container for positioning
-        menu = ft.Container(
-            left=self.widget.story.mouse_x,     # Positions the menu at the mouse location
-            top=self.widget.story.mouse_y,
-            border_radius=ft.border_radius.all(4),
-            bgcolor=ft.Colors.ON_SECONDARY,
-            padding=2,
-            alignment=ft.alignment.center,
-            content=ft.Column(controls=self.menu_options),
-        )
-
-        # Outside gesture detector to close the menu when clicking outside the menu container
-        outside_detector = ft.GestureDetector(
-            expand=True,
-            on_tap=self.close_menu,
-            on_secondary_tap=self.close_menu,
-        )
-
-        # Overlay is a stack, so add the detector, then the menu container
-        self.widget.p.overlay.append(outside_detector)
-        self.widget.p.overlay.append(menu)
         self.widget.p.update()
 
 
