@@ -98,19 +98,19 @@ class Tree_View_File(ft.GestureDetector):
         self.capital_title = widget.title.capitalize()
 
         if tag is None:
-            icon = ft.Icons.DESCRIPTION_OUTLINED
+            self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
         elif tag == "note":
-            icon = ft.Icons.STICKY_NOTE_2_OUTLINED
+            self.icon = ft.Icons.STICKY_NOTE_2_OUTLINED
 
         elif tag == "chapter":
-            icon = ft.Icons.BOOK_OUTLINED
+            self.icon = ft.Icons.BOOK_OUTLINED
 
         else:
-            icon = ft.Icons.DESCRIPTION_OUTLINED
+            self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
         # Set our text style
-        text_style = ft.TextStyle(
+        self.text_style = ft.TextStyle(
             size=14,
             color=ft.Colors.PRIMARY,
             #font_family="Consolas",
@@ -118,7 +118,7 @@ class Tree_View_File(ft.GestureDetector):
         )
 
         # Get icon color from widget data if it exists
-        icon_color = widget.data.get('rail_icon_color', 'primary')
+        self.icon_color = widget.data.get('rail_icon_color', 'primary')
 
         
     
@@ -132,18 +132,7 @@ class Tree_View_File(ft.GestureDetector):
                     ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.GREY_300),
                     ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), 
                 ]),
-                items=[
-                    ft.PopupMenuItem(text="Primary", on_click=lambda e: self.change_icon_color("primary")),
-                    ft.PopupMenuItem(text="Red", on_click=lambda e: self.change_icon_color("red")),
-                    ft.PopupMenuItem(text="Orange", on_click=lambda e: self.change_icon_color("orange")),
-                    ft.PopupMenuItem(text="Yellow", on_click=lambda e: self.change_icon_color("yellow")),
-                    ft.PopupMenuItem(text="Green", on_click=lambda e: self.change_icon_color("green")),
-                    ft.PopupMenuItem(text="Blue", on_click=lambda e: self.change_icon_color("blue")),
-                    ft.PopupMenuItem(text="Purple", on_click=lambda e: self.change_icon_color("purple")),
-                    ft.PopupMenuItem(text="Pink", on_click=lambda e: self.change_icon_color("pink")),
-                    ft.PopupMenuItem(text="Brown", on_click=lambda e: self.change_icon_color("brown")),
-                    ft.PopupMenuItem(text="Grey", on_click=lambda e: self.change_icon_color("grey")),
-                ],
+                items=self.get_colors()
             ),
             ft.TextButton(content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
         ]
@@ -161,8 +150,8 @@ class Tree_View_File(ft.GestureDetector):
                 content=ft.Row(
                     expand=True,
                     controls=[
-                        ft.Icon(icon, color=icon_color), 
-                        ft.Text(value=self.capital_title, style=text_style),
+                        ft.Icon(self.icon, color=self.icon_color), 
+                        ft.Text(value=self.capital_title, style=self.text_style),
                     ],
                 ),
             ),
@@ -170,23 +159,44 @@ class Tree_View_File(ft.GestureDetector):
             mouse_cursor = ft.MouseCursor.CLICK
         )
 
-    # Called when a color option is clicked on popup menu to change icon color
-    def change_icon_color(self, color: str):
-        ''' Passes in our kwargs to the widget, and applies the updates '''
+    def get_colors(self) -> list[ft.Control]:
+        ''' Returns a list of all available colors for icon changing '''
 
-        # Change the data
-        self.widget.change_data({'rail_icon_color': color})
+        # Called when a color option is clicked on popup menu to change icon color
+        def _change_icon_color(color: str):
+            ''' Passes in our kwargs to the widget, and applies the updates '''
 
+            # Change the data
+            self.widget.change_data(**{'rail_icon_color': color})
+            self.icon_color = color
+            
+            # Change our icon to match, apply the update
+            self.reload()
+            #self.close_menu(None)
 
-        # Pass in data correctly
-        # See if color updated correctly
+        colors = [
+            "primary",
+            "red",
+            "orange",
+            "yellow",
+            "green",
+            "blue",
+            "purple",
+            "pink",
+            "brown",
+            "grey",
+        ]
 
+        color_controls = [] 
+        for color in colors:
+            color_controls.append(
+                ft.PopupMenuItem(
+                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
+                    on_click=lambda e, col=color: _change_icon_color(col)
+                )
+            )
 
-
-        
-        # Change our icon to match, apply the update
-        self.content.content.controls[0].color = color
-        self.widget.p.update()
+        return color_controls
 
     # Called when hovering mouse over a tree view item
     def on_hover(self, e):
@@ -327,15 +337,16 @@ class Tree_View_File(ft.GestureDetector):
         self.widget.p.overlay.clear()
         self.widget.p.update()
 
+    
+    # Called clicking outside the menu to close it
+    def close_menu(self, e):
+        self.widget.p.overlay.clear()
+        self.widget.p.update()
+
         
     # Called when we right click our object on the tree view
     def open_menu(self, e):
         ''' Pops open our options on the screen at the mouse location '''
-
-        # Called clicking outside the menu to close it
-        def close_menu(e):
-            self.widget.p.overlay.clear()
-            self.widget.p.update()
         
         # Our container that contains a column of our options. Need to use container for positioning
         menu = ft.Container(
@@ -351,13 +362,29 @@ class Tree_View_File(ft.GestureDetector):
         # Outside gesture detector to close the menu when clicking outside the menu container
         outside_detector = ft.GestureDetector(
             expand=True,
-            on_tap=close_menu,
-            on_secondary_tap=close_menu,
+            on_tap=self.close_menu,
+            on_secondary_tap=self.close_menu,
         )
 
         # Overlay is a stack, so add the detector, then the menu container
         self.widget.p.overlay.append(outside_detector)
         self.widget.p.overlay.append(menu)
+        self.widget.p.update()
+
+
+    def reload(self):
+        self.content = ft.Container(
+            expand=True, 
+            padding=ft.Padding(5, 2, 5, 2),
+            content=ft.Row(
+                expand=True,
+                controls=[
+                    ft.Icon(self.icon, color=self.icon_color), 
+                    ft.Text(value=self.capital_title, style=self.text_style),
+                ],
+            ),
+        )
+
         self.widget.p.update()
 
 
