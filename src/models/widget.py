@@ -144,6 +144,20 @@ class Widget(ft.Container):
         self.save_dict()                                # Save our data to the json file
 
         # Remove from our live dict wherever we are stored
+        tag = self.data['tag']
+        if tag == "chapter":
+            self.story.chapters.pop(title, None)
+            self.story.chapters[self.title] = self
+        elif tag == "image":
+            self.story.images.pop(title, None)
+            self.story.images[self.title] = self
+        elif tag == "note":
+            self.story.notes.pop(title, None)
+            self.story.notes[self.title] = self
+        elif tag == "map":
+            self.story.maps.pop(title, None)
+            self.story.maps[self.title] = self
+        
         
         
         self.reload_tab()                               # Reload our tab widget to reflect changes
