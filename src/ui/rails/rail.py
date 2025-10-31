@@ -57,8 +57,6 @@ class Rail(ft.Container):
         
         # Check all our folders and compare them to the new key
         for key in self.story.data['folders'].keys():
-
-            print("Comparing existing folder key:", key, "to new key:", new_key)
             
             # Path comparisons require normalization
             if os.path.normcase(os.path.normpath(key)) == new_key:

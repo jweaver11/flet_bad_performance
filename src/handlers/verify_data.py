@@ -37,6 +37,10 @@ def verify_data(object, required_data: dict) -> bool:
                 # Special case for overwriting defaults 'tag' key to always set the value
                 elif key == 'tag':
                     current_data[key] = value
+
+                # Special case for overwriting 'pin_location' key to always set the value
+                elif key == 'pin_location':
+                    current_data[key] = value
         
 
     # Main block to run our internal function above
