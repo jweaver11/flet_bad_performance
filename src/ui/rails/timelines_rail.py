@@ -14,7 +14,8 @@ class Timelines_Rail(Rail):
         # Initialize the parent Rail class first
         super().__init__(
             page=page,
-            story=story
+            story=story,
+            directory_path=story.data['timelines_directory_path']
         )
  
         self.reload_rail()

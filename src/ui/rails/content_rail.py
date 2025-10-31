@@ -1,6 +1,7 @@
 """ WIP """
 
 import flet as ft
+import os
 from models.story import Story
 from ui.rails.rail import Rail
 from handlers.tree_view import load_directory_data
@@ -14,48 +15,42 @@ class Content_Rail(Rail):
         # Initialize the parent Rail class first
         super().__init__(
             page=page,
-            story=story
+            story=story,
+            directory_path=story.data['content_directory_path']
         )
 
+        # State variables used for our UI to track logic
+        self.item_is_unique = True          # If the new category, chapter, note, etc. title is unique within its directory
+        self.are_submitting = False         # If we are currently submitting this item
+
         # UI elements for easier referencing later
-        self.new_category_textfield = ft.TextField(  
-            hint_text="Category Name",
-            #on_submit=lambda e: self.submit_category(e.control.value, self.story),
-            autofocus=True,
-            visible=False
-        )
-        
         self.new_chapter_textfield = ft.TextField(  
             hint_text="Chapter Name",
-            on_submit=lambda e: self.submit_chapter(e.control.value, self.story),
+            data="chapter",
+            on_submit=self.submit_item,
+            on_change=self.on_new_item_change,
+            on_blur=self.on_new_item_blur,
             autofocus=True,
             visible=False
         )
 
         self.new_note_textfield = ft.TextField(  
             hint_text="Note Name",
-            #on_submit=lambda e: self.submit_note(e.control.value, self.story),
+            data="note",
+            on_submit=self.submit_item,
+            on_change=self.on_new_item_change,
+            on_blur=self.on_new_item_blur,
             autofocus=True,
             visible=False
         )
 
         # Reload the rail on start
         self.reload_rail()
-
-    # Called when user creates a new chapter
-    def submit_chapter(self, title: str, story: Story):
-        ''' Grabs our story.type object and creates a new chapter directory inside it.
-         Chapter directory can contain images, notes, and the text content for the chapter itself '''
-        
-        # Pass in default path for now, but accepts new ones in future for organization
-        story.create_chapter(title, directory_path=story.data['content_directory_path'])
-
     
+    
+
     # Called to return our list of menu options for the content rail
     def get_menu_options(self) -> list[ft.Control]:
-
-        is_unique = True
-        submitting = False
 
         # Functions to handle when one of menu options is selected
         def _new_category_clicked(e):
@@ -105,6 +100,7 @@ class Content_Rail(Rail):
                     ft.Text("New Note"),
                 ])
             ),
+
             # New and upload options? or just upload?? or how do i wanna do this?? Compact vs spread out view??
         ]
 
@@ -119,10 +115,6 @@ class Content_Rail(Rail):
         # Creating a chapter for comics creates a folder to store images and drawings
         # Creating a chapter for novels creates a text document for writing, and allows
         # Right clicking allows to create, upload, delete, rename
-        # -- Create allows new categories (One folder), books/seasons (multiple folders), chapter, note, drawing, etc.
-        
-        # Drag a file/category to move it into another folder/category
-        # -- Needs to highlight the category its hovering above
                  
 
         # Build the content of our rail

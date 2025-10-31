@@ -49,7 +49,7 @@ class Story(ft.View):
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
                 'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
-                'notes_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content", "Notes"),
+                'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
                 'top_pin_height': int,
                 'left_pin_width': int,
                 'main_pin_height': int,
@@ -68,7 +68,7 @@ class Story(ft.View):
                 'folders': {
                     'path': {                   # Path to the category folder (used as the key, since all will be unique)
                         'name': str,            # Name of category just in case
-                        'color': str,            # Color of that folder
+                        'color': str,           # Color of that folder
                         'is_expanded': True     # Whether this folder is expanded in the tree view
                     }
                 },            
@@ -190,7 +190,7 @@ class Story(ft.View):
                 os.makedirs(folder_path, exist_ok=True)     # Checks if they exist or not, so they won't be overwritten
 
             self.create_folder(
-                directory_path=self.data['notes_directory_path'], 
+                directory_path=self.data['content_directory_path'], 
                 name="Notes"
             )
                 
@@ -245,13 +245,17 @@ class Story(ft.View):
     # Called when a new folder/category is created.
     def create_folder(self, directory_path: str, name: str):
         ''' Creates a new category inside of our story structure for content organization '''
+        #print("Creating folder at path:", directory_path)
 
         try:
-            # Make the folder in our storage if it doesn't already exist
-            os.makedirs(directory_path, exist_ok=True) 
 
+            folder_path = os.path.join(directory_path, name)
+
+            # Make the folder in our storage if it doesn't already exist
+            os.makedirs(folder_path, exist_ok=True) 
             # Add this folder to our folders data so we can save stuff like colors
-            self.data['folders'].setdefault(directory_path, {'name': name, 'color': "primary", 'is_expanded': True})
+            self.data['folders'].update({folder_path: {'name': name, 'color': "primary", 'is_expanded': True}})
+            self.save_dict()
 
         # Handle errors
         except Exception as e:
@@ -297,27 +301,28 @@ class Story(ft.View):
         We then remove its storage file from our file storage as well. '''
         from models.widget import Widget
 
-        print("Delete widget called")
-
-
         # Called if file is successfully deleted. Then we remove the widget from its live storage
         def _delete_live_widget(widget: Widget):
             # Grab our widgets tag to see what type of object it is
             tag = widget.data.get('tag', None)
+
+            #print("Widget tag: ", tag)
             
             # Based on its tag, it deletes it from our appropriate dict
             if tag == "chapter":
-                if widget.title in self.chapters:
-                    del self.chapters[widget.title]
+                print("Running chapter check")
+                if widget.data['key'] in self.chapters.keys():
+                    print("Widget is in self.chapters")
+                    del self.chapters[widget.data['key']]
             elif tag == "image":
-                if widget.title in self.images:
-                    del self.images[widget.title]
+                if widget in self.images:
+                    del self.images[widget.data['key']]
             elif tag == "character":
-                if widget.title in self.characters:
-                    del self.characters[widget.title]
+                if widget in self.characters:
+                    del self.characters[widget.data['key']]
             elif tag == "note":
-                if widget.title in self.notes:
-                    del self.notes[widget.title]
+                if widget in self.notes:
+                    del self.notes[widget.data['key']]
 
             
             # Remove from our master widgets list so it won't be rendered anymore
@@ -643,7 +648,7 @@ class Story(ft.View):
 
         # Save the new chapter and add it to the widget list
         self.chapters[key] = Chapter(title, self.p, directory_path, self)
-        self.widgets.append(self.chapters[title])
+        self.widgets.append(self.chapters[key])
 
         # Apply the UI changes
         self.active_rail.content.reload_rail()
@@ -656,14 +661,14 @@ class Story(ft.View):
 
         # If no path is passed in, construct the full file path for the note JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
-            directory_path = self.data['notes_directory_path']
+            directory_path = self.data['content_directory_path']
            
         # Set the key
         key = directory_path + "\\" + title
 
         # Save our new note and add it to the widget list
         self.notes[key] = Note(title, self.p, directory_path, self)
-        self.widgets.append(self.notes[title]) 
+        self.widgets.append(self.notes[key]) 
 
         # Apply the UI changes
         self.active_rail.content.reload_rail()
@@ -684,7 +689,7 @@ class Story(ft.View):
         
         # Save our new character and add it to the widget list
         self.characters[key] = Character(title, self.p, directory_path, self)
-        self.widgets.append(self.characters[title])  
+        self.widgets.append(self.characters[key])  
 
         # Apply the UI changes
         self.active_rail.content.reload_rail()
@@ -702,7 +707,7 @@ class Story(ft.View):
 
         # Save our new timeline and add it to the widget list
         self.timelines[key] = Timeline(title, self.p, dirpath, self)
-        self.widgets.append(self.timelines[title])  
+        self.widgets.append(self.timelines[key])  
 
         # Apply the UI changes
         self.active_rail.content.reload_rail()
@@ -738,7 +743,7 @@ class Story(ft.View):
         )
 
         # Add to our master list of widgets in our story
-        self.widgets.append(self.maps[title]) 
+        self.widgets.append(self.maps[key]) 
 
         # Reload our UI's
         self.active_rail.content.reload_rail()

@@ -88,6 +88,10 @@ class Tree_View_File(ft.GestureDetector):
         additional_menu_options: list = None
     ):
         
+        # Drag a file/category to move it into another folder/category
+        # -- Needs to highlight the category its hovering above
+        
+        
         # Set our widget reference and tag
         self.widget = widget
         self.additional_menu_options = additional_menu_options
