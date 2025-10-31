@@ -46,55 +46,55 @@ class Content_Rail(Rail):
 
         # Reload the rail on start
         self.reload_rail()
+
+    # Functions to handle when one of menu options is selected
+    def new_category_clicked(self, e):
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_category_textfield.visible = True
+        self.new_chapter_textfield.visible = False
+        self.new_note_textfield.visible = False
+
+        # Close the menu, which will update the page as well
+        self.story.close_menu()
+
+    # New chapters
+    def new_chapter_clicked(self, e):
+        self.new_chapter_textfield.visible = True
+        self.new_category_textfield.visible = False
+        self.new_note_textfield.visible = False
+        self.story.close_menu()
+        
+    # New notes
+    def new_note_clicked(self, e):
+        self.new_note_textfield.visible = True
+        self.new_category_textfield.visible = False
+        self.new_chapter_textfield.visible = False
+        self.story.close_menu()
     
     
 
     # Called to return our list of menu options for the content rail
     def get_menu_options(self) -> list[ft.Control]:
-
-        # Functions to handle when one of menu options is selected
-        def _new_category_clicked(e):
-            
-            # Makes sure the right textfield is visible and the others are hidden
-            self.new_category_textfield.visible = True
-            self.new_chapter_textfield.visible = False
-            self.new_note_textfield.visible = False
-
-            # Close the menu, which will update the page as well
-            self.story.close_menu()
-
-        # New chapters
-        def _new_chapter_clicked(e):
-            self.new_chapter_textfield.visible = True
-            self.new_category_textfield.visible = False
-            self.new_note_textfield.visible = False
-            self.story.close_menu()
-            
-        # New notes
-        def _new_note_clicked(e):
-            self.new_note_textfield.visible = True
-            self.new_category_textfield.visible = False
-            self.new_chapter_textfield.visible = False
-            self.story.close_menu()
             
         # Builds our buttons that are our options in the menu
         return [
             ft.TextButton(
-                on_click=_new_category_clicked,
+                on_click=self.new_category_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.FOLDER_OPEN),
                     ft.Text("New Category"),
                 ])
             ),
             ft.TextButton(
-                on_click=_new_chapter_clicked,
+                on_click=self.new_chapter_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.BOOK),
                     ft.Text("New Chapter"),
                 ])
             ),
             ft.TextButton(
-                on_click=_new_note_clicked,
+                on_click=self.new_note_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED),
                     ft.Text("New Note"),
@@ -114,19 +114,47 @@ class Content_Rail(Rail):
         # Categories get colors as well??
         # Creating a chapter for comics creates a folder to store images and drawings
         # Creating a chapter for novels creates a text document for writing, and allows
-        # Right clicking allows to create, upload, delete, rename
+        # Right clicking allows to upload
+        header = ft.Row(
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            
+            controls=[
+
+            # Add here, story name, and buttons to create new stuff.
+            # As well as right click options here that work like normal.
+
+            ft.Container(expand=True),
+
+            ft.IconButton(
+                tooltip="New Category",
+                icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
+                on_click=self.new_category_clicked
+            ),
+            
+            ft.IconButton(
+                tooltip="New Chapter",
+                icon=ft.Icons.NOTE_ADD_OUTLINED,
+                on_click=self.new_chapter_clicked
+            ),
+            ft.IconButton(
+                tooltip="New Note",
+                icon=ft.Icons.ADD_COMMENT_OUTLINED,
+                on_click=self.new_note_clicked
+            ),
+            ft.Container(expand=True),
+        ])
                  
 
         # Build the content of our rail
         content = ft.Column(
-            controls=[
-
-                # Add here, story name, and buttons to create new stuff.
-                # As well as right click options here that work like normal
-                
-                ft.Container(height=30)
-            ]
+            scroll=ft.ScrollMode.AUTO,
+            spacing=0,
+            controls=[]
         )
+        # Append our hiddent textfields for creating new categories, chapters, and notes
+        content.controls.append(self.new_category_textfield)
+        content.controls.append(self.new_chapter_textfield)
+        content.controls.append(self.new_note_textfield)
 
         # Load our content directory data into the rail
         load_directory_data(
@@ -136,20 +164,23 @@ class Content_Rail(Rail):
             column=content
         )
 
-        # Append our hiddent textfields for creating new categories, chapters, and notes
-        content.controls.append(self.new_category_textfield)
-        content.controls.append(self.new_chapter_textfield)
-        content.controls.append(self.new_note_textfield)
-
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(
             expand=True,
-            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options())
+            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+            content=content
         )
 
-        content.controls.append(gd)
-
-        self.content = content
+        self.content = ft.Column(
+            spacing=0,
+            expand=True,
+            controls=[
+                header,
+                ft.Divider(),
+                gd
+            ]
+        )
+        #self.content = content
         
         # Apply our update
         self.p.update()

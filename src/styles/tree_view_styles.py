@@ -41,7 +41,7 @@ class Tree_View_Directory(ft.GestureDetector):
             initially_expanded=is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),
-            leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=color),
+            leading=ft.Icon(ft.Icons.FOLDER_OUTLINED, color=color),
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             bgcolor=ft.Colors.TRANSPARENT,
@@ -66,6 +66,7 @@ class Tree_View_Directory(ft.GestureDetector):
 
 
     def on_hover(self, e):
+        # Need to set the directory path when dragging stuff
         self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.WHITE)
         if self.father is not None:
             self.father.content.bgcolor = ft.Colors.TRANSPARENT
@@ -94,29 +95,29 @@ class Tree_View_File(ft.GestureDetector):
         
         # Set our widget reference and tag
         self.widget = widget
-        self.additional_menu_options = additional_menu_options
-
         tag = widget.data.get('tag', None)
 
-        self.capital_title = widget.title.capitalize()
+        self.additional_menu_options = additional_menu_options
+
+        #self.capital_title = widget.title.capitalize()
 
         if tag is None:
             self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
-        elif tag == "note":
-            self.icon = ft.Icons.STICKY_NOTE_2_OUTLINED
-
         elif tag == "chapter":
-            self.icon = ft.Icons.BOOK_OUTLINED
+            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+
+        elif tag == "note":
+            self.icon = ft.Icons.COMMENT_ROUNDED
+
 
         else:
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+            self.icon = ft.Icons.FOLDER_OUTLINED
 
         # Set our text style
         self.text_style = ft.TextStyle(
             size=14,
             color=ft.Colors.PRIMARY,
-            #font_family="Consolas",
             weight=ft.FontWeight.BOLD,
         )
 
@@ -137,7 +138,7 @@ class Tree_View_File(ft.GestureDetector):
                     expand=True,
                     controls=[
                         ft.Icon(self.icon, color=self.icon_color), 
-                        ft.Text(value=self.capital_title, style=self.text_style),
+                        ft.Text(value=self.widget.title, style=self.text_style),
                     ],
                 ),
             ),
@@ -249,10 +250,12 @@ class Tree_View_File(ft.GestureDetector):
             # Check our widgets tag, and then check for uniqueness accordingly
             if tag is not None:
 
-                # Chapters check (Not sure how, but it grabs the title as the objects so whatevs it works)
+                print("Checking uniqueness for tag:", tag)
+
+                # Chapters check 
                 if tag == "chapter":
-                    for chapter in self.widget.story.chapters:
-                        if chapter == name and chapter != current_name:
+                    for chapter in self.widget.story.chapters.values():
+                        if chapter.title == name and chapter.title != current_name:
                             is_unique = False
 
                 # Notes
@@ -392,8 +395,6 @@ class Tree_View_File(ft.GestureDetector):
 
         self.widget.p.open(dlg)
 
-        #self.widget.story.delete_widget(self.widget)
-
 
     def reload(self):
         self.content = ft.Container(
@@ -403,7 +404,7 @@ class Tree_View_File(ft.GestureDetector):
                 expand=True,
                 controls=[
                     ft.Icon(self.icon, color=self.icon_color), 
-                    ft.Text(value=self.capital_title, style=self.text_style),
+                    ft.Text(value=self.widget.title, style=self.text_style),
                 ],
             ),
         )

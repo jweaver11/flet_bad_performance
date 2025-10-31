@@ -216,7 +216,7 @@ class Story(ft.View):
 
             # Create the sub folders inside of notes
             for folder in notes_folders:
-                folder_path = os.path.join(directory_path, "content", "Notes", folder)
+                folder_path = os.path.join(directory_path, "content", "Notes")
 
                 # Creates the sub folder using out path above
                 self.create_folder(
@@ -228,12 +228,10 @@ class Story(ft.View):
             # Create the path to the story's JSON file
             directory_path = os.path.join(data_paths.stories_directory_path, self.title) 
 
-
-
             # If multiplanetary, create the worlds folder
             if self.data['settings']['multi_planetary']:
-                worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps", "Worlds")
-                self.create_folder(worlds_folder_path, "Worlds")
+                worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps")
+                self.create_folder(worlds_folder_path, name="Worlds")
             
             # Save our data
             self.save_dict()
@@ -292,6 +290,11 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             print(f"Error changing folder data: {e}")
+
+    
+    def move_file(self, new_path: str):
+        ''' Moves a file from its current directory to a new one '''
+        pass
 
             
 

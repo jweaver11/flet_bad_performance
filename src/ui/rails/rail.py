@@ -135,7 +135,7 @@ class Rail(ft.Container):
             if tag == "category":
                 # Create our new category
                 self.story.create_folder(
-                    directory_path=self.story.data['content_directory_path'], 
+                    directory_path=self.directory_path, 
                     name=title
                 )
                 # This one requires reloading the rail, but the rest don't
