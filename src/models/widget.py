@@ -47,14 +47,15 @@ class Widget(ft.Container):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'title': self.title,                        # Title of our widget  
-                'directory_path': self.directory_path,      # Directory path to the file this widget's data is stored in
-                'tag': str,                                 # Tag to identify what type of widget this is
-                'pin_location': "main",                     # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
-                'visible': True,                            # Whether this widget is visible in the workspace or not
-                'tab_title_color': "primary",               # Color of the title in the tab
-                'rail_icon_color': "primary",               # Color of the icon on the rail 
-                'mini_widgets_location': "right",           # Side of the widget the mini widgets show up on (left or right)
+                'key': f"{self.directory_path}\\{self.title}",  # Unique key for this widget based on directory path + title
+                'title': self.title,                            # Title of our widget  
+                'directory_path': self.directory_path,          # Directory path to the file this widget's data is stored in
+                'tag': str,                                     # Tag to identify what type of widget this is
+                'pin_location': "main",                         # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
+                'visible': True,                                # Whether this widget is visible in the workspace or not
+                'tab_title_color': "primary",                   # Color of the title in the tab
+                'rail_icon_color': "primary",                   # Color of the icon on the rail 
+                'mini_widgets_location': "right",               # Side of the widget the mini widgets show up on (left or right)
             },
         )
 

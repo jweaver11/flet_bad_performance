@@ -187,6 +187,7 @@ class Settings(Widget):
         # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
         # Option to change where certain widgets default display to in pins
         # NOTE: Add is_first_launch check to run a tutorial
+        # Option for compact vs spread on view in the rails
 
 
 

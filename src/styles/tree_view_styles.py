@@ -28,8 +28,6 @@ class Tree_View_Directory(ft.GestureDetector):
         self.color = color
         self.is_expanded = is_expanded  
 
-        #print(f"Color inside of tree view directory {title}:", color)
-
         folder_options = [
             ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
             ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
@@ -78,6 +76,7 @@ class Tree_View_Directory(ft.GestureDetector):
         self.bgcolor = ft.Colors.TRANSPARENT
         self.p.update()
         
+
 
 
 # Class for items within a tree view on the rail
@@ -166,7 +165,8 @@ class Tree_View_File(ft.GestureDetector):
                     controls=[
                         ft.Container(),   # Spacer
                         ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
-                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), 
+                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300, expand=True), 
+                        ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.GREY_300, size=16),
                     ]
                 ),
                 items=self.get_color_options()

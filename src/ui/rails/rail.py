@@ -22,7 +22,7 @@ class Rail(ft.Container):
         self.story = story
 
         # Calling initial rail to reload
-        self.reload_rail()
+        #self.reload_rail()
 
     # Called when changes occure that require rail to be reloaded. Should be overwritten by children
     def reload_rail(self) -> ft.Control:
