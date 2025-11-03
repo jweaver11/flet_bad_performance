@@ -6,17 +6,14 @@ class Tree_View_Directory(ft.GestureDetector):
 
     def __init__(
         self, 
-        directory_path: str,            # Full path to this directory
-        title: str,                     # Title of this item
-        story: Story,                   # Story reference for mouse positions
-        page: ft.Page,                  # Page reference for overlay menu
-        is_expanded: bool = False,      # Whether this directory is expanded or not
-        color: str = "primary",         # Color of the folder icon
+        directory_path: str,                        # Full path to this directory
+        title: str,                                 # Title of this item
+        story: Story,                               # Story reference for mouse positions
+        page: ft.Page,                              # Page reference for overlay menu
+        is_expanded: bool = False,                  # Whether this directory is expanded or not
+        color: str = "primary",                     # Color of the folder icon
         father: 'Tree_View_Directory' = None,       # Optional parent directory tile
-        additional_menu_options: list = None,      # Options to show when right clicking a directory
-
-        # Options passed in by child classes
-        buttons: list = None,           # Buttons to attach to the right side of the tile
+        additional_menu_options: list = None,       # Options to show when right clicking a directory
     ):
         
         # Reference for all our passed in data
