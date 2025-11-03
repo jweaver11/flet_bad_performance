@@ -208,21 +208,31 @@ class Workspace(ft.Container):
                 )
                 self.bottom_pin.controls.insert(insert_position, gd)
 
+        # Called when selected new tab in the main pin
+        def main_pin_tab_change(e: ft.ControlEvent):
+            ''' Updates the widgets data to reflect the new active tab '''
+
+            # Run through our visible main pin widgets
+            for widget in visible_main_controls:
+
+                # If the widgets tab is selected, make the widget data match, otherwise deselect the rest
+                if widget.tab == e.control.tabs[e.control.selected_index]:
+                    widget.data['is_active_tab'] = True
+                else:
+                    widget.data['is_active_tab'] = False
+
+                # Save the data. This allows for selected main pin tabs to save between sessions
+                widget.save_dict()
+
 
         # Main pin is rendered as a tab control, so we won't use dividers and will use different logic
         visible_main_controls = [control for control in self.main_pin.controls if getattr(control, 'visible', True)]
         if len(visible_main_controls) > 1:
-            # Get the selected tab index from the self.story object, default to 0
-            selected_tab_index = getattr(self.story, 'selected_main_tab_index', 0)
-            # Ensure the index is within bounds
-            if selected_tab_index >= len(visible_main_controls):
-                selected_tab_index = 0
-                self.selected_main_tab_index = 0
                 
             # Temporary
             formatted_main_pin = ft.Tabs(
-                selected_index=selected_tab_index,
                 animation_duration=0,
+                on_change=main_pin_tab_change,
                 expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
                 divider_color=ft.Colors.TRANSPARENT,
                 padding=ft.padding.all(0),
@@ -232,6 +242,9 @@ class Workspace(ft.Container):
             )
             for control in visible_main_controls:
                 formatted_main_pin.tabs.append(control.tab)
+                # Sets the selected tab to the active one in the main pin
+                if control.data['is_active_tab']:
+                    formatted_main_pin.selected_index = formatted_main_pin.tabs.index(control.tab)
         else:
             formatted_main_pin = self.main_pin
         

@@ -117,7 +117,7 @@ class Tree_View_File(ft.GestureDetector):
         # Set our text style
         self.text_style = ft.TextStyle(
             size=14,
-            color=ft.Colors.PRIMARY,
+            color=ft.Colors.GREY_300,
             weight=ft.FontWeight.BOLD,
         )
 
@@ -133,7 +133,7 @@ class Tree_View_File(ft.GestureDetector):
 
             content = ft.Container(
                 expand=True, 
-                padding=ft.Padding(5, 2, 5, 2),
+                padding=ft.Padding(0, 2, 5, 2),
                 content=ft.Row(
                     expand=True,
                     controls=[
@@ -221,12 +221,8 @@ class Tree_View_File(ft.GestureDetector):
             else:
 
                 self.content.content.controls[1] = ft.Text(
-                    value=self.capital_title,
-                    style=ft.TextStyle(
-                        size=14,
-                        color=ft.Colors.PRIMARY,
-                        weight=ft.FontWeight.BOLD,
-                    )
+                    value=self.widget.title,
+                    style=self.text_style
                 )
                 self.widget.p.update()
 
@@ -312,8 +308,9 @@ class Tree_View_File(ft.GestureDetector):
                 
         # Our text field that our functions use for renaming and referencing
         text_field = ft.TextField(
-            value=self.capital_title,
+            value=self.widget.title,
             expand=True,
+            dense=True,
             autofocus=True,
             on_submit=_submit_name,
             on_change=_name_check,
@@ -384,7 +381,7 @@ class Tree_View_File(ft.GestureDetector):
 
         # Append an overlay to confirm the deletion
         dlg = ft.AlertDialog(
-            title=ft.Text(f"Are you sure you want to delete '{self.capital_title}' forever?", weight=ft.FontWeight.BOLD),
+            title=ft.Text(f"Are you sure you want to delete '{self.widget.title}' forever?", weight=ft.FontWeight.BOLD),
             alignment=ft.alignment.center,
             title_padding=ft.padding.all(25),
             actions=[

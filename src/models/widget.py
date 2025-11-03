@@ -53,6 +53,7 @@ class Widget(ft.Container):
                 'tag': str,                                     # Tag to identify what type of widget this is
                 'pin_location': "main" if data is None else data.get('pin_location', "main"),       # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
                 'visible': True,                                # Whether this widget is visible in the workspace or not
+                'is_active_tab': True,                          # Whether this widget's tab is the active tab in the main pin
                 'tab_title_color': "primary",                   # Color of the title in the tab
                 'rail_icon_color': "primary",                   # Color of the icon on the rail 
                 'mini_widgets_location': "right",               # Side of the widget the mini widgets show up on (left or right)
@@ -136,33 +137,61 @@ class Widget(ft.Container):
     # Called when renaming a widget
     def rename(self, title: str):
         ''' Renames our widget in live title, data, and json file '''
+        
+        # Hides the widget while renaming to make sure pointers are updated as well
+        self.toggle_visibility() 
 
-        old_file_path = os.path.join(self.directory_path, f"{self.title}.json")     # Path to old file before rename
-        self.delete_file(old_file_path)                                             # Delete the old file
+        # Deletes the old file. Saving again with updated dir path with new title will create the new file
+        old_file_path = os.path.join(self.directory_path, f"{self.title}.json")     
+        self.delete_file(old_file_path)                                             
 
-        self.title = title                              # Update our live title
-        self.data['title'] = self.title                 # Update our data title
-        self.save_dict()                                # Save our data to the json file
+        # Update our data and live title
+        self.title = title                              
+        self.data['title'] = self.title                 
+        self.data['key'] = f"{self.directory_path}\\{self.title}"   
+        self.save_dict()                                
 
         # Remove from our live dict wherever we are stored
         tag = self.data['tag']
         if tag == "chapter":
             self.story.chapters.pop(title, None)
-            self.story.chapters[self.title] = self
+            self.story.chapters[self.data['key']] = self
         elif tag == "image":
             self.story.images.pop(title, None)
-            self.story.images[self.title] = self
+            self.story.images[self.data['key']] = self
         elif tag == "note":
             self.story.notes.pop(title, None)
-            self.story.notes[self.title] = self
+            self.story.notes[self.data['key']] = self
         elif tag == "map":
             self.story.maps.pop(title, None)
-            self.story.maps[self.title] = self
+            self.story.maps[self.data['key']] = self
         
         
-        
-        self.reload_tab()                               # Reload our tab widget to reflect changes
-        self.story.active_rail.content.reload_rail()    # Reload our rail to reflect changes
+        # Reloads our tab to reflect the new title
+        self.reload_tab()    
+
+        # Re-applies visibility to what it was before rename
+        self.toggle_visibility()                
+
+        # Reload our widget ui and rail to reflect changes 
+        self.reload_widget()           
+        self.set_active_tab()              
+        self.story.active_rail.content.reload_rail()   
+
+    # Called on many actions to make this the active tab if in the main pin
+    def set_active_tab(self):
+        ''' Sets this widgets tab as the active tab in the main pin'''
+        self.data['is_active_tab'] = True
+        self.save_dict()
+
+        # Deactivate all other widgets in main pin
+        for widget in self.story.widgets:
+            if widget != self and widget.data['pin_location'] == "main" and widget.visible:
+                widget.data['is_active_tab'] = False
+                widget.save_dict()
+
+        # Reload the workspace to reflect changes
+        self.story.workspace.reload_workspace()
 
 
     # Called when a new mini note is created inside a widget
