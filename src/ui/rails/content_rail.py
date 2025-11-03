@@ -32,7 +32,8 @@ class Content_Rail(Rail):
             on_change=self.on_new_item_change,
             on_blur=self.on_new_item_blur,
             autofocus=True,
-            visible=False
+            visible=False,
+            text_style=self.text_style
         )
 
         self.new_note_textfield = ft.TextField(  
@@ -42,7 +43,8 @@ class Content_Rail(Rail):
             on_change=self.on_new_item_change,
             on_blur=self.on_new_item_blur,
             autofocus=True,
-            visible=False
+            visible=False,
+            text_style=self.text_style,
         )
 
         # Reload the rail on start
