@@ -248,7 +248,24 @@ class Tree_View_Directory(ft.GestureDetector):
         pass
 
     def category_submit(self, e):
-        pass
+        # Get our name and check if its unique
+        name = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_folder(
+                directory_path=self.directory_path,
+                name=name,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.error_text = "Name already exists"
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
 
     def chapter_submit(self, e):
         pass
@@ -379,8 +396,7 @@ class Tree_View_Directory(ft.GestureDetector):
             self.color = color
             
             # Change our icon to match, apply the update
-            self.reload()
-            self.p.update()
+            self.story.active_rail.content.reload_rail()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
         # List of available colors
