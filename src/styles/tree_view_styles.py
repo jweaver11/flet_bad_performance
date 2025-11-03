@@ -220,10 +220,7 @@ class Tree_View_File(ft.GestureDetector):
             # Otherwise we're not submitting (just clicking off the textbox), so we cancel the rename
             else:
 
-                self.content.content.controls[1] = ft.Text(
-                    value=self.widget.title,
-                    style=self.text_style
-                )
+                self.reload()
                 self.widget.p.update()
 
         # Called everytime a change in textbox occurs
@@ -312,6 +309,9 @@ class Tree_View_File(ft.GestureDetector):
             expand=True,
             dense=True,
             autofocus=True,
+            adaptive=True,
+            text_size=14,
+            text_style=self.text_style,
             on_submit=_submit_name,
             on_change=_name_check,
             on_blur=_cancel_rename,
@@ -396,7 +396,7 @@ class Tree_View_File(ft.GestureDetector):
     def reload(self):
         self.content = ft.Container(
             expand=True, 
-            padding=ft.Padding(5, 2, 5, 2),
+            padding=ft.Padding(0, 2, 5, 2),
             content=ft.Row(
                 expand=True,
                 controls=[

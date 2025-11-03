@@ -189,52 +189,54 @@ class Story(ft.View):
                 folder_path = os.path.join(directory_path, folder)
                 os.makedirs(folder_path, exist_ok=True)     # Checks if they exist or not, so they won't be overwritten
 
-            self.create_folder(
-                directory_path=self.data['content_directory_path'], 
-                name="Notes"
-            )
-                
-            # Using templates
-            if template is not None:
-                pass
-
-            # Create our folder to store our maps data files and their drawings
-            maps_folders = [
-                "maps",
-                #"displays",
-            ]
-            for folder in maps_folders:
-                folder_path = os.path.join(directory_path, "world_building", folder)
-                os.makedirs(folder_path, exist_ok=True)
-
-            # Set our sub folders inside of notes
-            notes_folders = [
-                "Themes",
-                "Quotes",
-                "Research",
-            ]
-
-            # Create the sub folders inside of notes
-            for folder in notes_folders:
-                folder_path = os.path.join(directory_path, "content", "Notes")
-
-                # Creates the sub folder using out path above
-                self.create_folder(
-                    directory_path=folder_path, 
-                    name=folder
-                )
-                
-            
-            # Create the path to the story's JSON file
-            directory_path = os.path.join(data_paths.stories_directory_path, self.title) 
-
-            # If multiplanetary, create the worlds folder
-            if self.data['settings']['multi_planetary']:
-                worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps")
-                self.create_folder(worlds_folder_path, name="Worlds")
-            
             # Save our data
             self.save_dict()
+
+            def _create_template_name():
+
+                self.create_folder(
+                    directory_path=self.data['content_directory_path'], 
+                    name="Notes"
+                )
+                    
+                # Using templates
+                if template is not None:
+                    pass
+
+                # Create our folder to store our maps data files and their drawings
+                maps_folders = [
+                    "maps",
+                    #"displays",
+                ]
+                for folder in maps_folders:
+                    folder_path = os.path.join(directory_path, "world_building", folder)
+                    os.makedirs(folder_path, exist_ok=True)
+
+                # Set our sub folders inside of notes
+                notes_folders = [
+                    "Themes",
+                    "Quotes",
+                    "Research",
+                ]
+
+                # Create the sub folders inside of notes
+                for folder in notes_folders:
+                    folder_path = os.path.join(directory_path, "content", "Notes")
+
+                    # Creates the sub folder using out path above
+                    self.create_folder(
+                        directory_path=folder_path, 
+                        name=folder
+                    )
+                    
+                
+                # Create the path to the story's JSON file
+                directory_path = os.path.join(data_paths.stories_directory_path, self.title) 
+
+                # If multiplanetary, create the worlds folder
+                if self.data['settings']['multi_planetary']:
+                    worlds_folder_path = os.path.join(self.data['world_building_directory_path'], "maps")
+                    self.create_folder(worlds_folder_path, name="Worlds")
 
         # Handle errors
         except Exception as e:
@@ -277,6 +279,7 @@ class Story(ft.View):
     # Called when changing folder metadata, like color or is expanded or not
     def change_folder_data(self, directory_path: str, key: str, value):
         ''' Changes our folder metadata inside of our story data '''
+        print("Changing folder data:", directory_path, key, value)
 
         try:
             # Check if the folder exists in our data
