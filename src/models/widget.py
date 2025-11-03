@@ -271,19 +271,39 @@ class Widget(ft.Container):
             self.data['visible'] = not self.data['visible']
             self.save_dict()
             self.visible = self.data['visible']
-            self.p.update()
 
             self.story.workspace.reload_workspace()
 
         # Catch errors
         except Exception as e:
-            print(f"Error toggling visibility of widget {self.title}. (Story is probably none): {e}")
+            print(f"Error toggling visibility of widget {self.title}. {e}")
 
     # Called at end of constructor
     def reload_tab(self):
         ''' Creates our tab for our widget that has the title and hide icon '''
 
-        # TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
+        tag = self.data.get('tag', None)
+
+        if tag is None:
+            icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
+
+        elif tag == "chapter":
+            icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
+
+        elif tag == "note":
+            icon = ft.Icon(ft.Icons.COMMENT_OUTLINED)
+
+        elif tag == "character":
+            icon = ft.Icon(ft.Icons.PERSON_OUTLINE)
+
+        elif tag == "settings":
+            icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
+
+        else:
+            icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
+        
+        icon.color = self.data['rail_icon_color']
+        icon.scale = 0.8
 
         # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
         self.tabs = ft.Tabs(
@@ -341,13 +361,13 @@ class Widget(ft.Container):
 
                         # The controls of the row that are now left to right
                         controls=[
-                            # A container for padding. We do this because we can still drag this type of padding
-                            ft.Container(width=6),
+        
+                            icon,
 
                             # The text control that holds our title of the object
                             ft.Text(
                                 weight=ft.FontWeight.BOLD, # Make the text bold
-                                color=self.data['tab_title_color'],   # Set our color to the tab color
+                                #color=ft.,   # Set our color to the tab color
                                 theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
                                 value=self.title,   # Set the text to our title
                                 
@@ -364,6 +384,8 @@ class Widget(ft.Container):
     # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
     def reload_widget(self):
         ''' Children build their own content of the widget in their own reload_widget functions '''
+
+        # TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
 
         # Set the body container.content to whatever control you build in the child
         self.body_container.content = ft.Text(f"hello from: {self.title}")

@@ -96,6 +96,7 @@ class World_Building(Widget):
 
         # Drawing controls here. Not sure if need to be stored or how do that yet
 
+        self.reload_tab()
         self.reload_widget()
     
 

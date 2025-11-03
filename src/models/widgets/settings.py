@@ -26,7 +26,7 @@ class Settings(Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': str,  # Tag for logic, should be overwritten by child classes
+                'tag': "settings",  # Tag for logic, should be overwritten by child classes
                 'active_story': "/",    # this works as a route for the correct story
                 'is_maximized': True,   # If the window is maximized or not
                 'tab_title_color': "primary",        # the tab color
@@ -49,7 +49,7 @@ class Settings(Widget):
             },
         )
 
-
+        self.reload_tab()
         self.reload_widget()  # Loads our settings widget UI
 
 

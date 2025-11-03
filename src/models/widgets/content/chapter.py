@@ -11,11 +11,11 @@ class Chapter(Widget):
 
         # Initialize from our parent class 'Widget'. 
         super().__init__(
-            title = title,  # Title of the widget that will show up on its tab
-            page = page,   # Grabs our original page for convenience and consistency
-            directory_path = directory_path,  # Path to our chapters json file
-            story = story,       # Saves our story object that this widget belongs to, so we can access it later
-            data = data,    # This gets initialized at the end of our constructor
+            title = title,  
+            page = page,  
+            directory_path = directory_path,  
+            story = story,       
+            data = data,    
         )
 
         # Verifies this object has the required data fields, and creates them if not
@@ -35,6 +35,7 @@ class Chapter(Widget):
         self.load_mini_notes()
 
         # Load our widget UI on start after we have loaded our data
+        self.reload_tab()
         self.reload_widget()
 
 

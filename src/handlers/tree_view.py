@@ -8,8 +8,8 @@ import flet as ft
 import os
 import json
 from models.story import Story
-from styles.tree_view_styles import Tree_View_Directory
-from styles.tree_view_styles import Tree_View_File
+from styles.tree_view_directory import Tree_View_Directory
+from styles.tree_view_file import Tree_View_File
 
 
 def load_directory_data(
@@ -18,6 +18,7 @@ def load_directory_data(
     directory: str,                                       # The directory to load data from
     dir_dropdown: Tree_View_Directory = None,             # Optional parent expansion tile for when recursively called
     column: ft.Column = None,                             # Optional parent column to add elements too when not starting inside a tile
+    additional_menu_options: list[ft.Control] = None      # Additional menu options passed in from parent rail to be used for directories
     # Only dir_dropdown OR column should be provided, but one is required
 ) -> ft.Control:
     
@@ -82,6 +83,7 @@ def load_directory_data(
                 page=page,
                 color=color,
                 is_expanded=is_expanded,
+                additional_menu_options=additional_menu_options,
                 father=dir_dropdown if dir_dropdown is not None else None,
             )
 
@@ -107,14 +109,10 @@ def load_directory_data(
           
             # Find our widget based on the filename
             for widget in story.widgets:
-                #print("Widget title check: ", widget.title, " vs ", name)
-                #print("Widget dir path check: ", widget.directory_path, " vs ", os.path.join(directory))
                 if widget.title == name and widget.directory_path == os.path.join(directory):  
-                    #print("Passed")
                     widget = widget
                     break
-                #else:
-                    #print("Failed")
+                
 
             # Create the file item
             item = Tree_View_File(
