@@ -18,11 +18,11 @@ class Character(Widget):
 
         # Parent class constructor
         super().__init__(
-            title = name,  # Name of character, but all objects have a 'title' for identification, so characters do too
-            page = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            directory_path = directory_path,    # Directory where our json file is stored (characters/)
-            story = story,   # Grabs our story reference so we can access story data and save our character in the right folder
-            data = data,    # Passes in our data if we loaded it, or None if its a new character
+            title = name,  
+            page = page,   
+            directory_path = directory_path, 
+            story = story,   
+            data = data,    
         )
 
         # Verifies this object has the required data fields, and creates them if not
@@ -68,6 +68,8 @@ class Character(Widget):
                 'backstory': str,
                 'abilities': str,
                 'is_dead': bool,    # Defaults to false
+                'data1': str,
+                'data2': "coding sux",
             },
         )
         
@@ -78,81 +80,6 @@ class Character(Widget):
         self.reload_tab()
         self.reload_widget()
     
-    
-    # Change our tab color of widget. Accepts a flet color as parameter
-    def submit_color_change(self, color):
-        colors = [
-            "red",
-            "pink",
-            "purple",
-            "blue",
-            "cyan",
-            "teal",
-            "green",
-            "lime",
-            "yellow",
-            "orange",
-            "brown",
-            "light grey",
-            "grey",
-            "none",
-        ]
-
-        self.tab_color = color
-        self.reload_widget()
-        self.p.update()
-
-    
-    # Called when the morality dropdown is changed
-    # Sets our new morality based on the choice selected. Applies changes to name_color, the rail, and the widget
-    def submit_morality_change(self, e):
-        print("Morality change ran")
-        self.data['Morality'] = e.control.value
-
-        morality = self.check_morality(e)
-        if morality == "lawful_good":
-            self.name_color = ft.Colors.GREEN_200
-        #...
-
-        self.reload_widget()    # Apply our changes to the name at top of widget
-        # reload rail as well
-
-        self.p.update()
-    
-    # Called by the changes in characters morality.
-    def check_morality(self, e=None) -> str:
-        # If we have the setting turned on to change char name colors, change them
-        return "lawful_good"
-     
-        
-
-        # USE MORALITY CHART (AND N/A), NOT JUST GOOD EVIL NEUTRAL
-                
-
-    # Called when the textfield for writing in custom sex's is submitted
-    # Adds our custom sex to our stories sex_options list
-    def submit_sex_change(self, e):
-        #print("sex submit ran")
-
-        pass
-
-    # Called when the age is changed. Changes the age data
-    def submit_age_change(self, e):
-        #print("Age change ran")
-        self.data['age'].data = e.control.value
-        #print(self.data['Age'].data)
-        self.save_dict()
-
-    # Called when the race is changed. Changes the race data
-    def submit_race_change(self, e):
-        #print("Race change ran")
-        pass
-        
-
-    # Expand the tile to show physical descriptions
-    def expand_physical_description(self, e):
-        #print("expand physical description ran")
-        pass
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
@@ -167,7 +94,7 @@ class Character(Widget):
                 ft.Text("hi from " + self.title),
                 ft.Row(
                         wrap=True,
-                       controls=[
+                        controls=[
                            #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                 label="Morality",
@@ -183,7 +110,7 @@ class Character(Widget):
                                     ft.DropdownOption(text="None"),
                                     
                                 ],
-                                on_change=self.submit_morality_change,
+                                #n_change=self.submit_morality_change,
                             ),
                                
                             ft.Dropdown(      # Sex of each character
@@ -198,7 +125,7 @@ class Character(Widget):
                                     ft.DropdownOption(text="Other"),
                                     ft.DropdownOption(text="None"),
                                 ],
-                                on_change=self.submit_sex_change,
+                                #on_change=self.submit_sex_change,
                             ),
                         ]
                     ),
