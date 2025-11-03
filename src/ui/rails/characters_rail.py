@@ -15,7 +15,8 @@ class Characters_Rail(Rail):
         # Initialize the parent Rail class first
         super().__init__(
             page=page,
-            story=story
+            story=story,
+            directory_path=story.data['characters_directory_path']
         )
 
         self.reload_rail()
@@ -29,7 +30,7 @@ class Characters_Rail(Rail):
         story.create_character(name)
 
         e.control.value = None  # Clear the text field
-        self.reload_rail(story)
+        self.reload_rail()
 
 
     def rename_character(self, character: Character):

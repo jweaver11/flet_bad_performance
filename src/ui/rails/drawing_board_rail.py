@@ -14,7 +14,8 @@ class Drawing_Board_Rail(Rail):
         # Initialize the parent Container class first
         super().__init__(
             page=page,
-            story=story
+            story=story,
+            directory_path=story.data['content_directory_path']
         )
         
         # Reload the rail on start

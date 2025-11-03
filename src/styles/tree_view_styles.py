@@ -28,8 +28,6 @@ class Tree_View_Directory(ft.GestureDetector):
         self.color = color
         self.is_expanded = is_expanded  
 
-        #print(f"Color inside of tree view directory {title}:", color)
-
         folder_options = [
             ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
             ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
@@ -43,7 +41,7 @@ class Tree_View_Directory(ft.GestureDetector):
             initially_expanded=is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),
-            leading=ft.Icon(ft.Icons.FOLDER_OPEN, color=color),
+            leading=ft.Icon(ft.Icons.FOLDER_OUTLINED, color=color),
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             bgcolor=ft.Colors.TRANSPARENT,
@@ -68,6 +66,7 @@ class Tree_View_Directory(ft.GestureDetector):
 
 
     def on_hover(self, e):
+        # Need to set the directory path when dragging stuff
         self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.WHITE)
         if self.father is not None:
             self.father.content.bgcolor = ft.Colors.TRANSPARENT
@@ -80,6 +79,7 @@ class Tree_View_Directory(ft.GestureDetector):
         
 
 
+
 # Class for items within a tree view on the rail
 class Tree_View_File(ft.GestureDetector):
 
@@ -89,31 +89,35 @@ class Tree_View_File(ft.GestureDetector):
         additional_menu_options: list = None
     ):
         
+        # Drag a file/category to move it into another folder/category
+        # -- Needs to highlight the category its hovering above
+        
+        
         # Set our widget reference and tag
         self.widget = widget
-        self.additional_menu_options = additional_menu_options
-
         tag = widget.data.get('tag', None)
 
-        self.capital_title = widget.title.capitalize()
+        self.additional_menu_options = additional_menu_options
+
+        #self.capital_title = widget.title.capitalize()
 
         if tag is None:
             self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
-        elif tag == "note":
-            self.icon = ft.Icons.STICKY_NOTE_2_OUTLINED
-
         elif tag == "chapter":
-            self.icon = ft.Icons.BOOK_OUTLINED
+            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+
+        elif tag == "note":
+            self.icon = ft.Icons.COMMENT_ROUNDED
+
 
         else:
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+            self.icon = ft.Icons.FOLDER_OUTLINED
 
         # Set our text style
         self.text_style = ft.TextStyle(
             size=14,
-            color=ft.Colors.PRIMARY,
-            #font_family="Consolas",
+            color=ft.Colors.GREY_300,
             weight=ft.FontWeight.BOLD,
         )
 
@@ -129,72 +133,19 @@ class Tree_View_File(ft.GestureDetector):
 
             content = ft.Container(
                 expand=True, 
-                padding=ft.Padding(5, 2, 5, 2),
+                padding=ft.Padding(0, 2, 5, 2),
                 content=ft.Row(
                     expand=True,
                     controls=[
                         ft.Icon(self.icon, color=self.icon_color), 
-                        ft.Text(value=self.capital_title, style=self.text_style),
+                        ft.Text(value=self.widget.title, style=self.text_style),
                     ],
                 ),
             ),
 
             mouse_cursor = ft.MouseCursor.CLICK
         )
-
-    def get_color_options(self) -> list[ft.Control]:
-        ''' Returns a list of all available colors for icon changing '''
-
-        # Called when a color option is clicked on popup menu to change icon color
-        def _change_icon_color(color: str):
-            ''' Passes in our kwargs to the widget, and applies the updates '''
-
-            # Change the data
-            self.widget.change_data(**{'rail_icon_color': color})
-            self.icon_color = color
-            
-            # Change our icon to match, apply the update
-            self.reload()
-            self.widget.p.update()
-            #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
-
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
-
-        # List for our colors when formatted
-        color_controls = [] 
-
-        # Create our controls for our color options
-        for color in colors:
-            color_controls.append(
-                ft.PopupMenuItem(
-                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
-                    on_click=lambda e, col=color: _change_icon_color(col)
-                )
-            )
-
-        return color_controls
-
-    # Called when hovering mouse over a tree view item
-    def on_hover(self, e):
-        self.content.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
-        self.widget.p.update()
-
-    def on_stop_hover(self, e):
-        self.content.bgcolor = ft.Colors.TRANSPARENT
-        self.widget.p.update()
-
+    
     def get_menu_options(self) -> list[ft.Control]:
         menu_options = [
             ft.TextButton(
@@ -219,12 +170,14 @@ class Tree_View_File(ft.GestureDetector):
                     controls=[
                         ft.Container(),   # Spacer
                         ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
-                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300), 
+                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300, expand=True), 
+                        ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.GREY_300, size=16),
                     ]
                 ),
                 items=self.get_color_options()
             ),
             ft.TextButton(
+                on_click=lambda e: self.delete_clicked(e),
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
                     ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300, expand=True),
@@ -232,6 +185,15 @@ class Tree_View_File(ft.GestureDetector):
             ),
         ]
         return menu_options
+
+    # Called when hovering mouse over a tree view item
+    def on_hover(self, e):
+        self.content.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
+        self.widget.p.update()
+
+    def on_stop_hover(self, e):
+        self.content.bgcolor = ft.Colors.TRANSPARENT
+        self.widget.p.update()
 
     # Called when rename button is clicked
     def rename_clicked(self, e):
@@ -259,12 +221,8 @@ class Tree_View_File(ft.GestureDetector):
             else:
 
                 self.content.content.controls[1] = ft.Text(
-                    value=self.capital_title,
-                    style=ft.TextStyle(
-                        size=14,
-                        color=ft.Colors.PRIMARY,
-                        weight=ft.FontWeight.BOLD,
-                    )
+                    value=self.widget.title,
+                    style=self.text_style
                 )
                 self.widget.p.update()
 
@@ -288,10 +246,12 @@ class Tree_View_File(ft.GestureDetector):
             # Check our widgets tag, and then check for uniqueness accordingly
             if tag is not None:
 
-                # Chapters check (Not sure how, but it grabs the title as the objects so whatevs it works)
+                print("Checking uniqueness for tag:", tag)
+
+                # Chapters check 
                 if tag == "chapter":
-                    for chapter in self.widget.story.chapters:
-                        if chapter == name and chapter != current_name:
+                    for chapter in self.widget.story.chapters.values():
+                        if chapter.title == name and chapter.title != current_name:
                             is_unique = False
 
                 # Notes
@@ -348,8 +308,9 @@ class Tree_View_File(ft.GestureDetector):
                 
         # Our text field that our functions use for renaming and referencing
         text_field = ft.TextField(
-            value=self.capital_title,
+            value=self.widget.title,
             expand=True,
+            dense=True,
             autofocus=True,
             on_submit=_submit_name,
             on_change=_name_check,
@@ -363,6 +324,74 @@ class Tree_View_File(ft.GestureDetector):
         self.widget.p.overlay.clear()
         self.widget.p.update()
 
+    def get_color_options(self) -> list[ft.Control]:
+        ''' Returns a list of all available colors for icon changing '''
+
+        # Called when a color option is clicked on popup menu to change icon color
+        def _change_icon_color(color: str):
+            ''' Passes in our kwargs to the widget, and applies the updates '''
+
+            # Change the data
+            self.widget.change_data(**{'rail_icon_color': color})
+            self.icon_color = color
+            
+            # Change our icon to match, apply the update
+            self.reload()
+            self.widget.p.update()
+            #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
+
+        # List of available colors
+        colors = [
+            "primary",
+            "red",
+            "orange",
+            "yellow",
+            "green",
+            "blue",
+            "purple",
+            "pink",
+            "brown",
+            "grey",
+        ]
+
+        # List for our colors when formatted
+        color_controls = [] 
+
+        # Create our controls for our color options
+        for color in colors:
+            color_controls.append(
+                ft.PopupMenuItem(
+                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
+                    on_click=lambda e, col=color: _change_icon_color(col)
+                )
+            )
+
+        return color_controls
+    
+    # Called when the delete button is clicked in the menu options
+    def delete_clicked(self, e):
+        ''' Deletes this file from the story '''
+
+        def _delete_confirmed(e):
+            ''' Deletes the widget after confirmation '''
+
+            self.widget.p.close(dlg)
+            self.widget.story.delete_widget(self.widget)
+            
+
+        # Append an overlay to confirm the deletion
+        dlg = ft.AlertDialog(
+            title=ft.Text(f"Are you sure you want to delete '{self.widget.title}' forever?", weight=ft.FontWeight.BOLD),
+            alignment=ft.alignment.center,
+            title_padding=ft.padding.all(25),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: self.widget.p.close(dlg)),
+                ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+            ]
+        )
+
+        self.widget.p.open(dlg)
+
 
     def reload(self):
         self.content = ft.Container(
@@ -372,7 +401,7 @@ class Tree_View_File(ft.GestureDetector):
                 expand=True,
                 controls=[
                     ft.Icon(self.icon, color=self.icon_color), 
-                    ft.Text(value=self.capital_title, style=self.text_style),
+                    ft.Text(value=self.widget.title, style=self.text_style),
                 ],
             ),
         )

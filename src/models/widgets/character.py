@@ -30,7 +30,7 @@ class Character(Widget):
             object=self,   # Pass in our own data so the function can see the actual data we loaded
             required_data={
                 'tag': "character",
-                'pin_location': "left",     # Start our characters on the left pin
+                'pin_location': "left" if data is None else data.get('pin_location', "left"),     # Start our characters on the left pin
 
                 'tab_color': "primary",
                 'name_color': "primary",

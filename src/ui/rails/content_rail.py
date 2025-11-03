@@ -1,6 +1,7 @@
 """ WIP """
 
 import flet as ft
+import os
 from models.story import Story
 from ui.rails.rail import Rail
 from handlers.tree_view import load_directory_data
@@ -14,65 +15,96 @@ class Content_Rail(Rail):
         # Initialize the parent Rail class first
         super().__init__(
             page=page,
-            story=story
+            story=story,
+            directory_path=story.data['content_directory_path']
+        )
+
+        # State variables used for our UI to track logic
+        self.item_is_unique = True          # If the new category, chapter, note, etc. title is unique within its directory
+        self.are_submitting = False         # If we are currently submitting this item
+
+        # UI elements for easier referencing later
+        self.new_chapter_textfield = ft.TextField(  
+            hint_text="Chapter Name",
+            data="chapter",
+            on_submit=self.submit_item,
+            on_change=self.on_new_item_change,
+            on_blur=self.on_new_item_blur,
+            autofocus=True,
+            visible=False
+        )
+
+        self.new_note_textfield = ft.TextField(  
+            hint_text="Note Name",
+            data="note",
+            on_submit=self.submit_item,
+            on_change=self.on_new_item_change,
+            on_blur=self.on_new_item_blur,
+            autofocus=True,
+            visible=False
         )
 
         # Reload the rail on start
         self.reload_rail()
 
-    def create_new_book(self, title: str, story: Story):
-        # TODO: Make it accept the type of story to give a structure for new books, seasons, etc.
-        pass
-
-    def create_new_season(self, title: str, story: Story):
-        pass
-
-    # Called when user creates a new chapter
-    def submit_chapter(self, title: str, story: Story):
-        ''' Grabs our story.type object and creates a new chapter directory inside it.
-         Chapter directory can contain images, notes, and the text content for the chapter itself '''
+    # Functions to handle when one of menu options is selected
+    def new_category_clicked(self, e):
         
-        # Pass in default path for now, but accepts new ones in future for organization
-        story.create_chapter(title, directory_path=story.data['content_directory_path'])
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_category_textfield.visible = True
+        self.new_chapter_textfield.visible = False
+        self.new_note_textfield.visible = False
 
-    # Called when creating a new note
-    def submit_note(self, title: str, story: Story):
-        ''' Submits our notes title to create a new note file inside our notes directory '''
+        # Close the menu, which will update the page as well
+        self.story.close_menu()
+
+    # New chapters
+    def new_chapter_clicked(self, e):
+        self.new_chapter_textfield.visible = True
+        self.new_category_textfield.visible = False
+        self.new_note_textfield.visible = False
+        self.story.close_menu()
         
-        # Pass in default path for now, but accepts new ones in future for organization
-        story.create_note(title, directory_path=story.data['notes_directory_path'])
+    # New notes
+    def new_note_clicked(self, e):
+        self.new_note_textfield.visible = True
+        self.new_category_textfield.visible = False
+        self.new_chapter_textfield.visible = False
+        self.story.close_menu()
+    
+    
 
-    def open_menu(self, e):
+    # Called to return our list of menu options for the content rail
+    def get_menu_options(self) -> list[ft.Control]:
             
-        #print(f"Open menu at x={story.mouse_x}, y={story.mouse_y}")
+        # Builds our buttons that are our options in the menu
+        return [
+            ft.TextButton(
+                on_click=self.new_category_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.FOLDER_OPEN),
+                    ft.Text("New Category"),
+                ])
+            ),
+            ft.TextButton(
+                on_click=self.new_chapter_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.BOOK),
+                    ft.Text("New Chapter"),
+                ])
+            ),
+            ft.TextButton(
+                on_click=self.new_note_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED),
+                    ft.Text("New Note"),
+                ])
+            ),
 
-        def close_menu(e):
-            self.p.overlay.clear()
-            self.p.update()
-        
-        menu = ft.Container(
-            left=self.story.mouse_x,     # Positions the menu at the mouse location
-            top=self.story.mouse_y,
-            border_radius=ft.border_radius.all(6),
-            bgcolor=ft.Colors.ON_SECONDARY,
-            padding=2,
-            alignment=ft.alignment.center,
-            content=ft.Column([
-                ft.TextButton("Option 1"),
-                ft.TextButton("Option 2"),
-                ft.TextButton("Option 3"),
-            ]),
-        )
-        outside_detector = ft.GestureDetector(
-            expand=True,
-            on_tap=close_menu,
-            on_secondary_tap=close_menu,
-        )
+            # New and upload options? or just upload?? or how do i wanna do this?? Compact vs spread out view??
+        ]
 
-        self.p.overlay.append(outside_detector)
-        self.p.overlay.append(menu)
         
-        self.p.update()
 
     # Reload the rail whenever we need
     def reload_rail(self) -> ft.Control:
@@ -82,27 +114,47 @@ class Content_Rail(Rail):
         # Categories get colors as well??
         # Creating a chapter for comics creates a folder to store images and drawings
         # Creating a chapter for novels creates a text document for writing, and allows
-        # Right clicking allows to create, upload, delete, rename
-        # -- Create allows new categories (One folder), books/seasons (multiple folders), chapter, note, drawing, etc.
-        
-        # Drag a file/category to move it into another folder/category
-        # -- Needs to highlight the category its hovering above
+        # Right clicking allows to upload
+        header = ft.Row(
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            
+            controls=[
+
+            # Add here, story name, and buttons to create new stuff.
+            # As well as right click options here that work like normal.
+
+            ft.Container(expand=True),
+
+            ft.IconButton(
+                tooltip="New Category",
+                icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
+                on_click=self.new_category_clicked
+            ),
+            
+            ft.IconButton(
+                tooltip="New Chapter",
+                icon=ft.Icons.NOTE_ADD_OUTLINED,
+                on_click=self.new_chapter_clicked
+            ),
+            ft.IconButton(
+                tooltip="New Note",
+                icon=ft.Icons.ADD_COMMENT_OUTLINED,
+                on_click=self.new_note_clicked
+            ),
+            ft.Container(expand=True),
+        ])
                  
 
         # Build the content of our rail
         content = ft.Column(
-            controls=[
-                ft.TextButton(  # 'Create boook button'
-                    "Create New Book", 
-                    icon=ft.Icons.WAVES_OUTLINED, 
-                ),
-                ft.TextButton(  # 'Create season button'
-                    "Create New Season", 
-                    icon=ft.Icons.WAVES_OUTLINED, 
-                ),
-                ft.Container(height=30)
-            ]
+            scroll=ft.ScrollMode.AUTO,
+            spacing=0,
+            controls=[]
         )
+        # Append our hiddent textfields for creating new categories, chapters, and notes
+        content.controls.append(self.new_category_textfield)
+        content.controls.append(self.new_chapter_textfield)
+        content.controls.append(self.new_note_textfield)
 
         # Load our content directory data into the rail
         load_directory_data(
@@ -115,29 +167,20 @@ class Content_Rail(Rail):
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(
             expand=True,
-            on_secondary_tap=self.open_menu,
+            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+            content=content
         )
 
-        content.controls.append(gd)
-
-        content.controls.append(
-            ft.TextField(
-                label="New Chapter Title",
-                hint_text="put title here dummy",
-                on_submit=lambda e: self.submit_chapter(e.control.value, self.story)
-            )
+        self.content = ft.Column(
+            spacing=0,
+            expand=True,
+            controls=[
+                header,
+                ft.Divider(),
+                gd
+            ]
         )
-
-        content.controls.append(
-            ft.TextField(
-                label="New Note Title",
-                hint_text="put title here dummy",
-                on_submit=lambda e: self.submit_note(e.control.value, self.story)
-            )
-        )
-
-        self.content = content
-
+        #self.content = content
         
         # Apply our update
         self.p.update()

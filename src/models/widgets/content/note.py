@@ -27,7 +27,7 @@ class Note(Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
                 'tag': "note",             # Tag to identify what type of object this is
-                'pin_location': "right",   # Default pin location for notes
+                'pin_location': "right" if data is None else data.get('pin_location', "right"),   # Default pin location for notes
                 'character_count': int,
                 'created_at': str,
                 'last_modified': str,
