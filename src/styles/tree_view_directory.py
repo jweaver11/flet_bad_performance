@@ -1,6 +1,5 @@
 import flet as ft
 from models.story import Story
-from models.widget import Widget
 
 # Expansion tile for all sub directories (folders) in a directory
 class Tree_View_Directory(ft.GestureDetector):
@@ -12,14 +11,15 @@ class Tree_View_Directory(ft.GestureDetector):
         story: Story,                   # Story reference for mouse positions
         page: ft.Page,                  # Page reference for overlay menu
         is_expanded: bool = False,      # Whether this directory is expanded or not
-        color: str = "primary",
-        father: 'Tree_View_Directory' = None,
+        color: str = "primary",         # Color of the folder icon
+        father: 'Tree_View_Directory' = None,       # Optional parent directory tile
+        additional_menu_options: list = None,      # Options to show when right clicking a directory
 
         # Options passed in by child classes
         buttons: list = None,           # Buttons to attach to the right side of the tile
-        menu_options: list = None,      # Options to show when right clicking a directory
     ):
         
+        # Reference for all our passed in data
         self.directory_path = directory_path
         self.title = title
         self.story = story
@@ -27,95 +27,7 @@ class Tree_View_Directory(ft.GestureDetector):
         self.father = father
         self.color = color
         self.is_expanded = is_expanded  
-
-        folder_options = [
-            ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)),
-            ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)),
-            ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)),
-        ]
-
-
-        self.expansion_tile = ft.ExpansionTile(
-            title=ft.Text(value=title, weight=ft.FontWeight.BOLD, text_align="left"),
-            dense=True,
-            initially_expanded=is_expanded,
-            tile_padding=ft.Padding(0, 0, 0, 0),
-            controls_padding=ft.Padding(10, 0, 0, 0),
-            leading=ft.Icon(ft.Icons.FOLDER_OUTLINED, color=color),
-            maintain_state=True,
-            expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
-            bgcolor=ft.Colors.TRANSPARENT,
-            shape=ft.RoundedRectangleBorder(),
-            on_change=lambda e: self.toggle_expand()
-        )
-
-        super().__init__(
-            mouse_cursor=ft.MouseCursor.CLICK,
-            on_enter=self.on_hover,
-            on_exit=self.on_stop_hover,
-            content = self.expansion_tile,
-        )
-
-    def toggle_expand(self):
-        self.is_expanded = not self.is_expanded
-        self.story.change_folder_data(
-            directory_path=self.directory_path,
-            key='is_expanded',
-            value=self.is_expanded
-        )
-
-
-    def on_hover(self, e):
-        # Need to set the directory path when dragging stuff
-        self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.WHITE)
-        if self.father is not None:
-            self.father.content.bgcolor = ft.Colors.TRANSPARENT
-        self.p.update()
-       
-
-    def on_stop_hover(self, e):
-        self.bgcolor = ft.Colors.TRANSPARENT
-        self.p.update()
-        
-
-
-
-
-
-# Class for items within a tree view on the rail
-class Tree_View_File(ft.GestureDetector):
-
-    def __init__(
-        self, 
-        widget: Widget, 
-        additional_menu_options: list = None
-    ):
-        
-        # Drag a file/category to move it into another folder/category
-        # -- Needs to highlight the category its hovering above
-        
-        
-        # Set our widget reference and tag
-        self.widget = widget
-        tag = widget.data.get('tag', None)
-
         self.additional_menu_options = additional_menu_options
-
-        #self.capital_title = widget.title.capitalize()
-
-        # Check our tag and set our icon accordingly
-        if tag is None:
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
-
-        elif tag == "chapter":
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
-
-        elif tag == "note":
-            self.icon = ft.Icons.COMMENT_OUTLINED
-            self.icon.scale = 0.8
-
-        else:
-            self.icon = ft.Icons.FOLDER_OUTLINED
 
         # Set our text style
         self.text_style = ft.TextStyle(
@@ -124,21 +36,34 @@ class Tree_View_File(ft.GestureDetector):
             weight=ft.FontWeight.BOLD,
         )
 
-        # Get icon color from widget data if it exists
-        self.icon_color = widget.data.get('rail_icon_color', 'primary')
-
-        # Parent constructor
         super().__init__(
-            on_enter = self.on_hover,
-            on_exit = self.on_stop_hover,
-            on_secondary_tap = lambda e: self.widget.story.open_menu(self.get_menu_options()),
-            on_tap = lambda e: self.widget.focus(),
-            mouse_cursor = ft.MouseCursor.CLICK,
+            mouse_cursor=ft.MouseCursor.CLICK,
+            on_enter=self.on_hover,
+            on_exit=self.on_stop_hover,
+            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
         )
         self.reload()
-    
+
+
     def get_menu_options(self) -> list[ft.Control]:
+        ''' Pops open a column of the menu options for this tree view directory'''
+
         menu_options = [
+            ft.TextButton(
+                #on_click=self.new_category_clicked,
+                expand=True,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
+                    ft.Text("Sub-Category", color=ft.Colors.ON_SURFACE),
+                ])
+            ),
+        ]
+
+        if self.additional_menu_options is not None:
+            menu_options.extend(self.additional_menu_options)
+
+        menu_options.extend([
+            # Rename button
             ft.TextButton(
                 expand=True,
                 on_click=self.rename_clicked,
@@ -151,13 +76,14 @@ class Tree_View_File(ft.GestureDetector):
                     ), 
                 ]),
             ),
+
+            # Color changing popup menu
             ft.PopupMenuButton(
                 expand=True,
                 tooltip="",
                 padding=ft.Padding(10,0,0,0),
                 content=ft.Row(
                     expand=True,
-                    #spacing=0,
                     controls=[
                         ft.Container(),   # Spacer
                         ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
@@ -167,26 +93,29 @@ class Tree_View_File(ft.GestureDetector):
                 ),
                 items=self.get_color_options()
             ),
+        
+            # Delete button
             ft.TextButton(
                 on_click=lambda e: self.delete_clicked(e),
+                expand=True,
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
                     ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
                 ]),
             ),
-        ]
+        ])
+
         return menu_options
 
-    # Called when hovering mouse over a tree view item
-    def on_hover(self, e):
-        self.content.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
-        self.widget.p.update()
+    def toggle_expand(self):
+        self.is_expanded = not self.is_expanded
+        self.story.change_folder_data(
+            directory_path=self.directory_path,
+            key='is_expanded',
+            value=self.is_expanded
+        )
 
-    def on_stop_hover(self, e):
-        self.content.bgcolor = ft.Colors.TRANSPARENT
-        self.widget.p.update()
-
-    # Called when rename button is clicked
+        # Called when rename button is clicked
     def rename_clicked(self, e):
 
         # Track if our name is unique for checks, and if we're submitting or not
@@ -194,7 +123,7 @@ class Tree_View_File(ft.GestureDetector):
         submitting = False
 
         # Grab our current name for comparison
-        current_name = self.widget.title
+        current_name = self.title
 
         # Called when clicking outside the input field to cancel renaming
         def _cancel_rename(e):
@@ -212,7 +141,7 @@ class Tree_View_File(ft.GestureDetector):
             else:
 
                 self.reload()
-                self.widget.p.update()
+                self.p.update()
 
         # Called everytime a change in textbox occurs
         def _name_check(e):
@@ -232,6 +161,7 @@ class Tree_View_File(ft.GestureDetector):
 
 
             # Check our widgets tag, and then check for uniqueness accordingly
+            '''
             if tag is not None:
 
                 print("Checking uniqueness for tag:", tag)
@@ -260,6 +190,8 @@ class Tree_View_File(ft.GestureDetector):
                         if map_.title == name and map_.title != current_name:
                             is_unique = False
 
+            '''
+
             # Give us our error text if not unique
             if not is_unique:
                 e.control.error_text = "Name already exists"
@@ -267,7 +199,7 @@ class Tree_View_File(ft.GestureDetector):
                 e.control.error_text = None
 
             # Apply the update
-            self.widget.p.update()
+            self.p.update()
 
         # Called when submitting our textfield.
         def _submit_name(e):
@@ -286,17 +218,18 @@ class Tree_View_File(ft.GestureDetector):
 
             # If it is, call the rename function. It will do everything else
             if is_unique:
-                self.widget.rename(name)
+                #self.widget.rename(name)
+                print("We're unique!")
                 
             # Otherwise make sure we show our error
             else:
                 text_field.error_text = "Name already exists"
                 text_field.focus()                                  # Auto focus the textfield
-                self.widget.p.update()
+                self.p.update()
                 
         # Our text field that our functions use for renaming and referencing
         text_field = ft.TextField(
-            value=self.widget.title,
+            value=self.title,
             expand=True,
             dense=True,
             autofocus=True,
@@ -309,11 +242,10 @@ class Tree_View_File(ft.GestureDetector):
         )
 
         # Replaces our name text with a text field for renaming
-        self.content.content.content.content.controls[1] = text_field
+        self.content.title = text_field
 
         # Clears our popup menu button and applies to the UI
-        self.widget.p.overlay.clear()
-        self.widget.p.update()
+        self.story.close_menu()
 
     def get_color_options(self) -> list[ft.Control]:
         ''' Returns a list of all available colors for icon changing '''
@@ -323,12 +255,12 @@ class Tree_View_File(ft.GestureDetector):
             ''' Passes in our kwargs to the widget, and applies the updates '''
 
             # Change the data
-            self.widget.change_data(**{'rail_icon_color': color})
-            self.icon_color = color
+            self.story.change_folder_data(self.directory_path, 'color', color)
+            self.color = color
             
             # Change our icon to match, apply the update
             self.reload()
-            self.widget.p.update()
+            self.p.update()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
         # List of available colors
@@ -366,45 +298,56 @@ class Tree_View_File(ft.GestureDetector):
         def _delete_confirmed(e):
             ''' Deletes the widget after confirmation '''
 
-            self.widget.p.close(dlg)
-            self.widget.story.delete_widget(self.widget)
+            self.p.close(dlg)
+            self.story.delete_folder(self.directory_path)
+            self.story.close_menu()
             
 
         # Append an overlay to confirm the deletion
         dlg = ft.AlertDialog(
-            title=ft.Text(f"Are you sure you want to delete '{self.widget.title}' forever?", weight=ft.FontWeight.BOLD),
+            title=ft.Text(f"Are you sure you want to delete '{self.title}' forever?", weight=ft.FontWeight.BOLD),
             alignment=ft.alignment.center,
             title_padding=ft.padding.all(25),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.widget.p.close(dlg)),
+                ft.TextButton("Cancel", on_click=lambda e: self.p.close(dlg)),
                 ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
             ]
         )
 
-        self.widget.p.open(dlg)
+        self.p.open(dlg)
 
 
+    def on_hover(self, e):
+        # Need to set the directory path when dragging stuff
+        self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.RED)
+        #if self.father is not None:
+            #self.father.content.bgcolor = ft.Colors.TRANSPARENT
+        self.p.update()
+       
+
+    def on_stop_hover(self, e):
+        self.bgcolor = ft.Colors.TRANSPARENT
+        self.p.update()
+
+    # Called when we need to reload this directory tile
     def reload(self):
-        self.content = ft.Container(
-            expand=True, 
-            padding=ft.Padding(0, 2, 5, 2),
-            content=ft.Draggable(
-                group="widget",
-                content_feedback=self.content,
-                content=ft.GestureDetector(
-                    mouse_cursor=ft.MouseCursor.CLICK,
-                    content=ft.Row(
-                        expand=True,
-                        controls=[
-                            ft.Icon(self.icon, color=self.icon_color), 
-                            ft.Text(value=self.widget.title, style=self.text_style),
-                        ],
-                    ),
-                )
-            )
+        expansion_tile = ft.ExpansionTile(
+            title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
+            dense=True,
+            initially_expanded=self.is_expanded,
+            tile_padding=ft.Padding(0, 0, 0, 0),
+            controls_padding=ft.Padding(10, 0, 0, 0),
+            leading=ft.Icon(ft.Icons.FOLDER_OUTLINED, color=self.color),
+            maintain_state=True,
+            expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
+            bgcolor=ft.Colors.TRANSPARENT,
+            shape=ft.RoundedRectangleBorder(),
+            on_change=lambda e: self.toggle_expand()
         )
 
-        self.widget.p.update()
+        self.content = expansion_tile
+        
+
 
 
 

@@ -9,6 +9,7 @@ from handlers.tree_view import load_directory_data
 
 # Class is created in main on program startup
 class Content_Rail(Rail):
+
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
@@ -82,26 +83,46 @@ class Content_Rail(Rail):
             ft.TextButton(
                 on_click=self.new_category_clicked,
                 content=ft.Row([
-                    ft.Icon(ft.Icons.FOLDER_OPEN),
-                    ft.Text("New Category"),
+                    ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
+                    ft.Text("Category", color=ft.Colors.ON_SURFACE),
                 ])
             ),
             ft.TextButton(
                 on_click=self.new_chapter_clicked,
                 content=ft.Row([
-                    ft.Icon(ft.Icons.BOOK),
-                    ft.Text("New Chapter"),
+                    ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
+                    ft.Text("Chapter", color=ft.Colors.ON_SURFACE),
                 ])
             ),
             ft.TextButton(
                 on_click=self.new_note_clicked,
                 content=ft.Row([
-                    ft.Icon(ft.Icons.STICKY_NOTE_2_OUTLINED),
-                    ft.Text("New Note"),
+                    ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
+                    ft.Text("Note", color=ft.Colors.ON_SURFACE),
                 ])
             ),
 
             # New and upload options? or just upload?? or how do i wanna do this?? Compact vs spread out view??
+        ]
+    
+    def get_sub_menu_options(self) -> list[ft.Control]:
+        return [
+            ft.TextButton(
+                on_click=self.new_chapter_clicked,
+                expand=True,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
+                    ft.Text("Chapter", color=ft.Colors.ON_SURFACE),
+                ])
+            ),
+            ft.TextButton(
+                on_click=self.new_note_clicked,
+                expand=True,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
+                    ft.Text("Note", color=ft.Colors.ON_SURFACE),
+                ])
+            ),
         ]
 
         
@@ -161,7 +182,8 @@ class Content_Rail(Rail):
             page=self.p,
             story=self.story,
             directory=self.story.data['content_directory_path'],
-            column=content
+            column=content,
+            additional_menu_options=self.get_sub_menu_options()
         )
 
         # Gesture detector to put on top of stack on the rail to pop open menus on right click

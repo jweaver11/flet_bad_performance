@@ -272,6 +272,10 @@ class Story(ft.View):
             # Remove it from data
             self.data['folders'].pop(directory_path, None)
 
+            self.save_dict()
+
+            self.active_rail.content.reload_rail()
+
         # Handle errors
         except Exception as e:
             print(f"Error deleting folder: {e}")

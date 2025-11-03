@@ -296,6 +296,9 @@ class Widget(ft.Container):
         elif tag == "character":
             icon = ft.Icon(ft.Icons.PERSON_OUTLINE)
 
+        elif tag == "settings":
+            icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
+
         else:
             icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
         

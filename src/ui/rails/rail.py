@@ -38,6 +38,14 @@ class Rail(ft.Container):
 
         # Calling initial rail to reload
         #self.reload_rail()
+
+    def get_menu_options(self) -> list[ft.Control]:
+        ''' Returns a list of menu options when right clicking child rail '''
+        return []
+    
+    def get_sub_menu_options(self) -> list[ft.Control]:
+        ''' Returns a list of additional menu options for sub-items in tree view directories '''
+        return []
         
 
     # Called whenever our user inputs a new key into one of our textfields for new items
