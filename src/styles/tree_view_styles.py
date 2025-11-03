@@ -15,7 +15,7 @@ class Tree_View_Directory(ft.GestureDetector):
         color: str = "primary",
         father: 'Tree_View_Directory' = None,
 
-        # Optinos passed in by child classes
+        # Options passed in by child classes
         buttons: list = None,           # Buttons to attach to the right side of the tile
         menu_options: list = None,      # Options to show when right clicking a directory
     ):
@@ -29,9 +29,9 @@ class Tree_View_Directory(ft.GestureDetector):
         self.is_expanded = is_expanded  
 
         folder_options = [
-            ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-            ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-            ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
+            ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)),
+            ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)),
+            ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)),
         ]
 
 
@@ -51,7 +51,7 @@ class Tree_View_Directory(ft.GestureDetector):
 
         super().__init__(
             mouse_cursor=ft.MouseCursor.CLICK,
-            #on_enter=self.on_hover,
+            on_enter=self.on_hover,
             on_exit=self.on_stop_hover,
             content = self.expansion_tile,
         )
@@ -80,6 +80,8 @@ class Tree_View_Directory(ft.GestureDetector):
 
 
 
+
+
 # Class for items within a tree view on the rail
 class Tree_View_File(ft.GestureDetector):
 
@@ -101,6 +103,7 @@ class Tree_View_File(ft.GestureDetector):
 
         #self.capital_title = widget.title.capitalize()
 
+        # Check our tag and set our icon accordingly
         if tag is None:
             self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
@@ -108,8 +111,8 @@ class Tree_View_File(ft.GestureDetector):
             self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
         elif tag == "note":
-            self.icon = ft.Icons.COMMENT_ROUNDED
-
+            self.icon = ft.Icons.COMMENT_OUTLINED
+            self.icon.scale = 0.8
 
         else:
             self.icon = ft.Icons.FOLDER_OUTLINED
@@ -117,7 +120,7 @@ class Tree_View_File(ft.GestureDetector):
         # Set our text style
         self.text_style = ft.TextStyle(
             size=14,
-            color=ft.Colors.GREY_300,
+            color=ft.Colors.ON_SURFACE,
             weight=ft.FontWeight.BOLD,
         )
 
@@ -130,21 +133,9 @@ class Tree_View_File(ft.GestureDetector):
             on_exit = self.on_stop_hover,
             on_secondary_tap = lambda e: self.widget.story.open_menu(self.get_menu_options()),
             on_tap = lambda e: self.widget.focus(),
-
-            content = ft.Container(
-                expand=True, 
-                padding=ft.Padding(0, 2, 5, 2),
-                content=ft.Row(
-                    expand=True,
-                    controls=[
-                        ft.Icon(self.icon, color=self.icon_color), 
-                        ft.Text(value=self.widget.title, style=self.text_style),
-                    ],
-                ),
-            ),
-
-            mouse_cursor = ft.MouseCursor.CLICK
+            mouse_cursor = ft.MouseCursor.CLICK,
         )
+        self.reload()
     
     def get_menu_options(self) -> list[ft.Control]:
         menu_options = [
@@ -156,7 +147,7 @@ class Tree_View_File(ft.GestureDetector):
                     ft.Text(
                         "Rename", 
                         weight=ft.FontWeight.BOLD, 
-                        color=ft.Colors.GREY_300
+                        color=ft.Colors.ON_SURFACE
                     ), 
                 ]),
             ),
@@ -170,8 +161,8 @@ class Tree_View_File(ft.GestureDetector):
                     controls=[
                         ft.Container(),   # Spacer
                         ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
-                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300, expand=True), 
-                        ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.GREY_300, size=16),
+                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                        ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
                     ]
                 ),
                 items=self.get_color_options()
@@ -180,7 +171,7 @@ class Tree_View_File(ft.GestureDetector):
                 on_click=lambda e: self.delete_clicked(e),
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
-                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300, expand=True),
+                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
                 ]),
             ),
         ]
@@ -253,20 +244,20 @@ class Tree_View_File(ft.GestureDetector):
 
                 # Notes
                 elif tag == "note":
-                    for note in self.widget.story.notes:
-                        if note == name and note != current_name:
+                    for note in self.widget.story.notes.values():
+                        if note.title == name and note.title != current_name:
                             is_unique = False
 
                 # Characters
                 elif tag == "character":
-                    for character in self.widget.story.characters:
-                        if character == name and character != current_name:
+                    for character in self.widget.story.characters.values():
+                        if character.title == name and character.title != current_name:
                             is_unique = False
 
                 # Maps
                 elif tag == "maps":
-                    for map_widget in self.widget.story.maps:
-                        if map_widget == name and map_widget != current_name:
+                    for map_ in self.widget.story.maps.values():
+                        if map_.title == name and map_.title != current_name:
                             is_unique = False
 
             # Give us our error text if not unique
@@ -318,7 +309,7 @@ class Tree_View_File(ft.GestureDetector):
         )
 
         # Replaces our name text with a text field for renaming
-        self.content.content.controls[1] = text_field
+        self.content.content.content.content.controls[1] = text_field
 
         # Clears our popup menu button and applies to the UI
         self.widget.p.overlay.clear()
@@ -397,13 +388,20 @@ class Tree_View_File(ft.GestureDetector):
         self.content = ft.Container(
             expand=True, 
             padding=ft.Padding(0, 2, 5, 2),
-            content=ft.Row(
-                expand=True,
-                controls=[
-                    ft.Icon(self.icon, color=self.icon_color), 
-                    ft.Text(value=self.widget.title, style=self.text_style),
-                ],
-            ),
+            content=ft.Draggable(
+                group="widget",
+                content_feedback=self.content,
+                content=ft.GestureDetector(
+                    mouse_cursor=ft.MouseCursor.CLICK,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(self.icon, color=self.icon_color), 
+                            ft.Text(value=self.widget.title, style=self.text_style),
+                        ],
+                    ),
+                )
+            )
         )
 
         self.widget.p.update()

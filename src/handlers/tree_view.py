@@ -107,14 +107,10 @@ def load_directory_data(
           
             # Find our widget based on the filename
             for widget in story.widgets:
-                #print("Widget title check: ", widget.title, " vs ", name)
-                #print("Widget dir path check: ", widget.directory_path, " vs ", os.path.join(directory))
                 if widget.title == name and widget.directory_path == os.path.join(directory):  
-                    #print("Passed")
                     widget = widget
                     break
-                #else:
-                    #print("Failed")
+                
 
             # Create the file item
             item = Tree_View_File(

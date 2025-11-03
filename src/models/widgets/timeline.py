@@ -82,6 +82,7 @@ class Timeline(Widget):
         
 
         # Builds/reloads our timeline UI
+        self.reload_tab()
         self.reload_widget()
 
     def create_information_display(self):

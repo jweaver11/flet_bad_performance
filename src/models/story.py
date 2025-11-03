@@ -279,7 +279,7 @@ class Story(ft.View):
     # Called when changing folder metadata, like color or is expanded or not
     def change_folder_data(self, directory_path: str, key: str, value):
         ''' Changes our folder metadata inside of our story data '''
-        print("Changing folder data:", directory_path, key, value)
+        #print("Changing folder data:", directory_path, key, value)
 
         try:
             # Check if the folder exists in our data

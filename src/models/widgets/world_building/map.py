@@ -129,6 +129,7 @@ class Map(Widget):
         
 
         # Reloads the information display of the map
+        self.reload_tab()
         self.reload_widget()
 
 

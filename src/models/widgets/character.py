@@ -75,6 +75,7 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Build our widget on start, but just reloads it later
+        self.reload_tab()
         self.reload_widget()
     
     

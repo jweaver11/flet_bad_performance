@@ -49,7 +49,7 @@ class Settings(Widget):
             },
         )
 
-
+        self.reload_tab()
         self.reload_widget()  # Loads our settings widget UI
 
 
