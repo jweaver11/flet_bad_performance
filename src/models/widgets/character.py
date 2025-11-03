@@ -73,7 +73,6 @@ class Character(Widget):
             },
         )
         
-        #self.image = ""     # Use AI to gen based off characteristics, or mini icon generator, or upload img
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Build our widget on start, but just reloads it later
@@ -85,24 +84,30 @@ class Character(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
+
+        if self.data['is_active_tab']:
+            self.icon = ft.Icon(ft.Icons.PERSON, size=100, color="primary", expand=False)
+        else:
+            self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE, size=100, color="disabled", expand=False)
+
         # Body of the tab, which is the content of flet container
         body = ft.Container(
-            expand=True,
-            padding=6,
-            #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
-            content=ft.Column([
-                ft.Text("hi from " + self.title),
-                ft.Row(
-                        wrap=True,
-                        controls=[
+            expand=True,                # Takes up maximum space allowed in its parent container
+            padding=6,                  # Padding around everything inside the container
+            content=ft.Column([                 # The column that will hold all our stuff top down
+                self.icon,                          # The icon above the name
+                ft.Text("hi from " + self.title),           # Text that shows the title
+                ft.Row(                     # The row that will hold our dropdowns
+                        wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
+                        controls=[          # All flet controls inside our Row
                            #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                                label="Morality",
-                                value=self.data['morality'],
+                                label="Morality",           # Label at top of dropdown 
+                                value=self.data['morality'],        # Value selected in the drop down
                                 #padding=ft.padding.all(0),
-                                color=self.data['name_color'],
-                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                                options=[
+                                color=self.data['name_color'],      # Color of the dropdown text
+                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
+                                options=[           # Options for the dropdown
                                     ft.DropdownOption(text="Undecided"),
                                     ft.DropdownOption(text="Good"),
                                     ft.DropdownOption(text="Neutral"),
@@ -134,9 +139,10 @@ class Character(Widget):
 
         )     
         
-        # Set our content
+        # Set our content to the body_container (from Widget class) as the body we just built
         self.body_container.content = body
 
+        # Call render widget (from Widget class) to update the UI
         self._render_widget()
             
 
