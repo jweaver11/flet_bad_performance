@@ -29,11 +29,14 @@ class Image(Widget):
             
 
         # Load our widget UI on start after we have loaded our data
-        self.reload_tab()
         self.reload_widget()
         
 
     def reload_widget(self):
+
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
+        
         # Our column that will display our header filters and body of our widget
         body = ft.Text(f"hello from: {self.title}")
 

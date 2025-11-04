@@ -82,7 +82,6 @@ class Timeline(Widget):
         
 
         # Builds/reloads our timeline UI
-        self.reload_tab()
         self.reload_widget()
 
     def create_information_display(self):
@@ -223,6 +222,9 @@ class Timeline(Widget):
 
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):
+
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
 
         # Right clicking arc or plotpoints opens multiple mini widgets at the same time
         

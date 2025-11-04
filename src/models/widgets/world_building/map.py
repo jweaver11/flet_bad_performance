@@ -129,7 +129,6 @@ class Map(Widget):
         
 
         # Reloads the information display of the map
-        self.reload_tab()
         self.reload_widget()
 
 
@@ -248,6 +247,9 @@ class Map(Widget):
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):       
         ''' Rebuilds/reloads our map UI '''
+
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
 
         # Make it so that maps 'mini widget' shows inside of the map...
         # Multiple mini widgets able to be shown at same time

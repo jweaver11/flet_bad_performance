@@ -76,7 +76,6 @@ class Character(Widget):
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
 
         # Build our widget on start, but just reloads it later
-        self.reload_tab()
         self.reload_widget()
     
 
@@ -84,6 +83,8 @@ class Character(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
 
         if self.data['is_active_tab']:
             self.icon = ft.Icon(ft.Icons.PERSON, size=100, color="primary", expand=False)

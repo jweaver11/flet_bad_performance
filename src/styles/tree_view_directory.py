@@ -7,14 +7,14 @@ class Tree_View_Directory(ft.GestureDetector):
 
     def __init__(
         self, 
-        directory_path: str,                        # Full path to this directory
-        title: str,                                 # Title of this item
-        story: Story,                               # Story reference for mouse positions
-        page: ft.Page,                              # Page reference for overlay menu
-        is_expanded: bool = False,                  # Whether this directory is expanded or not
-        color: str = "primary",                     # Color of the folder icon
-        father: 'Tree_View_Directory' = None,       # Optional parent directory tile
-        additional_menu_options: list = None,       # Options to show when right clicking a directory
+        directory_path: str,                                    # Full path to this directory
+        title: str,                                             # Title of this folder
+        story: Story,                                           # Story reference for mouse positions and other logic
+        page: ft.Page,                                          # Page reference for overlay menu
+        is_expanded: bool = False,                              # Whether this directory is expanded or not
+        color: str = "primary",                                 # Color of the folder icon
+        father: 'Tree_View_Directory' = None,                   # Optional parent directory tile, if there is one
+        additional_menu_options: list[ft.Control] = None,       # Additional menu options when right clicking a category, depending on the rail
     ):
         
         # Reference for all our passed in data
@@ -80,7 +80,8 @@ class Tree_View_Directory(ft.GestureDetector):
         for option in self.additional_menu_options or []:
 
             # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_click = lambda e: self.new_item_clicked(type=option.data)
+            option.on_click = lambda e, t=option.data: self.new_item_clicked(type=t)
+
             # Add them to the list
             menu_options.append(option)
 
@@ -161,24 +162,24 @@ class Tree_View_Directory(ft.GestureDetector):
 
         elif type == "chapter":
             self.new_item_textfield.on_change = self.chapter_check
-            #self.new_item_textfield.on_submit = self.chapter_submit
+            self.new_item_textfield.on_submit = self.chapter_submit
 
         elif type == "note":
             self.new_item_textfield.on_change = self.note_check
-            #self.new_item_textfield.on_submit = self.note_submit
+            self.new_item_textfield.on_submit = self.note_submit
 
         elif type == "character":
             self.new_item_textfield.on_change = self.character_check
-            #self.new_item_textfield.on_submit = self.character_submit
+            self.new_item_textfield.on_submit = self.character_submit
 
         elif type == "map":
             self.new_item_textfield.on_change = self.map_check
-            #self.new_item_textfield.on_submit = self.map_submit
+            self.new_item_textfield.on_submit = self.map_submit
 
         # Check our expanded state. Rebuild if needed
         if self.is_expanded == False:
             self.toggle_expand()
-            self.reload()
+            self.story.active_rail.content.reload_rail()
 
         # Close the menu, which will also update the page
         self.story.close_menu()
@@ -224,22 +225,83 @@ class Tree_View_Directory(ft.GestureDetector):
         title = e.control.value
 
         # Generate our new key to compare. Requires normalization
-        nk = self.directory_path + "\\" + self.title + title
+        nk = self.directory_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
         # Compare all our folders that would be inside of this folder, and check for uniqueness
         for key in self.story.data['folders'].keys():
-            if os.path.normcase(os.path.normpath(key)) == new_key:
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
                 self.item_is_unique = False
-                self.new_item_textfield.error_text = "Category name already exists"
-                self.p.update()
-                return
+                break
             
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Name must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+
+        self.p.update()
+            
+        
+    # Called when our user inputs a new key into the chapter textfield
     def chapter_check(self, e):
-        pass
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.directory_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Check our chapters
+        for key in self.story.chapters.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Title must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+            
+        self.p.update()
+       
 
     def note_check(self, e):
-        pass
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.directory_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Check our chapters
+        for key in self.story.notes.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Title must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+            
+        self.p.update()
 
     def character_check(self, e):
         pass
@@ -263,15 +325,49 @@ class Tree_View_Directory(ft.GestureDetector):
             
         # Otherwise make sure we show our error
         else:
-            self.new_item_textfield.error_text = "Name already exists"
+            #self.new_item_textfield.error_text = "Sub-Category already exists"
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.p.update()
 
     def chapter_submit(self, e):
-        pass
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_chapter(
+                directory_path=self.directory_path,
+                title=title,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.error_text = "Chapter name already exists"
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
 
     def note_submit(self, e):
-        pass
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_note(
+                directory_path=self.directory_path,
+                title=title,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.error_text = "Chapter name already exists"
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
 
     def character_submit(self, e):
         pass
@@ -305,8 +401,8 @@ class Tree_View_Directory(ft.GestureDetector):
             # Otherwise we're not submitting (just clicking off the textbox), so we cancel the rename
             else:
 
-                self.reload()
-                self.p.update()
+                self.story.active_rail.content.reload_rail()
+                
 
         # Called everytime a change in textbox occurs
         def _name_check(e):
@@ -325,9 +421,6 @@ class Tree_View_Directory(ft.GestureDetector):
             for key in self.story.data['folders'].keys():
                 if key == self.directory_path + "\\" + self.title:
                     self.is_unique = False
-
-
-
 
 
             # Give us our error text if not unique

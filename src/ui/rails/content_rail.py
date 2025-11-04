@@ -112,6 +112,7 @@ class Content_Rail(Rail):
             ft.TextButton(
                 on_click=self.new_chapter_clicked,
                 expand=True,
+                data="chapter",
                 content=ft.Row([
                     ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
                     ft.Text("Chapter", color=ft.Colors.ON_SURFACE),
@@ -120,6 +121,7 @@ class Content_Rail(Rail):
             ft.TextButton(
                 on_click=self.new_note_clicked,
                 expand=True,
+                data="note",
                 content=ft.Row([
                     ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
                     ft.Text("Note", color=ft.Colors.ON_SURFACE),

@@ -49,7 +49,6 @@ class Settings(Widget):
             },
         )
 
-        self.reload_tab()
         self.reload_widget()  # Loads our settings widget UI
 
 
@@ -67,6 +66,9 @@ class Settings(Widget):
     
     # Called when someone expands the drop down holding the color scheme options
     def reload_widget(self):
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
+        
         def get_color_scheme_options():
             ''' Adds our choices to the color scheme dropdown control'''
 

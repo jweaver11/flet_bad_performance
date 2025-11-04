@@ -37,13 +37,15 @@ class Note(Widget):
 
         
         # Load our widget UI on start after we have loaded our data
-        self.reload_tab()
         self.reload_widget()
 
 
     # Called after any changes happen to the data that need to be reflected in the UI, usually just ones that require a rebuild
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
+
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
         
         # Body of the tab, which is the content of flet container
         body = ft.Container(

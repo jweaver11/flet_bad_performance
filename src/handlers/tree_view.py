@@ -92,7 +92,8 @@ def load_directory_data(
                 page=page,
                 story=story,
                 directory=full_path,
-                dir_dropdown=new_expansion_tile
+                dir_dropdown=new_expansion_tile,
+                additional_menu_options=additional_menu_options
             )
 
             # Add our expansion tile for the directory to its parent, or the column if top most directory
