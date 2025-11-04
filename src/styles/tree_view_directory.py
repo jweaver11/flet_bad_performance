@@ -1,19 +1,20 @@
 import flet as ft
 from models.story import Story
+import os
 
 # Expansion tile for all sub directories (folders) in a directory
 class Tree_View_Directory(ft.GestureDetector):
 
     def __init__(
         self, 
-        directory_path: str,                        # Full path to this directory
-        title: str,                                 # Title of this item
-        story: Story,                               # Story reference for mouse positions
-        page: ft.Page,                              # Page reference for overlay menu
-        is_expanded: bool = False,                  # Whether this directory is expanded or not
-        color: str = "primary",                     # Color of the folder icon
-        father: 'Tree_View_Directory' = None,       # Optional parent directory tile
-        additional_menu_options: list = None,       # Options to show when right clicking a directory
+        directory_path: str,                                    # Full path to this directory
+        title: str,                                             # Title of this folder
+        story: Story,                                           # Story reference for mouse positions and other logic
+        page: ft.Page,                                          # Page reference for overlay menu
+        is_expanded: bool = False,                              # Whether this directory is expanded or not
+        color: str = "primary",                                 # Color of the folder icon
+        father: 'Tree_View_Directory' = None,                   # Optional parent directory tile, if there is one
+        additional_menu_options: list[ft.Control] = None,       # Additional menu options when right clicking a category, depending on the rail
     ):
         
         # Reference for all our passed in data
@@ -26,6 +27,10 @@ class Tree_View_Directory(ft.GestureDetector):
         self.is_expanded = is_expanded  
         self.additional_menu_options = additional_menu_options
 
+        # State tracking variables
+        self.are_submitting = False
+        self.item_is_unique = True
+
         # Set our text style
         self.text_style = ft.TextStyle(
             size=14,
@@ -33,21 +38,36 @@ class Tree_View_Directory(ft.GestureDetector):
             weight=ft.FontWeight.BOLD,
         )
 
+        # Textfield for creating new items (sub-categories, chapters, notes, characters, etc.)
+        self.new_item_textfield = ft.TextField(  
+            hint_text="Sub-Category Name",          
+            #data="category",                                       # Data for logic routing on submit
+            #on_submit=self.new_sub_category_clicked,               # Called when enter is pressed
+            autofocus=True,
+            on_blur=self.on_new_item_blur,
+            visible=False,
+            text_style=self.text_style
+        )
+
+        # Parent constructor
         super().__init__(
             mouse_cursor=ft.MouseCursor.CLICK,
             on_enter=self.on_hover,
             on_exit=self.on_stop_hover,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
         )
+
+        # Reload our directory tile to set up initial UI
         self.reload()
 
-
+    # Called when right clicking over our expansion tile
     def get_menu_options(self) -> list[ft.Control]:
-        ''' Pops open a column of the menu options for this tree view directory'''
+        ''' Returns our built in menu options all tree view rails have, and any additional ones passed in '''
 
+        # Declare our menu options list, and add our category option first
         menu_options = [
             ft.TextButton(
-                #on_click=self.new_category_clicked,
+                on_click=lambda e: self.new_item_clicked(type="category"),
                 expand=True,
                 content=ft.Row([
                     ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
@@ -56,9 +76,16 @@ class Tree_View_Directory(ft.GestureDetector):
             ),
         ]
 
-        if self.additional_menu_options is not None:
-            menu_options.extend(self.additional_menu_options)
+        # Run through our additional menu options if we have any, and add them
+        for option in self.additional_menu_options or []:
 
+            # Set their on_click to call our on_click method, which can handle any type of widget
+            option.on_click = lambda e, t=option.data: self.new_item_clicked(type=t)
+
+            # Add them to the list
+            menu_options.append(option)
+
+        # Add our remaining built in options: rename, color change, delete
         menu_options.extend([
             # Rename button
             ft.TextButton(
@@ -102,9 +129,13 @@ class Tree_View_Directory(ft.GestureDetector):
             ),
         ])
 
+        # Return our menu options list
         return menu_options
 
+    # Called when expanding/collapsing the directory
     def toggle_expand(self):
+        ''' Makes sure our state and data match the updated expanded/collapsed state '''
+
         self.is_expanded = not self.is_expanded
         self.story.change_folder_data(
             directory_path=self.directory_path,
@@ -112,12 +143,246 @@ class Tree_View_Directory(ft.GestureDetector):
             value=self.is_expanded
         )
 
-        # Called when rename button is clicked
+    # Called when creating new category or when additional menu items are clicked
+    def new_item_clicked(self, type: str = "category"):
+        ''' Shows the textfield for creating new item. Requires what type of item (category, chapter, note, etc.) '''
+
+        # Clear out any previous value
+        self.new_item_textfield.value = None
+
+        # Make our textfield visible and set values
+        self.new_item_textfield.visible = True
+        self.new_item_textfield.data = type
+        self.new_item_textfield.hint_text = f"{type.capitalize()} Name"
+
+        # Check the type passed in by the option, and route our logic through that
+        if type == "category":
+            self.new_item_textfield.on_change = self.category_check
+            self.new_item_textfield.on_submit = self.category_submit
+
+        elif type == "chapter":
+            self.new_item_textfield.on_change = self.chapter_check
+            self.new_item_textfield.on_submit = self.chapter_submit
+
+        elif type == "note":
+            self.new_item_textfield.on_change = self.note_check
+            self.new_item_textfield.on_submit = self.note_submit
+
+        elif type == "character":
+            self.new_item_textfield.on_change = self.character_check
+            self.new_item_textfield.on_submit = self.character_submit
+
+        elif type == "map":
+            self.new_item_textfield.on_change = self.map_check
+            self.new_item_textfield.on_submit = self.map_submit
+
+        # Check our expanded state. Rebuild if needed
+        if self.is_expanded == False:
+            self.toggle_expand()
+            self.story.active_rail.content.reload_rail()
+
+        # Close the menu, which will also update the page
+        self.story.close_menu()
+
+    # Called when clicking off the textfield and after submission
+    def on_new_item_blur(self, e):
+        ''' Handles if we need to hide our textfield or re-focus it based on submissions '''
+        
+        # Check if we're submitting, or normal blur
+        if self.are_submitting:
+
+            # Change submitting to false
+            self.are_submitting = False     
+
+            # If our item is unique, hide the textfield and update
+            if self.item_is_unique:
+                e.control.visible = False
+                e.control.value = None
+                e.control.error_text = None
+                self.p.update()
+                return
+            
+            # Otherwise its not unique, re-focus our textfield
+            else:
+                e.control.visible = True
+                e.control.focus()
+        
+        # If we're not submitting, just hide the textfield and reset values
+        else:
+            e.control.visible = False
+            e.control.value = None
+            e.control.error_text = None
+            self.p.update()
+
+    # Called whenever our user inputs a new key into one of our textfields for new items
+    def category_check(self, e):
+        ''' Checks if our title is unique within its directory (default in this case) '''
+
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.directory_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Compare all our folders that would be inside of this folder, and check for uniqueness
+        for key in self.story.data['folders'].keys():
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+            
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Name must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+
+        self.p.update()
+            
+        
+    # Called when our user inputs a new key into the chapter textfield
+    def chapter_check(self, e):
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.directory_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Check our chapters
+        for key in self.story.chapters.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Title must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+            
+        self.p.update()
+       
+
+    def note_check(self, e):
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.directory_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Check our chapters
+        for key in self.story.notes.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Title must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+            
+        self.p.update()
+
+    def character_check(self, e):
+        pass
+
+    def map_check(self, e):
+        pass
+
+    def category_submit(self, e):
+        # Get our name and check if its unique
+        name = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_folder(
+                directory_path=self.directory_path,
+                name=name,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            #self.new_item_textfield.error_text = "Sub-Category already exists"
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
+
+    def chapter_submit(self, e):
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_chapter(
+                directory_path=self.directory_path,
+                title=title,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.error_text = "Chapter name already exists"
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
+
+    def note_submit(self, e):
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_note(
+                directory_path=self.directory_path,
+                title=title,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.error_text = "Chapter name already exists"
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
+
+    def character_submit(self, e):
+        pass
+
+    def map_submit(self, e):
+        pass
+
+
+
+    # Called when rename button is clicked
     def rename_clicked(self, e):
 
         # Track if our name is unique for checks, and if we're submitting or not
-        is_unique = True
-        submitting = False
+        self.is_unique = True
+        self.are_submitting = False
 
         # Grab our current name for comparison
         current_name = self.title
@@ -127,18 +392,17 @@ class Tree_View_Directory(ft.GestureDetector):
             ''' Puts our name back to static and unalterable '''
 
             # Grab our submitting state
-            nonlocal submitting
 
             # Since this auto calls on submit, we need to check. If it is cuz of a submit, do nothing
-            if submitting:
+            if self.are_submitting:
                 submitting = not submitting     # Change submit status to False so we can de-select the textbox
                 return
             
             # Otherwise we're not submitting (just clicking off the textbox), so we cancel the rename
             else:
 
-                self.reload()
-                self.p.update()
+                self.story.active_rail.content.reload_rail()
+                
 
         # Called everytime a change in textbox occurs
         def _name_check(e):
@@ -146,52 +410,22 @@ class Tree_View_Directory(ft.GestureDetector):
 
             # Grab the new name, and tag
             name = e.control.value
-            tag = self.widget.data.get('tag', None)
 
             # Nonlocal variables
-            nonlocal is_unique
-            nonlocal submitting
 
-            # Set submitting to false, and unique to True
-            submitting = False
-            is_unique = True
+             # Set submitting to false, and unique to True
+            self.are_submitting = False
+            self.is_unique = True
+        
 
+            for key in self.story.data['folders'].keys():
+                if key == self.directory_path + "\\" + self.title:
+                    self.is_unique = False
 
-            # Check our widgets tag, and then check for uniqueness accordingly
-            '''
-            if tag is not None:
-
-                print("Checking uniqueness for tag:", tag)
-
-                # Chapters check 
-                if tag == "chapter":
-                    for chapter in self.widget.story.chapters.values():
-                        if chapter.title == name and chapter.title != current_name:
-                            is_unique = False
-
-                # Notes
-                elif tag == "note":
-                    for note in self.widget.story.notes.values():
-                        if note.title == name and note.title != current_name:
-                            is_unique = False
-
-                # Characters
-                elif tag == "character":
-                    for character in self.widget.story.characters.values():
-                        if character.title == name and character.title != current_name:
-                            is_unique = False
-
-                # Maps
-                elif tag == "maps":
-                    for map_ in self.widget.story.maps.values():
-                        if map_.title == name and map_.title != current_name:
-                            is_unique = False
-
-            '''
 
             # Give us our error text if not unique
-            if not is_unique:
-                e.control.error_text = "Name already exists"
+            if not self.is_unique:
+                e.control.error_text = "Category name already exists"
             else:
                 e.control.error_text = None
 
@@ -206,15 +440,14 @@ class Tree_View_Directory(ft.GestureDetector):
             name = e.control.value
 
             # Non local variables
-            nonlocal is_unique
             nonlocal text_field
-            nonlocal submitting
+            
 
             # Set submitting to True
-            submitting = True
+            self.are_submitting = True
 
             # If it is, call the rename function. It will do everything else
-            if is_unique:
+            if self.is_unique:
                 #self.widget.rename(name)
                 print("We're unique!")
                 
@@ -256,8 +489,7 @@ class Tree_View_Directory(ft.GestureDetector):
             self.color = color
             
             # Change our icon to match, apply the update
-            self.reload()
-            self.p.update()
+            self.story.active_rail.content.reload_rail()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
         # List of available colors
@@ -339,7 +571,8 @@ class Tree_View_Directory(ft.GestureDetector):
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
-            on_change=lambda e: self.toggle_expand()
+            on_change=lambda e: self.toggle_expand(),
+            controls=[self.new_item_textfield],
         )
 
         self.content = expansion_tile

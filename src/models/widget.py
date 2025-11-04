@@ -54,8 +54,7 @@ class Widget(ft.Container):
                 'pin_location': "main" if data is None else data.get('pin_location', "main"),       # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
                 'visible': True,                                # Whether this widget is visible in the workspace or not
                 'is_active_tab': True,                          # Whether this widget's tab is the active tab in the main pin
-                'tab_title_color': "primary",                   # Color of the title in the tab
-                'rail_icon_color': "primary",                   # Color of the icon on the rail 
+                'color': "primary",                             # Color of the icon on the rail and next to title on rail
                 'mini_widgets_location': "right",               # Side of the widget the mini widgets show up on (left or right)
             },
         )
@@ -78,8 +77,8 @@ class Widget(ft.Container):
         self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
         self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
 
-        # Gives our objects their uniform tabs.
-        self.reload_tab()  # Tabs that don't need too be reloaded for color changes are only built here
+        # Called at end of constructor for all child widgets to build their view
+        self.reload_widget()
 
     # Called whenever there are changes in our data
     def save_dict(self):
@@ -164,11 +163,7 @@ class Widget(ft.Container):
             self.story.notes[self.data['key']] = self
         elif tag == "map":
             self.story.maps.pop(title, None)
-            self.story.maps[self.data['key']] = self
-        
-        
-        # Reloads our tab to reflect the new title
-        self.reload_tab()    
+            self.story.maps[self.data['key']] = self  
 
         # Re-applies visibility to what it was before rename
         self.toggle_visibility()                
@@ -302,7 +297,7 @@ class Widget(ft.Container):
         else:
             icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
         
-        icon.color = self.data['rail_icon_color']
+        icon.color = self.data['color']
         icon.scale = 0.8
 
         # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
@@ -386,6 +381,9 @@ class Widget(ft.Container):
         ''' Children build their own content of the widget in their own reload_widget functions '''
 
         # TODO Have option in the mini_widget column to show on mini widgets on right vs left side of widget
+
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
 
         # Set the body container.content to whatever control you build in the child
         self.body_container.content = ft.Text(f"hello from: {self.title}")

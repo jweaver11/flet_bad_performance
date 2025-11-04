@@ -42,7 +42,7 @@ class Tree_View_File(ft.GestureDetector):
         )
 
         # Get icon color from widget data if it exists
-        self.icon_color = widget.data.get('rail_icon_color', 'primary')
+        self.icon_color = widget.data.get('color', 'primary')
 
         # Parent constructor
         super().__init__(
@@ -249,12 +249,14 @@ class Tree_View_File(ft.GestureDetector):
             ''' Passes in our kwargs to the widget, and applies the updates '''
 
             # Change the data
-            self.widget.change_data(**{'rail_icon_color': color})
+            self.widget.change_data(**{'color': color})
             self.icon_color = color
             
             # Change our icon to match, apply the update
             self.reload()
-            self.widget.p.update()
+            self.widget.reload_widget()
+            self.widget.story.workspace.reload_workspace()
+            #self.widget.p.update()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
         # List of available colors

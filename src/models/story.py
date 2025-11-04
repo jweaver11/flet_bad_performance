@@ -257,6 +257,8 @@ class Story(ft.View):
             self.data['folders'].update({folder_path: {'name': name, 'color': "primary", 'is_expanded': True}})
             self.save_dict()
 
+            self.active_rail.content.reload_rail()
+
         # Handle errors
         except Exception as e:
             print(f"Error creating folder: {e}")

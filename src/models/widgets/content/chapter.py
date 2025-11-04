@@ -35,7 +35,6 @@ class Chapter(Widget):
         self.load_mini_notes()
 
         # Load our widget UI on start after we have loaded our data
-        self.reload_tab()
         self.reload_widget()
 
 
@@ -65,7 +64,9 @@ class Chapter(Widget):
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
 
-
+        # Rebuild out tab to reflect any changes
+        self.reload_tab()
+        
         # BUILDING BODY - the inside the body container of our widget
         self.body_container.content = ft.Column(
             expand=True,

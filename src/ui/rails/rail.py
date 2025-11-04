@@ -25,6 +25,12 @@ class Rail(ft.Container):
         # The path this rail displays. Mostly used for adding folders on the rails
         self.directory_path = directory_path
 
+        self.text_style = ft.TextStyle(
+            size=14,
+            color=ft.Colors.ON_SURFACE,
+            weight=ft.FontWeight.BOLD,
+        )
+
         # Declaring UI elements for easier referencing. This one is for folders, since most rails use it
         self.new_category_textfield = ft.TextField(  
             hint_text="Category Name",          
@@ -33,7 +39,8 @@ class Rail(ft.Container):
             on_change=self.on_new_item_change,      # Called on every key input
             on_blur=self.on_new_item_blur,          # Called when clicking off the textfield or after submitting
             autofocus=True,
-            visible=False
+            visible=False,
+            text_style=self.text_style
         )
 
         # Calling initial rail to reload
