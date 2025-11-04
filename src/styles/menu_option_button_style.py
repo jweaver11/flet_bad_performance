@@ -5,5 +5,5 @@ import flet as ft
 
 menu_option_button_style = ft.ButtonStyle(
     #color=ft.Colors.GREY_300,
-    bgcolor=ft.Colors.SURFACE,
+    #bgcolor=ft.Colors.SURFACE,
 )

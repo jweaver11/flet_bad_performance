@@ -88,6 +88,11 @@ class Rail(ft.Container):
             
             if os.path.normcase(os.path.normpath(key)) == new_key:
                 self.item_is_unique = False
+
+        for key in self.story.characters.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key:
+                self.item_is_unique = False
                 
         # If we are NOT unique, show our error text
         if not self.item_is_unique:
@@ -163,6 +168,9 @@ class Rail(ft.Container):
             # New Notes
             elif tag == "note":
                 self.story.create_note(title)
+
+            elif tag == "character":
+                self.story.create_character(title)
 
     # Called when changes occure that require rail to be reloaded. Should be overwritten by children
     def reload_rail(self) -> ft.Control:

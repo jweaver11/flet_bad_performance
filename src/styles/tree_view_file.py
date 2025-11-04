@@ -29,10 +29,14 @@ class Tree_View_File(ft.GestureDetector):
 
         elif tag == "note":
             self.icon = ft.Icons.COMMENT_OUTLINED
-            self.icon.scale = 0.8
+            
+
+        elif tag == "character":
+            self.icon = ft.Icons.PERSON_OUTLINED
 
         else:
             self.icon = ft.Icons.FOLDER_OUTLINED
+            
 
         # Set our text style
         self.text_style = ft.TextStyle(
@@ -256,8 +260,7 @@ class Tree_View_File(ft.GestureDetector):
             self.reload()
             self.widget.reload_widget()
             self.widget.story.workspace.reload_workspace()
-            #self.widget.p.update()
-            #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
+            
 
         # List of available colors
         colors = [
@@ -317,7 +320,7 @@ class Tree_View_File(ft.GestureDetector):
             expand=True, 
             padding=ft.Padding(0, 2, 5, 2),
             content=ft.Draggable(
-                group="widget",
+                group="rail",
                 content_feedback=self.content,
                 content=ft.GestureDetector(
                     mouse_cursor=ft.MouseCursor.CLICK,

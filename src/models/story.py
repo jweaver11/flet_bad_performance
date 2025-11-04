@@ -782,7 +782,7 @@ class Story(ft.View):
             left=self.mouse_x,     # Positions the menu at the mouse location
             top=self.mouse_y,
             border_radius=ft.border_radius.all(4),
-            bgcolor=ft.Colors.ON_SECONDARY,
+            bgcolor=ft.Colors.ON_PRIMARY,
             padding=2,
             content=ft.Column(controls=menu_options),
         )

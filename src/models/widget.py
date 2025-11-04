@@ -78,7 +78,7 @@ class Widget(ft.Container):
         self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
 
         # Called at end of constructor for all child widgets to build their view
-        self.reload_widget()
+        #self.reload_widget()
 
     # Called whenever there are changes in our data
     def save_dict(self):
@@ -277,6 +277,7 @@ class Widget(ft.Container):
     def reload_tab(self):
         ''' Creates our tab for our widget that has the title and hide icon '''
 
+        # Grabs our tag to determine the icon we'll use
         tag = self.data.get('tag', None)
 
         if tag is None:
@@ -297,6 +298,7 @@ class Widget(ft.Container):
         else:
             icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
         
+        # Set the color and size
         icon.color = self.data['color']
         icon.scale = 0.8
 

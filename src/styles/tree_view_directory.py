@@ -49,6 +49,7 @@ class Tree_View_Directory(ft.GestureDetector):
             text_style=self.text_style
         )
 
+        gd = ft.GestureDetector()
         # Parent constructor
         super().__init__(
             mouse_cursor=ft.MouseCursor.CLICK,
@@ -304,7 +305,33 @@ class Tree_View_Directory(ft.GestureDetector):
         self.p.update()
 
     def character_check(self, e):
-        pass
+
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.directory_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Check our chapters
+        for key in self.story.characters.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Title must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+            
+        self.p.update()
 
     def map_check(self, e):
         pass
@@ -325,7 +352,6 @@ class Tree_View_Directory(ft.GestureDetector):
             
         # Otherwise make sure we show our error
         else:
-            #self.new_item_textfield.error_text = "Sub-Category already exists"
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.p.update()
 
@@ -345,7 +371,6 @@ class Tree_View_Directory(ft.GestureDetector):
             
         # Otherwise make sure we show our error
         else:
-            self.new_item_textfield.error_text = "Chapter name already exists"
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.p.update()
 
@@ -365,12 +390,27 @@ class Tree_View_Directory(ft.GestureDetector):
             
         # Otherwise make sure we show our error
         else:
-            self.new_item_textfield.error_text = "Chapter name already exists"
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.p.update()
 
     def character_submit(self, e):
-        pass
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_character(
+                directory_path=self.directory_path,
+                title=title,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
 
     def map_submit(self, e):
         pass
@@ -565,14 +605,15 @@ class Tree_View_Directory(ft.GestureDetector):
             dense=True,
             initially_expanded=self.is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
-            controls_padding=ft.Padding(10, 0, 0, 0),
+            controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented
             leading=ft.Icon(ft.Icons.FOLDER_OUTLINED, color=self.color),
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
+            adaptive=True,
             bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
-            controls=[self.new_item_textfield],
+            controls=[self.new_item_textfield], 
         )
 
         self.content = expansion_tile
