@@ -43,6 +43,10 @@ class Rail(ft.Container):
             text_style=self.text_style
         )
 
+        # State variables used for our UI to track logic
+        self.item_is_unique = True          # If the new category, chapter, note, etc. title is unique within its directory
+        self.are_submitting = False         # If we are currently submitting this item
+
         # Calling initial rail to reload
         #self.reload_rail()
 

@@ -1,6 +1,7 @@
 import flet as ft
 from models.story import Story
 import os
+from styles.menu_option_style import Menu_Option_Style
 
 # Expansion tile for all sub directories (folders) in a directory
 class Tree_View_Directory(ft.GestureDetector):
@@ -67,21 +68,20 @@ class Tree_View_Directory(ft.GestureDetector):
 
         # Declare our menu options list, and add our category option first
         menu_options = [
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=lambda e: self.new_item_clicked(type="category"),
-                expand=True,
                 content=ft.Row([
                     ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
-                    ft.Text("Sub-Category", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Sub-Category", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
         ]
 
-        # Run through our additional menu options if we have any, and add them
+        # Run through our additional menu options if we have any, and set their on_click methods
         for option in self.additional_menu_options or []:
 
             # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_click = lambda e, t=option.data: self.new_item_clicked(type=t)
+            option.on_tap = lambda e, t=option.data: self.new_item_clicked(type=t)
 
             # Add them to the list
             menu_options.append(option)
@@ -89,8 +89,7 @@ class Tree_View_Directory(ft.GestureDetector):
         # Add our remaining built in options: rename, color change, delete
         menu_options.extend([
             # Rename button
-            ft.TextButton(
-                expand=True,
+            Menu_Option_Style(
                 on_click=self.rename_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
@@ -103,29 +102,32 @@ class Tree_View_Directory(ft.GestureDetector):
             ),
 
             # Color changing popup menu
-            ft.PopupMenuButton(
-                expand=True,
-                tooltip="",
-                padding=ft.Padding(10,0,0,0),
-                content=ft.Row(
+            Menu_Option_Style(
+                content=ft.PopupMenuButton(
                     expand=True,
-                    controls=[
-                        ft.Container(),   # Spacer
-                        ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
-                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
-                        ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
-                    ]
-                ),
-                items=self.get_color_options()
+                    tooltip="",
+                    padding=None,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            #ft.Container(),   # Spacer
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
+                            ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                            ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
+                            ft.Container(expand=True)
+                        ]
+                    ),
+                    items=self.get_color_options()
+                )
             ),
         
             # Delete button
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=lambda e: self.delete_clicked(e),
-                expand=True,
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
                     ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
+                    ft.Container(expand=True),   # Spacer to push text to left
                 ]),
             ),
         ])
@@ -138,6 +140,7 @@ class Tree_View_Directory(ft.GestureDetector):
         ''' Makes sure our state and data match the updated expanded/collapsed state '''
 
         self.is_expanded = not self.is_expanded
+
         self.story.change_folder_data(
             directory_path=self.directory_path,
             key='is_expanded',
@@ -180,7 +183,7 @@ class Tree_View_Directory(ft.GestureDetector):
         # Check our expanded state. Rebuild if needed
         if self.is_expanded == False:
             self.toggle_expand()
-            self.story.active_rail.content.reload_rail()
+            self.reload()
 
         # Close the menu, which will also update the page
         self.story.close_menu()
@@ -424,9 +427,6 @@ class Tree_View_Directory(ft.GestureDetector):
         self.is_unique = True
         self.are_submitting = False
 
-        # Grab our current name for comparison
-        current_name = self.title
-
         # Called when clicking outside the input field to cancel renaming
         def _cancel_rename(e):
             ''' Puts our name back to static and unalterable '''
@@ -435,7 +435,7 @@ class Tree_View_Directory(ft.GestureDetector):
 
             # Since this auto calls on submit, we need to check. If it is cuz of a submit, do nothing
             if self.are_submitting:
-                submitting = not submitting     # Change submit status to False so we can de-select the textbox
+                self.are_submitting = not self.are_submitting     # Change submit status to False so we can de-select the textbox
                 return
             
             # Otherwise we're not submitting (just clicking off the textbox), so we cancel the rename
@@ -448,10 +448,10 @@ class Tree_View_Directory(ft.GestureDetector):
         def _name_check(e):
             ''' Checks if the name is unique within its type of widget '''
 
-            # Grab the new name, and tag
-            name = e.control.value
+            nonlocal text_field
 
-            # Nonlocal variables
+            # Grab the new name
+            new_name = text_field.value
 
              # Set submitting to false, and unique to True
             self.are_submitting = False
@@ -459,9 +459,17 @@ class Tree_View_Directory(ft.GestureDetector):
         
 
             for key in self.story.data['folders'].keys():
-                if key == self.directory_path + "\\" + self.title:
-                    self.is_unique = False
 
+                # If there is no change, skip the checks
+                if new_name.capitalize() == self.title:
+                    break
+
+                # Give us our would-be path to compare
+                nk = self.directory_path[:self.directory_path.rfind("\\")+1] + new_name
+                
+                if os.path.normcase(os.path.normpath(key)) == os.path.normcase(os.path.normpath(nk)):
+                    self.is_unique = False
+           
 
             # Give us our error text if not unique
             if not self.is_unique:
@@ -476,20 +484,27 @@ class Tree_View_Directory(ft.GestureDetector):
         def _submit_name(e):
             ''' Checks that we're unique and renames the widget if so. on_blur is auto called after this, so we handle that as well '''
 
-            # Get our name and check if its unique
-            name = e.control.value
-
-            # Non local variables
             nonlocal text_field
-            
 
+            # Get our name and check if its unique
+            new_name = text_field.value
+            
             # Set submitting to True
             self.are_submitting = True
 
             # If it is, call the rename function. It will do everything else
             if self.is_unique:
-                #self.widget.rename(name)
-                print("We're unique!")
+
+                new_path = self.directory_path[:self.directory_path.rfind("\\")+1] + new_name
+                
+                self.story.rename_folder(
+                    old_path=self.directory_path,
+                    new_path=new_path
+                )
+
+
+                self.story.active_rail.content.reload_rail()
+                
                 
             # Otherwise make sure we show our error
             else:
@@ -616,6 +631,14 @@ class Tree_View_Directory(ft.GestureDetector):
             controls=[self.new_item_textfield], 
         )
 
+        # Re-adds our content controls so we can keep states
+        if self.content is not None:        # Protects against first loads
+            if self.content.controls is not None:
+                for control in self.content.controls:
+                    if control != self.new_item_textfield:      # Don't re-add our textfield, its already there
+                        expansion_tile.controls.append(control)
+        
+        # Set the content
         self.content = expansion_tile
         
 

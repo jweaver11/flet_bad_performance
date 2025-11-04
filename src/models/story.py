@@ -251,6 +251,8 @@ class Story(ft.View):
 
             folder_path = os.path.join(directory_path, name)
 
+            name = name.capitalize()
+
             # Make the folder in our storage if it doesn't already exist
             os.makedirs(folder_path, exist_ok=True) 
             # Add this folder to our folders data so we can save stuff like colors
@@ -299,6 +301,31 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             print(f"Error changing folder data: {e}")
+
+    def rename_folder(self, old_path: str, new_path: str):
+        ''' Renames the folder/category in our story structure '''
+
+        # Does the actual renaming
+        os.rename(old_path, new_path)
+
+        print("Renaming folder from ", old_path, " to ", new_path)
+        for key in self.data['folders'].keys():
+            print("Existing folder key: ", key)
+
+        # Update the old key in our folders data
+        if old_path in self.data['folders']:
+            print("Updating old path in story data")
+            self.data['folders'][new_path] = self.data['folders'].pop(old_path)
+            self.save_dict()
+
+        # Go through each widget and update its directory path if it was in the renamed folder
+        for widget in self.widgets:
+            if widget.directory_path.startswith(old_path):
+                # Update the directory path
+                relative_path = widget.directory_path[len(old_path):]
+                widget.directory_path = new_path + relative_path
+                widget.save_dict()  # Save the updated widget data
+                print("Updated widget directory path to ", widget.title, " to ", widget.directory_path)
 
     
     def move_file(self, new_path: str):

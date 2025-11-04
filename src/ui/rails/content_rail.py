@@ -5,6 +5,7 @@ import os
 from models.story import Story
 from ui.rails.rail import Rail
 from handlers.tree_view import load_directory_data
+from styles.menu_option_style import Menu_Option_Style
 
 
 # Class is created in main on program startup
@@ -19,10 +20,6 @@ class Content_Rail(Rail):
             story=story,
             directory_path=story.data['content_directory_path']
         )
-
-        # State variables used for our UI to track logic
-        self.item_is_unique = True          # If the new category, chapter, note, etc. title is unique within its directory
-        self.are_submitting = False         # If we are currently submitting this item
 
         # UI elements for easier referencing later
         self.new_chapter_textfield = ft.TextField(  
@@ -82,25 +79,26 @@ class Content_Rail(Rail):
             
         # Builds our buttons that are our options in the menu
         return [
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_category_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
-                    ft.Text("Category", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Category", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_chapter_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
-                    ft.Text("Chapter", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Chapter", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_note_clicked,
-                content=ft.Row([
+                content=ft.Row(expand=True, controls=[
                     ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
-                    ft.Text("Note", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Note", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ft.Container(expand=True)
                 ])
             ),
 
@@ -109,22 +107,20 @@ class Content_Rail(Rail):
     
     def get_sub_menu_options(self) -> list[ft.Control]:
         return [
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_chapter_clicked,
-                expand=True,
                 data="chapter",
                 content=ft.Row([
                     ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
-                    ft.Text("Chapter", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Chapter", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_note_clicked,
-                expand=True,
                 data="note",
                 content=ft.Row([
                     ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
-                    ft.Text("Note", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Note", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
         ]
@@ -176,10 +172,6 @@ class Content_Rail(Rail):
             spacing=0,
             controls=[]
         )
-        # Append our hiddent textfields for creating new categories, chapters, and notes
-        content.controls.append(self.new_category_textfield)
-        content.controls.append(self.new_chapter_textfield)
-        content.controls.append(self.new_note_textfield)
 
         # Load our content directory data into the rail
         load_directory_data(
@@ -189,6 +181,11 @@ class Content_Rail(Rail):
             column=content,
             additional_menu_options=self.get_sub_menu_options()
         )
+
+        # Append our hiddent textfields for creating new categories, chapters, and notes
+        content.controls.append(self.new_category_textfield)
+        content.controls.append(self.new_chapter_textfield)
+        content.controls.append(self.new_note_textfield)
 
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(
