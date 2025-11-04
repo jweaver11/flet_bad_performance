@@ -8,7 +8,7 @@ class Tree_View_Directory(ft.GestureDetector):
 
     def __init__(
         self, 
-        directory_path: str,                                    # Full path to this directory
+        full_path: str,                                    # Full path to this directory
         title: str,                                             # Title of this folder
         story: Story,                                           # Story reference for mouse positions and other logic
         page: ft.Page,                                          # Page reference for overlay menu
@@ -19,7 +19,7 @@ class Tree_View_Directory(ft.GestureDetector):
     ):
         
         # Reference for all our passed in data
-        self.directory_path = directory_path
+        self.full_path = full_path
         self.title = title
         self.story = story
         self.p = page
@@ -142,7 +142,7 @@ class Tree_View_Directory(ft.GestureDetector):
         self.is_expanded = not self.is_expanded
 
         self.story.change_folder_data(
-            directory_path=self.directory_path,
+            full_path=self.full_path,
             key='is_expanded',
             value=self.is_expanded
         )
@@ -229,7 +229,7 @@ class Tree_View_Directory(ft.GestureDetector):
         title = e.control.value
 
         # Generate our new key to compare. Requires normalization
-        nk = self.directory_path + "\\" + title
+        nk = self.full_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
         # Compare all our folders that would be inside of this folder, and check for uniqueness
@@ -258,7 +258,7 @@ class Tree_View_Directory(ft.GestureDetector):
         title = e.control.value
 
         # Generate our new key to compare. Requires normalization
-        nk = self.directory_path + "\\" + title
+        nk = self.full_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
         # Check our chapters
@@ -287,7 +287,7 @@ class Tree_View_Directory(ft.GestureDetector):
         title = e.control.value
 
         # Generate our new key to compare. Requires normalization
-        nk = self.directory_path + "\\" + title
+        nk = self.full_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
         # Check our chapters
@@ -316,7 +316,7 @@ class Tree_View_Directory(ft.GestureDetector):
         title = e.control.value
 
         # Generate our new key to compare. Requires normalization
-        nk = self.directory_path + "\\" + title
+        nk = self.full_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
         # Check our chapters
@@ -349,7 +349,7 @@ class Tree_View_Directory(ft.GestureDetector):
         # If it is, call the rename function. It will do everything else
         if self.item_is_unique:
             self.story.create_folder(
-                directory_path=self.directory_path,
+                directory_path=self.full_path,
                 name=name,
             )
             
@@ -368,7 +368,7 @@ class Tree_View_Directory(ft.GestureDetector):
         # If it is, call the rename function. It will do everything else
         if self.item_is_unique:
             self.story.create_chapter(
-                directory_path=self.directory_path,
+                directory_path=self.full_path,
                 title=title,
             )
             
@@ -387,7 +387,7 @@ class Tree_View_Directory(ft.GestureDetector):
         # If it is, call the rename function. It will do everything else
         if self.item_is_unique:
             self.story.create_note(
-                directory_path=self.directory_path,
+                directory_path=self.full_path,
                 title=title,
             )
             
@@ -406,7 +406,7 @@ class Tree_View_Directory(ft.GestureDetector):
         # If it is, call the rename function. It will do everything else
         if self.item_is_unique:
             self.story.create_character(
-                directory_path=self.directory_path,
+                directory_path=self.full_path,
                 title=title,
             )
             
@@ -465,7 +465,7 @@ class Tree_View_Directory(ft.GestureDetector):
                     break
 
                 # Give us our would-be path to compare
-                nk = self.directory_path[:self.directory_path.rfind("\\")+1] + new_name
+                nk = self.full_path[:self.full_path.rfind("\\")+1] + new_name
                 
                 if os.path.normcase(os.path.normpath(key)) == os.path.normcase(os.path.normpath(nk)):
                     self.is_unique = False
@@ -495,10 +495,10 @@ class Tree_View_Directory(ft.GestureDetector):
             # If it is, call the rename function. It will do everything else
             if self.is_unique:
 
-                new_path = self.directory_path[:self.directory_path.rfind("\\")+1] + new_name
+                new_path = self.full_path[:self.full_path.rfind("\\")+1] + new_name
                 
                 self.story.rename_folder(
-                    old_path=self.directory_path,
+                    old_path=self.full_path,
                     new_path=new_path
                 )
 
@@ -540,7 +540,7 @@ class Tree_View_Directory(ft.GestureDetector):
             ''' Passes in our kwargs to the widget, and applies the updates '''
 
             # Change the data
-            self.story.change_folder_data(self.directory_path, 'color', color)
+            self.story.change_folder_data(self.full_path, 'color', color)
             self.color = color
             
             # Change our icon to match, apply the update
@@ -583,7 +583,7 @@ class Tree_View_Directory(ft.GestureDetector):
             ''' Deletes the widget after confirmation '''
 
             self.p.close(dlg)
-            self.story.delete_folder(self.directory_path)
+            self.story.delete_folder(self.full_path)
             self.story.close_menu()
             
 

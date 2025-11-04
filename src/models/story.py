@@ -266,15 +266,15 @@ class Story(ft.View):
             print(f"Error creating folder: {e}")
         
     # Called when deleting a folder/category from our story
-    def delete_folder(self, directory_path: str):
+    def delete_folder(self, full_path: str):
         ''' Deletes a category from our story structure '''
 
         try:
             # Delete the folder from storage
-            shutil.rmtree(directory_path)
+            shutil.rmtree(full_path)
 
             # Remove it from data
-            self.data['folders'].pop(directory_path, None)
+            self.data['folders'].pop(full_path, None)
 
             self.save_dict()
 
@@ -285,18 +285,18 @@ class Story(ft.View):
             print(f"Error deleting folder: {e}")
 
     # Called when changing folder metadata, like color or is expanded or not
-    def change_folder_data(self, directory_path: str, key: str, value):
+    def change_folder_data(self, full_path: str, key: str, value):
         ''' Changes our folder metadata inside of our story data '''
-        #print("Changing folder data:", directory_path, key, value)
+        #print("Changing folder data:", full_path, key, value)
 
         try:
             # Check if the folder exists in our data
-            if directory_path in self.data['folders']:
-                self.data['folders'][directory_path][key] = value
+            if full_path in self.data['folders']:
+                self.data['folders'][full_path][key] = value
                 self.save_dict()
-                #print("Changed folder data:", directory_path, key, value)
+                #print("Changed folder data:", full_path, key, value)
             else:
-                print(f"Folder {directory_path} not found in story data.")
+                print(f"Folder {full_path} not found in story data.")
 
         # Handle errors
         except Exception as e:
@@ -308,13 +308,9 @@ class Story(ft.View):
         # Does the actual renaming
         os.rename(old_path, new_path)
 
-        print("Renaming folder from ", old_path, " to ", new_path)
-        for key in self.data['folders'].keys():
-            print("Existing folder key: ", key)
-
         # Update the old key in our folders data
         if old_path in self.data['folders']:
-            print("Updating old path in story data")
+            #print("Updating old path in story data")
             self.data['folders'][new_path] = self.data['folders'].pop(old_path)
             self.save_dict()
 
@@ -325,7 +321,7 @@ class Story(ft.View):
                 relative_path = widget.directory_path[len(old_path):]
                 widget.directory_path = new_path + relative_path
                 widget.save_dict()  # Save the updated widget data
-                print("Updated widget directory path to ", widget.title, " to ", widget.directory_path)
+                #print("Updated widget directory path to ", widget.title, " to ", widget.directory_path)
 
     
     def move_file(self, new_path: str):

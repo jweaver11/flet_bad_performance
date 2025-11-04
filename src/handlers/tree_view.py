@@ -77,7 +77,7 @@ def load_directory_data(
 
             # Create the expansion tile here
             new_expansion_tile = Tree_View_Directory(
-                directory_path=full_path,
+                full_path=full_path,
                 title=capital_dir_path,
                 story=story,
                 page=page,
