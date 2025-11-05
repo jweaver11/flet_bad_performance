@@ -52,27 +52,27 @@ class Workspace(ft.Container):
         self.top_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.top_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
+            on_accept=lambda e: self.pin_drag_accept(e, "top"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.left_pin_drag_target = ft.DragTarget(
             group="widgets",
             content=ft.Container(expand=True, width=self.minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.left_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
+            on_accept=lambda e: self.pin_drag_accept(e, "left"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.main_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, height=self.minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.main_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
+            on_accept=lambda e: self.pin_drag_accept(e, "main"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.right_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, width=self.minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=self.right_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
+            on_accept=lambda e: self.pin_drag_accept(e, "right"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.bottom_pin_drag_target = ft.DragTarget(
             group="widgets", 
             content=ft.Container(expand=True, height=self.minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0),
-            on_accept=self.bottom_pin_drag_accept, on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
+            on_accept=lambda e: self.pin_drag_accept(e, "bottom"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
 
         self.pin_drag_targets = [
@@ -108,11 +108,77 @@ class Workspace(ft.Container):
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
         #self.reload_workspace() 
 
+    # When a draggable starts dragging, we add our drag targets to the master stack
+    def show_pin_drag_targets(self):
+        ''' Adds our drag targets to the master stack so we can drop our widgets into pin locations '''
+
+        if self.pin_drag_targets not in self.master_stack.controls:
+            self.master_stack.controls.extend(self.pin_drag_targets)
+            self.master_stack.update()
+
+        self.p.update()
+
+    # Called whenever a drag target accepts a draggable
+    def remove_drag_targets(self):
+        ''' Removes our drag targets from the master stack, otherwise they sit overtop our widgets and get in the way '''
+
+        for target in self.pin_drag_targets:
+            if target in self.master_stack.controls:
+                self.master_stack.controls.remove(target)
+        self.master_stack.update()
+
+    # Called when a draggable hovers over a drag target before dropping
+    def on_hover_pin_drag_target(self, e):
+        ''' Makes the drag target visible for so visual feedback '''
+
+        e.control.content.opacity = .5
+        e.control.content.update()
+       
+    # Called when a draggable leaves a drag target
+    def on_stop_hover_drag_target(self, e):
+        ''' Makes the drag target invisible again '''
+
+        e.control.content.opacity = 0
+        e.control.content.update()
+        
+    # Accepting drags for our five pin locations
+    def pin_drag_accept(self, e, pin_location: str):
+
+        # Reset our container to be invisible again
+        e.control.content.opacity = 0
+        e.control.content.update()
+
+        self.remove_drag_targets()  # Remove our drag targets from the stack, since we have completed our drag
+
+        # Load our event data
+        event_data = json.loads(e.data)
+        # Save the src id from the data so we can find our draggable
+        src_id = event_data.get("src_id")
+        
+        # Save our draggable so we can load its data
+        draggable = e.page.get_control(src_id)
+            
+        # Set object variable to our object
+        widget = draggable.data
+                
+
+        # Set our objects pin location to the correct new location
+        widget.data['pin_location'] = pin_location  
+        
+        # Make sure our widget is visible if it was dragged from the rail
+        if not widget.visible:
+            widget.toggle_visibility()      # This will save dict as well
+        else:
+            widget.save_dict()  
+
+        # Apply to UI
+        self.reload_workspace()
+        
+        print(f"{pin_location} pin accepted")
+
     # Called when we need to reload our workspace content, especially after pin drags
     def reload_workspace(self):
         ''' Reloads our workspace content by clearing and re-adding our 5 pin locations to the master row '''
-
-        from handlers.arrange_widgets import arrange_widgets
 
         arrange_widgets(self.story)
 
@@ -438,209 +504,6 @@ class Workspace(ft.Container):
         
         self.p.update()
 
-    # When a draggable starts dragging, we add our drag targets to the master stack
-    def show_pin_drag_targets(self):
-        #print("show_pin_drag_targets called")
-        
-        # Only add drag targets if they're not already in the stack
-        if self.pin_drag_targets not in self.master_stack.controls:
-            self.master_stack.controls.extend(self.pin_drag_targets)
-            self.master_stack.update()
-        else:
-            print("drag targets already in master stack. This is an error")
-
-        self.p.update()
-
-
-    # Called whenever a drag target accepts a draggable
-    # Removes our drag targets from the stack, otherwise they sit overtop our widgets and break the program
-    def remove_drag_targets(self):
-        #print("remove drag_targets called")
-        # Remove all our drag targets when a drag is complete
-        for target in self.pin_drag_targets:
-            if target in self.master_stack.controls:
-                self.master_stack.controls.remove(target)
-        self.master_stack.update()
-
-    # Called when a draggable hovers over a drag target before dropping
-    # Makes the drag target visible to notify apps they can drop here
-    def on_hover_pin_drag_target(self, e):
-        # e.control = whichever drag target is calling this method
-        e.control.content.opacity = .5
-        e.control.content.update()
-        #print("Hovered over a drag target")
-        
-    # Called when a draggable leaves a drag target
-    # Makes the drag target invisible again
-    def on_stop_hover_drag_target(self, e):
-        e.control.content.opacity = 0
-        e.control.content.update()
-        #print("Left a drag target")
-
-
-    # Accepting drags for our five pin locations
-    def top_pin_drag_accept(self, e):
-
-
-        # Grab out widget better than this, jeeez
-
-        # Reset our container to be invisible again
-        e.control.content.opacity = 0
-        e.control.content.update()
-
-        self.remove_drag_targets()  # Remove our drag targets from the stack, since we have completed our drag
-
-        # Grab our object from e.data, which is is a JSON string, so we have to parse it
-        event_data = json.loads(e.data)
-        src_id = event_data.get("src_id")
-        
-        if src_id:
-            # Get the Draggable control by ID. our object is stored in its data
-            draggable = e.page.get_control(src_id)
-            if draggable:
-                # Set object variable to our object
-                object = draggable.data
-                
-            else:
-                print("Could not find control with src_id:", src_id)
-        else:
-            print("src_id not found in event data")
-
-        # Set our objects pin location to the correct new location
-        object.data['pin_location'] = "top"  
-        
-        # Make sure our widget is visible if it was dragged from the rail
-        if not object.visible:
-            object.toggle_visibility()      # This will save dict as well
-        else:
-            object.save_dict()  
-
-        # Apply to UI
-        self.reload_workspace()
-        
-        print("top pin accepted")
-
-    # Left drag accept
-    def left_pin_drag_accept(self, e):
-        e.control.content.opacity = 0
-        e.control.content.update()
-
-        self.remove_drag_targets() 
-
-        event_data = json.loads(e.data)
-        src_id = event_data.get("src_id")
-        
-        if src_id:
-            draggable = e.page.get_control(src_id)
-            if draggable:
-                object = draggable.data
-            else:
-                print("Could not find control with src_id:", src_id)
-        else:
-            print("src_id not found in event data")
-
-        
-        object.data['pin_location'] = "left"
-           
-            # Make sure our widget is visible if it was dragged from the rail
-        if not object.visible:
-            object.toggle_visibility()      # This will save dict as well
-        else:
-            object.save_dict()  
-     
-        self.reload_workspace() 
-        
-        print("left pin accepted")
-
-    # Main drag accept
-    def main_pin_drag_accept(self, e):
-        e.control.content.opacity = 0
-        e.control.content.update()
-        
-        self.remove_drag_targets() 
-
-        event_data = json.loads(e.data)
-        src_id = event_data.get("src_id")
-        
-        if src_id:
-            draggable = e.page.get_control(src_id)
-            if draggable:
-                object = draggable.data
-            else:
-                print("Could not find control with src_id:", src_id)
-        else:
-            print("src_id not found in event data")
-
-        object.data['pin_location'] = "main"
-
-        # Make sure our widget is visible if it was dragged from the rail
-        if not object.visible:
-            object.toggle_visibility()      # This will save dict as well
-        else:
-            object.save_dict()  
-             
-        self.reload_workspace() 
-        
-        print("main pin accepted")
-
-    # Right drag accept
-    def right_pin_drag_accept(self, e):
-        e.control.content.opacity = 0
-        e.control.content.update()
-        
-        self.remove_drag_targets() 
-
-        event_data = json.loads(e.data)
-        src_id = event_data.get("src_id")
-        
-        if src_id:
-            draggable = e.page.get_control(src_id)
-            if draggable:
-                object = draggable.data
-            else:
-                print("Could not find control with src_id:", src_id)
-        else:
-            print("src_id not found in event data")
-
-        object.data['pin_location'] = "right"
-
-        # Make sure our widget is visible if it was dragged from the rail
-        if not object.visible:
-            object.toggle_visibility()      # This will save dict as well
-        else:
-            object.save_dict()  
-     
-        self.reload_workspace()  
-        
-        print("right pin accepted")
-
-    def bottom_pin_drag_accept(self, e):
-        e.control.content.opacity = 0
-        e.control.content.update()
-        
-        self.remove_drag_targets() 
-
-        event_data = json.loads(e.data)
-        src_id = event_data.get("src_id")
-        
-        if src_id:
-            draggable = e.page.get_control(src_id)
-            if draggable:
-                object = draggable.data
-            else:
-                print("Could not find control with src_id:", src_id)
-        else:
-            print("src_id not found in event data")
-
-        object.data['pin_location'] = "bottom"
-        
-        # Make sure our widget is visible if it was dragged from the rail
-        if not object.visible:
-            object.toggle_visibility()      # This will save dict as well
-        else:
-            object.save_dict()  
-      
-        self.reload_workspace()  
         
 
 
