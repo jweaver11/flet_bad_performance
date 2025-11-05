@@ -107,37 +107,51 @@ class Rail(ft.Container):
         # Start out assuming we are unique
         self.item_is_unique = True
 
-        # Grab out title from the textfield, and set our new key to compare
+        # Grab out title and tag from the textfield, and set our new key to compare
         title = e.control.value
+        tag = e.control.data
 
         # Generate our new key to compare. Requires normalization
         nk = self.directory_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
-        
         # Check all our folders and compare them to the new key
-        for key in self.story.data['folders'].keys():
-            
-            # Path comparisons require normalization
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        if tag == "category":
+            for key in self.story.data['folders'].keys():
+                
+                # Path comparisons require normalization
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
                 
         # Check our chapters
-        for key in self.story.chapters.keys():
-            
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        elif tag == "chapter":
+            for key in self.story.chapters.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
 
         # Check our notes
-        for key in self.story.notes.keys():
-            
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        elif tag == "note":
+            for key in self.story.notes.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
 
-        for key in self.story.characters.keys():
-            
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        # Check our characters
+        elif tag == "character":
+            for key in self.story.characters.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
+
+        # Check our timelines
+        elif tag == "timeline":
+            for key in self.story.timelines.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
+
+        # Check our maps
+        elif tag == "map":
+            for key in self.story.maps.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
                 
         # If we are NOT unique, show our error text
         if not self.item_is_unique:
@@ -209,8 +223,17 @@ class Rail(ft.Container):
             elif tag == "note":
                 self.story.create_note(title)
 
+            # New Characters
             elif tag == "character":
                 self.story.create_character(title)
+
+            # New Timelines
+            elif tag == "timeline":
+                self.story.create_timeline(title)
+
+            # New Maps
+            elif tag == "map":
+                self.story.create_map(title)
 
     # Called when changes occure that require rail to be reloaded. Should be overwritten by children
     def reload_rail(self) -> ft.Control:

@@ -101,6 +101,10 @@ def load_directory_data(
 
             # Get rid of the extension and capitalize the name
             name = os.path.splitext(file_name)[0] 
+
+            # Skip any map display files
+            if name.endswith("_display"):
+                continue
           
             # Find our widget based on the filename
             for widget in story.widgets:

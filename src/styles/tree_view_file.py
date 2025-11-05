@@ -31,12 +31,14 @@ class Tree_View_File(ft.GestureDetector):
         elif tag == "note":
             self.icon = ft.Icons.COMMENT_OUTLINED
             
-
         elif tag == "character":
             self.icon = ft.Icons.PERSON_OUTLINED
 
+        elif tag == "map":
+            self.icon = ft.Icons.MAP_OUTLINED
+
         else:
-            self.icon = ft.Icons.FOLDER_OUTLINED
+            self.icon = ft.Icons.ERROR_OUTLINE
             
 
         # Set our text style

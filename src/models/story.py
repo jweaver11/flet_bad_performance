@@ -49,6 +49,7 @@ class Story(ft.View):
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
                 'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
+                'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
                 'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
                 'top_pin_height': int,
                 'left_pin_width': int,
@@ -352,6 +353,14 @@ class Story(ft.View):
                 if widget.data['key'] in self.characters.keys():
                     del self.characters[widget.data['key']]
 
+            elif tag == "timeline":
+                if widget.data['key'] in self.timelines.keys():
+                    del self.timelines[widget.data['key']]
+
+            elif tag == "map":
+                if widget.data['key'] in self.maps.keys():
+                    del self.maps[widget.data['key']]
+
             
             # Remove from our master widgets list so it won't be rendered anymore
             if widget in self.widgets:
@@ -611,6 +620,8 @@ class Story(ft.View):
             if len(self.maps) == 0:
                 #print("No world maps found, creating default world map")
                 self.create_map(title="World Map", father=None, category="world")
+
+            print(f"Loaded {len(self.maps)} maps into story '{self.title}'")
 
         # Catch errors
         except Exception as e:

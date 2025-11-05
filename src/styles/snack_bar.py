@@ -9,5 +9,6 @@ class Snack_Bar(ft.SnackBar):
             elevation=4,
             content=content,
             padding=None,
+            shape=ft.RoundedRectangleBorder(radius=8),
         )
         

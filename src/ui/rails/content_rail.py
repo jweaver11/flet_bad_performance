@@ -21,29 +21,6 @@ class Content_Rail(Rail):
             directory_path=story.data['content_directory_path']
         )
 
-        # UI elements for easier referencing later
-        self.new_chapter_textfield = ft.TextField(  
-            hint_text="Chapter Name",
-            data="chapter",
-            on_submit=self.submit_item,
-            on_change=self.on_new_item_change,
-            on_blur=self.on_new_item_blur,
-            autofocus=True,
-            visible=False,
-            text_style=self.text_style
-        )
-
-        self.new_note_textfield = ft.TextField(  
-            hint_text="Note Name",
-            data="note",
-            on_submit=self.submit_item,
-            on_change=self.on_new_item_change,
-            on_blur=self.on_new_item_blur,
-            autofocus=True,
-            visible=False,
-            text_style=self.text_style,
-        )
-
         # Reload the rail on start
         self.reload_rail()
 
@@ -142,6 +119,7 @@ class Content_Rail(Rail):
         # Creating a chapter for comics creates a folder to store images and drawings
         # Creating a chapter for novels creates a text document for writing, and allows
         # Right clicking allows to upload
+
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             
@@ -183,7 +161,7 @@ class Content_Rail(Rail):
         load_directory_data(
             page=self.p,
             story=self.story,
-            directory=self.story.data['content_directory_path'],
+            directory=self.directory_path,
             column=content,
             additional_menu_options=self.get_sub_menu_options()
         )
@@ -194,13 +172,21 @@ class Content_Rail(Rail):
         # Add container to the bottom to make sure the drag target and gesture detector fill the rest of the space
         content.controls.append(ft.Container(expand=True))
 
+        # Wrap the gd in a drag target so we can move characters here
+        dt = ft.DragTarget(
+            group="widgets",
+            content=content,     # Our content is the content we built above
+            on_accept=lambda e: self.on_drag_accept(e, self.directory_path)
+        )
+
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(
             expand=True,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
-            content=content
+            content=dt,
         )
 
+        # Set our content to be a column
         self.content = ft.Column(
             spacing=0,
             expand=True,
@@ -210,7 +196,6 @@ class Content_Rail(Rail):
                 gd
             ]
         )
-        #self.content = content
         
         # Apply our update
         self.p.update()

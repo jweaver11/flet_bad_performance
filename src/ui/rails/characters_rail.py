@@ -21,18 +21,6 @@ class Characters_Rail(Rail):
             directory_path=story.data['characters_directory_path']
         )
 
-        # UI elements for easier referencing later
-        self.new_character_textfield = ft.TextField(  
-            hint_text="Character Name",
-            data="character",
-            on_submit=self.submit_item,
-            on_change=self.on_new_item_change,
-            on_blur=self.on_new_item_blur,
-            autofocus=True,
-            visible=False,
-            text_style=self.text_style
-        )
-
         # Reload the rail on start
         self.reload_rail()
 
@@ -129,7 +117,7 @@ class Characters_Rail(Rail):
         load_directory_data(
             page=self.p,
             story=self.story,
-            directory=self.story.data['characters_directory_path'],
+            directory=self.directory_path,
             column=content,
             additional_menu_options=self.get_sub_menu_options()
         )
@@ -143,8 +131,7 @@ class Characters_Rail(Rail):
         # Wrap the gd in a drag target so we can move characters here
         dt = ft.DragTarget(
             group="widgets",
-            content=content,     # Our content is the gesture detector
-            #on_will_accept=self.story.show_pin_drag_targets,
+            content=content,     # Our content is the content we built above
             on_accept=lambda e: self.on_drag_accept(e, self.directory_path)
         )
 
@@ -152,9 +139,10 @@ class Characters_Rail(Rail):
         gd = ft.GestureDetector(
             expand=True,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
-            content=dt
+            content=dt,
         )
 
+        # Set our content to be a column
         self.content = ft.Column(
             spacing=0,
             expand=True,
@@ -167,6 +155,3 @@ class Characters_Rail(Rail):
         
         # Apply our update
         self.p.update()
-
-
-

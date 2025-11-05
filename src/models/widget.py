@@ -138,8 +138,6 @@ class Widget(ft.Container):
     def move_file(self, new_directory: str):
         ''' Moves our widget's json file to a new directory '''
 
-        print("Move file claled")
-
         # Go through our new directory and check if any files there have the same title
         files = os.listdir(new_directory)
         for file in files:

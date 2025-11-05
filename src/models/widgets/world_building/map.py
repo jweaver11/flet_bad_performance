@@ -16,6 +16,7 @@ from models.widget import Widget
 from models.mini_widgets.world_building.map_information_display import Map_Information_Display
 from models.story import Story
 from handlers.verify_data import verify_data
+from styles.snack_bar import Snack_Bar
 from models.state import State
 import flet.canvas as cv
 from threading import Thread
@@ -211,6 +212,45 @@ class Map(Widget):
         except Exception as e:
             print(f"Error saving widget to {file_path}: {e}") 
             print("Data that failed to save: ", self.state.shapes)
+
+
+    # Use our parent delete file method, and delete our display as well
+    def delete_file(self, old_file_path):
+
+        if super().delete_file(old_file_path):
+
+            try:
+                file_path = os.path.join(self.directory_path, f"{self.title}_display.json")
+
+                # Delete the file if it exists
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                else:
+                    print(f"File {old_file_path} does not exist, cannot delete.")
+
+                return True
+
+
+            except Exception as e:
+                print(f"Error deleting map display file: {e}")
+
+        else:
+            return False
+        
+
+
+    def rename_file():
+        pass
+
+    def move_file(self, new_directory):
+        ''' Moves our map file to a new directory, and its display file as well '''
+
+        # Call our parent move file. Since we defined our own delete file, it will delete the display file as well
+        super().move_file(new_directory)
+
+        # Now save our new display file
+        self.save_display()
+            
 
     def load_details(self):
         ''' Loads the rest of our map details that are not sub maps into our details dict '''
