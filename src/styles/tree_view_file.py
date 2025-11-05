@@ -318,6 +318,7 @@ class Tree_View_File(ft.GestureDetector):
         self.widget.p.open(dlg)
 
 
+    # Called to reload our tree view file display
     def reload(self):
 
         self.content = ft.Container(

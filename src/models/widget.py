@@ -192,13 +192,19 @@ class Widget(ft.Container):
         self.toggle_visibility() 
 
         # Save our old file path for renaming later
-        old_file_path = os.path.join(self.directory_path, f"{self.title}.json")     
+        old_file_path = os.path.join(self.directory_path, f"{self.title}.json")   
+        old_key = f"{self.directory_path}\\{self.title}"  
                                                  
-
         # Update our live title, and associated data
         self.title = title                              
-        self.data['title'] = self.title                 
+        self.data['title'] = self.title     
+
+        print(f"Old key: {old_key}")
+
+
         self.data['key'] = f"{self.directory_path}\\{self.title}"  
+
+        print(f"Old key: {old_key}")
 
         # Rename our json file so it doesnt just create a new one
         os.rename(old_file_path, self.data['key'] + ".json")  
@@ -208,6 +214,8 @@ class Widget(ft.Container):
 
         # Remove from our live dict wherever we are stored
         tag = self.data['tag']
+
+        # Fix this, it no worky
         if tag == "chapter":
             self.story.chapters.pop(self.data['key'], None)
             self.story.chapters[self.data['key']] = self
@@ -217,9 +225,14 @@ class Widget(ft.Container):
         elif tag == "note":
             self.story.notes.pop(self.data['key'], None)
             self.story.notes[self.data['key']] = self
+        elif tag == "character":
+            self.story.characters.pop(old_key, None)
+            self.story.characters[self.data['key']] = self
+            print(self.story.characters.keys())
         elif tag == "map":
             self.story.maps.pop(self.data['key'], None)
             self.story.maps[self.data['key']] = self  
+
 
         # Re-applies visibility to what it was before rename
         self.toggle_visibility()                

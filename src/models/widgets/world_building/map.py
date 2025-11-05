@@ -215,11 +215,14 @@ class Map(Widget):
 
 
     # Use our parent delete file method, and delete our display as well
-    def delete_file(self, old_file_path):
+    def delete_file(self, old_file_path) -> bool:
 
+        # Call our parent delete first
         if super().delete_file(old_file_path):
 
             try:
+
+                # Set our display file path
                 file_path = os.path.join(self.directory_path, f"{self.title}_display.json")
 
                 # Delete the file if it exists
@@ -230,23 +233,43 @@ class Map(Widget):
 
                 return True
 
-
             except Exception as e:
                 print(f"Error deleting map display file: {e}")
+                return False
 
         else:
             return False
         
 
+    # Called when renaming our map
+    def rename(self, title: str):
+        ''' Calls our parent to rename our json file, and then renames our display file as well '''
 
-    def rename_file():
-        pass
+        # Save our old title
+        old_title = self.title
 
+        # Call parent to rename our main widget file
+        super().rename(title)
+
+        # Save our old file path for renaming our display
+        old_file_path = os.path.join(self.directory_path, f"{old_title}_display.json")     
+                                               
+        # Rename our display file 
+        os.rename(old_file_path, self.data['key'] + "_display" + ".json") 
+
+        # Save our display
+        self.save_display()
+
+    # Called when moving file
     def move_file(self, new_directory):
-        ''' Moves our map file to a new directory, and its display file as well '''
+        ''' Calls parent move, and then save display to give us our new display file '''
+
+        # Copy display file here first
 
         # Call our parent move file. Since we defined our own delete file, it will delete the display file as well
         super().move_file(new_directory)
+
+        # TODO: Paste new display file with correct title
 
         # Now save our new display file
         self.save_display()

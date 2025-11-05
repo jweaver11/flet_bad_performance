@@ -334,7 +334,32 @@ class Tree_View_Directory(ft.GestureDetector):
         self.p.update()
 
     def map_check(self, e):
-        pass
+        # Start out assuming we are unique
+        self.item_is_unique = True
+
+        # Grab out title from the textfield, and set our new key to compare
+        title = e.control.value
+
+        # Generate our new key to compare. Requires normalization
+        nk = self.full_path + "\\" + title
+        new_key = os.path.normcase(os.path.normpath(nk))
+
+        # Check our chapters
+        for key in self.story.maps.keys():
+            
+            if os.path.normcase(os.path.normpath(key)) == new_key and title != "":
+                self.item_is_unique = False
+                break
+
+        # If we are NOT unique, show our error text
+        if not self.item_is_unique:
+            e.control.error_text = "Title must be unique"
+
+        # Otherwise remove our error text
+        else:
+            e.control.error_text = None
+            
+        self.p.update()
 
     def category_submit(self, e):
         # Get our name and check if its unique
@@ -413,7 +438,23 @@ class Tree_View_Directory(ft.GestureDetector):
             self.p.update()
 
     def map_submit(self, e):
-        pass
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Set submitting to True
+        self.are_submitting = True
+
+        # If it is, call the rename function. It will do everything else
+        if self.item_is_unique:
+            self.story.create_map(
+                directory_path=self.full_path,
+                title=title,
+            )
+            
+        # Otherwise make sure we show our error
+        else:
+            self.new_item_textfield.focus()                                  # Auto focus the textfield
+            self.p.update()
 
 
 

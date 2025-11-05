@@ -601,7 +601,8 @@ class Story(ft.View):
                             map_key = map_data.get("key", None)
                             map_title = map_data.get("title", filename.replace(".json", ""))    
                                 
-                            # Create our timeline object using our loaded data
+                            # Create our Map widgets.
+                            # TODO: Add in loading fathers? or get that from data inside of map constructor??
                             self.maps[map_key] = Map(
                                 title=map_title, 
                                 page=self.p, 
@@ -621,7 +622,7 @@ class Story(ft.View):
                 #print("No world maps found, creating default world map")
                 self.create_map(title="World Map", father=None, category="world")
 
-            print(f"Loaded {len(self.maps)} maps into story '{self.title}'")
+            #print(f"Loaded {len(self.maps)} maps into story '{self.title}'")
 
         # Catch errors
         except Exception as e:
