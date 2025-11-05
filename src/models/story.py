@@ -334,24 +334,23 @@ class Story(ft.View):
         def _delete_live_widget(widget: Widget):
             # Grab our widgets tag to see what type of object it is
             tag = widget.data.get('tag', None)
-
-            #print("Widget tag: ", tag)
             
             # Based on its tag, it deletes it from our appropriate dict
             if tag == "chapter":
-                print("Running chapter check")
                 if widget.data['key'] in self.chapters.keys():
-                    print("Widget is in self.chapters")
                     del self.chapters[widget.data['key']]
-            elif tag == "image":
-                if widget in self.images:
-                    del self.images[widget.data['key']]
-            elif tag == "character":
-                if widget in self.characters:
-                    del self.characters[widget.data['key']]
+
             elif tag == "note":
-                if widget in self.notes:
+                if widget.data['key'] in self.notes.keys():
                     del self.notes[widget.data['key']]
+
+            elif tag == "image":
+                if widget.data['key'] in self.images.keys():
+                    del self.images[widget.data['key']]
+
+            elif tag == "character":
+                if widget.data['key'] in self.characters.keys():
+                    del self.characters[widget.data['key']]
 
             
             # Remove from our master widgets list so it won't be rendered anymore

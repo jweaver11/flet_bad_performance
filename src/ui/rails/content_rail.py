@@ -47,29 +47,35 @@ class Content_Rail(Rail):
         # Reload the rail on start
         self.reload_rail()
 
-    # Functions to handle when one of menu options is selected
-    def new_category_clicked(self, e):
+
+    # Called when new chapter button or menu option is clicked
+    def new_chapter_clicked(self, e):
+        ''' Handles setting our textfield for new chaper creation '''
         
         # Makes sure the right textfield is visible and the others are hidden
-        self.new_category_textfield.visible = True
-        self.new_chapter_textfield.visible = False
-        self.new_note_textfield.visible = False
+        self.new_item_textfield.visible = True
 
-        # Close the menu, which will update the page as well
-        self.story.close_menu()
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Chapter Title"
+        self.new_item_textfield.data = "chapter"
 
-    # New chapters
-    def new_chapter_clicked(self, e):
-        self.new_chapter_textfield.visible = True
-        self.new_category_textfield.visible = False
-        self.new_note_textfield.visible = False
+        # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()
         
-    # New notes
+    # Called when new note button or menu option is clicked
     def new_note_clicked(self, e):
-        self.new_note_textfield.visible = True
-        self.new_category_textfield.visible = False
-        self.new_chapter_textfield.visible = False
+        ''' Handles setting our textfield for new note creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Note Title"
+        self.new_item_textfield.data = "note"
+
+        # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()
     
     
@@ -182,10 +188,11 @@ class Content_Rail(Rail):
             additional_menu_options=self.get_sub_menu_options()
         )
 
-        # Append our hiddent textfields for creating new categories, chapters, and notes
-        content.controls.append(self.new_category_textfield)
-        content.controls.append(self.new_chapter_textfield)
-        content.controls.append(self.new_note_textfield)
+        # Append our hidden textfield for creating new items
+        content.controls.append(self.new_item_textfield)
+
+        # Add container to the bottom to make sure the drag target and gesture detector fill the rest of the space
+        content.controls.append(ft.Container(expand=True))
 
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(

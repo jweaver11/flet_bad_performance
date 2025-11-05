@@ -1,5 +1,5 @@
 ''' 
-Loads all data in a directory and adds it to expansion tiles or to rail for uniform look 
+Loads all data in a directory and adds it to expansion tiles or to rail (column) for uniform look 
 When called recursively, only the parent expansion tile argument is provided
 When called initially when there is no parent dropdown, a column is provided instead
 '''

@@ -33,24 +33,22 @@ class Characters_Rail(Rail):
             text_style=self.text_style
         )
 
+        # Reload the rail on start
         self.reload_rail()
 
-
-    # Functions to handle when one of menu options is selected
-    def new_category_clicked(self, e):
+    # Called when new character button or menu option is clicked
+    def new_character_clicked(self, e):
+        ''' Handles setting our textfield for new character creation '''
         
         # Makes sure the right textfield is visible and the others are hidden
-        self.new_category_textfield.visible = True
-        self.new_character_textfield.visible = False
+        self.new_item_textfield.visible = True
 
-        # Close the menu, which will update the page as well
-        self.story.close_menu()
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Character Name"
+        self.new_item_textfield.data = "character"
 
-    # New chapters
-    def new_character_clicked(self, e):
-        self.new_character_textfield.visible = True
-        self.new_category_textfield.visible = False
-        
+        # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()
         
 
@@ -59,15 +57,17 @@ class Characters_Rail(Rail):
             
         # Builds our buttons that are our options in the menu
         return [
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_category_clicked,
+                data="category",
                 content=ft.Row([
                     ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
                     ft.Text("Category", color=ft.Colors.ON_SURFACE),
                 ])
             ),
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=self.new_character_clicked,
+                data="character",
                 content=ft.Row([
                     ft.Icon(ft.Icons.PERSON_ADD_ALT_OUTLINED),
                     ft.Text("Character", color=ft.Colors.ON_SURFACE),
@@ -124,9 +124,6 @@ class Characters_Rail(Rail):
             spacing=0,
             controls=[]
         )
-        # Append our hiddent textfields for creating new categories, chapters, and notes
-        content.controls.append(self.new_category_textfield)
-        content.controls.append(self.new_character_textfield)
 
         # Load our content directory data into the rail
         load_directory_data(
@@ -137,11 +134,25 @@ class Characters_Rail(Rail):
             additional_menu_options=self.get_sub_menu_options()
         )
 
+        # Append our hidden textfield for creating new items
+        content.controls.append(self.new_item_textfield)
+
+        # Add container to the bottom to make sure the drag target and gesture detector fill the rest of the space
+        content.controls.append(ft.Container(expand=True))
+
+        # Wrap the gd in a drag target so we can move characters here
+        dt = ft.DragTarget(
+            group="widgets",
+            content=content,     # Our content is the gesture detector
+            #on_will_accept=self.story.show_pin_drag_targets,
+            on_accept=lambda e: self.on_drag_accept(e, self.directory_path)
+        )
+
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(
             expand=True,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
-            content=content
+            content=dt
         )
 
         self.content = ft.Column(

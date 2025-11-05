@@ -51,7 +51,6 @@ class Tree_View_Directory(ft.GestureDetector):
             text_style=self.text_style
         )
 
-        gd = ft.GestureDetector()
         # Parent constructor
         super().__init__(
             mouse_cursor=ft.MouseCursor.CLICK,
