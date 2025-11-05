@@ -124,7 +124,7 @@ class Tree_View_File(ft.GestureDetector):
         submitting = False
 
         # Grab our current name for comparison
-        current_name = self.widget.title
+        current_name = self.widget.title.lower()
 
         # Called when clicking outside the input field to cancel renaming
         def _cancel_rename(e):
@@ -149,7 +149,7 @@ class Tree_View_File(ft.GestureDetector):
             ''' Checks if the name is unique within its type of widget '''
 
             # Grab the new name, and tag
-            name = e.control.value
+            name = e.control.value.lower()
             tag = self.widget.data.get('tag', None)
 
             # Nonlocal variables
@@ -169,25 +169,25 @@ class Tree_View_File(ft.GestureDetector):
                 # Chapters check 
                 if tag == "chapter":
                     for chapter in self.widget.story.chapters.values():
-                        if chapter.title == name and chapter.title != current_name:
+                        if chapter.title.lower() == name and chapter.title.lower() != current_name:
                             is_unique = False
 
                 # Notes
                 elif tag == "note":
                     for note in self.widget.story.notes.values():
-                        if note.title == name and note.title != current_name:
+                        if note.title.lower() == name and note.title.lower() != current_name:
                             is_unique = False
 
                 # Characters
                 elif tag == "character":
                     for character in self.widget.story.characters.values():
-                        if character.title == name and character.title != current_name:
+                        if character.title.lower() == name and character.title.lower() != current_name:
                             is_unique = False
 
                 # Maps
                 elif tag == "maps":
                     for map_ in self.widget.story.maps.values():
-                        if map_.title == name and map_.title != current_name:
+                        if map_.title.lower() == name and map_.title.lower() != current_name:
                             is_unique = False
 
             # Give us our error text if not unique

@@ -524,7 +524,7 @@ class Tree_View_Directory(ft.GestureDetector):
         )
 
         # Replaces our name text with a text field for renaming
-        self.content.title = text_field
+        self.content.content.title = text_field
 
         # Clears our popup menu button and applies to the UI
         self.story.close_menu()
@@ -650,8 +650,8 @@ class Tree_View_Directory(ft.GestureDetector):
 
         # Re-adds our content controls so we can keep states
         if self.content is not None:        # Protects against first loads
-            if self.content.controls is not None:
-                for control in self.content.controls:
+            if self.content.content.controls is not None:
+                for control in self.content.content.controls:
                     if control != self.new_item_textfield:      # Don't re-add our textfield, its already there
                         expansion_tile.controls.append(control)
 
