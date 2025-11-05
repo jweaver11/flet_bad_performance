@@ -6,10 +6,6 @@ import flet as ft
 class Menu_Option_Style(ft.GestureDetector):
     def __init__(self, content: ft.Control, on_click: callable = None, data=None):
         super().__init__(
-            #padding=ft.Padding(8, 4, 8, 4),
-            #bgcolor=ft.Colors.ON_PRIMARY_CONTAINER,
-            #border_radius=ft.border_radius.all(4),
-            #padding=ft.Padding(6, 0, 0, 0),
             expand=True,
             data=data,
             content=content,

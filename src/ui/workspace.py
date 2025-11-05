@@ -9,6 +9,8 @@ import flet as ft
 from models.app import app
 from models.story import Story
 import json
+from handlers.arrange_widgets import arrange_widgets
+
 
 # Our workspace object that is stored in our story object
 class Workspace(ft.Container):
@@ -478,6 +480,10 @@ class Workspace(ft.Container):
 
     # Accepting drags for our five pin locations
     def top_pin_drag_accept(self, e):
+
+
+        # Grab out widget better than this, jeeez
+
         # Reset our container to be invisible again
         e.control.content.opacity = 0
         e.control.content.update()
@@ -494,20 +500,23 @@ class Workspace(ft.Container):
             if draggable:
                 # Set object variable to our object
                 object = draggable.data
-                #print("object:\n", object) 
+                
             else:
                 print("Could not find control with src_id:", src_id)
         else:
             print("src_id not found in event data")
 
-        # Set our objects pin location to the correct new location, and then call our arrange_widgets function
-        if hasattr(object, 'data') and object.data:
-            object.data['pin_location'] = "top"  # Update our object's data dictionary as well
-            object.save_dict()  # Save our object with its new pin location
+        # Set our objects pin location to the correct new location
+        object.data['pin_location'] = "top"  
+        
+        # Make sure our widget is visible if it was dragged from the rail
+        if not object.visible:
+            object.toggle_visibility()      # This will save dict as well
+        else:
+            object.save_dict()  
 
-        from handlers.arrange_widgets import arrange_widgets
-        arrange_widgets(self.story)       # Re-arrange our widgets held in the story object
-        self.reload_workspace()  # Re-render the widgets to reflect the new pin location
+        # Apply to UI
+        self.reload_workspace()
         
         print("top pin accepted")
 
@@ -530,12 +539,15 @@ class Workspace(ft.Container):
         else:
             print("src_id not found in event data")
 
-        if hasattr(object, 'data') and object.data:
-            object.data['pin_location'] = "left"
-            object.save_dict()
-
-        from handlers.arrange_widgets import arrange_widgets
-        arrange_widgets(self.story)       
+        
+        object.data['pin_location'] = "left"
+           
+            # Make sure our widget is visible if it was dragged from the rail
+        if not object.visible:
+            object.toggle_visibility()      # This will save dict as well
+        else:
+            object.save_dict()  
+     
         self.reload_workspace() 
         
         print("left pin accepted")
@@ -560,10 +572,13 @@ class Workspace(ft.Container):
             print("src_id not found in event data")
 
         object.data['pin_location'] = "main"
-        object.save_dict()
-        
-        from handlers.arrange_widgets import arrange_widgets
-        arrange_widgets(self.story)       
+
+        # Make sure our widget is visible if it was dragged from the rail
+        if not object.visible:
+            object.toggle_visibility()      # This will save dict as well
+        else:
+            object.save_dict()  
+             
         self.reload_workspace() 
         
         print("main pin accepted")
@@ -588,10 +603,13 @@ class Workspace(ft.Container):
             print("src_id not found in event data")
 
         object.data['pin_location'] = "right"
-        object.save_dict()
 
-        from handlers.arrange_widgets import arrange_widgets
-        arrange_widgets(self.story)       
+        # Make sure our widget is visible if it was dragged from the rail
+        if not object.visible:
+            object.toggle_visibility()      # This will save dict as well
+        else:
+            object.save_dict()  
+     
         self.reload_workspace()  
         
         print("right pin accepted")
@@ -615,10 +633,13 @@ class Workspace(ft.Container):
             print("src_id not found in event data")
 
         object.data['pin_location'] = "bottom"
-        object.save_dict()
-
-        from handlers.arrange_widgets import arrange_widgets
-        arrange_widgets(self.story)       
+        
+        # Make sure our widget is visible if it was dragged from the rail
+        if not object.visible:
+            object.toggle_visibility()      # This will save dict as well
+        else:
+            object.save_dict()  
+      
         self.reload_workspace()  
         
 

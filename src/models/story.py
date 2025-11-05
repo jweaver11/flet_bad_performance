@@ -322,13 +322,7 @@ class Story(ft.View):
                 widget.directory_path = new_path + relative_path
                 widget.save_dict()  # Save the updated widget data
                 #print("Updated widget directory path to ", widget.title, " to ", widget.directory_path)
-
-    
-    def move_file(self, new_path: str):
-        ''' Moves a file from its current directory to a new one '''
-        pass
-
-            
+        
 
     # Called when deleting a widget from our story
     def delete_widget(self, widget) -> bool:

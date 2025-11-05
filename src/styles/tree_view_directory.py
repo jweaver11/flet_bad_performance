@@ -1,6 +1,7 @@
 import flet as ft
 from models.story import Story
 import os
+import json
 from styles.menu_option_style import Menu_Option_Style
 
 # Expansion tile for all sub directories (folders) in a directory
@@ -613,6 +614,26 @@ class Tree_View_Directory(ft.GestureDetector):
         self.bgcolor = ft.Colors.TRANSPARENT
         self.p.update()
 
+    # Called when a widget is dragged and dropped into this directory
+    def on_drag_accept(self, e):
+        ''' Moves our widgets into this directory from wherever they were '''
+
+        # Load our data (draggables can't just pass in simple data for some reason)
+        event_data = json.loads(e.data)
+        # Grab the source id of the draggable
+        src_id = event_data.get("src_id")     
+        
+        # Set the draggable
+        draggable = e.page.get_control(src_id)
+            
+        # Now we can grab its data, in this case the widget
+        widget = draggable.data
+
+        # Call the move file using the new directory path
+        widget.move_file(new_directory=self.full_path)
+        
+    
+
     # Called when we need to reload this directory tile
     def reload(self):
         expansion_tile = ft.ExpansionTile(
@@ -637,9 +658,16 @@ class Tree_View_Directory(ft.GestureDetector):
                 for control in self.content.controls:
                     if control != self.new_item_textfield:      # Don't re-add our textfield, its already there
                         expansion_tile.controls.append(control)
+
+        # Wrap in all in a drag target so we can drag to move widgets into different folders
+        drag_target = ft.DragTarget(
+            group="widgets",
+            on_accept=self.on_drag_accept,
+            content=expansion_tile,
+        )
         
         # Set the content
-        self.content = expansion_tile
+        self.content = drag_target
         
 
 

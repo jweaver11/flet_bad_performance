@@ -25,12 +25,6 @@ def load_directory_data(
     def _canon_path(p: str) -> str:
         return os.path.normcase(os.path.normpath(p))
     
-    # Options that all folders and files/widgets using tree view will have. Like rename, delete
-    folder_options = [
-        ft.TextButton(content=ft.Text("Option 1", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-        ft.TextButton(content=ft.Text("Option 2", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-        ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-    ]
 
     file_options = [
         ft.TextButton(content=ft.Text("Rename", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
@@ -89,16 +83,16 @@ def load_directory_data(
 
             # Recursively go through this directory as well to load its data, and any sub directories
             load_directory_data(
-                page=page,
-                story=story,
-                directory=full_path,
-                dir_dropdown=new_expansion_tile,
-                additional_menu_options=additional_menu_options
+                page=page,                                                # Page reference
+                story=story,                                              # Story reference
+                directory=full_path,                                      # Our new directory to load
+                dir_dropdown=new_expansion_tile,                          # Our new parent expansion tile
+                additional_menu_options=additional_menu_options           # Any additional menu options to pass down
             )
 
             # Add our expansion tile for the directory to its parent, or the column if top most directory
             if dir_dropdown is not None:
-                dir_dropdown.content.controls.append(new_expansion_tile)
+                dir_dropdown.content.content.controls.append(new_expansion_tile)
             else:
                 column.controls.append(new_expansion_tile)
 
@@ -123,7 +117,7 @@ def load_directory_data(
 
             # Add them to parent expansion tile if one exists, otherwise just add it to the column
             if dir_dropdown is not None:
-                dir_dropdown.content.controls.append(item)
+                dir_dropdown.content.content.controls.append(item)
             else: 
                 column.controls.append(item)
             pass

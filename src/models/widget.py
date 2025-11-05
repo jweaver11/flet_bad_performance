@@ -21,7 +21,7 @@ class Widget(ft.Container):
             page: ft.Page,          # Grabs a page reference for updates
             directory_path: str,    # Path to our directory that will contain our json file
             story: Story,           # Reference to our story object that owns this widget
-            data: dict=None
+            data: dict = None       # Our data passed in if loaded (or none if new object)
         ):
 
         # Sets uniformity for all widgets
@@ -115,9 +115,9 @@ class Widget(ft.Container):
         except Exception as e:
             print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
 
-    # Called usually when renaming, and we need to delete the old file
+    # Called when moving widget files
     def delete_file(self, old_file_path: str) -> bool:
-        ''' Deletes our widget's json file from the directory. Useful for renaming '''
+        ''' Deletes our widget's json file from the directory '''
 
         try:
             # Delete the file if it exists
@@ -132,6 +132,25 @@ class Widget(ft.Container):
         except Exception as e:
             print(f"Error deleting widget file at {old_file_path}: {e}")
             return False
+        
+    # Called when moving widget files
+    def move_file(self, new_directory: str):
+        ''' Moves our widget's json file to a new directory '''
+
+        # Delete the old file
+        self.delete_file(old_file_path=os.path.join(self.directory_path, f"{self.title}.json"))
+
+        # Set our data to the new path where we need to
+        self.data['directory_path'] = new_directory
+        self.directory_path = self.data['directory_path']
+        self.data['key'] = f"{new_directory}\\{self.title}"
+
+        # Save our updated data
+        self.save_dict()
+
+        # Reload the rail to apply changes
+        self.story.active_rail.content.reload_rail()        
+
 
     # Called when renaming a widget
     def rename(self, title: str):
@@ -140,29 +159,34 @@ class Widget(ft.Container):
         # Hides the widget while renaming to make sure pointers are updated as well
         self.toggle_visibility() 
 
-        # Deletes the old file. Saving again with updated dir path with new title will create the new file
+        # Save our old file path for renaming later
         old_file_path = os.path.join(self.directory_path, f"{self.title}.json")     
-        self.delete_file(old_file_path)                                             
+                                                 
 
-        # Update our data and live title
+        # Update our live title, and associated data
         self.title = title                              
         self.data['title'] = self.title                 
-        self.data['key'] = f"{self.directory_path}\\{self.title}"   
+        self.data['key'] = f"{self.directory_path}\\{self.title}"  
+
+        # Rename our json file so it doesnt just create a new one
+        os.rename(old_file_path, self.data['key'] + ".json")  
+
+        # Save our data to this new file
         self.save_dict()                                
 
         # Remove from our live dict wherever we are stored
         tag = self.data['tag']
         if tag == "chapter":
-            self.story.chapters.pop(title, None)
+            self.story.chapters.pop(self.data['key'], None)
             self.story.chapters[self.data['key']] = self
         elif tag == "image":
-            self.story.images.pop(title, None)
+            self.story.images.pop(self.data['key'], None)
             self.story.images[self.data['key']] = self
         elif tag == "note":
-            self.story.notes.pop(title, None)
+            self.story.notes.pop(self.data['key'], None)
             self.story.notes[self.data['key']] = self
         elif tag == "map":
-            self.story.maps.pop(title, None)
+            self.story.maps.pop(self.data['key'], None)
             self.story.maps[self.data['key']] = self  
 
         # Re-applies visibility to what it was before rename
@@ -267,6 +291,7 @@ class Widget(ft.Container):
             self.save_dict()
             self.visible = self.data['visible']
 
+            # Reload the UI
             self.story.workspace.reload_workspace()
 
         # Catch errors

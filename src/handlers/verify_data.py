@@ -41,6 +41,10 @@ def verify_data(object, required_data: dict) -> bool:
                 # Special case for overwriting 'pin_location' key to always set the value
                 elif key == 'pin_location':
                     current_data[key] = value
+
+                # Special case for overwriting 'directory_path' key to always set the value (in case user moves files outside of app)
+                elif key == 'directory_path':
+                    current_data[key] = value
         
 
     # Main block to run our internal function above

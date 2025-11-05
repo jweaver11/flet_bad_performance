@@ -316,12 +316,15 @@ class Tree_View_File(ft.GestureDetector):
 
 
     def reload(self):
+
         self.content = ft.Container(
             expand=True, 
             padding=ft.Padding(0, 2, 5, 2),
             content=ft.Draggable(
-                group="rail",
+                group="widgets",
+                data=self.widget,
                 content_feedback=self.content,
+                on_drag_start=lambda e: self.widget.story.workspace.show_pin_drag_targets(),
                 content=ft.GestureDetector(
                     mouse_cursor=ft.MouseCursor.CLICK,
                     content=ft.Row(
