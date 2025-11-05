@@ -164,7 +164,6 @@ class Characters_Rail(Rail):
                 gd
             ]
         )
-        #self.content = content
         
         # Apply our update
         self.p.update()

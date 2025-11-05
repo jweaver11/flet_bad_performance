@@ -324,7 +324,7 @@ class Tree_View_File(ft.GestureDetector):
             content=ft.Draggable(
                 group="widgets",
                 data=self.widget,
-                content_feedback=self.content,
+                content_feedback=ft.TextButton(content=ft.Row([ft.Icon(self.icon), ft.Text(self.widget.title, style=self.text_style, expand=True)])),
                 on_drag_start=lambda e: self.widget.story.workspace.show_pin_drag_targets(),
                 content=ft.GestureDetector(
                     mouse_cursor=ft.MouseCursor.CLICK,

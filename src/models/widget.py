@@ -10,6 +10,7 @@ from models.story import Story
 import os
 import json
 from handlers.verify_data import verify_data
+from styles.snack_bar import Snack_Bar
 
 
 class Widget(ft.Container):
@@ -137,7 +138,40 @@ class Widget(ft.Container):
     def move_file(self, new_directory: str):
         ''' Moves our widget's json file to a new directory '''
 
-        # Delete the old file
+        print("Move file claled")
+
+        # Go through our new directory and check if any files there have the same title
+        files = os.listdir(new_directory)
+        for file in files:
+
+            # Split the file name and extension
+            file_name, file_ext = os.path.splitext(file)
+
+            # Check the file name against our title
+            if file_name == self.title: 
+
+                # If we dropped where we started, just return out of the function
+                if new_directory == self.directory_path:
+                    return
+                
+                # Otherwise, open our app bar dialog to show the error
+                self.p.open(
+                    Snack_Bar(          
+                        content=ft.Text(
+                            f"Cannot move {self.title}. A file with that name already exists in the target directory.",
+                            weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True
+                        ),
+                    )
+                )
+
+                # Remove our drag targets since we arent moving anything
+                self.story.workspace.remove_drag_targets()
+                
+                # Return out of the function
+                return
+
+
+        # If we passed the check earlier, delete the old file
         self.delete_file(old_file_path=os.path.join(self.directory_path, f"{self.title}.json"))
 
         # Set our data to the new path where we need to
