@@ -9,7 +9,6 @@ import flet as ft
 from models.app import app
 from models.story import Story
 import json
-from handlers.arrange_widgets import arrange_widgets
 
 
 # Our workspace object that is stored in our story object
@@ -176,11 +175,91 @@ class Workspace(ft.Container):
         
         print(f"{pin_location} pin accepted")
 
+    # Called when we drag a widget from one pin location to another
+    def arrange_widgets(self):
+        ''' Arranges our widgets to their correct pin locations after a change is made to their pin location.
+        Also adds widgets to their correct pin locations if they are missing from any pin location '''
+
+        story = self.story
+        
+        try:
+
+            # Clear all pin locations first
+            story.workspace.top_pin.controls.clear()
+            story.workspace.left_pin.controls.clear()
+            story.workspace.main_pin.controls.clear()
+            story.workspace.right_pin.controls.clear()
+            story.workspace.bottom_pin.controls.clear()
+
+            # Go through all our widgets in the story
+            for widget in story.widgets:
+
+                # Check if they are visible
+                if widget.visible == True:
+
+                    # Check if widget has data and pin_location
+                    if hasattr(widget, 'data') and widget.data and 'pin_location' in widget.data:
+                        pin_location = widget.data['pin_location']
+                        
+                        # Add widget to the correct pin based on its pin_location
+                        if pin_location == "top":
+                            story.workspace.top_pin.controls.append(widget)
+                        elif pin_location == "left":
+                            story.workspace.left_pin.controls.append(widget)
+                        elif pin_location == "main":
+                            story.workspace.main_pin.controls.append(widget)
+                        elif pin_location == "right":
+                            story.workspace.right_pin.controls.append(widget)
+                        elif pin_location == "bottom":
+                            story.workspace.bottom_pin.controls.append(widget)
+                            
+                    else:
+                        # If no valid pin_location, default to main pin
+                        if widget not in story.workspace.main_pin.controls:
+                            print("Invalid pin location, adding to main pin")
+                            story.workspace.main_pin.controls.append(widget)
+
+                # Skip non visible widgets
+                else:
+                    continue
+
+            # If main pin is empty, steal one from other pins so we are always fullscreen
+            if len(story.workspace.main_pin.controls) == 0:
+
+                # Steal from left first
+                if len(story.workspace.left_pin.controls) > 0:
+                    # Copy and delete last widget in left pin
+                    widget = story.workspace.left_pin.controls.pop()
+                    story.workspace.main_pin.controls.append(widget)
+                # Right pin
+                elif len(story.workspace.right_pin.controls) > 0:
+                    widget = story.workspace.right_pin.controls.pop()
+                    story.workspace.main_pin.controls.append(widget)
+                # Top pin
+                elif len(story.workspace.top_pin.controls) > 0:
+                    widget = story.workspace.top_pin.controls.pop()
+                    story.workspace.main_pin.controls.append(widget)
+                # Bottom pin
+                elif len(story.workspace.bottom_pin.controls) > 0:
+                    widget = story.workspace.bottom_pin.controls.pop()
+                    story.workspace.main_pin.controls.append(widget)
+                else:
+                    pass
+
+                # If we stole a widget, make its data match its new location
+                if widget is not None:
+                    widget.data['pin_location'] = "main"
+                    widget.save_dict()
+
+        except Exception as e:
+            print(f"Error arranging widgets: {e}")
+
     # Called when we need to reload our workspace content, especially after pin drags
     def reload_workspace(self):
         ''' Reloads our workspace content by clearing and re-adding our 5 pin locations to the master row '''
 
-        arrange_widgets(self.story)
+        # Make sure our widgets are arranged correctly
+        self.arrange_widgets()
 
         # Change our cursor when we hover over a resizer (divider). Either vertical or horizontal
         def show_vertical_cursor(e: ft.HoverEvent):
