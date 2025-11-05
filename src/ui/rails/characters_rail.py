@@ -62,7 +62,7 @@ class Characters_Rail(Rail):
                 data="category",
                 content=ft.Row([
                     ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
-                    ft.Text("Category", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Category", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
             Menu_Option_Style(
@@ -70,7 +70,7 @@ class Characters_Rail(Rail):
                 data="character",
                 content=ft.Row([
                     ft.Icon(ft.Icons.PERSON_ADD_ALT_OUTLINED),
-                    ft.Text("Character", color=ft.Colors.ON_SURFACE),
+                    ft.Text("Character", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
 

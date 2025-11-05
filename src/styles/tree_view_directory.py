@@ -72,7 +72,7 @@ class Tree_View_Directory(ft.GestureDetector):
                 on_click=lambda e: self.new_item_clicked(type="category"),
                 content=ft.Row([
                     ft.Icon(ft.Icons.CREATE_NEW_FOLDER_OUTLINED),
-                    ft.Text("Sub-Category", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ft.Text("Category", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD, expand=True),
                 ])
             ),
         ]
@@ -110,11 +110,9 @@ class Tree_View_Directory(ft.GestureDetector):
                     content=ft.Row(
                         expand=True,
                         controls=[
-                            #ft.Container(),   # Spacer
-                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
                             ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
                             ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
-                            ft.Container(expand=True)
                         ]
                     ),
                     items=self.get_color_options()
@@ -127,7 +125,6 @@ class Tree_View_Directory(ft.GestureDetector):
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
                     ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
-                    ft.Container(expand=True),   # Spacer to push text to left
                 ]),
             ),
         ])

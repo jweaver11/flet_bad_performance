@@ -1,5 +1,6 @@
 import flet as ft
 from models.widget import Widget
+from styles.menu_option_style import Menu_Option_Style
 
 # Class for items within a tree view on the rail
 class Tree_View_File(ft.GestureDetector):
@@ -64,8 +65,7 @@ class Tree_View_File(ft.GestureDetector):
 
         return [
             # Rename button
-            ft.TextButton(
-                expand=True,
+            Menu_Option_Style(
                 on_click=self.rename_clicked,
                 content=ft.Row([
                     ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
@@ -78,25 +78,25 @@ class Tree_View_File(ft.GestureDetector):
             ),
 
             # Color changing popup menu
-            ft.PopupMenuButton(
-                expand=True,
-                tooltip="",
-                padding=ft.Padding(10,0,0,0),
-                content=ft.Row(
+            Menu_Option_Style(
+                content=ft.PopupMenuButton(
                     expand=True,
-                    #spacing=0,
-                    controls=[
-                        ft.Container(),   # Spacer
-                        ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY, size=20),
-                        ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
-                        ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
-                    ]
+                    tooltip="",
+                    padding=ft.Padding(0,0,0,0),
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
+                            ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                            ft.Icon(ft.Icons.ARROW_RIGHT_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
+                        ]
+                    ),
+                    items=self.get_color_options()
                 ),
-                items=self.get_color_options()
             ),
 
             # Delete button
-            ft.TextButton(
+            Menu_Option_Style(
                 on_click=lambda e: self.delete_clicked(e),
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
@@ -260,6 +260,7 @@ class Tree_View_File(ft.GestureDetector):
             self.reload()
             self.widget.reload_widget()
             self.widget.story.workspace.reload_workspace()
+
             
 
         # List of available colors
