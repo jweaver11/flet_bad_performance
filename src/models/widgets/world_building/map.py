@@ -155,6 +155,7 @@ class Map(Widget):
                     dictionary_path="maps",
                     data=map_data,
                 )
+                
                 # Add it to our mini widgets list
                 self.mini_widgets.append(self.maps[map_title])
 

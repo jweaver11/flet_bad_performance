@@ -196,15 +196,10 @@ class Widget(ft.Container):
         old_key = f"{self.directory_path}\\{self.title}"  
                                                  
         # Update our live title, and associated data
-        self.title = title                              
+        self.title = title.capitalize()                              
         self.data['title'] = self.title     
-
-        print(f"Old key: {old_key}")
-
-
         self.data['key'] = f"{self.directory_path}\\{self.title}"  
 
-        print(f"Old key: {old_key}")
 
         # Rename our json file so it doesnt just create a new one
         os.rename(old_file_path, self.data['key'] + ".json")  
@@ -215,22 +210,21 @@ class Widget(ft.Container):
         # Remove from our live dict wherever we are stored
         tag = self.data['tag']
 
-        # Fix this, it no worky
+        # Delete our old live saved object, and add the new one
         if tag == "chapter":
-            self.story.chapters.pop(self.data['key'], None)
+            self.story.chapters.pop(old_key, None)
             self.story.chapters[self.data['key']] = self
         elif tag == "image":
-            self.story.images.pop(self.data['key'], None)
+            self.story.images.pop(old_key, None)
             self.story.images[self.data['key']] = self
         elif tag == "note":
-            self.story.notes.pop(self.data['key'], None)
+            self.story.notes.pop(old_key, None)
             self.story.notes[self.data['key']] = self
         elif tag == "character":
             self.story.characters.pop(old_key, None)
             self.story.characters[self.data['key']] = self
-            print(self.story.characters.keys())
         elif tag == "map":
-            self.story.maps.pop(self.data['key'], None)
+            self.story.maps.pop(old_key, None)
             self.story.maps[self.data['key']] = self  
 
 
@@ -259,12 +253,12 @@ class Widget(ft.Container):
 
 
     # Called when a new mini note is created inside a widget
-    def create_mini_note(self, title: str):
+    def create_comment(self, title: str):
         ''' Creates a mini note inside an image or chapter '''
-        from models.mini_widgets.mini_note import MiniNote
+        from models.mini_widgets.comment import Comment
 
         self.mini_widgets.append(
-            MiniNote(
+            Comment(
                 title=title, 
                 owner=self, 
                 father=self,

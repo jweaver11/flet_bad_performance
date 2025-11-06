@@ -9,7 +9,8 @@ from handlers.verify_data import verify_data
 
 
 # Class that holds our mini note objects inside images or chapters
-class MiniNote(MiniWidget):
+class Comment(MiniWidget):
+    
     # Constructor
     def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
 
@@ -26,7 +27,7 @@ class MiniNote(MiniWidget):
         verify_data(
             self,   # Pass in our object so we can access its data and change it
             {   # Pass in the required fields and their types``
-                'tag': "mini_note",
+                'tag': "comment",
                 'content': str,
             },
         )

@@ -27,7 +27,7 @@ class Chapter(Widget):
                 'content': str,
                 'temp': str,
                 'test': str,
-                'mini_notes': dict,
+                'comments': dict,
             }
         )
 
@@ -40,22 +40,22 @@ class Chapter(Widget):
 
     def load_mini_notes(self):
         ''' Loads our mini notes from our data into live objects '''
-        from models.mini_widgets.mini_note import MiniNote
+        from models.mini_widgets.comment import Comment
 
         # Loop through our data mini notes and create live objects for each
-        for note_title, note_data in self.data['mini_notes'].items():
-            self.mini_widgets.append(MiniNote(
+        for note_title, note_data in self.data['comments'].items():
+            self.mini_widgets.append(Comment(
                 title=note_title,
                 owner=self,
                 father=self,
                 page=self.p,
-                dictionary_path="mini_notes",
+                dictionary_path="comments",
                 data=note_data,
             ))
     
-    def submit_mini_note(self, e):
+    def submit_comment(self, e):
         title = e.control.value
-        self.create_mini_note(title)
+        self.create_comment(title)
         e.control.value = ""
         self.reload_widget()
 
@@ -73,10 +73,10 @@ class Chapter(Widget):
             controls=[
                 ft.Text(f"hello from: {self.title}"),
                 ft.TextField(
-                    label="Create Mini Note",
-                    hint_text="Mini Note Title",
+                    label="Add Comment",
+                    hint_text="Comment Title",
                     expand=True,
-                    on_submit=self.submit_mini_note,
+                    on_submit=self.submit_comment,
                 )
             ]
         )

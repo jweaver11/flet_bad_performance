@@ -21,38 +21,55 @@ class Content_Rail(Rail):
             directory_path=story.data['content_directory_path']
         )
 
+        # UI elements for easier referencing later
+        self.new_chapter_textfield = ft.TextField(  
+            hint_text="Chapter Name",
+            data="chapter",
+            on_submit=self.submit_item,
+            on_change=self.on_new_item_change,
+            on_blur=self.on_new_item_blur,
+            autofocus=True,
+            visible=False,
+            text_style=self.text_style
+        )
+
+        self.new_note_textfield = ft.TextField(  
+            hint_text="Note Name",
+            data="note",
+            on_submit=self.submit_item,
+            on_change=self.on_new_item_change,
+            on_blur=self.on_new_item_blur,
+            autofocus=True,
+            visible=False,
+            text_style=self.text_style,
+        )
+
         # Reload the rail on start
         self.reload_rail()
 
-
-    # Called when new chapter button or menu option is clicked
-    def new_chapter_clicked(self, e):
-        ''' Handles setting our textfield for new chaper creation '''
+    # Functions to handle when one of menu options is selected
+    def new_category_clicked(self, e):
         
         # Makes sure the right textfield is visible and the others are hidden
-        self.new_item_textfield.visible = True
+        self.new_category_textfield.visible = True
+        self.new_chapter_textfield.visible = False
+        self.new_note_textfield.visible = False
 
-        # Set our textfield value to none, and the hint and data
-        self.new_item_textfield.value = None
-        self.new_item_textfield.hint_text = "Chapter Title"
-        self.new_item_textfield.data = "chapter"
+        # Close the menu, which will update the page as well
+        self.story.close_menu()
 
-        # Close the menu (if ones is open), which will update the page as well
+    # New chapters
+    def new_chapter_clicked(self, e):
+        self.new_chapter_textfield.visible = True
+        self.new_category_textfield.visible = False
+        self.new_note_textfield.visible = False
         self.story.close_menu()
         
-    # Called when new note button or menu option is clicked
+    # New notes
     def new_note_clicked(self, e):
-        ''' Handles setting our textfield for new note creation '''
-        
-        # Makes sure the right textfield is visible and the others are hidden
-        self.new_item_textfield.visible = True
-
-        # Set our textfield value to none, and the hint and data
-        self.new_item_textfield.value = None
-        self.new_item_textfield.hint_text = "Note Title"
-        self.new_item_textfield.data = "note"
-
-        # Close the menu (if ones is open), which will update the page as well
+        self.new_note_textfield.visible = True
+        self.new_category_textfield.visible = False
+        self.new_chapter_textfield.visible = False
         self.story.close_menu()
     
     
@@ -119,7 +136,6 @@ class Content_Rail(Rail):
         # Creating a chapter for comics creates a folder to store images and drawings
         # Creating a chapter for novels creates a text document for writing, and allows
         # Right clicking allows to upload
-
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             
@@ -161,32 +177,22 @@ class Content_Rail(Rail):
         load_directory_data(
             page=self.p,
             story=self.story,
-            directory=self.directory_path,
+            directory=self.story.data['content_directory_path'],
             column=content,
             additional_menu_options=self.get_sub_menu_options()
         )
 
-        # Append our hidden textfield for creating new items
+        # Append our hiddent textfields for creating new categories, chapters, and notes
         content.controls.append(self.new_item_textfield)
-
-        # Add container to the bottom to make sure the drag target and gesture detector fill the rest of the space
-        content.controls.append(ft.Container(expand=True))
-
-        # Wrap the gd in a drag target so we can move characters here
-        dt = ft.DragTarget(
-            group="widgets",
-            content=content,     # Our content is the content we built above
-            on_accept=lambda e: self.on_drag_accept(e, self.directory_path)
-        )
+        
 
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(
             expand=True,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
-            content=dt,
+            content=content
         )
 
-        # Set our content to be a column
         self.content = ft.Column(
             spacing=0,
             expand=True,
@@ -196,6 +202,7 @@ class Content_Rail(Rail):
                 gd
             ]
         )
+        #self.content = content
         
         # Apply our update
         self.p.update()

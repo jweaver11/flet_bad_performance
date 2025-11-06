@@ -166,8 +166,6 @@ class Tree_View_File(ft.GestureDetector):
             # Check our widgets tag, and then check for uniqueness accordingly
             if tag is not None:
 
-                print("Checking uniqueness for tag:", tag)
-
                 # Chapters check 
                 if tag == "chapter":
                     for chapter in self.widget.story.chapters.values():
@@ -187,7 +185,7 @@ class Tree_View_File(ft.GestureDetector):
                             is_unique = False
 
                 # Maps
-                elif tag == "maps":
+                elif tag == "map":
                     for map_ in self.widget.story.maps.values():
                         if map_.title.lower() == name and map_.title.lower() != current_name:
                             is_unique = False
