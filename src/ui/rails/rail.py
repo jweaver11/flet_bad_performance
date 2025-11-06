@@ -4,6 +4,7 @@ Parent rail class used by our six workspaces. Gives uniformity to our rails
 
 import flet as ft
 import os
+import json
 from models.story import Story
 
 
@@ -31,28 +32,72 @@ class Rail(ft.Container):
             weight=ft.FontWeight.BOLD,
         )
 
-        # Declaring UI elements for easier referencing. This one is for folders, since most rails use it
-        self.new_category_textfield = ft.TextField(  
-            hint_text="Category Name",          
-            data="category",                        # Data for logic routing on submit
-            on_submit=self.submit_item,             # Called when enter is pressed
+        # Textfield for creating new items (sub-categories, chapters, notes, characters, etc.)
+        self.new_item_textfield = ft.TextField(     
+            hint_text="hint",                       # Placeholder text before user starts typings
+            data="data",                            # Data for logic routing on submit
+            autofocus=True,                         # Auto-focus when made visible
+            visible=False,                          # Hidden by default
+            text_style=self.text_style,             # Text style for consistency
+            on_blur=self.on_new_item_blur,          # Called when clicking off the textfield and after submitting
             on_change=self.on_new_item_change,      # Called on every key input
-            on_blur=self.on_new_item_blur,          # Called when clicking off the textfield or after submitting
-            autofocus=True,
-            visible=False,
-            text_style=self.text_style
+            on_submit=self.submit_item,             # Called when enter is pressed and textfield is focused
         )
 
-        # Calling initial rail to reload
-        #self.reload_rail()
+
+        # State variables used for our UI to track logic
+        self.item_is_unique = True          # If the new category, chapter, note, etc. title is unique within its directory
+        self.are_submitting = False         # If we are currently submitting this item
+
+        # Calling initial rail to reload. Child override this one
+        #self.reload_rail() 
 
     def get_menu_options(self) -> list[ft.Control]:
         ''' Returns a list of menu options when right clicking child rail '''
         return []
     
     def get_sub_menu_options(self) -> list[ft.Control]:
-        ''' Returns a list of additional menu options for sub-items in tree view directories '''
+        ''' Returns a list of additional menu options when clicking directories in the rail '''
         return []
+    
+    # Called when a widget is dragged and dropped into this directory
+    def on_drag_accept(self, e, new_directory: str):
+        ''' Moves our widgets into this directory from wherever they were '''
+        print("Drag accepting")
+
+        # Load our data (draggables can't just pass in simple data for some reason)
+        event_data = json.loads(e.data)
+
+        # Grab the source id of the draggable
+        src_id = event_data.get("src_id")     
+        
+        # Set the draggable
+        draggable = e.page.get_control(src_id)
+            
+        # Now we can grab its data, in this case the widget
+        widget = draggable.data
+
+        # Call the move file using the new directory path
+        widget.move_file(new_directory=new_directory)
+
+        # Remove the drag targets from our workspace to clean up
+        widget.story.workspace.remove_drag_targets()
+
+
+    # Called when new category button or menu option is clicked
+    def new_category_clicked(self, e):
+        ''' Handles setting our textfield for new category creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Category Name"
+        self.new_item_textfield.data = "category"
+
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu()
         
 
     # Called whenever our user inputs a new key into one of our textfields for new items
@@ -62,32 +107,51 @@ class Rail(ft.Container):
         # Start out assuming we are unique
         self.item_is_unique = True
 
-        # Grab out title from the textfield, and set our new key to compare
+        # Grab out title and tag from the textfield, and set our new key to compare
         title = e.control.value
+        tag = e.control.data
 
         # Generate our new key to compare. Requires normalization
         nk = self.directory_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
-        
         # Check all our folders and compare them to the new key
-        for key in self.story.data['folders'].keys():
-            
-            # Path comparisons require normalization
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        if tag == "category":
+            for key in self.story.data['folders'].keys():
+                
+                # Path comparisons require normalization
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
                 
         # Check our chapters
-        for key in self.story.chapters.keys():
-            
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        elif tag == "chapter":
+            for key in self.story.chapters.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
 
         # Check our notes
-        for key in self.story.notes.keys():
-            
-            if os.path.normcase(os.path.normpath(key)) == new_key:
-                self.item_is_unique = False
+        elif tag == "note":
+            for key in self.story.notes.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
+
+        # Check our characters
+        elif tag == "character":
+            for key in self.story.characters.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
+
+        # Check our timelines
+        elif tag == "timeline":
+            for key in self.story.timelines.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
+
+        # Check our maps
+        elif tag == "map":
+            for key in self.story.maps.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
                 
         # If we are NOT unique, show our error text
         if not self.item_is_unique:
@@ -111,22 +175,22 @@ class Rail(ft.Container):
 
             # If our item is unique, hide the textfield and update
             if self.item_is_unique:
-                e.control.visible = False
-                e.control.value = None
-                e.control.error_text = None
+                self.new_item_textfield.visible = False
+                self.new_item_textfield.value = None
+                self.new_item_textfield.error_text = None
                 self.p.update()
                 return
             
             # Otherwise its not unique, re-focus our textfield
             else:
-                e.control.visible = True
-                e.control.focus()
+                self.new_item_textfield.visible = True
+                self.new_item_textfield.focus()
         
         # If we're not submitting, just hide the textfield and reset values
         else:
-            e.control.visible = False
-            e.control.value = None
-            e.control.error_text = None
+            self.new_item_textfield.visible = False
+            self.new_item_textfield.value = None
+            self.new_item_textfield.error_text = None
             self.p.update()
 
 
@@ -149,13 +213,8 @@ class Rail(ft.Container):
             # New categories
             if tag == "category":
                 # Create our new category
-                self.story.create_folder(
-                    directory_path=self.directory_path, 
-                    name=title
-                )
-                # This one requires reloading the rail, but the rest don't
-                self.reload_rail()
-
+                self.story.create_folder(directory_path=self.directory_path, name=title)
+                 
             # New chapters
             elif tag == "chapter":
                 self.story.create_chapter(title)
@@ -163,6 +222,18 @@ class Rail(ft.Container):
             # New Notes
             elif tag == "note":
                 self.story.create_note(title)
+
+            # New Characters
+            elif tag == "character":
+                self.story.create_character(title)
+
+            # New Timelines
+            elif tag == "timeline":
+                self.story.create_timeline(title)
+
+            # New Maps
+            elif tag == "map":
+                self.story.create_map(title)
 
     # Called when changes occure that require rail to be reloaded. Should be overwritten by children
     def reload_rail(self) -> ft.Control:

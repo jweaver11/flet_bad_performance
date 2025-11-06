@@ -49,6 +49,7 @@ class Story(ft.View):
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
                 'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
+                'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
                 'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
                 'top_pin_height': int,
                 'left_pin_width': int,
@@ -251,6 +252,8 @@ class Story(ft.View):
 
             folder_path = os.path.join(directory_path, name)
 
+            name = name.capitalize()
+
             # Make the folder in our storage if it doesn't already exist
             os.makedirs(folder_path, exist_ok=True) 
             # Add this folder to our folders data so we can save stuff like colors
@@ -264,15 +267,15 @@ class Story(ft.View):
             print(f"Error creating folder: {e}")
         
     # Called when deleting a folder/category from our story
-    def delete_folder(self, directory_path: str):
+    def delete_folder(self, full_path: str):
         ''' Deletes a category from our story structure '''
 
         try:
             # Delete the folder from storage
-            shutil.rmtree(directory_path)
+            shutil.rmtree(full_path)
 
             # Remove it from data
-            self.data['folders'].pop(directory_path, None)
+            self.data['folders'].pop(full_path, None)
 
             self.save_dict()
 
@@ -283,29 +286,44 @@ class Story(ft.View):
             print(f"Error deleting folder: {e}")
 
     # Called when changing folder metadata, like color or is expanded or not
-    def change_folder_data(self, directory_path: str, key: str, value):
+    def change_folder_data(self, full_path: str, key: str, value):
         ''' Changes our folder metadata inside of our story data '''
-        #print("Changing folder data:", directory_path, key, value)
+        #print("Changing folder data:", full_path, key, value)
 
         try:
             # Check if the folder exists in our data
-            if directory_path in self.data['folders']:
-                self.data['folders'][directory_path][key] = value
+            if full_path in self.data['folders']:
+                self.data['folders'][full_path][key] = value
                 self.save_dict()
-                #print("Changed folder data:", directory_path, key, value)
+                #print("Changed folder data:", full_path, key, value)
             else:
-                print(f"Folder {directory_path} not found in story data.")
+                print(f"Folder {full_path} not found in story data.")
 
         # Handle errors
         except Exception as e:
             print(f"Error changing folder data: {e}")
 
-    
-    def move_file(self, new_path: str):
-        ''' Moves a file from its current directory to a new one '''
-        pass
+    def rename_folder(self, old_path: str, new_path: str):
+        ''' Renames the folder/category in our story structure '''
 
-            
+        # Does the actual renaming
+        os.rename(old_path, new_path)
+
+        # Update the old key in our folders data
+        if old_path in self.data['folders']:
+            #print("Updating old path in story data")
+            self.data['folders'][new_path] = self.data['folders'].pop(old_path)
+            self.save_dict()
+
+        # Go through each widget and update its directory path if it was in the renamed folder
+        for widget in self.widgets:
+            if widget.directory_path.startswith(old_path):
+                # Update the directory path
+                relative_path = widget.directory_path[len(old_path):]
+                widget.directory_path = new_path + relative_path
+                widget.save_dict()  # Save the updated widget data
+                #print("Updated widget directory path to ", widget.title, " to ", widget.directory_path)
+        
 
     # Called when deleting a widget from our story
     def delete_widget(self, widget) -> bool:
@@ -317,24 +335,31 @@ class Story(ft.View):
         def _delete_live_widget(widget: Widget):
             # Grab our widgets tag to see what type of object it is
             tag = widget.data.get('tag', None)
-
-            #print("Widget tag: ", tag)
             
             # Based on its tag, it deletes it from our appropriate dict
             if tag == "chapter":
-                print("Running chapter check")
                 if widget.data['key'] in self.chapters.keys():
-                    print("Widget is in self.chapters")
                     del self.chapters[widget.data['key']]
-            elif tag == "image":
-                if widget in self.images:
-                    del self.images[widget.data['key']]
-            elif tag == "character":
-                if widget in self.characters:
-                    del self.characters[widget.data['key']]
+
             elif tag == "note":
-                if widget in self.notes:
+                if widget.data['key'] in self.notes.keys():
                     del self.notes[widget.data['key']]
+
+            elif tag == "image":
+                if widget.data['key'] in self.images.keys():
+                    del self.images[widget.data['key']]
+
+            elif tag == "character":
+                if widget.data['key'] in self.characters.keys():
+                    del self.characters[widget.data['key']]
+
+            elif tag == "timeline":
+                if widget.data['key'] in self.timelines.keys():
+                    del self.timelines[widget.data['key']]
+
+            elif tag == "map":
+                if widget.data['key'] in self.maps.keys():
+                    del self.maps[widget.data['key']]
 
             
             # Remove from our master widgets list so it won't be rendered anymore
@@ -576,7 +601,8 @@ class Story(ft.View):
                             map_key = map_data.get("key", None)
                             map_title = map_data.get("title", filename.replace(".json", ""))    
                                 
-                            # Create our timeline object using our loaded data
+                            # Create our Map widgets.
+                            # TODO: Add in loading fathers? or get that from data inside of map constructor??
                             self.maps[map_key] = Map(
                                 title=map_title, 
                                 page=self.p, 
@@ -595,6 +621,8 @@ class Story(ft.View):
             if len(self.maps) == 0:
                 #print("No world maps found, creating default world map")
                 self.create_map(title="World Map", father=None, category="world")
+
+            #print(f"Loaded {len(self.maps)} maps into story '{self.title}'")
 
         # Catch errors
         except Exception as e:
@@ -782,9 +810,14 @@ class Story(ft.View):
             left=self.mouse_x,     # Positions the menu at the mouse location
             top=self.mouse_y,
             border_radius=ft.border_radius.all(4),
-            bgcolor=ft.Colors.ON_SECONDARY,
-            padding=2,
-            content=ft.Column(controls=menu_options),
+            border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
+            bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+            width=120,
+            content=ft.Column(
+                spacing=4,
+                horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                controls=menu_options
+            ),
         )
 
         # Outside gesture detector to close the menu when clicking outside the menu container
