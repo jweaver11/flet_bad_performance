@@ -13,11 +13,11 @@ Since maps could have hundreds of sub-maps, we give them each their own file to 
 
 import flet as ft
 from models.widget import Widget
-from models.mini_widget import MiniWidget
+from models.mini_widget import Mini_Widget
 
 
 
-class Map_Information_Display(MiniWidget):
+class Map_Information_Display(Mini_Widget):
 
     # Constructor.
     def __init__(

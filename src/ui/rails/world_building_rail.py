@@ -143,7 +143,8 @@ class World_Building_Rail(Rail):
         # Maps showing up on the rail.........
         # Categories rendered normal.
         # Maps with no sub maps, get rendered as normal files.
-        # Maps with sub maps get drop downs like categories, that pocess sub categories
+        # Maps with sub maps (saved in their data for reference) get drop downs like categories
+        
 
         # Load our content directory data into the rail
         load_directory_data(

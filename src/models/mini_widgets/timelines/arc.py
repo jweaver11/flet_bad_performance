@@ -1,11 +1,11 @@
 import flet as ft
-from models.mini_widget import MiniWidget
+from models.mini_widget import Mini_Widget
 from models.widget import Widget
 from handlers.verify_data import verify_data
 
 # Class for arcs (essentially sub-timelines that are connected) on a timeline. 
 # Arcs split off from the main timeline and can merge back in later. Exp: Characters going on different journeys that rejoin later
-class Arc(MiniWidget):
+class Arc(Mini_Widget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
     def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):

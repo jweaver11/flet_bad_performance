@@ -96,7 +96,7 @@ class Content_Rail(Rail):
             Menu_Option_Style(
                 on_click=self.new_note_clicked,
                 content=ft.Row(expand=True, controls=[
-                    ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
+                    ft.Icon(ft.Icons.NOTE_ALT_OUTLINED),
                     ft.Text("Note", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                     ft.Container(expand=True)
                 ])
@@ -119,7 +119,7 @@ class Content_Rail(Rail):
                 on_click=self.new_note_clicked,
                 data="note",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.ADD_COMMENT_OUTLINED),
+                    ft.Icon(ft.Icons.NOTE_ALT_OUTLINED),
                     ft.Text("Note", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
@@ -159,7 +159,7 @@ class Content_Rail(Rail):
             ),
             ft.IconButton(
                 tooltip="New Note",
-                icon=ft.Icons.ADD_COMMENT_OUTLINED,
+                icon=ft.Icons.NOTE_ALT_OUTLINED,
                 on_click=self.new_note_clicked
             ),
             ft.Container(expand=True),

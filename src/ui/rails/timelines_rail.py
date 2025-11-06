@@ -3,15 +3,18 @@
 import flet as ft
 from models.story import Story
 from ui.rails.rail import Rail
-from styles.timeline_styles import Timeline_Expansion_Tile
+from styles.timeline_expansion_tile import Timeline_Expansion_Tile
+from styles.timeline_item import Timeline_Item
+from styles.menu_option_style import Menu_Option_Style
 
 
 # Class is created in main on program startup
 class Timelines_Rail(Rail):
+
     # Constructor
     def __init__(self, page: ft.Page, story: Story):
         
-        # Initialize the parent Rail class first
+        # Parent constructor
         super().__init__(
             page=page,
             story=story,
@@ -20,24 +23,115 @@ class Timelines_Rail(Rail):
  
         self.reload_rail()
 
-    # Called when user creates a new plotline
-    def submit_timeline(self, title: str):
-        ''' Creates a new timeline inside of the current story '''
+    # Called recursively to load arcs, plotpoints, and timeskips of either a parent timeline or arc
+    def load_timeline_or_arc_data(
+        self,                                           
+        father,                                         # Either timeilne or an arc
+        father_expansion_tile: ft.ExpansionTile,         # Dropdown created for either timeline or arc
+        additional_directory_menu_options: list[ft.Control] = None,   # Additional menu options for right click on directory
+    ):    
+        ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
 
-        # Check if name is unique
-        name_is_unique = True
+        # Create our 3 expansion tile for our plotpoints, time skips, and arcs
+        plot_points_expansion_tile = Timeline_Expansion_Tile("Plot Points", self.story)
+        time_skips_expansion_tile = Timeline_Expansion_Tile("Time Skips", self.story)
+        arcs_expansion_tile = Timeline_Expansion_Tile("Arcs", self.story)
+    
 
-        for timeline in self.story.timelines.values():
-            if timeline.title == title:
-                name_is_unique = False
-                print("Plotline name already exists!")
-                break
+        # Go through our plotpoints from our parent arc or timeline, and add each item
+        for plot_point in father.plot_points.values():
+            plot_points_expansion_tile.content.controls.append(
+                ft.Text(plot_point.title),
+                # Timeline_Item(plot_point.title)
+            )
 
-        # Make sure the name is unique before creating
-        if name_is_unique:
+        # For timeskips
+        for time_skip in father.time_skips.values():
+            # Add each timeskip to the expansion tile
+            time_skips_expansion_tile.content.controls.append(
+                ft.Text(time_skip.title),
+                # Timeline_Item(time_skip.title)
+            )
+        
+        # Go through all the arcs/sub arcs held in our parent arc or timeline
+        for arc in father.arcs.values():
 
-            # Calls story function to create a new plotline
-            self.story.create_timeline(title)
+            # Create a new parent expansion tile we'll need for recursion
+            sub_arc_expansion_tile = Timeline_Expansion_Tile(arc.title, self.story)
+            
+            # Since its an arc, we need to recursively load its data as well
+            self.load_timeline_or_arc_data(
+                father=arc, 
+                father_expansion_tile=sub_arc_expansion_tile,
+                additional_directory_menu_options=additional_directory_menu_options
+            )
+
+            # Add the new parent expansion tile to our current parents expansion tile controls
+            arcs_expansion_tile.content.controls.append(sub_arc_expansion_tile)
+            
+
+        # Add our three expansion tiles to the parent expansion tile
+        father_expansion_tile.content.controls.append(plot_points_expansion_tile)
+        father_expansion_tile.content.controls.append(time_skips_expansion_tile)
+        father_expansion_tile.content.controls.append(arcs_expansion_tile)
+
+    
+    def new_timeline_clicked(self, e):
+        ''' Handles setting our textfield for new timeline creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Timeline Title"
+        self.new_item_textfield.data = "timeline"
+
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu()
+
+    def new_arc_clicked(self, e):
+        ''' Handles setting our textfield for new arc creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Arc Name"
+        self.new_item_textfield.data = "arc"
+
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu()
+
+    def new_plotpoint_clicked(self, e):
+        ''' Handles setting our textfield for new plotpoint creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Plot Point Name"
+        self.new_item_textfield.data = "plot_point"
+
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu()
+
+    def new_timeskip_clicked(self, e):
+        ''' Handles setting our textfield for new timeskip creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "Time Skip Name"
+        self.new_item_textfield.data = "time_skip"
+
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu()
+
 
     # Called when new arc is submitted 
     def submit_arc(self, e, parent):
@@ -91,173 +185,127 @@ class Timelines_Rail(Rail):
         print(f"New arc created on the {parent.title} arc or timeline. Name: {time_skip_title} ")
 
 
+    # Called to return our list of menu options for the content rail
+    def get_menu_options(self) -> list[ft.Control]:
+            
+        # Builds our buttons that are our options in the menu
+        return [
+            Menu_Option_Style(
+                on_click=self.new_category_clicked,
+                data="arc",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.ALARM_ADD_OUTLINED),
+                    ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                #on_click=self.new_character_clicked,
+                data="plot_point",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.EXPAND_CIRCLE_DOWN_OUTLINED),
+                    ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                #on_click=self.new_character_clicked,
+                data="time_skip",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.FAST_FORWARD_OUTLINED),
+                    ft.Text("Time skip", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+        ]
+    
+    def get_directory_menu_options(self) -> list[ft.Control]:
+        return [
+            Menu_Option_Style(
+                data="character",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.PERSON_ADD_ALT_OUTLINED),
+                    ft.Text("Character", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+        ]
+
+
     # Reload the rail whenever we need
     def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
-        from models.widgets.timeline import Timeline
 
         # TIMELINES RAIL ONLY HAS THE ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
-        # ALTERING THEM IS DONE IN THEIR MINI WIDGETS
+        # ALTERING THEIR DATA IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
 
-
-        # Called recursively to load arcs, plotpoints, and timeskips of either a timeline or arc
-        def _load_timeline_or_arc_data(parent, parent_expansion_tile: ft.ExpansionTile):    
-            ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
-
-            # Create an expansion tile for our plotpoints, time skips, and arcs
-            plot_points_expansion_tile = Timeline_Expansion_Tile("Plot Points", .8)
-            time_skips_expansion_tile = Timeline_Expansion_Tile("Time Skips", .8)
-            arcs_expansion_tile = Timeline_Expansion_Tile("Arcs", .8)
-        
-
-            # Go through our plotpoints from our parent arc or timeline
-            for plot_point in parent.plot_points.values():
-
-                # Add each plot point to the expansion tile
-                plot_points_expansion_tile.controls.append(
-                    ft.Text(plot_point.title),
-                )
-
-
-            # Go through our timeskips from our parent arc or timeline
-            for time_skip in parent.time_skips.values():
-
-                # Add each timeskip to the expansion tile
-                time_skips_expansion_tile.controls.append(
-                    ft.Text(time_skip.title),
-                )
+        header = ft.Row(
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
             
+            controls=[
 
-            # Go through all the sub arcs held in our parent arc or timeline
-            for sub_arc in parent.arcs.values():
+                # Add here, story name, and buttons to create new stuff.
+                # As well as right click options here that work like normal.
 
-                # Create a new parent expansion tile we'll need for recursion
-                sub_arc_expansion_tile = Timeline_Expansion_Tile(sub_arc.title)
+                ft.Container(expand=True),
 
-                # Add the new parent expansion tile to our current parents expansion tile controls
-                arcs_expansion_tile.controls.append(sub_arc_expansion_tile)
+                ft.IconButton(
+                    tooltip="New Timeline",
+                    icon=ft.Icons.TIMELINE_OUTLINED,
+                    on_click=self.new_timeline_clicked
+                ),
                 
-                # Recursively load them, passing in our new parent and parent expansion tile
-                _load_timeline_or_arc_data(parent=sub_arc, parent_expansion_tile=sub_arc_expansion_tile)
-                
+                ft.Container(expand=True),
+            ]
+        )
 
-            # Add text field to create new plot points 
-            plot_points_expansion_tile.controls.append(
-                ft.TextField(
-                    label="Create Plot Point",
-                    data=timeline.title,
-                    on_submit=lambda e: self.submit_plotpoint(e, parent),
-                    expand=True,
-                )
-            )
-
-            # Add text field to create new time skips
-            time_skips_expansion_tile.controls.append(
-                ft.TextField(
-                    label="Create Time Skip",
-                    expand=True,
-                    on_submit=lambda e: self.submit_timeskip(e, parent),
-                    data=timeline.title,
-                )
-            )
-
-            # Add text field to create new sub arcs
-            arcs_expansion_tile.controls.append(
-                ft.TextField(
-                    label="Create Arc" if isinstance(parent, Timeline) else "Create Sub-Arc",
-                    expand=True,
-                    on_submit=lambda e: self.submit_arc(e, parent),
-                    data=parent.title,
-                )
-            )
-
-            # Add our three expansion tiles to the parent expansion tile
-
-            parent_expansion_tile.controls.append(plot_points_expansion_tile)
-            parent_expansion_tile.controls.append(time_skips_expansion_tile)
-            parent_expansion_tile.controls.append(arcs_expansion_tile)
-
-
-            
-
-        # Set our content to be a column for a top down view
-        self.content = ft.Column(
+        # Build the content of our rail
+        content = ft.Column(
+            scroll=ft.ScrollMode.AUTO,
             spacing=0,
-            expand=True,
-            scroll="auto",
-            alignment=ft.MainAxisAlignment.START,
-            controls=[],
+            controls=[]
         )
 
         # Run through each timeline in the story
         for timeline in self.story.timelines.values():
 
             # Create an expansion tile for our timeline
-            timeline_expansion_tile = Timeline_Expansion_Tile(title=timeline.title, scale=1.0)
+            timeline_expansion_tile = Timeline_Expansion_Tile(title=timeline.title, story=self.story)
 
-            # Take our data, and add it to the rail under each timeline
-            _load_timeline_or_arc_data(parent=timeline, parent_expansion_tile=timeline_expansion_tile)
+            # Pass our timeline into the recursive loaded function to load its data
+            self.load_timeline_or_arc_data( 
+                father=timeline, 
+                father_expansion_tile=timeline_expansion_tile,
+                additional_directory_menu_options=self.get_directory_menu_options()
+            )
 
-            # Add our expansion tile to the rail content
-            self.content.controls.append(timeline_expansion_tile)
-            self.content.controls.append(ft.Container(height=10))
-
-            # If theres only one timeline, no need to add the parent expansion to the page
+            # If theres only one timeline, no need to add the parent expansion to the page. Just add the content
             if len(self.story.timelines) == 1:
-                self.content.controls = timeline_expansion_tile.controls
-                break
+                content.controls.append(timeline_expansion_tile.content)
+
+            # Otherwise, add the full expansion panel
+            else:
+                content.controls.append(timeline_expansion_tile)
 
 
-        def open_menu(story: Story):
-            
-            #print(f"Open menu at x={story.mouse_x}, y={story.mouse_y}")
+        # Finally, add our new item textfield at the bottom
+        content.controls.append(self.new_item_textfield)
 
-            def close_menu(e):
-                self.p.overlay.clear()
-                self.p.update()
-            
-            menu = ft.Container(
-                left=story.mouse_x,     # Positions the menu at the mouse location
-                top=story.mouse_y,
-                border_radius=ft.border_radius.all(6),
-                bgcolor=ft.Colors.ON_SECONDARY,
-                padding=2,
-                alignment=ft.alignment.center,
-                content=ft.Column([
-                    ft.TextButton("Option 1"),
-                    ft.TextButton("Option 2"),
-                    ft.TextButton("Option 3"),
-                ]),
-            )
-            outside_detector = ft.GestureDetector(
-                expand=True,
-                on_tap=close_menu,
-                on_secondary_tap=close_menu,
-            )
-
-            self.p.overlay.append(outside_detector)
-            self.p.overlay.append(menu)
-            
-            self.p.update()
-
-            
-        self.content.controls.append(ft.Container(height=50))
-
-        self.content.controls.append(
-            ft.GestureDetector(
-                content=ft.Text("GD"),
-                on_secondary_tap=lambda e: open_menu(self.story),
-                mouse_cursor="click",
-            )
-        )
-        
-
-        self.content.controls.append(ft.Container(height=20))
-
-        self.content.controls.append(
-            ft.TextField(label="Create New Timeline", on_submit=lambda e: self.submit_timeline(e.control.value)),
+        # Gesture detector to put on top of stack on the rail to pop open menus on right click
+        gd = ft.GestureDetector(
+            expand=True,
+            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+            content=content,
         )
 
+        # Set our content to be a column
+        self.content = ft.Column(
+            spacing=0,
+            expand=True,
+            controls=[
+                header,
+                ft.Divider(),
+                gd
+            ]
+        )
+
+        # Apply the changes to the page
         self.p.update()
     
