@@ -525,9 +525,9 @@ class Story(ft.View):
         
         # Create our plotline object with no data if story is new, or loaded data if it exists already
         if len(self.timelines) == 0:
-            key = self.data['timelines_directory_path'] + "\\" + "_Main_Timeline"
+            key = self.data['timelines_directory_path'] + "\\" + "Timeline 1"
             self.timelines[key] = Timeline(
-                title="Main_Timeline", 
+                title="Timeline 1", 
                 page=self.p, 
                 directory_path=dirpath, 
                 story=self, 

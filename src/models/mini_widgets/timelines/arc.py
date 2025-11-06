@@ -13,12 +13,14 @@ class Arc(Mini_Widget):
         # Parent constructor
         super().__init__(
             title=title,        
-            owner=owner,        
-            father=father,      # In this case, father is always a timeline or another arc
+            owner=owner,                    # Top most timeline this arc belongs too
+            father=father,                  # Immediate parent timeline or arc that thisarc belongs too
             page=page,          
             dictionary_path=dictionary_path,  
             data=data,         
         ) 
+
+        # Type of arcs?? timeskips, normal, etc??
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -39,7 +41,7 @@ class Arc(Mini_Widget):
                 'rail_dropdown_is_expanded': True,  # If the rail dropdown is expanded  
                 'content': str,
                 'description': str,
-                'events': list,                     # Step by step of plot events through the arc. Call plot point??
+                'summary': str,
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,

@@ -15,7 +15,15 @@ class Mini_Widget(ft.Container):
 
     # Constructor. All mini widgets require a title, owner widget, father (parent), page reference...
     # Dictionary path, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
+    def __init__(
+        self, 
+        title: str,                     # Title of the widget that will show up on its tab
+        owner: Widget,                  # The widget that contains this mini widget.
+        father,                         # Immidiate parent widget or mini widget that holds us (Since some mini widget)
+        page: ft.Page,                  # Grabs our original page for convenience and consistency
+        dictionary_path: str,           # Path to our dict within our fathers data
+        data: dict = None               # Data passed in for this mini widget
+    ):
 
         # Parent constructor
         super().__init__(
@@ -25,13 +33,13 @@ class Mini_Widget(ft.Container):
             data=data,      # Sets our data.
         )
 
-        title = title.capitalize()
-           
-        self.title = title                          # Title of the widget that will show up on its tab
-        self.owner = owner                          # The widget that contains this mini widget.
-        self.father = father                        # Immidiate parent object that holds us (Can't use 'parent' cuz flet)
-        self.p = page                               # Grabs our original page for convenience and consistency
-        self.dictionary_path = dictionary_path      # Path to our dict within our fathers data
+        
+        # Set our parameters
+        self.title = title.capitalize()                        
+        self.owner = owner                          
+        self.father = father                        
+        self.p = page                               
+        self.dictionary_path = dictionary_path      
 
 
         # Verifies this object has the required data fields, and creates them if not

@@ -21,6 +21,7 @@ class Timeline_Expansion_Tile(ft.GestureDetector):
         additional_menu_options: list[ft.Control] = None,       # Additional menu options when right clicking a category, depending on the rail
     ):
 
+        # Set our parameters
         self.title = title.capitalize()
         self.story = story
         self.additional_menu_options = additional_menu_options
@@ -57,7 +58,32 @@ class Timeline_Expansion_Tile(ft.GestureDetector):
     def get_menu_options(self) -> list[ft.Control]:
 
         # Declare our menu options list, and add our category option first
-        menu_options = []
+        menu_options = [
+            Menu_Option_Style(
+                #on_click=self.new_category_clicked,
+                data="arc",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.ALARM_ADD_OUTLINED),
+                    ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                #on_click=self.new_character_clicked,
+                data="plot_point",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.EXPAND_CIRCLE_DOWN_OUTLINED),
+                    ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                #on_click=self.new_character_clicked,
+                data="time_skip",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.FAST_FORWARD_OUTLINED),
+                    ft.Text("Time skip", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+        ]
 
         # Run through our additional menu options if we have any, and set their on_click methods
         for option in self.additional_menu_options or []:

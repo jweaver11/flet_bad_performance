@@ -1,5 +1,5 @@
 import flet as ft
-from styles.timeline_expansion_tile import Timeline_Expansion_Tile
+from styles.timeline_dropdown import Timeline_Expansion_Tile
 from models.mini_widget import Mini_Widget
 from styles.menu_option_style import Menu_Option_Style
 

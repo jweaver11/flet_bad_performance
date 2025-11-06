@@ -3,7 +3,7 @@
 import flet as ft
 from models.story import Story
 from ui.rails.rail import Rail
-from styles.timeline_expansion_tile import Timeline_Expansion_Tile
+from styles.timeline_dropdown import Timeline_Expansion_Tile
 from styles.timeline_item import Timeline_Item
 from styles.menu_option_style import Menu_Option_Style
 
@@ -23,11 +23,11 @@ class Timelines_Rail(Rail):
  
         self.reload_rail()
 
-    # Called recursively to load arcs, plotpoints, and timeskips of either a parent timeline or arc
-    def load_timeline_or_arc_data(
+    # Called recursively to load arcs, plotpoints, and timeskips an arc
+    def load_arc_data(
         self,                                           
-        father,                                         # Either timeilne or an arc
-        father_expansion_tile: ft.ExpansionTile,         # Dropdown created for either timeline or arc
+        father,                                         # Either timeline or an arc
+        father_expansion_tile: ft.ExpansionTile,         # Dropdown created for parent arc
         additional_directory_menu_options: list[ft.Control] = None,   # Additional menu options for right click on directory
     ):    
         ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
@@ -191,27 +191,11 @@ class Timelines_Rail(Rail):
         # Builds our buttons that are our options in the menu
         return [
             Menu_Option_Style(
-                on_click=self.new_category_clicked,
-                data="arc",
+                on_click=self.new_timeline_clicked,
+                data="timeline",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.ALARM_ADD_OUTLINED),
-                    ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                ])
-            ),
-            Menu_Option_Style(
-                #on_click=self.new_character_clicked,
-                data="plot_point",
-                content=ft.Row([
-                    ft.Icon(ft.Icons.EXPAND_CIRCLE_DOWN_OUTLINED),
-                    ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                ])
-            ),
-            Menu_Option_Style(
-                #on_click=self.new_character_clicked,
-                data="time_skip",
-                content=ft.Row([
-                    ft.Icon(ft.Icons.FAST_FORWARD_OUTLINED),
-                    ft.Text("Time skip", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ft.Icon(ft.Icons.TIMELINE_ROUNDED),
+                    ft.Text("Timeline", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
         ]
@@ -235,6 +219,28 @@ class Timelines_Rail(Rail):
         # TIMELINES RAIL ONLY HAS THE ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
         # ALTERING THEIR DATA IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
+
+
+        # Create a dropdown inside timeline dropdown 
+        def _create_dropdown(title: str) -> ft.ExpansionTile:
+            icon = ft.Icons.TIMELINE_ROUNDED
+
+            return ft.ExpansionTile(
+                title=ft.Text(value=title, weight=ft.FontWeight.BOLD, text_align="left"),
+                dense=True,
+                #initially_expanded=self.is_expanded,
+                tile_padding=ft.Padding(0, 0, 0, 0),
+                controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented
+                leading=ft.Icon(icon),
+                maintain_state=True,
+                expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
+                adaptive=True,
+                bgcolor=ft.Colors.TRANSPARENT,
+                shape=ft.RoundedRectangleBorder(),
+                #on_change=lambda e: self.toggle_expand(),
+                controls=[self.new_item_textfield], 
+            )
+
 
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -269,8 +275,18 @@ class Timelines_Rail(Rail):
             # Create an expansion tile for our timeline
             timeline_expansion_tile = Timeline_Expansion_Tile(title=timeline.title, story=self.story)
 
+            
+
+            # Create our sub expansion tiles for arcs and plotpoints. 
+            # Add each plot point to plotpoints dropdown
+
+            # Create arc dropdown using the style.
+            # Add each arc dropdown to arcs dropdown
+
+
+
             # Pass our timeline into the recursive loaded function to load its data
-            self.load_timeline_or_arc_data( 
+            self.load_arc_data( 
                 father=timeline, 
                 father_expansion_tile=timeline_expansion_tile,
                 additional_directory_menu_options=self.get_directory_menu_options()

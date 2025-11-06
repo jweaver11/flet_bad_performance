@@ -13,8 +13,8 @@ class Timeline_Information_Display(Mini_Widget):
         # Parent constructor
         super().__init__(
             title=title,        
-            owner=owner,        
-            father=father,      # In this case, father is always the timeline we belong to
+            owner=owner,                    
+            father=father,                  # In this case, father is always the timeline or arc we belong to
             page=page,          
             dictionary_path=dictionary_path,  # Not used, but its required so just whatever works
             data=None,      # No data is used here, so NEVER reference it. Use self.owner.data instead
