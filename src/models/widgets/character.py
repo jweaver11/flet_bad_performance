@@ -35,7 +35,8 @@ class Character(Widget):
                 'tab_color': "primary",
                 'name_color': "primary",
                 'sex_color': "primary",
-                'morality': str,
+                'alignment1': str, #lawful, neutral, chaotic, none
+                'alignment2': str, #good, neutral, evil, none
                 'sex': str,
                 'age': str,
                 'physical_description': {
@@ -103,20 +104,20 @@ class Character(Widget):
                         controls=[          # All flet controls inside our Row
                            #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                                label="Morality",           # Label at top of dropdown 
-                                value=self.data['morality'],        # Value selected in the drop down
+                                label="alignnment1",           # Label at top of dropdown 
+                                value=self.data['alignment1'],        # Value selected in the drop down
                                 #padding=ft.padding.all(0),
                                 color=self.data['name_color'],      # Color of the dropdown text
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
                                 options=[           # Options for the dropdown
                                     ft.DropdownOption(text="Undecided"),
-                                    ft.DropdownOption(text="Good"),
+                                    ft.DropdownOption(text="Lawful"),
                                     ft.DropdownOption(text="Neutral"),
-                                    ft.DropdownOption(text="Evil"),
+                                    ft.DropdownOption(text="Chaotic"),
                                     ft.DropdownOption(text="None"),
                                     
                                 ],
-                                #n_change=self.submit_morality_change,
+                                #n_change=self.submit_alignment1_change,
                             ),
                                
                             ft.Dropdown(      # Sex of each character
