@@ -21,8 +21,8 @@ class DraggableWidget extends StatelessWidget {
 TODO: add classes for "draggableExample" and "draggableExampleState"
 PSEUDO CODE/EXPLANATION 4 ME:
 Draggable<Border>(
-    data: how should look - the border
-    child: what shows when not dragging - the border
+    data: how should look - the border perhaps ref to existing border?
+    child: what shows when not dragging - the border ^
     feedback: what shows when dragging - same but with opacity
     childWhenDragging: what shows in place of child when dragging - empty 
     onDragStarted: what to do when drag starts - start moving the border?
