@@ -65,7 +65,7 @@ class Characters_Rail(Rail):
             # New and upload options? or just upload?? or how do i wanna do this?? Compact vs spread out view??
         ]
     
-    def get_sub_menu_options(self) -> list[ft.Control]:
+    def get_directory_menu_options(self) -> list[ft.Control]:
         return [
             Menu_Option_Style(
                 data="character",
@@ -119,7 +119,7 @@ class Characters_Rail(Rail):
             story=self.story,
             directory=self.directory_path,
             column=content,
-            additional_menu_options=self.get_sub_menu_options()
+            additional_directory_menu_options=self.get_directory_menu_options()
         )
 
         # Append our hidden textfield for creating new items

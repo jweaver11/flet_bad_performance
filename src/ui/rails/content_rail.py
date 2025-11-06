@@ -105,7 +105,7 @@ class Content_Rail(Rail):
             # New and upload options? or just upload?? or how do i wanna do this?? Compact vs spread out view??
         ]
     
-    def get_sub_menu_options(self) -> list[ft.Control]:
+    def get_directory_menu_options(self) -> list[ft.Control]:
         return [
             Menu_Option_Style(
                 on_click=self.new_chapter_clicked,
@@ -179,7 +179,7 @@ class Content_Rail(Rail):
             story=self.story,
             directory=self.story.data['content_directory_path'],
             column=content,
-            additional_menu_options=self.get_sub_menu_options()
+            additional_directory_menu_options=self.get_sub_menu_options()
         )
 
         # Append our hiddent textfields for creating new categories, chapters, and notes

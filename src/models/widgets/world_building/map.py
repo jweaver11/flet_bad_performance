@@ -32,7 +32,7 @@ class Map(Widget):
         page: ft.Page, 
         directory_path: str, 
         story: Story,
-        father: str = None,                     # Parent map this map belongs to. None if top level map
+        father: str = None,                     # Parent map this map belongs to (using data['key'] of the parent map)
         category: str = None,                   # Type of map this is (world map, continent, country, city, dungeon, room, etc)
         data: dict = None
     ):
@@ -66,12 +66,12 @@ class Map(Widget):
                 'rooms': dict,                  
                 'notes': str,
 
-                'position': {               # Our position on our parent map
+                'position': {               # Our position on our parent map when parent map is not in edit mode
                     'x': 0,                    
                     'y': 0,                     
                 },
 
-                'sub_categories': {                     # Categories for organizing our maps on the rail
+                'sub_categories': {                     # Categories for organizing our sub maps on the rail
                     'category_name': {
                         'title': str,                   # Title of the category
                         'is_expanded': bool,            # Whether the category is expanded or collapsed

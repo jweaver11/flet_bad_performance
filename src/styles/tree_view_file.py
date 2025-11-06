@@ -1,6 +1,7 @@
 import flet as ft
 from models.widget import Widget
 from styles.menu_option_style import Menu_Option_Style
+from styles.tree_view_directory import Tree_View_Directory
 
 # Class for items within a tree view on the rail
 class Tree_View_File(ft.GestureDetector):
@@ -8,15 +9,14 @@ class Tree_View_File(ft.GestureDetector):
     def __init__(
         self, 
         widget: Widget, 
-        additional_menu_options: list = None
+        father: Tree_View_Directory = None,
+        additional_menu_options: list[ft.Control] = None
     ):
-        
-        # Drag a file/category to move it into another folder/category
-        # -- Needs to highlight the category its hovering above
         
         
         # Set our widget reference and tag
         self.widget = widget
+        self.father = father
         tag = widget.data.get('tag', None)
 
         self.additional_menu_options = additional_menu_options
@@ -59,14 +59,17 @@ class Tree_View_File(ft.GestureDetector):
             on_tap = lambda e: self.widget.focus(),
             mouse_cursor = ft.MouseCursor.CLICK,
         )
+
+
         self.reload()
     
     # Called when this item is right clicked
     def get_menu_options(self) -> list[ft.Control]:
         ''' Pops open a column of the menu options for this tree view item'''
 
-        return [
-            # Rename button
+        
+        # Rename button
+        menu_options = [
             Menu_Option_Style(
                 on_click=self.rename_clicked,
                 content=ft.Row([
@@ -77,9 +80,20 @@ class Tree_View_File(ft.GestureDetector):
                         color=ft.Colors.ON_SURFACE
                     ), 
                 ]),
-            ),
+            )
+        ]
+        
+        # Run through our additional menu options if we have any, and set their on_click methods
+        for option in self.additional_menu_options or []:
 
-            # Color changing popup menu
+            # Set their on_click to call our on_click method, which can handle any type of widget
+            option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
+
+            # Add them to the list
+            menu_options.append(option)
+
+        # Color changing popup menu
+        menu_options.append(
             Menu_Option_Style(
                 content=ft.PopupMenuButton(
                     expand=True,
@@ -95,17 +109,21 @@ class Tree_View_File(ft.GestureDetector):
                     ),
                     items=self.get_color_options()
                 ),
-            ),
+            )
+        )
 
-            # Delete button
+        # Delete button
+        menu_options.append(
             Menu_Option_Style(
                 on_click=lambda e: self.delete_clicked(e),
                 content=ft.Row([
                     ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
                     ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
                 ]),
-            ),
-        ]
+            )
+        )
+
+        return menu_options
 
 
     # Called when hovering mouse over a tree view item

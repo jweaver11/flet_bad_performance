@@ -23,7 +23,7 @@ class World_Building_Rail(Rail):
         self.reload_rail()
 
     # Called when new character button or menu option is clicked
-    def new_map_clicked(self, e):
+    def new_map_clicked(self, e=None, is_sub_map: bool = None):
         ''' Handles setting our textfield for new character creation '''
         
         # Makes sure the right textfield is visible and the others are hidden
@@ -36,6 +36,12 @@ class World_Building_Rail(Rail):
 
         # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()
+
+    # Called to have our create new map option called
+    def new_item_clicked(self, type: str):
+        ''' Same function name as the tree_view_directory style in order to give functionality'''
+
+        self.new_map_clicked()
         
 
     # Called to return our list of menu options for the content rail
@@ -63,13 +69,24 @@ class World_Building_Rail(Rail):
             # New and upload options? or just upload?? or how do i wanna do this?? Compact vs spread out view??
         ]
     
-    def get_sub_menu_options(self) -> list[ft.Control]:
+    def get_directory_menu_options(self) -> list[ft.Control]:
         return [
             Menu_Option_Style(
                 data="map",
                 content=ft.Row([
                     ft.Icon(ft.Icons.MAP_OUTLINED),
                     ft.Text("Map", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+        ]
+
+    def get_file_menu_options(self) -> list[ft.Control]:
+        return [
+            Menu_Option_Style(
+                data="map",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.MAP_OUTLINED),
+                    ft.Text("Sub-Map", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
         ]
@@ -122,13 +139,20 @@ class World_Building_Rail(Rail):
             controls=[]
         )
 
+
+        # Maps showing up on the rail.........
+        # Categories rendered normal.
+        # Maps with no sub maps, get rendered as normal files.
+        # Maps with sub maps get drop downs like categories, that pocess sub categories
+
         # Load our content directory data into the rail
         load_directory_data(
             page=self.p,
             story=self.story,
             directory=self.directory_path,
             column=content,
-            additional_menu_options=self.get_sub_menu_options()
+            additional_directory_menu_options=self.get_directory_menu_options(),
+            additional_file_menu_options=self.get_file_menu_options()
         )
 
         # Append our hidden textfield for creating new items

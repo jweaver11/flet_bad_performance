@@ -18,7 +18,8 @@ def load_directory_data(
     directory: str,                                       # The directory to load data from
     dir_dropdown: Tree_View_Directory = None,             # Optional parent expansion tile for when recursively called
     column: ft.Column = None,                             # Optional parent column to add elements too when not starting inside a tile
-    additional_menu_options: list[ft.Control] = None      # Additional menu options passed in from parent rail to be used for directories
+    additional_directory_menu_options: list[ft.Control] = None,      # Additional menu options passed in from parent rail to be used for directories
+    additional_file_menu_options: list[ft.Control] = None   
     # Only dir_dropdown OR column should be provided, but one is required
 ) -> ft.Control:
     
@@ -77,7 +78,7 @@ def load_directory_data(
                 page=page,
                 color=color,
                 is_expanded=is_expanded,
-                additional_menu_options=additional_menu_options,
+                additional_menu_options=additional_directory_menu_options,
                 father=dir_dropdown if dir_dropdown is not None else None,
             )
 
@@ -87,7 +88,8 @@ def load_directory_data(
                 story=story,                                              # Story reference
                 directory=full_path,                                      # Our new directory to load
                 dir_dropdown=new_expansion_tile,                          # Our new parent expansion tile
-                additional_menu_options=additional_menu_options           # Any additional menu options to pass down
+                additional_directory_menu_options=additional_directory_menu_options,           # Any additional menu options to pass down
+                additional_file_menu_options=additional_file_menu_options
             )
 
             # Add our expansion tile for the directory to its parent, or the column if top most directory
@@ -111,12 +113,13 @@ def load_directory_data(
                 if widget.title == name and widget.directory_path == os.path.join(directory):  
                     widget = widget
                     break
-                
+            
 
             # Create the file item
             item = Tree_View_File(
                 widget,
-                additional_menu_options=file_options
+                father=dir_dropdown if dir_dropdown is not None else None,
+                additional_menu_options=additional_file_menu_options
             )        
 
             # Add them to parent expansion tile if one exists, otherwise just add it to the column
