@@ -7,5 +7,8 @@ class Arc_Dropdown(ft.GestureDetector):
         self,
         title: str,
     ):
+        
+        # Clicking this dropdown on the rail focuses the mini widget info display...
+        # And zooms in on this arc on the Timeline
         pass
     
