@@ -660,14 +660,17 @@ class Tree_View_Directory(ft.GestureDetector):
     # Called when we need to reload this directory tile
     def reload(self):
         expansion_tile = ft.ExpansionTile(
-            title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
+            title=ft.Row([
+                ft.Icon(ft.Icons.FOLDER_OUTLINED, color=self.color),
+                ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left")
+            ]),
             dense=True,
             visual_density=ft.VisualDensity.COMPACT,
             initially_expanded=self.is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented
-            leading=ft.Icon(ft.Icons.FOLDER_OUTLINED, color=self.color),
             maintain_state=True,
+            #affinity=ft.TileAffinity.LEADING, 
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             adaptive=True,
             bgcolor=ft.Colors.TRANSPARENT,

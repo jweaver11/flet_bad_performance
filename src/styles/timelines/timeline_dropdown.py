@@ -121,8 +121,6 @@ class Timeline_Dropdown(ft.GestureDetector):
         # Set the data from our option
         data = e.control.data
 
-        print(f"New item clicked: {data}")
-
 
         # Make our textfield visible and set values
         if data == "plot_point":

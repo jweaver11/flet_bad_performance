@@ -44,6 +44,7 @@ class Timelines_Rail(Rail):
 
         # Add our label to the father dropdown and add the textfield for new plotpoints
         father_dropdown.content.controls.append(plot_points_label)
+        father_dropdown.content.controls.append(ft.Divider())
         father_dropdown.content.controls.append(father_dropdown.new_plot_point_textfield)
     
         # Go through our plotpoints from our parent arc or timeline, and add each item
@@ -54,12 +55,13 @@ class Timelines_Rail(Rail):
 
         # Create our label for arcs
         arcs_label = Timeline_Label(
-            title="Arcs:",
+            title=f"{arcs_dropdown_title}:",
             icon=ft.Icons.ARCHITECTURE_OUTLINED,
         )
 
         # Add our label to the father dropdown and add the textfield for new arcs
         father_dropdown.content.controls.append(arcs_label)
+        father_dropdown.content.controls.append(ft.Divider())
         father_dropdown.content.controls.append(father_dropdown.new_arc_textfield)
 
         # Go through all the arcs/sub arcs held in our parent arc or timeline
@@ -330,7 +332,10 @@ class Timelines_Rail(Rail):
             # If theres only one timeline, no need to add the parent expansion to the page.
             if len(self.story.timelines) == 1:
                 # Just add the Title, and two dropdowns 
-                content.controls.append(ft.Text(timeline.title, weight=ft.FontWeight.BOLD))
+                #content.controls.append(Timeline_Label(
+                    #title=timeline.title,
+                    #icon=ft.Icons.TIMELINE_OUTLINED,
+                #))
                 content.controls.extend(timeline_dropdown.content.controls)
 
             # Otherwise, add the full expansion panel

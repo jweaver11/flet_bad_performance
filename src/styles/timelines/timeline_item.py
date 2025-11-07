@@ -360,7 +360,7 @@ class Timeline_Item(ft.GestureDetector):
                 content=ft.Row(
                     expand=True,
                     controls=[
-                        #ft.Icon(self.icon, color=self.color), 
+                        ft.Icon(self.icon, color=self.color, size=20), 
                         #ft.Container(width=20),
                         ft.Text(value=self.title, style=self.text_style),
                     ],
