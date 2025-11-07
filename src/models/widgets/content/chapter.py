@@ -49,7 +49,7 @@ class Chapter(Widget):
                 owner=self,
                 father=self,
                 page=self.p,
-                dictionary_path="comments",
+                key="comments",
                 data=note_data,
             ))
     

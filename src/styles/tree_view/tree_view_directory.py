@@ -676,6 +676,7 @@ class Tree_View_Directory(ft.GestureDetector):
         expansion_tile = ft.ExpansionTile(
             title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
             dense=True,
+            visual_density=ft.VisualDensity.COMPACT,
             initially_expanded=self.is_expanded,
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented

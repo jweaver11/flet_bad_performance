@@ -113,7 +113,7 @@ class Map(Widget):
             owner=self,                     # Our map is the owner of this mini widget
             father=self,                    # Our map is also the father of this mini widget
             page=self.p,
-            dictionary_path="information_display",
+            key="information_display",
             data=None
         )
 
@@ -152,7 +152,7 @@ class Map(Widget):
                     owner=self,       # Our world building widget
                     father=self,
                     page=self.p,
-                    dictionary_path="maps",
+                    key="maps",
                     data=map_data,
                 )
                 

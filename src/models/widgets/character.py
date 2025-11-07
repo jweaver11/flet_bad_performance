@@ -61,6 +61,16 @@ class Character(Widget):
                     'hometown': str,     
                     'education': str,        
                 },
+                'strengths': {
+                    'physical': str,
+                    'mental': str,
+                    'social': str,
+                },
+                'weaknesses': {
+                    'physical': str,
+                    'mental': str,
+                    'social': str,
+                },
                 'trauma': str,
                 'occupation': str,
                 'goals': str,

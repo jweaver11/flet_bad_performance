@@ -8,8 +8,8 @@ import flet as ft
 import os
 import json
 from models.story import Story
-from styles.tree_view_directory import Tree_View_Directory
-from styles.tree_view_file import Tree_View_File
+from styles.tree_view.tree_view_directory import Tree_View_Directory
+from styles.tree_view.tree_view_file import Tree_View_File
 
 
 def load_directory_data(

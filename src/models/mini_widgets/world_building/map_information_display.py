@@ -26,7 +26,7 @@ class Map_Information_Display(Mini_Widget):
         owner: Widget,                  # The owner is always our map owner
         father,                         # Our father is always our map owner as well    
         page: ft.Page, 
-        dictionary_path: str,           # Not used, but its required so just whatever works
+        key: str,           # Not used, but its required so just whatever works
         data: dict = None               # No data is used here, so NEVER reference it. Use self.owner.data instead
     ):
         
@@ -40,7 +40,7 @@ class Map_Information_Display(Mini_Widget):
             father=father,       
             page=page,              
             data=data,              
-            dictionary_path=dictionary_path     
+            key=key     
         ) 
 
         # Set our visibility based on our owners data

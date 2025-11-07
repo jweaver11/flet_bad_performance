@@ -1,26 +1,24 @@
 import flet as ft
-from styles.timeline_dropdown import Timeline_Expansion_Tile
-from models.mini_widget import Mini_Widget
+from models.widget import Widget
 from styles.menu_option_style import Menu_Option_Style
+from styles.tree_view.tree_view_directory import Tree_View_Directory
+import math
 
-
-# Rail items representing plotpoints, timeskips, and arcs themselves
-class Timeline_Item(ft.GestureDetector):
-    
+# Class for items within a tree view on the rail
+class Tree_View_File(ft.GestureDetector):
 
     def __init__(
         self, 
-        mini_widget: Mini_Widget, 
-        #father: Timeline = None,
-        dir_dropdown: Timeline_Expansion_Tile = None,
+        widget: Widget, 
+        father: Tree_View_Directory = None,
         additional_menu_options: list[ft.Control] = None
     ):
         
         
         # Set our widget reference and tag
-        self.mini_widget = mini_widget
-        #self.father = father
-        tag = mini_widget.data.get('tag', None)
+        self.widget = widget
+        self.father = father
+        tag = widget.data.get('tag', None)
 
         self.additional_menu_options = additional_menu_options
 
@@ -52,14 +50,14 @@ class Timeline_Item(ft.GestureDetector):
         )
 
         # Get icon color from widget data if it exists
-        #self.icon_color = mini_widget.data.get('color', 'primary')
+        self.icon_color = widget.data.get('color', 'primary')
 
         # Parent constructor
         super().__init__(
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
-            on_secondary_tap = lambda e: self.mini_widget.owner.story.open_menu(self.get_menu_options()),
-            #on_tap = lambda e: self.widget.focus(),
+            on_secondary_tap = lambda e: self.widget.story.open_menu(self.get_menu_options()),
+            on_tap = lambda e: self.widget.focus(),
             mouse_cursor = ft.MouseCursor.CLICK,
         )
 
@@ -141,8 +139,6 @@ class Timeline_Item(ft.GestureDetector):
 
     # Called when rename button is clicked
     def rename_clicked(self, e):
-        
-        # TODO: Edit rename to fit arcs
 
         # Track if our name is unique for checks, and if we're submitting or not
         is_unique = True
@@ -342,21 +338,31 @@ class Timeline_Item(ft.GestureDetector):
     # Called to reload our tree view file display
     def reload(self):
 
+        # If dir dropdown is not None, insert indentation icon ??
+
         self.content = ft.Container(
             expand=True, 
             padding=ft.Padding(0, 2, 5, 2),
-            
-            content=ft.GestureDetector(
-                mouse_cursor=ft.MouseCursor.CLICK,
-                content=ft.Row(
-                    expand=True,
-                    controls=[
-                        ft.Icon(self.icon, color=self.icon_color), 
-                        ft.Text(value=self.widget.title, style=self.text_style),
-                    ],
-                ),
+            content=ft.Draggable(
+                group="widgets",
+                data=self.widget,
+                content_feedback=ft.TextButton(content=ft.Row([ft.Icon(self.icon), ft.Text(self.widget.title, style=self.text_style, expand=True)])),
+                on_drag_start=lambda e: self.widget.story.workspace.show_pin_drag_targets(),
+                content=ft.GestureDetector(
+                    mouse_cursor=ft.MouseCursor.CLICK,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(self.icon, color=self.icon_color), 
+                            ft.Text(value=self.widget.title, style=self.text_style),
+                        ],
+                    ),
+                )
             )
         )
-        
+
+        # If dir dropdown is not None, insert indentation icon ??
+        #ft.Icon(ft.Icons.HORIZONTAL_RULE, rotate=ft.Rotate(math.pi/2)),
 
         self.widget.p.update()
+

@@ -44,8 +44,10 @@ class Timeline(Widget):
                 'color': "primary",                 # Color of the branch in the timeline
                 'is_expanded': True,                # If the branch dropdown is expanded on the rail
                 'plot_points_are_expanded': True,   # If the plotpoints section is expanded
+                'plot_points_dropdown_color': "primary",  # Color of the plot points dropdown in the rail
                 'arcs_are_expanded': True,          # If the arcs section is expanded
-                'time_skips_are_expanded': True,    # If the timeskips section is expanded
+                'arcs_dropdown_color': "primary",   # Color of the arcs dropdown in the rail
+
                 'plot_points': dict,                # Dict of plot points in this branch
                 'time_skips': dict,                 # Dict of time skips in this branch
                 'arcs': dict,                       # Dict of arcs in this branch
@@ -92,7 +94,7 @@ class Timeline(Widget):
             owner=self,
             father=self,
             page=self.p,
-            dictionary_path="none",     # Not used, but its required so just whatever works
+            key="none",     # Not used, but its required so just whatever works
             data=None,      # It uses our data, so we don't need to give it a copy that we would have to constantly maintain
         )
         # Add to our mini widgets so it shows up in the UI
@@ -109,7 +111,7 @@ class Timeline(Widget):
                 owner=self, 
                 father=self,
                 page=self.p, 
-                dictionary_path="arcs",
+                key="arcs",
                 data=data
             )
             self.mini_widgets.append(self.arcs[key])  # Branches need to be in the owners mini widgets list to show up in the UI
@@ -126,7 +128,7 @@ class Timeline(Widget):
                 owner=self, 
                 father=self,
                 page=self.p, 
-                dictionary_path="plot_points", 
+                key="plot_points", 
                 data=data
             )
             self.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
@@ -143,7 +145,7 @@ class Timeline(Widget):
                 owner=self, 
                 father=self,
                 page=self.p, 
-                dictionary_path="time_skips",
+                key="time_skips",
                 data=data
             )
             self.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
@@ -159,7 +161,7 @@ class Timeline(Widget):
             owner=self, 
             father=self,
             page=self.p, 
-            dictionary_path="arcs", 
+            key="arcs", 
             data=None
         )
         self.mini_widgets.append(self.arcs[title])
@@ -179,7 +181,7 @@ class Timeline(Widget):
             owner=self, 
             father=self,
             page=self.p, 
-            dictionary_path="plot_points", 
+            key="plot_points", 
             data=None
         )
         self.mini_widgets.append(self.plot_points[title])
@@ -199,7 +201,7 @@ class Timeline(Widget):
             owner=self, 
             father=self,
             page=self.p, 
-            dictionary_path="time_skips", 
+            key="time_skips", 
             data=None
         )
         self.mini_widgets.append(self.time_skips[title])

@@ -8,7 +8,7 @@ from models.widgets.timeline import Timeline
 class Time_Skip(Mini_Widget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, father, page: ft.Page, dictionary_path: str, data: dict=None):
+    def __init__(self, title: str, owner: Widget, father, page: ft.Page, key: str, data: dict=None):
 
         # Parent constructor
         super().__init__(
@@ -16,7 +16,7 @@ class Time_Skip(Mini_Widget):
             owner=owner,        
             father=father,      # In this case, father is always a timeline or another arc
             page=page,          
-            dictionary_path=dictionary_path,  
+            key=key,  
             data=data,    
         ) 
 

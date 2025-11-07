@@ -8,7 +8,7 @@ from models.widgets.timeline import Timeline
 class Timeline_Information_Display(Mini_Widget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, father: Timeline, page: ft.Page, dictionary_path: str, data: dict=None):
+    def __init__(self, title: str, owner: Widget, father: Timeline, page: ft.Page, key: str, data: dict=None):
 
         # Parent constructor
         super().__init__(
@@ -16,7 +16,7 @@ class Timeline_Information_Display(Mini_Widget):
             owner=owner,                    
             father=father,                  # In this case, father is always the timeline or arc we belong to
             page=page,          
-            dictionary_path=dictionary_path,  # Not used, but its required so just whatever works
+            key=key,  # Not used, but its required so just whatever works
             data=None,      # No data is used here, so NEVER reference it. Use self.owner.data instead
         ) 
         

@@ -21,7 +21,7 @@ class Mini_Widget(ft.Container):
         owner: Widget,                  # The widget that contains this mini widget.
         father,                         # Immidiate parent widget or mini widget that holds us (Since some mini widget)
         page: ft.Page,                  # Grabs our original page for convenience and consistency
-        dictionary_path: str,           # Path to our dict within our fathers data
+        key: str,                       # Key to identify this mini widget (by title) within its fathers data
         data: dict = None               # Data passed in for this mini widget
     ):
 
@@ -39,7 +39,7 @@ class Mini_Widget(ft.Container):
         self.owner = owner                          
         self.father = father                        
         self.p = page                               
-        self.dictionary_path = dictionary_path      
+        self.key = key     
 
 
         # Verifies this object has the required data fields, and creates them if not
@@ -84,7 +84,7 @@ class Mini_Widget(ft.Container):
             else:
 
                 # Our data is correct, so we update our immidiate parents data to match
-                self.father.data[self.dictionary_path][self.title] = self.data
+                self.father.data[self.key][self.title] = self.data
 
             # Recursively updates the parents data until father=owner (widget), which saves to file
             self.father.save_dict()
@@ -106,7 +106,7 @@ class Mini_Widget(ft.Container):
 
             # Remove the data of our father (parent) widget/mini widget to match
             # By deleting the father data manually here, it will cascade up the chain when save_dict is called
-            self.father.data[self.dictionary_path].pop(self.title, None)
+            self.father.data[self.key].pop(self.title, None)
             
             # Applies the changes up the chain
             self.save_dict()

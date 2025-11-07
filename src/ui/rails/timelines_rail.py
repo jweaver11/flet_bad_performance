@@ -3,8 +3,9 @@
 import flet as ft
 from models.story import Story
 from ui.rails.rail import Rail
-from styles.timeline_dropdown import Timeline_Expansion_Tile
-from styles.timeline_item import Timeline_Item
+from styles.timelines.timeline_dropdown import Timeline_Dropdown
+from styles.timelines.arcs_or_plotpoints_dropdown import Arcs_Or_Plotpoints_Dropdown
+from styles.timelines.timeline_item import Timeline_Item
 from styles.menu_option_style import Menu_Option_Style
 
 
@@ -24,46 +25,36 @@ class Timelines_Rail(Rail):
         self.reload_rail()
 
     # Called recursively to load arcs, plotpoints, and timeskips an arc
-    def load_arc_data(
+    def load_timeline_or_arc_data(
         self,                                           
-        father,                                         # Either timeline or an arc
-        father_expansion_tile: ft.ExpansionTile,         # Dropdown created for parent arc
-        additional_directory_menu_options: list[ft.Control] = None,   # Additional menu options for right click on directory
+        father,                                             # Either timeline or an arc
+        father_dropdown: Timeline_Dropdown,            # Dropdown created for parent arc
+        arcs_dropdown_title: str = "Sub Arcs",              # Title for the arcs dropdown. We can overwrite this to 'arcs' for timelines
     ):    
         ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
 
-        # Create our 3 expansion tile for our plotpoints, time skips, and arcs
-        plot_points_expansion_tile = Timeline_Expansion_Tile("Plot Points", self.story)
-        time_skips_expansion_tile = Timeline_Expansion_Tile("Time Skips", self.story)
-        arcs_expansion_tile = Timeline_Expansion_Tile("Arcs", self.story)
+        # Create our 2 expansion tile for our plotpoints and arcs
+        plot_points_expansion_tile = Timeline_Dropdown("Plot Points", additional_menu_options=self.get_sub_menu_options(), story=self.story, father=father)
+        arcs_expansion_tile = Timeline_Dropdown(arcs_dropdown_title, additional_menu_options=self.get_sub_menu_options(), story=self.story, father=father)
     
 
         # Go through our plotpoints from our parent arc or timeline, and add each item
         for plot_point in father.plot_points.values():
             plot_points_expansion_tile.content.controls.append(
-                ft.Text(plot_point.title),
-                # Timeline_Item(plot_point.title)
+                Timeline_Item(plot_point.title, plot_point)
             )
 
-        # For timeskips
-        for time_skip in father.time_skips.values():
-            # Add each timeskip to the expansion tile
-            time_skips_expansion_tile.content.controls.append(
-                ft.Text(time_skip.title),
-                # Timeline_Item(time_skip.title)
-            )
         
         # Go through all the arcs/sub arcs held in our parent arc or timeline
         for arc in father.arcs.values():
 
             # Create a new parent expansion tile we'll need for recursion
-            sub_arc_expansion_tile = Timeline_Expansion_Tile(arc.title, self.story)
+            sub_arc_expansion_tile = Timeline_Dropdown(arc.title, self.story, type="arc", father=father, additional_menu_options=self.get_sub_menu_options())
             
             # Since its an arc, we need to recursively load its data as well
             self.load_timeline_or_arc_data(
                 father=arc, 
-                father_expansion_tile=sub_arc_expansion_tile,
-                additional_directory_menu_options=additional_directory_menu_options
+                father_dropdown=sub_arc_expansion_tile,
             )
 
             # Add the new parent expansion tile to our current parents expansion tile controls
@@ -71,9 +62,8 @@ class Timelines_Rail(Rail):
             
 
         # Add our three expansion tiles to the parent expansion tile
-        father_expansion_tile.content.controls.append(plot_points_expansion_tile)
-        father_expansion_tile.content.controls.append(time_skips_expansion_tile)
-        father_expansion_tile.content.controls.append(arcs_expansion_tile)
+        father_dropdown.content.controls.append(plot_points_expansion_tile)
+        father_dropdown.content.controls.append(arcs_expansion_tile)
 
     
     def new_timeline_clicked(self, e):
@@ -185,29 +175,79 @@ class Timelines_Rail(Rail):
         print(f"New arc created on the {parent.title} arc or timeline. Name: {time_skip_title} ")
 
 
-    # Called to return our list of menu options for the content rail
+    # Called to return our list of menu options when right clicking on the timeline rail
     def get_menu_options(self) -> list[ft.Control]:
-            
-        # Builds our buttons that are our options in the menu
+        ''' Returns our menu options for the timelines rail. In this case just timelines '''
+
         return [
             Menu_Option_Style(
                 on_click=self.new_timeline_clicked,
                 data="timeline",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.TIMELINE_ROUNDED),
+                    ft.Icon(ft.Icons.ADD_ROUNDED),
                     ft.Text("Timeline", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
         ]
     
-    def get_directory_menu_options(self) -> list[ft.Control]:
+    # Called when right clicking a timeline, arc, or the arc/plot point drop downs
+    def get_sub_menu_options(self) -> list[ft.Control]:
+        ''' Returns all possible menu options. The class that receives this option filters out what it needs '''
+
         return [
+            # Create plot point button
             Menu_Option_Style(
-                data="character",
+                data="plot_point",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.PERSON_ADD_ALT_OUTLINED),
-                    ft.Text("Character", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ft.Icon(ft.Icons.EVENT_OUTLINED),
+                    ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
+            ),
+            # Create arc button
+            Menu_Option_Style(
+                data="arc",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.EVENT_OUTLINED),
+                    ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            # Rename button
+            Menu_Option_Style(
+                #on_click=self.rename_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
+                    ft.Text(
+                        "Rename", 
+                        weight=ft.FontWeight.BOLD, 
+                        color=ft.Colors.ON_SURFACE
+                    ), 
+                ]),
+            ),
+            # Color changing popup menu
+            Menu_Option_Style(
+                content=ft.PopupMenuButton(
+                    expand=True,
+                    tooltip="",
+                    padding=None,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
+                            ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                            ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
+                        ]
+                    ),
+                    #items=self.get_color_options()
+                )
+            ),
+            
+            # Delete button
+            Menu_Option_Style(
+                #on_click=lambda e: self.delete_clicked(e),
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
+                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
+                ]),
             ),
         ]
 
@@ -220,26 +260,6 @@ class Timelines_Rail(Rail):
         # ALTERING THEIR DATA IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
 
-
-        # Create a dropdown inside timeline dropdown 
-        def _create_dropdown(title: str) -> ft.ExpansionTile:
-            icon = ft.Icons.TIMELINE_ROUNDED
-
-            return ft.ExpansionTile(
-                title=ft.Text(value=title, weight=ft.FontWeight.BOLD, text_align="left"),
-                dense=True,
-                #initially_expanded=self.is_expanded,
-                tile_padding=ft.Padding(0, 0, 0, 0),
-                controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented
-                leading=ft.Icon(icon),
-                maintain_state=True,
-                expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
-                adaptive=True,
-                bgcolor=ft.Colors.TRANSPARENT,
-                shape=ft.RoundedRectangleBorder(),
-                #on_change=lambda e: self.toggle_expand(),
-                controls=[self.new_item_textfield], 
-            )
 
 
         header = ft.Row(
@@ -272,33 +292,32 @@ class Timelines_Rail(Rail):
         # Run through each timeline in the story
         for timeline in self.story.timelines.values():
 
-            # Create an expansion tile for our timeline
-            timeline_expansion_tile = Timeline_Expansion_Tile(title=timeline.title, story=self.story)
-
-            
-
-            # Create our sub expansion tiles for arcs and plotpoints. 
-            # Add each plot point to plotpoints dropdown
-
-            # Create arc dropdown using the style.
-            # Add each arc dropdown to arcs dropdown
-
+            # Create an expansion tile for our timeline that we need in order to load its data
+            timeline_dropdown = Timeline_Dropdown(
+                title=timeline.title, 
+                story=self.story, 
+                father=timeline, 
+                type="timeline",
+                additional_menu_options=self.get_sub_menu_options()
+            )
 
 
             # Pass our timeline into the recursive loaded function to load its data
-            self.load_arc_data( 
+            self.load_timeline_or_arc_data( 
                 father=timeline, 
-                father_expansion_tile=timeline_expansion_tile,
-                additional_directory_menu_options=self.get_directory_menu_options()
+                father_dropdown=timeline_dropdown,
+                arcs_dropdown_title="Arcs"
             )
 
-            # If theres only one timeline, no need to add the parent expansion to the page. Just add the content
+            # If theres only one timeline, no need to add the parent expansion to the page.
             if len(self.story.timelines) == 1:
-                content.controls.append(timeline_expansion_tile.content)
+                # Just add the Title, and two dropdowns 
+                content.controls.append(ft.Text(timeline.title, weight=ft.FontWeight.BOLD))
+                content.controls.extend(timeline_dropdown.content.controls)
 
             # Otherwise, add the full expansion panel
             else:
-                content.controls.append(timeline_expansion_tile)
+                content.controls.append(timeline_dropdown)
 
 
         # Finally, add our new item textfield at the bottom
@@ -324,4 +343,6 @@ class Timelines_Rail(Rail):
 
         # Apply the changes to the page
         self.p.update()
+
+
     
