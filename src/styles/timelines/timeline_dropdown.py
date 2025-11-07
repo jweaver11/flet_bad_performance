@@ -48,12 +48,27 @@ class Timeline_Dropdown(ft.GestureDetector):
         )
         
         # Textfield for creating new items (sub-categories, chapters, notes, characters, etc.)
-        self.new_item_textfield = ft.TextField(  
-            hint_text="Sub-Arc Name",          
-            #data="arc",                                       # Data for logic routing on submit
-            #on_submit=self.new_sub_category_clicked,               # Called when enter is pressed
+        self.new_plot_point_textfield = ft.TextField(  
+            hint_text="Plot Point Name",   
+            data="plot_point",       
             autofocus=True,
+            capitalization=ft.TextCapitalization.SENTENCES,
+            on_change=self.new_item_check,
             on_blur=self.on_new_item_blur,
+            on_submit=self.new_item_submit,
+            visible=False,
+            text_style=self.text_style
+        )
+
+        # Textfield for creating new items (sub-categories, chapters, notes, characters, etc.)
+        self.new_arc_textfield = ft.TextField(  
+            hint_text="Sub Arc Name", 
+            data="arc",         
+            autofocus=True,
+            capitalization=ft.TextCapitalization.SENTENCES,
+            on_change=self.new_item_check,
+            on_blur=self.on_new_item_blur,
+            on_submit=self.new_item_submit,
             visible=False,
             text_style=self.text_style
         )
@@ -71,43 +86,18 @@ class Timeline_Dropdown(ft.GestureDetector):
     # Called to return our menu options when right clicking our dropdown
     def get_menu_options(self) -> list[ft.Control]:
         ''' Filters the five options we received, and only returns what we need with correct logic '''
-        #[
-            # Create plot points    (Plotpoint-Dropdown)
-            # Create arcs           (Sub-Arcs-Dropdown)
-            # Rename.               (Timeline, Arc)
-            # Change color.         (Timeline, Arc, Sub-Arcs-Dropdown, Plotpoint-Dropdown)
-            # Delete.               (Timeline, Arc)
-        #]
-
-        # Create our menu options list
-        menu_options = []
-
-        # Only return options for arcs and sub-arcs dropdowns
-        if self.title.lower() == "arcs" or self.title.lower() == "sub-arcs":
-            menu_options.append(self.additional_menu_options[1])      # Create arc
-            menu_options.append(self.additional_menu_options[3])      # Change color
-
-        # Only return options for plot points dropdown
-        elif self.title.lower() == "plot points":
-            menu_options.append(self.additional_menu_options[0])      # Create plot point
-            menu_options.append(self.additional_menu_options[3])      # Change color
-
-        # Only return options for timeline and arc dropdowns
-        elif self.type == "timeline" or self.type == "arc":
-            menu_options.append(self.additional_menu_options[2])      # Rename
-            menu_options.append(self.additional_menu_options[3])      # Change color
-            menu_options.append(self.additional_menu_options[4])      # Delete
-            
-        # For dropdowns representing arcs themselves, return all options
-        else:
-            menu_options.extend(self.additional_menu_options)    
-
+    
+        # Our menu options list
+        menu_options: list[ft.Control] = []
 
         # Run through our additional menu options if we have any, and set their on_click methods
         for option in self.additional_menu_options or []:
 
             # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_tap = lambda e: self.option_clicked(e)
+            option.on_tap = lambda e: self.new_item_clicked(e)
+
+            # Add to our menu options list
+            menu_options.append(option)
 
         # Return our menu options list
         return menu_options
@@ -122,32 +112,23 @@ class Timeline_Dropdown(ft.GestureDetector):
         
 
     # Called when creating new category or when additional menu items are clicked
-    def option_clicked(self, e):
+    def new_item_clicked(self, e):
         ''' Shows the textfield for creating new item. Requires what type of item (category, chapter, note, etc.) '''
 
         # Clear out any previous value
-        self.new_item_textfield.value = None
+        e.control.value = None
 
         # Set the data from our option
         data = e.control.data
 
-        # 
-        data_title = data.replace("_", " ").title()
+        print(f"New item clicked: {data}")
+
 
         # Make our textfield visible and set values
-        self.new_item_textfield.visible = True
-        self.new_item_textfield.data = data
-        self.new_item_textfield.hint_text = f"{data_title} Title"
-
-
-        # Check the type passed in by the option, and route our logic through that
         if data == "plot_point":
-            self.new_item_textfield.on_change = self.plot_point_check
-            self.new_item_textfield.on_submit = self.plot_point_submit
-
-        elif data== "arc":
-            self.new_item_textfield.on_change = self.arc_check
-            self.new_item_textfield.on_submit = self.arc_submit
+            self.new_plot_point_textfield.visible = True
+        elif data == "arc":
+            self.new_arc_textfield.visible = True
 
         # Check our expanded state. Rebuild if needed
         if self.is_expanded == False:
@@ -157,29 +138,96 @@ class Timeline_Dropdown(ft.GestureDetector):
         # Close the menu, which will also update the page
         self.story.close_menu()
 
-    def plot_point_check(self, e):
-        pass
-    def arc_check(self, e):
-        pass
-    def plot_point_submit(self, e):
-        # Call our timeline or arc to create a new plot point
-        pass
 
-    def arc_submit(self, e):
+    def new_item_check(self, e):
+        ''' Checks if our new item is unique in our father's dicts '''
+
+        # Get our name and check if its unique
+        title = e.control.value
+
+        # Either plotpoint or arc, whatever we're submitting
+        type = e.control.data
+
+        # Check for plot points
+        if type == "plot_point":
+
+            # Run through our father timeline/arcs plot points to see if the name exists
+            if title in self.father.plot_points.keys():
+                self.item_is_unique = False
+                e.control.error_text = "Title must be unique"
+            else:
+                self.item_is_unique = True
+                e.control.error_text = None
+
+        # Check for arcs
+        elif type == "arc":
+            if title in self.father.arcs.keys():
+                self.item_is_unique = False
+                e.control.error_text = "Title must be unique"
+            else:
+                self.item_is_unique = True
+                e.control.error_text = None
+
+        # Update the page to show changes
+        self.story.p.update()
+
+    # Called when clicking off the textfield and after submission
+    def on_new_item_blur(self, e):
+        ''' Handles if we need to hide our textfield or re-focus it based on submissions '''
+        
+        # Check if we're submitting, or normal blur
+        if self.are_submitting:
+
+            # Change submitting to false
+            self.are_submitting = False     
+
+            # If our item is unique, hide the textfield and update
+            if self.item_is_unique:
+                e.control.visible = False
+                e.control.value = None
+                e.control.error_text = None
+                self.story.p.update()
+                return
+            
+            # Otherwise its not unique, re-focus our textfield
+            else:
+                e.control.visible = True
+                e.control.focus()
+        
+        # If we're not submitting, just hide the textfield and reset values
+        else:
+            e.control.visible = False
+            e.control.value = None
+            e.control.error_text = None
+            self.story.p.update()
+
+
+    def new_item_submit(self, e):
         # Get our name and check if its unique
         title = e.control.value
 
         # Set submitting to True
         self.are_submitting = True
 
-        # If it is, call the rename function. It will do everything else
+        # Either plotpoint or arc, whatever we're submitting
+        type = e.control.data
+
+        # If we're unique, figure out what item we are creating
         if self.item_is_unique:
-            self.father.create_arc(title=title)
+
+            # Plot points
+            if type == "plot_point":
+                self.father.create_plot_point(title=title)
+
+            # Arcs
+            elif type == "arc":
+                self.father.create_arc(title=title)
             
         # Otherwise make sure we show our error
         else:
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.story.p.update()
+
 
     def get_color_options(self) -> list[ft.Control]:
         ''' Returns a list of all available colors for icon changing '''
@@ -224,35 +272,6 @@ class Timeline_Dropdown(ft.GestureDetector):
 
         return color_controls
 
-    # Called when clicking off the textfield and after submission
-    def on_new_item_blur(self, e):
-        ''' Handles if we need to hide our textfield or re-focus it based on submissions '''
-        
-        # Check if we're submitting, or normal blur
-        if self.are_submitting:
-
-            # Change submitting to false
-            self.are_submitting = False     
-
-            # If our item is unique, hide the textfield and update
-            if self.item_is_unique:
-                self.new_item_textfield.visible = False
-                self.new_item_textfield.value = None
-                self.new_item_textfield.error_text = None
-                self.story.p.update()
-                return
-            
-            # Otherwise its not unique, re-focus our textfield
-            else:
-                self.new_item_textfield.visible = True
-                self.new_item_textfield.focus()
-        
-        # If we're not submitting, just hide the textfield and reset values
-        else:
-            self.new_item_textfield.visible = False
-            self.new_item_textfield.value = None
-            self.new_item_textfield.error_text = None
-            self.story.p.update()
 
 
     # Called when we need to reload this directory tile
@@ -271,15 +290,13 @@ class Timeline_Dropdown(ft.GestureDetector):
             bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
             #on_change=lambda e: self.toggle_expand(),
-            controls=[self.new_item_textfield], 
         )
 
         # Re-adds our content controls so we can keep states
         if self.content is not None:        # Protects against first loads
             if self.content.controls is not None:
                 for control in self.content.controls:
-                    if control != self.new_item_textfield:      # Don't re-add our textfield, its already there
-                        expansion_tile.controls.append(control)
+                    expansion_tile.controls.append(control)
 
         
         # Set the content

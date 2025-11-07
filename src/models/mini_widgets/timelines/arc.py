@@ -30,7 +30,7 @@ class Arc(Mini_Widget):
                 'start_date': str,                  # Start and end date of the branch, for timeline view
                 'end_date': str,                    # Start and end date of the branch, for timeline view
                 'color': "primary",                 # Color of the branch in the timeline
-                'is_expanded': True,                # If the branch dropdown is expanded on the rail
+                'dropdown_is_expanded': True,                # If the branch dropdown is expanded on the rail
                 'plot_points_are_expanded': True,   # If the plotpoints section is expanded
                 'arcs_are_expanded': True,          # If the arcs section is expanded
                 

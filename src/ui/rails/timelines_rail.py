@@ -4,7 +4,7 @@ import flet as ft
 from models.story import Story
 from ui.rails.rail import Rail
 from styles.timelines.timeline_dropdown import Timeline_Dropdown
-from styles.timelines.arcs_or_plotpoints_dropdown import Arcs_Or_Plotpoints_Dropdown
+from styles.timelines.timeline_label import Timeline_Label
 from styles.timelines.timeline_item import Timeline_Item
 from styles.menu_option_style import Menu_Option_Style
 
@@ -24,27 +24,44 @@ class Timelines_Rail(Rail):
  
         self.reload_rail()
 
-    # Called recursively to load arcs, plotpoints, and timeskips an arc
+    # Called recursively to load arcs (and sub arcs) and plotpoings within a timeline. Called in reload_rail
     def load_timeline_or_arc_data(
         self,                                           
         father,                                             # Either timeline or an arc
-        father_dropdown: Timeline_Dropdown,            # Dropdown created for parent arc
+        father_dropdown: Timeline_Dropdown,                 # Dropdown created for parent arc
         arcs_dropdown_title: str = "Sub Arcs",              # Title for the arcs dropdown. We can overwrite this to 'arcs' for timelines
     ):    
         ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
 
-        # Create our 2 expansion tile for our plotpoints and arcs
-        plot_points_expansion_tile = Timeline_Dropdown("Plot Points", additional_menu_options=self.get_sub_menu_options(), story=self.story, father=father)
-        arcs_expansion_tile = Timeline_Dropdown(arcs_dropdown_title, additional_menu_options=self.get_sub_menu_options(), story=self.story, father=father)
-    
-
-        # Go through our plotpoints from our parent arc or timeline, and add each item
-        for plot_point in father.plot_points.values():
-            plot_points_expansion_tile.content.controls.append(
-                Timeline_Item(plot_point.title, plot_point)
-            )
 
         
+
+        # Create our label for plotpoints
+        plot_points_label = Timeline_Label(
+            title="Plot Points:",
+            icon=ft.Icons.LOCATION_PIN,
+        )       #Icons.LOCATION_SEARCHING_OUTLINED
+
+        # Add our label to the father dropdown and add the textfield for new plotpoints
+        father_dropdown.content.controls.append(plot_points_label)
+        father_dropdown.content.controls.append(father_dropdown.new_plot_point_textfield)
+    
+        # Go through our plotpoints from our parent arc or timeline, and add each item
+        for plot_point in father.plot_points.values():
+            father_dropdown.content.controls.append(
+                Timeline_Item(title=plot_point.title, mini_widget=plot_point)
+            )
+
+        # Create our label for arcs
+        arcs_label = Timeline_Label(
+            title="Arcs:",
+            icon=ft.Icons.ARCHITECTURE_OUTLINED,
+        )
+
+        # Add our label to the father dropdown and add the textfield for new arcs
+        father_dropdown.content.controls.append(arcs_label)
+        father_dropdown.content.controls.append(father_dropdown.new_arc_textfield)
+
         # Go through all the arcs/sub arcs held in our parent arc or timeline
         for arc in father.arcs.values():
 
@@ -58,12 +75,13 @@ class Timelines_Rail(Rail):
             )
 
             # Add the new parent expansion tile to our current parents expansion tile controls
-            arcs_expansion_tile.content.controls.append(sub_arc_expansion_tile)
+            #arcs_expansion_tile.content.controls.append(sub_arc_expansion_tile)
+            father_dropdown.content.controls.append(sub_arc_expansion_tile)
             
 
         # Add our three expansion tiles to the parent expansion tile
-        father_dropdown.content.controls.append(plot_points_expansion_tile)
-        father_dropdown.content.controls.append(arcs_expansion_tile)
+        #father_dropdown.content.controls.append(plot_points_expansion_tile)
+        #father_dropdown.content.controls.append(arcs_expansion_tile)
 
     
     def new_timeline_clicked(self, e):

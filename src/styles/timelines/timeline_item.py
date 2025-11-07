@@ -11,7 +11,8 @@ class Timeline_Item(ft.GestureDetector):
     def __init__(
         self, 
         mini_widget: Mini_Widget, 
-        title: str = None,
+        title: str,
+        icon: ft.Icon = None,
         #father: Timeline = None,
         dir_dropdown: Timeline_Dropdown = None,
         additional_menu_options: list[ft.Control] = None
@@ -20,14 +21,18 @@ class Timeline_Item(ft.GestureDetector):
         
         # Set our widget reference and tag
         self.mini_widget = mini_widget
+        self.title = title
+        self.color = ft.Colors.PRIMARY
         #self.father = father
-        tag = mini_widget.data.get('tag', None)
+        #tag = mini_widget.data.get('tag', None)
+
+        tag = None
 
         self.additional_menu_options = additional_menu_options
 
         # Check our tag and set our icon accordingly
         if tag is None:
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
+            self.icon = ft.Icons.LOCATION_PIN
 
         elif tag == "chapter":
             self.icon = ft.Icons.DESCRIPTION_OUTLINED
@@ -43,6 +48,9 @@ class Timeline_Item(ft.GestureDetector):
 
         else:
             self.icon = ft.Icons.ERROR_OUTLINE
+
+        if icon is not None:
+            self.icon = icon
             
 
         # Set our text style
@@ -57,9 +65,9 @@ class Timeline_Item(ft.GestureDetector):
 
         # Parent constructor
         super().__init__(
-            on_enter = self.on_hover,
-            on_exit = self.on_stop_hover,
-            on_secondary_tap = lambda e: self.mini_widget.owner.story.open_menu(self.get_menu_options()),
+            #on_enter = self.on_hover,
+            #on_exit = self.on_stop_hover,
+            #on_secondary_tap = lambda e: self.mini_widget.owner.story.open_menu(self.get_menu_options()),
             #on_tap = lambda e: self.widget.focus(),
             mouse_cursor = ft.MouseCursor.CLICK,
         )
@@ -337,7 +345,7 @@ class Timeline_Item(ft.GestureDetector):
             ]
         )
 
-        self.widget.p.open(dlg)
+        self.mini_widget.p.open(dlg)
 
 
     # Called to reload our tree view file display
@@ -352,12 +360,13 @@ class Timeline_Item(ft.GestureDetector):
                 content=ft.Row(
                     expand=True,
                     controls=[
-                        ft.Icon(self.icon, color=self.icon_color), 
-                        ft.Text(value=self.widget.title, style=self.text_style),
+                        #ft.Icon(self.icon, color=self.color), 
+                        #ft.Container(width=20),
+                        ft.Text(value=self.title, style=self.text_style),
                     ],
                 ),
             )
         )
         
 
-        self.widget.p.update()
+        #self.p.update()

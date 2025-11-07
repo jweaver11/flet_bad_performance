@@ -46,6 +46,7 @@ class Tree_View_Directory(ft.GestureDetector):
             #data="category",                                       # Data for logic routing on submit
             #on_submit=self.new_sub_category_clicked,               # Called when enter is pressed
             autofocus=True,
+            capitalization=ft.TextCapitalization.SENTENCES,
             on_blur=self.on_new_item_blur,
             visible=False,
             text_style=self.text_style
@@ -54,8 +55,6 @@ class Tree_View_Directory(ft.GestureDetector):
         # Parent constructor
         super().__init__(
             mouse_cursor=ft.MouseCursor.CLICK,
-            on_enter=self.on_hover,
-            on_exit=self.on_stop_hover,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
         )
 
@@ -637,19 +636,6 @@ class Tree_View_Directory(ft.GestureDetector):
         )
 
         self.p.open(dlg)
-
-
-    def on_hover(self, e):
-        # Need to set the directory path when dragging stuff
-        self.bgcolor = ft.Colors.with_opacity(0.8, ft.Colors.RED)
-        #if self.father is not None:
-            #self.father.content.bgcolor = ft.Colors.TRANSPARENT
-        self.p.update()
-       
-
-    def on_stop_hover(self, e):
-        self.bgcolor = ft.Colors.TRANSPARENT
-        self.p.update()
 
     # Called when a widget is dragged and dropped into this directory
     def on_drag_accept(self, e):
