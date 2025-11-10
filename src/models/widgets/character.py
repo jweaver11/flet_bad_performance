@@ -114,7 +114,7 @@ class Character(Widget):
                         controls=[          # All flet controls inside our Row
                            #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                                label="alignnment1",           # Label at top of dropdown 
+                                label="alignment1",           # Label at top of dropdown 
                                 value=self.data['alignment1'],        # Value selected in the drop down
                                 #padding=ft.padding.all(0),
                                 color=self.data['name_color'],      # Color of the dropdown text
@@ -124,6 +124,22 @@ class Character(Widget):
                                     ft.DropdownOption(text="Lawful"),
                                     ft.DropdownOption(text="Neutral"),
                                     ft.DropdownOption(text="Chaotic"),
+                                    ft.DropdownOption(text="None"),
+                                    
+                                ],
+                                #n_change=self.submit_alignment1_change,
+                            ),
+                            ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                                label="alignment2",           # Label at top of dropdown 
+                                value=self.data['alignment2'],        # Value selected in the drop down
+                                #padding=ft.padding.all(0),
+                                color=self.data['name_color'],      # Color of the dropdown text
+                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
+                                options=[           # Options for the dropdown
+                                    ft.DropdownOption(text="Undecided"),
+                                    ft.DropdownOption(text="Good"),
+                                    ft.DropdownOption(text="Neutral"),
+                                    ft.DropdownOption(text="Evil"),
                                     ft.DropdownOption(text="None"),
                                     
                                 ],
