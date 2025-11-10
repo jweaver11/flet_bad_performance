@@ -161,9 +161,13 @@ class Character(Widget):
                                 #on_change=self.submit_sex_change,
                             ),
             
-                            ft.TextField(label ="Race"),
+                            ft.TextField(
+                                label ="Race"
+                            ),
                             #gotta make it so it doesn't make a super long field if dragged
-                            ft.TextField(label ="Age"),
+                            ft.TextField(
+                                label ="Age"
+                            ),
                             #same as above but also both need to update data on change
                         ]
                     ),
