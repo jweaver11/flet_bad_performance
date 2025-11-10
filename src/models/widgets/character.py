@@ -161,6 +161,8 @@ class Character(Widget):
                                 #TODO on "other" selection, open a text field to specify
                                 #on_change=self.submit_sex_change,
                             ),
+                            #TODO add a dropdown for relatives (other characters)
+                            #should open another dropdown or text field to specify relationship
             
                             ft.TextField(   # Text field for race input
                                 label ="Race"
