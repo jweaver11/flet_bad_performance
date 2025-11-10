@@ -158,14 +158,15 @@ class Character(Widget):
                                     ft.DropdownOption(text="Other"),
                                     ft.DropdownOption(text="None"),
                                 ],
+                                #TODO on "other" selection, open a text field to specify
                                 #on_change=self.submit_sex_change,
                             ),
             
-                            ft.TextField(
+                            ft.TextField(   # Text field for race input
                                 label ="Race"
                             ),
                             #gotta make it so it doesn't make a super long field if dragged
-                            ft.TextField(
+                            ft.TextField(  # Text field for age input
                                 label ="Age"
                             ),
                             #same as above but also both need to update data on change
