@@ -113,7 +113,7 @@ class Character(Widget):
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
                            #TODO addition of second dropdown for alignment
-                            ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                            ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
                                 label="alignment1",           # Label at top of dropdown 
                                 value=self.data['alignment1'],        # Value selected in the drop down
                                 #padding=ft.padding.all(0),
@@ -160,6 +160,11 @@ class Character(Widget):
                                 ],
                                 #on_change=self.submit_sex_change,
                             ),
+            
+                            ft.TextField(label ="Race"),
+                            #gotta make it so it doesn't make a super long field if dragged
+                            ft.TextField(label ="Age"),
+                            #same as above but also both need to update data on change
                         ]
                     ),
                 ]
