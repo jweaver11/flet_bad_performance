@@ -39,22 +39,23 @@ class Timeline(Widget):
                     'show_arcs': True,
                 },        
                 'information_display': {'visibility': True},
-                'start_date': str,                  # Start and end date of the branch, for timeline view
-                'end_date': str,                    # Start and end date of the branch, for timeline view
-                'color': "primary",                 # Color of the branch in the timeline
-                'dropdown_is_expanded': True,                # If the branch dropdown is expanded on the rail
-                'plot_points_are_expanded': True,   # If the plotpoints section is expanded
-                'plot_points_dropdown_color': "primary",  # Color of the plot points dropdown in the rail
-                'arcs_are_expanded': True,          # If the arcs section is expanded
-                'arcs_dropdown_color': "primary",   # Color of the arcs dropdown in the rail
+                'time_label': str,                          # Label for the time axis (any str they want)
+                'start_date': str,                          # Start and end date of the branch, for timeline view
+                'end_date': str,                            # Start and end date of the branch, for timeline view
+                'color': "primary",                         # Color of the branch in the timeline
+                'dropdown_is_expanded': True,               # If the branch dropdown is expanded on the rail
+                'plot_points_are_expanded': True,           # If the plotpoints section is expanded
+                'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
+                'arcs_are_expanded': True,                  # If the arcs section is expanded
+                'arcs_dropdown_color': "primary",           # Color of the arcs dropdown in the rail
 
-                'plot_points': dict,                # Dict of plot points in this branch
-                'time_skips': dict,                 # Dict of time skips in this branch
-                'arcs': dict,                       # Dict of arcs in this branch
-                'connections': dict,                # Connect points, arcs, branch, etc.???
-                'rail_dropdown_is_expanded': True,  # If the rail dropdown is expanded  
+                'plot_points': dict,                        # Dict of plot points in this branch
+                'time_skips': dict,                         # Dict of time skips in this branch
+                'arcs': dict,                               # Dict of arcs in this branch
+                'connections': dict,                        # Connect points, arcs, branch, etc.???
+                'rail_dropdown_is_expanded': True,          # If the rail dropdown is expanded  
                 'description': str,
-                'events': list,                     # Step by step of plot events through the arc. Call plot point??
+                'events': list,                             # Step by step of plot events through the arc. Call plot point??
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,

@@ -26,20 +26,21 @@ class Arc(Mini_Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {   
-                'tag': "arc",                       # Tag to identify what type of object this is
-                'start_date': str,                  # Start and end date of the branch, for timeline view
-                'end_date': str,                    # Start and end date of the branch, for timeline view
-                'color': "primary",                 # Color of the branch in the timeline
-                'dropdown_is_expanded': True,                # If the branch dropdown is expanded on the rail
-                'plot_points_are_expanded': True,   # If the plotpoints section is expanded
-                'arcs_are_expanded': True,          # If the arcs section is expanded
+                'tag': "arc",                               # Tag to identify what type of object this is
+                'x_position': 0,                            # X position on the timeline
+                'start_date': str,                          # Start and end date of the branch, for timeline view
+                'end_date': str,                            # Start and end date of the branch, for timeline view
+                'color': "primary",                         # Color of the branch in the timeline
+                'dropdown_is_expanded': True,               # If the branch dropdown is expanded on the rail
+                'plot_points_are_expanded': True,           # If the plotpoints section is expanded
+                'arcs_are_expanded': True,                  # If the arcs section is expanded
                 
-                'plot_points': dict,                # Dict of plot points in this branch
-                'plot_points_dropdown_color': "primary",  # Color of the plot points dropdown in the rail
-                'arcs': dict,                       # Dict of arcs in this branch
-                'arcs_dropdown_color': "primary",   # Color of the arcs dropdown in the rail
-                'connections': dict,                # Connect points, arcs, branch, etc.???
-                'rail_dropdown_is_expanded': True,  # If the rail dropdown is expanded  
+                'plot_points': dict,                        # Dict of plot points in this branch
+                'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
+                'arcs': dict,                               # Dict of arcs in this branch
+                'arcs_dropdown_color': "primary",           # Color of the arcs dropdown in the rail
+                'connections': dict,                        # Connect points, arcs, branch, etc.???
+                'rail_dropdown_is_expanded': True,          # If the rail dropdown is expanded  
                 'content': str,
                 'description': str,
                 'summary': str,
