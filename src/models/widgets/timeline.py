@@ -72,7 +72,7 @@ class Timeline(Widget):
         
 
         # Declare dicts of our data types   
-        self.arcs: dict = {}
+        self.arcs: dict = {}        # TODO: No more infinite arcs
         self.plot_points: dict = {} 
         self.time_skips: dict = {}
         self.connections: dict = {}  # Needed????
@@ -365,7 +365,7 @@ class Timeline(Widget):
         )
 
         # Reset the content of our timeline control
-        self.timeline_control.content=ft.Row(spacing=0, expand=True)
+        self.timeline_control.content = ft.Row(spacing=0, expand=True)
 
 
         # Add line segments so our timeline control isn't just flat
@@ -391,6 +391,11 @@ class Timeline(Widget):
         # for arc in self.arcs.values():
         def load_arcs_to_timeline(timeline_control: ft.GestureDetector, arcs: dict):
             ''' Loads all our arcs into our timeline control '''
+
+            # Three rows: Top arcs, bottom arcs, middle arcs
+
+
+
             for arc in arcs.values():
                 pass
                 # Take arc.control and add it at timeline.control.x using a stack or sumthin

@@ -38,8 +38,6 @@ class Arc(Mini_Widget):
                 
                 'plot_points': dict,                        # Dict of plot points in this branch
                 'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
-                'arcs': dict,                               # Dict of arcs in this branch
-                'arcs_dropdown_color': "primary",           # Color of the arcs dropdown in the rail
                 'connections': dict,                        # Connect points, arcs, branch, etc.???
                 'rail_dropdown_is_expanded': True,          # If the rail dropdown is expanded  
                 'content': str,
@@ -55,28 +53,11 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
-        # Loads our three mini widgets into their dicts
-        self.load_arcs()    
+        # Loads our three mini widgets into their dicts   
         self.load_plot_points() 
 
         self.reload_mini_widget()
 
-
-    # Called in the constructor
-    def load_arcs(self):
-        ''' Loads branches from data into self.branches  '''
-
-        # Looks up our branches in our data, then passes in that data to create a live object
-        for key, data in self.data['arcs'].items():
-            self.arcs[key] = Arc(
-                title=key, 
-                owner=self.owner, 
-                father=self,
-                page=self.p, 
-                key="arcs",
-                data=data
-            )
-            self.owner.mini_widgets.append(self.arcs[key])  # Branches need to be in the owners mini widgets list to show up in the UI
     
     # Called in the constructor
     def load_plot_points(self):
@@ -95,27 +76,6 @@ class Arc(Mini_Widget):
             )
             self.owner.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
         
-    
-    # Called when creating a new sub arc
-    def create_arc(self, title: str):
-        ''' Creates a new arc inside of our timeline object, and updates the data to match '''
-        from models.mini_widgets.timelines.arc import Arc
-
-        # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
-        self.arcs[title] = Arc(
-            title=title, 
-            owner=self.owner, 
-            father=self,
-            page=self.p, 
-            key="arcs", 
-            data=None
-        )
-        self.owner.mini_widgets.append(self.arcs[title])
-
-        # Apply our changes in the UI
-        self.reload_mini_widget()
-        self.owner.story.active_rail.content.reload_rail()
-        self.owner.reload_widget()
         
     # Called when creating a new plotpoint
     def create_plot_point(self, title: str):
@@ -159,6 +119,7 @@ class Arc(Mini_Widget):
         self.owner.story.active_rail.content.reload_rail()
         self.owner.reload_widget()
 
+    # Called to reload our mini widget content
     def reload_mini_widget(self):
 
         
