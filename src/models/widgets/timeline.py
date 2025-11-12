@@ -63,7 +63,7 @@ class Timeline(Widget):
         ) 
 
         # Declare and create our information display, which is our timelines mini widget 
-        self.information_display = None
+        self.information_display: ft.Container = None
         self.create_information_display()
         
 
@@ -90,6 +90,7 @@ class Timeline(Widget):
     def create_information_display(self):
         ''' Creates our timeline information display mini widget '''
         from models.mini_widgets.timelines.timeline_information_display import Timeline_Information_Display
+        
         self.information_display = Timeline_Information_Display(
             title=self.title,
             owner=self,
@@ -214,13 +215,19 @@ class Timeline(Widget):
 
     def on_enter(self, e: ft.HoverEvent):
         print("hover")
-        e.control.content.opacity = 1
+        #e.control.content.opacity = 1
+        self.timeline_control.controls[0].content.color = ft.Colors.with_opacity(1, ft.Colors.BLUE)
+        self.timeline_control.controls[1].content.content.color = ft.Colors.with_opacity(1, ft.Colors.BLUE)
+        self.timeline_control.controls[2].content.color = ft.Colors.with_opacity(1, ft.Colors.BLUE)
         self.p.update()
         # Grab local mouse to figure out x and map it to our timeline
 
     def on_exit(self, e: ft.HoverEvent):
         print("leave")
-        e.control.content.opacity = 0.7
+        #e.control.content.opacity = 0.7
+        self.timeline_control.controls[0].content.color = ft.Colors.with_opacity(0.7, ft.Colors.BLUE)
+        self.timeline_control.controls[1].content.content.color = ft.Colors.with_opacity(0.7, ft.Colors.BLUE)
+        self.timeline_control.controls[2].content.color = ft.Colors.with_opacity(0.7, ft.Colors.BLUE)
         self.p.update()
 
     # Called when we need to rebuild out timeline UI
@@ -232,8 +239,7 @@ class Timeline(Widget):
         # Right clicking arc or plotpoints opens multiple mini widgets at the same time
         
         # TODO:
-        # When hovering over timeline or branch, make slightly brighter and thicker. Right clicking allows
-        # adding/removing pp, branches, arcs, timeskips, etc.
+        # Right clicking allows adding/removing pp, branches, arcs, timeskips, etc.
         # Clicking brings up a mini-menu in the timelines widget to show details and allow editing
         # Data of the control ties back to the object
         # Drag pp, arcs, timeskips to change their date/time??
@@ -248,29 +254,46 @@ class Timeline(Widget):
 
         Generate the gesture detector for the timeline control.
         Each gesture detector should only
-        - Add the plot points and timeskips based on start/end dates of the events and timeline (Also use x axis possibly??)
+        - Add the plot points and timeskips based on the position (x value) on the timeline
         - Iterate through arcs and...
-        - Find where arcs need to offshoot baseed on start date, add vertical divider there
+        - Find where arcs need to offshoot based on position, add vertical divider there
         - Add curved horizontal divider for duration of the arc
         
 
         '''
 
         # The actual timeline control shown in our widget
-        self.timeline_control = ft.GestureDetector(
+        self.timeline_control = ft.Row(
+            spacing=0,
             expand=True,
-            on_exit=self.on_exit,
-            on_enter=self.on_enter,
-            mouse_cursor=ft.MouseCursor.CLICK,
-            content=ft.Row(
-                spacing=0,
-                controls=[
-                    ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=4),
-                    ft.Container(expand=True, padding=None, content=ft.Divider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=4)),
-                    ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=4),
-                ]
-            )
+            controls=[
+                ft.GestureDetector(
+                    height=50,
+                    content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3, width=3), 
+                    mouse_cursor=ft.MouseCursor.CLICK,
+                    on_exit=self.on_exit,
+                    on_enter=self.on_enter,
+                ),
+                ft.Container(
+                    expand=True, 
+                    padding=None, 
+                    margin=0, 
+                    content=ft.GestureDetector(
+                        mouse_cursor=ft.MouseCursor.CLICK,
+                        on_exit=self.on_exit,
+                        on_enter=self.on_enter,
+                        content=ft.Divider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3)),
+                ),
+                ft.GestureDetector(
+                    height=50,
+                    content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3, width=3), 
+                    mouse_cursor=ft.MouseCursor.CLICK,
+                    on_exit=self.on_exit,
+                    on_enter=self.on_enter,
+                ),
+            ]
         )
+        
 
 
         # The UI element that will display our filters
@@ -278,8 +301,9 @@ class Timeline(Widget):
 
         # UI elements
         # Filter to show check marks across timeline as markings for years/months
-        filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True, on_change=lambda e: print(self.filter_plot_points.value))
-        filter_arcs = ft.Checkbox(label="Show Arcs", value=True, on_change=lambda e: print(self.filter_arcs.value))
+        show_information_display = ft.Checkbox(label="Show Information Display", value=self.data['information_display']['visibility'], on_change=lambda e: self.information_display.toggle_visibility(e))
+        filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True)
+        filter_arcs = ft.Checkbox(label="Show Arcs", value=True)
         reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))
 
         # Header that shows our filter options, as well as what timeliness are visible
@@ -287,7 +311,7 @@ class Timeline(Widget):
         header = ft.Row(
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
-            controls=[filter_plot_points, filter_arcs],
+            controls=[show_information_display, filter_plot_points, filter_arcs],
         )
 
 
