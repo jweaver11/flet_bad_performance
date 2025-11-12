@@ -449,7 +449,7 @@ class Story(ft.View):
     # Called as part of the startup method during program launch
     def load_characters(self):
         ''' Loads all our characters from our characters folder and adds them to the live story object'''
-        from models.widgets.character import Character
+        from models.widgets.character.character import Character
         
         # Check if the characters folder exists. Creates it if it doesn't. Handles errors on startup
         if not os.path.exists(self.data['characters_directory_path']):
@@ -721,7 +721,7 @@ class Story(ft.View):
     # Called to create a new character
     def create_character(self, title: str, directory_path: str=None):
         ''' Creates a new character object, saves it to our live story object, and saves it to storage'''
-        from models.widgets.character import Character
+        from models.widgets.character.character import Character
 
         # If no path is passed in, construct the full file path for the character JSON file
         if directory_path is None:

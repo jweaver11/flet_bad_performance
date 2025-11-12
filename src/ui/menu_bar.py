@@ -200,6 +200,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     # Styling used by lots of menu bar items
     menubar_style = ft.ButtonStyle(
         bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
+        color=ft.Colors.PRIMARY
     )
 
     # Create our menu bar with submenu items
@@ -249,30 +250,6 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                         leading=ft.Icon(ft.Icons.IMPORT_EXPORT_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
-                    ),
-                ],
-            ),
-            ft.SubmenuButton(
-                content=ft.Container(
-                    content=ft.Text("Edit", weight=ft.FontWeight.BOLD),
-                    alignment=ft.alignment.center
-                ),
-                style=menubar_style,
-                on_open=handle_submenu_open,
-                on_close=handle_submenu_close,
-                on_hover=handle_submenu_hover,
-                controls=[
-                    ft.MenuItemButton(
-                        content=ft.Text("Copy", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Paste", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
                     ),
                 ],
             ),
