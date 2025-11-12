@@ -633,6 +633,9 @@ class Story(ft.View):
         ''' Loads all our widgets (characters, chapters, notes, etc.) into our master list of widgets '''
         from models.app import app
 
+        # Clear our widgets list first to avoid duplicates
+        self.widgets.clear() 
+
         # Add all our characters to the widgets list
         for character in self.characters.values():
             if character not in self.widgets:

@@ -12,8 +12,7 @@ from models.widget import Widget
 from models.mini_widgets.timelines.arc import Arc
 from handlers.verify_data import verify_data
 
-# Live objects that are stored in our timeline object
-# We read data from this object, but it is displayed in the timelines widget, so need for this to be a flet control
+
 class Timeline(Widget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
@@ -94,7 +93,7 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_click=self.on_click,
+            on_tap=self.on_click,
         )
         self.timeline_right_edge = ft.GestureDetector(
             height=50,
@@ -102,7 +101,7 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_click=self.on_click,
+            on_tap=self.on_click,
         )
         
 
@@ -365,6 +364,7 @@ class Timeline(Widget):
             on_enter=self.on_enter,
             on_hover=lambda e: self.on_hovers(e),         # Not firing for some reason
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+            on_tap=self.on_click,
             hover_interval=20,
             content=ft.Row(spacing=0, expand=True)
         )
