@@ -27,11 +27,12 @@ class Arc(Mini_Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {   
                 'tag': "arc",                               # Tag to identify what type of object this is
-                'x_position': 0,                            # X position on the timeline
+                'x_position': int,                            # X position on the timeline
+                'branch_direction': "up",                 # Direction the arc branches off (top or bottom) from the timeline
                 'start_date': str,                          # Start and end date of the branch, for timeline view
                 'end_date': str,                            # Start and end date of the branch, for timeline view
-                'color': "primary",                         # Color of the branch in the timeline
-                'dropdown_is_expanded': True,               # If the branch dropdown is expanded on the rail
+                'color': "primary",                         # Color of the arc in the timeline
+                'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
                 'arcs_are_expanded': True,                  # If the arcs section is expanded
                 

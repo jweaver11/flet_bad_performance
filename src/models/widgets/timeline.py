@@ -11,6 +11,7 @@ from models.story import Story
 from models.widget import Widget
 from models.mini_widgets.timelines.arc import Arc
 from handlers.verify_data import verify_data
+import flet.canvas as cv
 
 
 class Timeline(Widget):
@@ -84,7 +85,16 @@ class Timeline(Widget):
         self.load_time_skips()
         
         # UI elements
-        self.timeline_control: ft.GestureDetector = ft.GestureDetector()
+        self.timeline_control = ft.GestureDetector(
+            mouse_cursor=ft.MouseCursor.CLICK,
+            expand=True,
+            on_exit=self.on_exit,
+            on_enter=self.on_enter,
+            on_hover=lambda e: self.on_hovers(e),         # Not firing for some reason
+            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+            on_tap=self.on_click,
+            hover_interval=20,
+        )
 
         # Edges of our timeline
         self.timeline_left_edge = ft.GestureDetector(
@@ -304,8 +314,6 @@ class Timeline(Widget):
         # Data of the control ties back to the object
         # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object and all its children are gesture detectors
-        # Have a show/hide filters button in top left of widget
-        # Show zoomed in time dates when zoomed in??s
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
 
         '''
@@ -356,18 +364,9 @@ class Timeline(Widget):
             ]
         )
 
-        # Build the timeline control
-        self.timeline_control = ft.GestureDetector(
-            mouse_cursor=ft.MouseCursor.CLICK,
-            expand=True,
-            on_exit=self.on_exit,
-            on_enter=self.on_enter,
-            on_hover=lambda e: self.on_hovers(e),         # Not firing for some reason
-            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
-            on_tap=self.on_click,
-            hover_interval=20,
-            content=ft.Row(spacing=0, expand=True)
-        )
+        # Reset the content of our timeline control
+        self.timeline_control.content=ft.Row(spacing=0, expand=True)
+
 
         # Add line segments so our timeline control isn't just flat
         for i in range(8):
@@ -386,9 +385,18 @@ class Timeline(Widget):
             # Otherwise add vertical segment
             else:
                 self.timeline_control.content.controls.append(vertical_line)
-            
+
+        
+        # Load all our sub arcs now, and add them to the TL appropriately
+        # for arc in self.arcs.values():
+        def load_arcs_to_timeline(timeline_control: ft.GestureDetector, arcs: dict):
+            ''' Loads all our arcs into our timeline control '''
+            for arc in arcs.values():
+                pass
+                # Take arc.control and add it at timeline.control.x using a stack or sumthin
         
         # Add our timeline control to the row
+        #row.controls.insert(1, self.timeline_control)
         row.controls.insert(1, self.timeline_control)
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
