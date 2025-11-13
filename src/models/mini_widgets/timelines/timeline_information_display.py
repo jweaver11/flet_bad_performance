@@ -20,7 +20,7 @@ class Timeline_Information_Display(Mini_Widget):
             data=None,      # No data is used here, so NEVER reference it. Use self.owner.data instead
         ) 
         
-        # Since we mirror our timelines data, we don't need to verify it here
+        # Since we only reference out owners data and not our own, we don't need to verify it here
 
         # Set our visibility based on our owners data
         self.visible = self.owner.data['information_display']['visibility']

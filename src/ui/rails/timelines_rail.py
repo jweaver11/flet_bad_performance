@@ -71,10 +71,27 @@ class Timelines_Rail(Rail):
             sub_arc_expansion_tile = Timeline_Dropdown(arc.title, self.story, type="arc", father=father, additional_menu_options=self.get_sub_menu_options())
             
             # Since its an arc, we need to recursively load its data as well
-            self.load_timeline_or_arc_data(
-                father=arc, 
-                father_dropdown=sub_arc_expansion_tile,
-            )
+            #self.load_timeline_or_arc_data(
+                #father=arc, 
+                #father_dropdown=sub_arc_expansion_tile,
+            #)
+
+
+            # Create our label for plotpoints
+            plot_points_label = Timeline_Label(
+                title="Plot Points:",
+                icon=ft.Icons.LOCATION_PIN,
+            )       #Icons.LOCATION_SEARCHING_OUTLINED
+
+            # Add our label to the father dropdown and add the textfield for new plotpoints
+            sub_arc_expansion_tile.content.controls.append(plot_points_label)
+            sub_arc_expansion_tile.content.controls.append(ft.Divider())
+            sub_arc_expansion_tile.content.controls.append(father_dropdown.new_plot_point_textfield)
+
+            for plot_point in arc.plot_points.values():
+                sub_arc_expansion_tile.content.controls.append(
+                    Timeline_Item(title=plot_point.title, mini_widget=plot_point)
+                )
 
             # Add the new parent expansion tile to our current parents expansion tile controls
             #arcs_expansion_tile.content.controls.append(sub_arc_expansion_tile)
@@ -331,11 +348,8 @@ class Timelines_Rail(Rail):
 
             # If theres only one timeline, no need to add the parent expansion to the page.
             if len(self.story.timelines) == 1:
-                # Just add the Title, and two dropdowns 
-                #content.controls.append(Timeline_Label(
-                    #title=timeline.title,
-                    #icon=ft.Icons.TIMELINE_OUTLINED,
-                #))
+
+                # Just Two dropdowns 
                 content.controls.extend(timeline_dropdown.content.controls)
 
             # Otherwise, add the full expansion panel

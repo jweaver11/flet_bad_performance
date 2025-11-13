@@ -28,10 +28,12 @@ class Plot_Point(Mini_Widget):
             {   
                 'tag': "plot_point",           # Tag to identify what type of object this is
                 'description': str,
-                'events': list,                 # Numbered list of events that occur at this plot point
+                'events': list,                # Numbered list of events that occur at this plot point
+                'x_position': int,           # X position on the timeline
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
+                'color': "primary",             # Color of the plot point on the timeline
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
@@ -49,7 +51,7 @@ class Plot_Point(Mini_Widget):
                 self.content_control,
                 ft.TextButton(
                     "Delete ME", 
-                    on_click=lambda e: self.owner.delete_mini_widget(self)
+                    on_click=lambda e: self.delete_dict()
                 ),
             ],
             expand=True,

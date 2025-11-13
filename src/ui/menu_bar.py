@@ -135,8 +135,6 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
 
         #print("Open Story Clicked")
 
-        # list that holds our story title buttons, and string of our selected story title
-        story_choices = []
         selected_story = None
 
         # Called when a new story text button is clicked
@@ -144,20 +142,23 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             ''' Changes our selected story variable '''
 
             nonlocal selected_story
-            selected_story = e.control.text
-            #print("Selected story: ", selected_story)
+            selected_story = e.control.value
 
         # Returns a list of all story titles available to open
-        def get_stories_list() -> list[ft.Control]:
+        def get_stories_list() -> ft.Control:
             ''' Returns a list of all story titles available to open '''
+
+            # List of our story choices
+            stories = []
 
             # Use something better than radio in future, but for now this works
             for story in app.stories.values():
-                story_choices.append(
-                    ft.TextButton(story.title, on_click=change_selected_story)
+                stories.append(
+                    ft.Radio(value=story.title, label=story.title)
                 )
 
-            return story_choices
+            # Return our list of stories
+            return stories
 
 
         # Called when the 'open' button is clicked in the bottom right of the dialog
@@ -182,7 +183,10 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             title=ft.Text("What story would you like to open?"),
             alignment=ft.alignment.center,
             title_padding=ft.padding.all(25),
-            content=ft.Column(expand=False, controls=get_stories_list()),
+            content=ft.RadioGroup(
+                content=ft.Column(controls=get_stories_list()),
+                on_change=change_selected_story
+            ),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
                 ft.TextButton("Open", on_click=open_selected_story),
@@ -196,6 +200,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     # Styling used by lots of menu bar items
     menubar_style = ft.ButtonStyle(
         bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
+        color=ft.Colors.PRIMARY
     )
 
     # Create our menu bar with submenu items
@@ -213,80 +218,38 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         controls=[  # The controls shown in our menu bar from left to right
             ft.SubmenuButton(   # Button that opens a subment
                 content=ft.Container(
-                    content=ft.Text("File", weight=ft.FontWeight.BOLD),     # Content of subment button
+                    content=ft.Text("File", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),     # Content of subment button
                     alignment=ft.alignment.center
-                ),
+                ), 
                 style=menubar_style,    # styleing for the button
                 on_open=handle_submenu_open,    # Handle when a submenu is opened
                 on_close=handle_submenu_close,  # Handle when a submenu is closed
                 on_hover=handle_submenu_hover,  # Handle when a submenu is hovered
                 controls=[      # The options shown inside of our button
                     ft.MenuItemButton(
-                        content=ft.Text("New", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.ADD_CIRCLE_ROUNDED,),
+                        content=ft.Text("New", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        leading=ft.Icon(ft.Icons.ADD_CIRCLE_OUTLINE_ROUNDED, color=ft.Colors.ON_SURFACE,),
                         style=menubar_style,
                         on_click=handle_create_new_story_clicked,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Save", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Save as", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.SAVE),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Open", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.CLOSE),
+                        content=ft.Text("Open", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        leading=ft.Icon(ft.Icons.MENU_BOOK_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Import", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.CLOSE),
+                        content=ft.Text("Import", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        leading=ft.Icon(ft.Icons.IMPORT_EXPORT_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
                         # CAN ONLY EXPORT WIDGETS AND PSEUDO WIDGETS
-                        content=ft.Text("Export", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.CLOSE),
+                        content=ft.Text("Export", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        leading=ft.Icon(ft.Icons.IMPORT_EXPORT_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Quit", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.CLOSE),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
-                    ),
-                ],
-            ),
-            ft.SubmenuButton(
-                content=ft.Container(
-                    content=ft.Text("Edit", weight=ft.FontWeight.BOLD),
-                    alignment=ft.alignment.center
-                ),
-                style=menubar_style,
-                on_open=handle_submenu_open,
-                on_close=handle_submenu_close,
-                on_hover=handle_submenu_hover,
-                controls=[
-                    ft.MenuItemButton(
-                        content=ft.Text("Copy", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
-                    ),
-                    ft.MenuItemButton(
-                        content=ft.Text("Paste", weight=ft.FontWeight.BOLD),
-                        leading=ft.Icon(ft.Icons.INFO),
-                        style=menubar_style,
-                        on_click=handle_menu_item_click,
                     ),
                 ],
             ),
