@@ -30,7 +30,7 @@ class Tree_View_File(ft.GestureDetector):
             self.icon = ft.Icons.DESCRIPTION_OUTLINED
 
         elif tag == "note":
-            self.icon = ft.Icons.COMMENT_OUTLINED
+            self.icon = ft.Icons.NOTE_ALT_OUTLINED
             
         elif tag == "character":
             self.icon = ft.Icons.PERSON_OUTLINED

@@ -5,6 +5,7 @@ from models.story import Story
 def route_change(e: ft.RouteChangeEvent) -> Story:
     ''' Handles changing our page view based on the new route '''
     from ui.menu_bar import create_menu_bar
+    from models.app import app
 
     # Grabs our page from the event for easier reference
     page = e.page
@@ -13,7 +14,6 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     page.views.clear()
     page.controls.clear()
 
-    from models.app import app
     new_story = None    # Set new story to none intially to handle routes that don't match any stories
 
     # Run through our stories and see which ones route matches our new route
