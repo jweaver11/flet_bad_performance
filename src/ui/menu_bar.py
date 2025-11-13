@@ -85,7 +85,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             # Checks if the title sitting in the text box is unique for submitting
             title = e.control.value
             for story in app.stories.values():
-                if story.title == title:
+                if story.title == title.title():
                     e.control.error_text = "Title must be unique"
                     is_unique = False
                     page.update()
@@ -110,7 +110,11 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         dlg = ft.AlertDialog(
 
             # Title of our dialog
-            title=ft.Text("Create New Story"),
+            title=ft.Text(
+                "Create New Story", 
+                color=ft.Colors.ON_SURFACE,
+                weight=ft.FontWeight.BOLD,
+            ),
 
             # Main content is text box for user to input story title
             content=story_title_field,
@@ -151,10 +155,17 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             # List of our story choices
             stories = []
 
+            # Set style for our options
+            style = ft.TextStyle(
+                size=14,
+                color=ft.Colors.ON_SURFACE,
+                weight=ft.FontWeight.BOLD,
+            )
+
             # Use something better than radio in future, but for now this works
             for story in app.stories.values():
                 stories.append(
-                    ft.Radio(expand=False, value=story.title, label=story.title)
+                    ft.Radio(expand=False, value=story.title, label=story.title, label_style=style)
                 )
 
             # Return our list of stories
@@ -180,7 +191,11 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
 
         # Our alert dialog that pops up when file -> open is clicked
         dlg = ft.AlertDialog(
-            title=ft.Text("What story would you like to open?"),
+            title=ft.Text(
+                "What story would you like to open?",
+                color=ft.Colors.ON_SURFACE,
+                weight=ft.FontWeight.BOLD,
+            ),
             alignment=ft.alignment.center,
             title_padding=ft.padding.all(25),
             content=ft.RadioGroup(
