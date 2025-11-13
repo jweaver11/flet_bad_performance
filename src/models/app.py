@@ -29,10 +29,10 @@ class App:
         # TODO: Add a type to accept for novel/comic
         
         # Create a new story object and add it to our stories dict
-        self.stories[title] = Story(title, page, data=None, template=template)
+        self.stories[title.title()] = Story(title.title(), page, data=None, template=template)
 
         # Opens this new story as the active one on screen
-        page.route = self.stories[title].route
+        page.route = self.stories[title.title()].route
 
         
     

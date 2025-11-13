@@ -39,8 +39,9 @@ class Timelines_Rail(Rail):
         # Create our label for plotpoints
         plot_points_label = Timeline_Label(
             title="Plot Points:",
-            icon=ft.Icons.LOCATION_PIN,
-        )       #Icons.LOCATION_SEARCHING_OUTLINED
+            icon=ft.Icons.LOCATION_SEARCHING_OUTLINED,
+            story=self.story,
+        )       #Icons.LOCATION_PIN
 
         # Add our label to the father dropdown and add the textfield for new plotpoints
         father_dropdown.content.controls.append(plot_points_label)
@@ -57,6 +58,7 @@ class Timelines_Rail(Rail):
         arcs_label = Timeline_Label(
             title=f"{arcs_dropdown_title}:",
             icon=ft.Icons.ARCHITECTURE_OUTLINED,
+            story=self.story,
         )
 
         # Add our label to the father dropdown and add the textfield for new arcs
@@ -70,18 +72,13 @@ class Timelines_Rail(Rail):
             # Create a new parent expansion tile we'll need for recursion
             sub_arc_expansion_tile = Timeline_Dropdown(arc.title, self.story, type="arc", father=father, additional_menu_options=self.get_sub_menu_options())
             
-            # Since its an arc, we need to recursively load its data as well
-            #self.load_timeline_or_arc_data(
-                #father=arc, 
-                #father_dropdown=sub_arc_expansion_tile,
-            #)
-
 
             # Create our label for plotpoints
             plot_points_label = Timeline_Label(
                 title="Plot Points:",
-                icon=ft.Icons.LOCATION_PIN,
-            )       #Icons.LOCATION_SEARCHING_OUTLINED
+                icon=ft.Icons.LOCATION_SEARCHING_OUTLINED,
+                story=self.story,
+            )       #Icons.LOCATION_PIN
 
             # Add our label to the father dropdown and add the textfield for new plotpoints
             sub_arc_expansion_tile.content.controls.append(plot_points_label)
@@ -98,11 +95,7 @@ class Timelines_Rail(Rail):
             father_dropdown.content.controls.append(sub_arc_expansion_tile)
             
 
-        # Add our three expansion tiles to the parent expansion tile
-        #father_dropdown.content.controls.append(plot_points_expansion_tile)
-        #father_dropdown.content.controls.append(arcs_expansion_tile)
-
-    
+    # Called when a new timeline button is clicked
     def new_timeline_clicked(self, e):
         ''' Handles setting our textfield for new timeline creation '''
         
@@ -216,16 +209,53 @@ class Timelines_Rail(Rail):
     def get_menu_options(self) -> list[ft.Control]:
         ''' Returns our menu options for the timelines rail. In this case just timelines '''
 
-        return [
-            Menu_Option_Style(
-                on_click=self.new_timeline_clicked,
-                data="timeline",
-                content=ft.Row([
-                    ft.Icon(ft.Icons.ADD_ROUNDED),
-                    ft.Text("Timeline", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                ])
-            ),
-        ]
+        if len(self.story.timelines) == 1:
+            return [
+                Menu_Option_Style(
+                    on_click=self.new_arc_clicked,
+                    data="arc",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_ROUNDED),
+                        ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+                Menu_Option_Style(
+                    on_click=self.new_plotpoint_clicked,
+                    data="plot_point",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_ROUNDED),
+                        ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+                Menu_Option_Style(
+                    on_click=self.new_timeskip_clicked,
+                    data="time_skip",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_ROUNDED),
+                        ft.Text("Time Skip", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+                Menu_Option_Style(
+                    on_click=self.new_timeline_clicked,
+                    data="timeline",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_ROUNDED),
+                        ft.Text("Timeline", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+            ]
+
+        else:
+            return [
+                Menu_Option_Style(
+                    on_click=self.new_timeline_clicked,
+                    data="timeline",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_ROUNDED),
+                        ft.Text("Timeline", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+            ]
     
     # Called when right clicking a timeline, arc, or the arc/plot point drop downs
     def get_sub_menu_options(self) -> list[ft.Control]:

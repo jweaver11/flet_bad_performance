@@ -154,7 +154,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             # Use something better than radio in future, but for now this works
             for story in app.stories.values():
                 stories.append(
-                    ft.Radio(value=story.title, label=story.title)
+                    ft.Radio(expand=False, value=story.title, label=story.title)
                 )
 
             # Return our list of stories
@@ -184,7 +184,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             alignment=ft.alignment.center,
             title_padding=ft.padding.all(25),
             content=ft.RadioGroup(
-                content=ft.Column(controls=get_stories_list()),
+                content=ft.Column(scroll=ft.ScrollMode.AUTO, expand=False, controls=get_stories_list()),
                 on_change=change_selected_story
             ),
             actions=[

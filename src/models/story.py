@@ -26,12 +26,12 @@ class Story(ft.View):
         
         # Parent constructor
         super().__init__(
-            route=f"/{title}",                                              # Sets our route for our new story
+            route=f"/{title.title()}",                                      # Sets our route for our new story
             padding=ft.padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
             spacing=0,                                                      # No spacing between menubar and rest of page
         )  
 
-        self.title = title              # Gives our story a title when its created
+        self.title = title.title()      # Gives our story a title when its created
         self.p = page                   # Reference to our page object for updating UI elements
         self.data = data                # Sets our data (if any) passed in. New stories just have none
         self.template = template        # Template for our story (sci-fi, fantasy, etc.)
