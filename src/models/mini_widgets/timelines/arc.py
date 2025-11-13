@@ -27,6 +27,7 @@ class Arc(Mini_Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {   
                 'tag': "arc",                               # Tag to identify what type of object this is
+                'is_timeskip': bool,                       # If this arc is a time skip (skips ahead in time on the timeline)   
                 'x_position': int,                            # X position on the timeline
                 'branch_direction': "up",                 # Direction the arc branches off (top or bottom) from the timeline
                 'start_date': str,                          # Start and end date of the branch, for timeline view
@@ -83,8 +84,8 @@ class Arc(Mini_Widget):
         from models.mini_widgets.timelines.plot_point import Plot_Point
 
         # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
-        self.plot_points[title] = Plot_Point(
-            title=title, 
+        self.plot_points[title.capitalize()] = Plot_Point(
+            title=title.capitalize(), 
             owner=self.owner, 
             father=self,
             page=self.p, 
@@ -104,8 +105,8 @@ class Arc(Mini_Widget):
         from models.mini_widgets.timelines.time_skip import Time_Skip
 
         # Add our new Time Skip mini widget object to our time_skips dict, and to our owners mini widgets
-        self.arcs[title] = Time_Skip(
-            title=title, 
+        self.arcs[title.capitalize()] = Time_Skip(
+            title=title.capitalize(), 
             owner=self.owner, 
             father=self,
             page=self.p, 

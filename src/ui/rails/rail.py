@@ -6,12 +6,19 @@ import flet as ft
 import os
 import json
 from models.story import Story
+from models.widgets.timeline import Timeline
 
 
 class Rail(ft.Container):
 
     # Constructor
-    def __init__(self, page: ft.Page, story: Story, directory_path: str):
+    def __init__(
+            self, 
+            page: ft.Page,                  # Page reference
+            story: Story,                   # Story reference
+            directory_path: str,            # Root path that loads this rails content
+            timeline: Timeline = None,      # Timeline reference for creating plot points and arcs on timeline rail
+        ):
         
         # Initialize the parent Container class first
         super().__init__(
@@ -19,13 +26,13 @@ class Rail(ft.Container):
             padding=ft.Padding(10, 0, 0, 0),        # Adds padding left to match divider on the right
         )
             
-        # Page and story reference
+        # Store our parameters
         self.p = page
         self.story = story
-
-        # The path this rail displays. Mostly used for adding folders on the rails
         self.directory_path = directory_path
+        self.timeline = timeline
 
+        # Text style for our textfields
         self.text_style = ft.TextStyle(
             size=14,
             color=ft.Colors.ON_SURFACE,
@@ -148,6 +155,20 @@ class Rail(ft.Container):
                 if os.path.normcase(os.path.normpath(key)) == new_key:
                     self.item_is_unique = False
 
+        # Check our plot points
+        elif tag == "plot_point":
+            if self.timeline is not None:
+                for key in self.timeline.plot_points.keys():
+                    if key == title.capitalize():
+                        self.item_is_unique = False
+
+        # Check our arcs
+        elif tag == "arc":
+            if self.timeline is not None:
+                for key in self.timeline.arcs.keys():
+                    if key == title.capitalize():
+                        self.item_is_unique = False
+
         # Check our maps
         elif tag == "map":
             for key in self.story.maps.keys():
@@ -197,7 +218,7 @@ class Rail(ft.Container):
 
     # Called whenever we submit a new item (Chapter, note, category, etc.) via enter key
     def submit_item(self, e):
-        ''' Sets our state to submitting, and creates new item if unique '''
+        ''' Sets our state to submitting, and creates new item if unique. Father is either timeline or arc for creating mini widgets '''
 
         # Change our submitting state
         self.are_submitting = True
@@ -231,6 +252,16 @@ class Rail(ft.Container):
             # New Timelines
             elif tag == "timeline":
                 self.story.create_timeline(title)
+
+            # New plot points and arcs on timelines or arcs
+            elif tag == "plot_point":
+                if self.timeline is not None:
+                    self.timeline.create_plot_point(title)
+
+            # New arcs on timelines
+            elif tag == "arc":
+                if self.timeline is not None:
+                    self.timeline.create_arc(title)
 
             # New Maps
             elif tag == "map":

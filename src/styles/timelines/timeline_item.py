@@ -32,19 +32,10 @@ class Timeline_Item(ft.GestureDetector):
 
         # Check our tag and set our icon accordingly
         if tag is None:
-            self.icon = ft.Icons.LOCATION_PIN
+            self.icon = ft.Icons.GPS_FIXED_OUTLINED
 
-        elif tag == "chapter":
-            self.icon = ft.Icons.DESCRIPTION_OUTLINED
-
-        elif tag == "note":
-            self.icon = ft.Icons.COMMENT_OUTLINED
-            
-        elif tag == "character":
-            self.icon = ft.Icons.PERSON_OUTLINED
-
-        elif tag == "map":
-            self.icon = ft.Icons.MAP_OUTLINED
+        elif tag == "plot_point":
+            self.icon = ft.Icons.GPS_FIXED_OUTLINED
 
         else:
             self.icon = ft.Icons.ERROR_OUTLINE
@@ -96,13 +87,13 @@ class Timeline_Item(ft.GestureDetector):
         ]
         
         # Run through our additional menu options if we have any, and set their on_click methods
-        for option in self.additional_menu_options or []:
+        #for option in self.additional_menu_options or []:
 
             # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
+            #option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
 
             # Add them to the list
-            menu_options.append(option)
+            #menu_options.append(option)
 
         # Color changing popup menu
         menu_options.append(
