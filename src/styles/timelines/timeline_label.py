@@ -2,6 +2,9 @@
 import flet as ft
 from models.widgets.timeline import Timeline
 from models.story import Story
+from styles.menu_option_style import Menu_Option_Style
+
+
 
 class Timeline_Label(ft.GestureDetector):
     def __init__(
@@ -9,13 +12,13 @@ class Timeline_Label(ft.GestureDetector):
         title: str,
         icon: ft.Icon,
         story: Story,
-        father: Timeline = None,            # Father timeline or arc object to create new items
+        father: Timeline,            # Father timeline or arc object to create new items
     ):
 
         self.title = title
         self.icon = icon
         self.story = story
-        
+
         super().__init__(
             mouse_cursor=ft.MouseCursor.CLICK,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_items()),
@@ -28,7 +31,19 @@ class Timeline_Label(ft.GestureDetector):
         ''' Returns a list of menu items when right clicking this label '''
 
         # Option for either plot point or arcs
-        return []
+        return [
+            Menu_Option_Style(
+                #on_click=self.rename_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
+                    ft.Text(
+                        "Rename", 
+                        weight=ft.FontWeight.BOLD, 
+                        color=ft.Colors.ON_SURFACE
+                    ), 
+                ]),
+            )
+        ]
 
 
     def reload(self):

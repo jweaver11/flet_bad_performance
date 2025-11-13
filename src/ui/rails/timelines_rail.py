@@ -41,6 +41,7 @@ class Timelines_Rail(Rail):
             title="Plot Points:",
             icon=ft.Icons.LOCATION_SEARCHING_OUTLINED,
             story=self.story,
+            father=father,
         )       #Icons.LOCATION_PIN
 
         # Add our label to the father dropdown and add the textfield for new plotpoints
@@ -59,6 +60,7 @@ class Timelines_Rail(Rail):
             title=f"{arcs_dropdown_title}:",
             icon=ft.Icons.ARCHITECTURE_OUTLINED,
             story=self.story,
+            father=father,
         )
 
         # Add our label to the father dropdown and add the textfield for new arcs
@@ -72,12 +74,12 @@ class Timelines_Rail(Rail):
             # Create a new parent expansion tile we'll need for recursion
             sub_arc_expansion_tile = Timeline_Dropdown(arc.title, self.story, type="arc", father=father, additional_menu_options=self.get_sub_menu_options())
             
-
             # Create our label for plotpoints
             plot_points_label = Timeline_Label(
                 title="Plot Points:",
                 icon=ft.Icons.LOCATION_SEARCHING_OUTLINED,
                 story=self.story,
+                father=arc,
             )       #Icons.LOCATION_PIN
 
             # Add our label to the father dropdown and add the textfield for new plotpoints
@@ -97,12 +99,9 @@ class Timelines_Rail(Rail):
 
     # Called when a new timeline button is clicked
     def new_timeline_clicked(self, e):
-        ''' Handles setting our textfield for new timeline creation '''
+        ''' Sets our textfield visibility, reset value, hint text, and data '''
         
-        # Makes sure the right textfield is visible and the others are hidden
         self.new_item_textfield.visible = True
-
-        # Set our textfield value to none, and the hint and data
         self.new_item_textfield.value = None
         self.new_item_textfield.hint_text = "Timeline Title"
         self.new_item_textfield.data = "timeline"
@@ -110,99 +109,43 @@ class Timelines_Rail(Rail):
         # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()
 
+    # New arcs
     def new_arc_clicked(self, e):
-        ''' Handles setting our textfield for new arc creation '''
+        ''' Sets our textfield visibility, reset value, hint text, data, and gives us the right timeline reference'''
         
-        # Makes sure the right textfield is visible and the others are hidden
         self.new_item_textfield.visible = True
-
-        # Set our textfield value to none, and the hint and data
         self.new_item_textfield.value = None
         self.new_item_textfield.hint_text = "Arc Name"
         self.new_item_textfield.data = "arc"
 
-        # Close the menu (if ones is open), which will update the page as well
+        # Since this is only clicked when there's one timeline, we just grab it
+        for timeline in self.story.timelines.values():
+            self.timeline = timeline
         self.story.close_menu()
 
+    # New plot points
     def new_plotpoint_clicked(self, e):
         ''' Handles setting our textfield for new plotpoint creation '''
-        
-        # Makes sure the right textfield is visible and the others are hidden
-        self.new_item_textfield.visible = True
 
-        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.visible = True
         self.new_item_textfield.value = None
         self.new_item_textfield.hint_text = "Plot Point Name"
         self.new_item_textfield.data = "plot_point"
-
-        # Close the menu (if ones is open), which will update the page as well
+        for timeline in self.story.timelines.values():
+            self.timeline = timeline
         self.story.close_menu()
 
+    # New time skips
     def new_timeskip_clicked(self, e):
         ''' Handles setting our textfield for new timeskip creation '''
         
-        # Makes sure the right textfield is visible and the others are hidden
         self.new_item_textfield.visible = True
-
-        # Set our textfield value to none, and the hint and data
         self.new_item_textfield.value = None
         self.new_item_textfield.hint_text = "Time Skip Name"
         self.new_item_textfield.data = "time_skip"
-
-        # Close the menu (if ones is open), which will update the page as well
+        for timeline in self.story.timelines.values():
+            self.timeline = timeline
         self.story.close_menu()
-
-
-    # Called when new arc is submitted 
-    def submit_arc(self, e, parent):
-        ''' Creates a new arc on the parent arc or timeline '''
-
-        # Our plotline title is stored in the data, while the new title is from the control value
-        arc_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for arc in parent.arcs.values():
-            if arc.title == arc_title:
-                print("Arc name already exists!")
-                return
-            
-        # Otherwise create the arc
-        parent.create_arc(arc_title)
-        print(f"New arc created on the {parent.title} arc or timeline. Name: {arc_title} ")
-                
-        
-
-    # When new plotpoint is submitted
-    def submit_plotpoint(self, e, parent):
-        ''' Creates a new plotpoint on the parent arc or timeline '''
-        
-        plot_point_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for plot_point in parent.plot_points.values():
-            if plot_point.title == plot_point_title:
-                print("Arc name already exists!")
-                return
-            
-        # Otherwise create the arc
-        parent.create_plot_point(plot_point_title)
-        print(f"New arc created on the {parent.title} arc or timeline. Name: {plot_point_title} ")
-
-    # Called when new timeskip is submitted
-    def submit_timeskip(self, e, parent):
-        ''' Creates a new timeskip on the parent arc or timeline '''
-
-        time_skip_title = e.control.value
-
-        # Go through each timeline until we find the right one
-        for time_skip in parent.time_skips.values():
-            if time_skip.title == time_skip_title:
-                print("Arc name already exists!")
-                return
-            
-        # Otherwise create the timeskip
-        parent.create_time_skip(time_skip_title)
-        print(f"New arc created on the {parent.title} arc or timeline. Name: {time_skip_title} ")
 
 
     # Called to return our list of menu options when right clicking on the timeline rail
@@ -225,14 +168,6 @@ class Timelines_Rail(Rail):
                     content=ft.Row([
                         ft.Icon(ft.Icons.ADD_ROUNDED),
                         ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                    ])
-                ),
-                Menu_Option_Style(
-                    on_click=self.new_timeskip_clicked,
-                    data="time_skip",
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.ADD_ROUNDED),
-                        ft.Text("Time Skip", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                     ])
                 ),
                 Menu_Option_Style(
