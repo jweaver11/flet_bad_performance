@@ -161,16 +161,20 @@ class Character(Widget):
                                 #TODO on "other" selection, open a text field to specify
                                 #on_change=self.submit_sex_change,
                             ),
-                            #TODO add a dropdown for relatives (other characters)
+                            #TODO add a dropdown for connections (other characters)
                             #should open another dropdown or text field to specify relationship
             
                             ft.TextField(   # Text field for race input
-                                label ="Race"
+                                label ="Race",
+                                width=250,
+                                expand = False,
                             ),
                             #gotta make it so it doesn't make a super long field if window is dragged
                             ft.TextField(  # Text field for age input
                                 label ="Age",
-                                max_length=5
+                                max_length=7,#allows for things like "unknown" or "ancient"
+                                width=100,
+                                expand = False,
                             ),
                             #same as above but also both need to update data on change
                         ]
