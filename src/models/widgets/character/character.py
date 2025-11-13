@@ -39,6 +39,7 @@ class Character(Widget):
                 'alignment2': str, #good, neutral, evil, none
                 'sex': str, #male,female,other,none
                 'age': str, #text input
+                'sexuality': str, #text input
                 'physical_description': {
                     'Race': str,
                     'Skin Color': str,
@@ -161,27 +162,39 @@ class Character(Widget):
                                 #TODO on "other" selection, open a text field to specify
                                 #on_change=self.submit_sex_change,
                             ),
+                            ft.TextField(  # Text field for age input
+                                label ="Age",
+                                max_length=7,#allows for things like "unknown" or "ancient"
+                                width=100,
+                                expand = False,
+                            ),  
+                            #ft.Dropdown(       # Dropdown selection of relatives (other characters)
+                            #    label="Connections",
+                            #    #TODO value needs to be a list of connections
+                            #    color=self.data[connections_color],
+                            #    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                            #    options=[
+                            #    #TODO populate options with other characters in story
+                            #    ],
+                            #),
+                           
                             #TODO add a dropdown for connections (other characters)
                             #should open another dropdown or text field to specify relationship
             
                             ft.TextField(   # Text field for race input
                                 label ="Race",
                                 width=250,
-                                expand = False,
+                                expand = False, #prevents stretching too wide
                             ),
-                            #gotta make it so it doesn't make a super long field if window is dragged
-                            ft.TextField(  # Text field for age input
-                                label ="Age",
-                                max_length=7,#allows for things like "unknown" or "ancient"
-                                width=100,
-                                expand = False,
+                            ft.TextField(   # Text field for sexuality input
+                                            label ="Sexuality",
+                                            width=200,
+                                            expand = False,
                             ),
-                            #same as above but also both need to update data on change
                         ]
                     ),
                 ]
             )
-
         )     
         
         # Set our content to the body_container (from Widget class) as the body we just built
