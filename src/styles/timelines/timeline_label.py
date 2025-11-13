@@ -1,11 +1,10 @@
-# Class for labels of plot points and arcs used underneath timeline and arc dropdowns
 import flet as ft
 from models.widgets.timeline import Timeline
 from models.story import Story
 from styles.menu_option_style import Menu_Option_Style
 
 
-
+# Class for labels of plot points and arcs used underneath timeline drops and arc drop downs
 class Timeline_Label(ft.GestureDetector):
     def __init__(
         self, 

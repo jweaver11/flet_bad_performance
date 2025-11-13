@@ -87,13 +87,13 @@ class Timeline_Item(ft.GestureDetector):
         ]
         
         # Run through our additional menu options if we have any, and set their on_click methods
-        for option in self.additional_menu_options or []:
+        #for option in self.additional_menu_options or []:
 
             # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
+            #option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
 
             # Add them to the list
-            menu_options.append(option)
+            #menu_options.append(option)
 
         # Color changing popup menu
         menu_options.append(
