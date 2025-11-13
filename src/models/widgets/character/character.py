@@ -37,8 +37,8 @@ class Character(Widget):
                 'sex_color': "primary",
                 'alignment1': str, #lawful, neutral, chaotic, none
                 'alignment2': str, #good, neutral, evil, none
-                'sex': str,
-                'age': str,
+                'sex': str, #male,female,other,none
+                'age': str, #text input
                 'physical_description': {
                     'Race': str,
                     'Skin Color': str,
@@ -49,7 +49,7 @@ class Character(Widget):
                     'Build': str,    
                     'Distinguishing Features': str,  
                 },
-                'family':  {
+                'family':  { #TODO "connections" dropdown+tree/detective view?
                     'Love Interest': str,    
                     'Father': str,   
                     'Mother': str,    
@@ -66,11 +66,13 @@ class Character(Widget):
                     'physical': str,
                     'mental': str,
                     'social': str,
+                    'magical': str,
                 },
                 'weaknesses': {
                     'physical': str,
                     'mental': str,
                     'social': str,
+                    'magical': str,
                 },
                 'trauma': str,
                 'occupation': str,
@@ -79,8 +81,6 @@ class Character(Widget):
                 'backstory': str,
                 'abilities': str,
                 'is_dead': bool,    # Defaults to false
-                'data1': str,
-                'data2': "coding sux",
             },
         )
         
@@ -167,9 +167,10 @@ class Character(Widget):
                             ft.TextField(   # Text field for race input
                                 label ="Race"
                             ),
-                            #gotta make it so it doesn't make a super long field if dragged
+                            #gotta make it so it doesn't make a super long field if window is dragged
                             ft.TextField(  # Text field for age input
                                 label ="Age"
+                                max_length=5
                             ),
                             #same as above but also both need to update data on change
                         ]
