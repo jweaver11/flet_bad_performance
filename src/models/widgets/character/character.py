@@ -169,7 +169,7 @@ class Character(Widget):
                             ),
                             #gotta make it so it doesn't make a super long field if window is dragged
                             ft.TextField(  # Text field for age input
-                                label ="Age"
+                                label ="Age",
                                 max_length=5
                             ),
                             #same as above but also both need to update data on change
