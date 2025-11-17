@@ -23,7 +23,7 @@ class Arc(Mini_Widget):
             data=data,         
         ) 
 
-        # Type of arcs?? timeskips, normal, etc??
+        # Type of arcs?? timeskips, normal, character arcs
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -40,7 +40,7 @@ class Arc(Mini_Widget):
                 'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
                 'arcs_are_expanded': True,                  # If the arcs section is expanded
-                'height': 200,                            # Height of the arc on the timeline
+                'height': 200,                              # Height of the arc on the timeline
                 
                 'plot_points': dict,                        # Dict of plot points in this branch
                 'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
@@ -59,14 +59,17 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
+        # The control we add to the timeline on its widget to display our arc
+        # NEED CUSTOM CONTROL??
         self.timeline_control = ft.GestureDetector(
             mouse_cursor=ft.MouseCursor.CLICK,
             on_tap=lambda e: print(f"Arc {self.title} tapped"),
             width=self.data['end_position'] - self.data['start_position'],
             left=self.data['start_position'],                                       # X position on the timeline
+            on_hover=self.on_hovers,
         )    
 
-        # Loads our three mini widgets into their dicts   
+        # Loads all our plot points on this arc from data
         self.load_plot_points() 
 
         self.reload_mini_widget()
@@ -132,36 +135,37 @@ class Arc(Mini_Widget):
         self.owner.story.active_rail.content.reload_rail()
         self.owner.reload_widget()
 
+    # Called when hovering over the arc on the timeline
+    def on_hovers(self, e):
+        pass
+
     # Called to reload our mini widget content
     def reload_mini_widget(self):
 
         # Declare how we will draw our arc on the timeline
         arc_start = 0
-        arc_sweep = math.pi
+        #arc_sweep = math.pi
 
         # If we are above the timeline, draw arc downwards. Defaults to drawing upwards
         if self.data.get("branch_direction") == "top":
-            arc_start = math.pi              
-            arc_sweep = math.pi     
+            arc_start = math.pi  
+            #arc_sweep = math.pi              
 
-        #self.timeline_control.height = self.arc_height
+        # Create our timeline control with the arc drawing
         self.timeline_control.content = cv.Canvas(
             width=self.data['end_position'] - self.data['start_position'],
             height=self.data.get("height", 200),
-            content=ft.Stack(
-                controls=[
-                    ft.Container(bgcolor=ft.Colors.with_opacity(0.4, "red")),
-                    ft.Text(self.title, color=self.data['color'])
-                ]
-            ),
+            content=ft.Text(self.title, color=self.data['color']),
+                
+            
             shapes=[
-                cv.Arc(
+                cv.Arc(         # Give it the actual arc shape to draw
                     x=0,
                     y=0,
                     width=self.data['end_position'] - self.data['start_position'],
                     height=self.data.get("height", 200),
                     start_angle=arc_start,
-                    sweep_angle=arc_sweep,
+                    sweep_angle=math.pi,
                     paint=ft.Paint(
                         color=self.data['color'],
                         stroke_width=3,
@@ -169,14 +173,27 @@ class Arc(Mini_Widget):
                     )
                 )
             ],
-        
         )
 
+        if self.data.get("branch_direction") == "top":
+            self.timeline_control.content = ft.Column(
+                spacing=0, 
+                controls=[
+                    self.timeline_control.content,
+                    ft.Container(bgcolor=ft.Colors.BLUE, expand=True)
+                ]
+            )
+        else:
+            self.timeline_control.content = ft.Column(
+                spacing=0, 
+                controls=[
+                    ft.Container(bgcolor=ft.Colors.BLUE, expand=True),
+                    self.timeline_control.content,
+                ]
+            )
 
-        
-        # Needs to show the owner
-        # Distinct plot arc vs character arc??
 
+        # Reload the mini widget content
         self.content = ft.Column(
             [
                 self.title_control,
