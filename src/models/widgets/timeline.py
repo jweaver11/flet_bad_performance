@@ -90,7 +90,7 @@ class Timeline(Widget):
             expand=True,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_hover=lambda e: self.on_hovers(e),         # Not firing for some reason
+            on_hover=lambda e: self.on_hovers(e),         
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
             on_tap=self.on_click,
             hover_interval=20,
@@ -327,36 +327,36 @@ class Timeline(Widget):
         - Add curved horizontal divider for duration of the arc
         '''
 
-        master_column = ft.Column()
 
-
-        # The UI element that will display our filters
-        filters = ft.Row(scroll="auto")
 
         # UI elements
-        # Filter to show check marks across timeline as markings for years/months
-        show_information_display = ft.Checkbox(label="Show Information Display", value=self.data['information_display']['visibility'], on_change=lambda e: self.information_display.toggle_visibility(e))
-        filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True)
-        filter_arcs = ft.Checkbox(label="Show Arcs", value=True)
-        reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))
+        filters = ft.Row(scroll="auto")     # Row to hold our filter options
+        show_information_display = ft.Checkbox(         # Checkbox to show/hide information display
+            label="Show Information Display",
+            value=self.data['information_display']['visibility'], 
+            on_change=lambda e: self.information_display.toggle_visibility(e)
+        )
+        filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True)      # Checkbox to filter plot points
+        filter_arcs = ft.Checkbox(label="Show Arcs", value=True)                    # Checkbox to filter arcs
+        reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))         # Button to reset zoom level
 
         # Header that shows our filter options, as well as what timeliness are visible
         # Add reset zoom button later
         header = ft.Row(
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
-            controls=[show_information_display, filter_plot_points, filter_arcs],
+            scroll="auto",
+            controls=[show_information_display, reset_zoom_button],
         )
 
-
-        filters.controls.append(reset_zoom_button)
+        # Add our filter options to the filters row
+        filters.controls = [filter_plot_points, filter_arcs]
             
-        # Add our timeliness as filters to our header
+        # Add our filters to the headers
         header.controls.append(filters)
 
-
         # Row to hold our timeline edges and control
-        row = ft.Row(
+        timeline_row = ft.Row(
             spacing=0,
             expand=True,
             controls=[
@@ -366,15 +366,14 @@ class Timeline(Widget):
             ]
         )
 
-        # Reset the content of our timeline control
+        # Reset the content of our timeline control so we can rebuild it
         self.timeline_control.content = ft.Row(spacing=0, expand=True)
-
 
         # Add line segments so our timeline control isn't just flat
         for i in range(8):
 
             # Horizontal followed up by a vertical line
-            horizontal_line = ft.Container(expand=True, content=ft.Divider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3))
+            horizontal_line = ft.Container(expand=True, height=16, content=ft.Divider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3))
             vertical_line = ft.Container(height=16, content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3, width=3))
             
             # Add our horizontal segment
@@ -389,25 +388,16 @@ class Timeline(Widget):
                 self.timeline_control.content.controls.append(vertical_line)
 
         
-        # Load all our sub arcs now, and add them to the TL appropriately
-        # for arc in self.arcs.values():
-        def load_arcs_to_timeline(timeline_control: ft.GestureDetector, arcs: dict):
-            ''' Loads all our arcs into our timeline control '''
-
-            # Three rows: Top arcs, bottom arcs, middle arcs
-
-
-
-            for arc in arcs.values():
-                pass
-                # Take arc.control and add it at timeline.control.x using a stack or sumthin
         
-        # Add our timeline control to the row
-        #row.controls.insert(1, self.timeline_control)
-        #row.controls.insert(1, self.timeline_control)
 
         # Column that will hold our timeline and its arcs
-        content_column = ft.Column()
+        master_column = ft.Column([timeline_row], spacing=0, alignment=ft.MainAxisAlignment.CENTER, expand=True)
+
+        for arc in self.arcs.values():
+            if arc.data['branch_direction'] == "up":
+                master_column.controls.insert(0, arc.arc_control)
+            else:
+                master_column.controls.append(arc.arc_control)
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our timeliness that that will display timeskips, etc. 
@@ -418,7 +408,7 @@ class Timeline(Widget):
                 expand=True,
                 controls=[
                     ft.Container(expand=True,),
-                    row,
+                    master_column,
                     ft.Container(expand=True,),
                 ]
             )

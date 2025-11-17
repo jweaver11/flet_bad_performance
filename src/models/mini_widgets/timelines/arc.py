@@ -54,6 +54,8 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
+        self.arc_control = ft.Divider()
+
         # Loads our three mini widgets into their dicts   
         self.load_plot_points() 
 

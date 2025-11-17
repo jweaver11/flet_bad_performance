@@ -111,6 +111,8 @@ class Workspace(ft.Container):
     def show_pin_drag_targets(self):
         ''' Adds our drag targets to the master stack so we can drop our widgets into pin locations '''
 
+        # Add logic here. pin drag targets.width = left_pin.width if left_pin.width > minimum_pin_width else minimum_pin_width
+
         if self.pin_drag_targets not in self.master_stack.controls:
             self.master_stack.controls.extend(self.pin_drag_targets)
             self.master_stack.update()
