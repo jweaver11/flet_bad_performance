@@ -393,8 +393,6 @@ class Timeline(Widget):
         # Add our plot points to the timeline (They position themselves)
         for plot_point in self.plot_points.values():
             timeline_stack.controls.append(plot_point.timeline_control)
-
-        
         
 
         # Lists for organizing our arcs into top and bottom rows
@@ -402,11 +400,11 @@ class Timeline(Widget):
         bottom_arcs = []
 
         # Stacks used to hold our arcs
-        top_arcs_stack = ft.Stack()
-        bottom_arcs_stack = ft.Stack()
+        top_arcs_stack = ft.Stack(expand=True, )
+        bottom_arcs_stack = ft.Stack(expand=True,)
 
         # Column that will hold our timeline and its arcs
-        master_column = ft.Column([timeline_stack], spacing=0, alignment=ft.MainAxisAlignment.CENTER, expand=True)
+        master_column = ft.Column([top_arcs_stack, timeline_stack, bottom_arcs_stack], spacing=0, alignment=ft.MainAxisAlignment.CENTER, expand=True)
 
         # Sort our arcs into top and bottom direction arcs
         for arc in self.arcs.values():
@@ -419,17 +417,134 @@ class Timeline(Widget):
             else:
                 bottom_arcs.append(arc)
 
+
         # Sort our arcs from earliest start to latest start. If same start, shortest to longest
-        #top_arcs.sort(key=lambda a: a.data['end_position'] - a.data['start_position'])
-        #bottom_arcs.sort(key=lambda a: a.data['end_position'] - a.data['start_position'])
+        top_arcs.sort(
+            key=lambda a: (
+                a.data.get('start_position', 0),
+                a.data.get('end_position', 0) - a.data.get('start_position', 0),
+            )
+        )
+        bottom_arcs.sort(
+            key=lambda a: (
+                a.data.get('start_position', 0),
+                a.data.get('end_position', 0) - a.data.get('start_position', 0),
+            )
+        )
 
+        print("Top Arcs Order:")
+        for arc in top_arcs:
+            print(arc.title)
 
-            # Using stacks
+        # List to hold previous arcs we skipped when checking for collisions since they were already raised, but may need to be check again
+        previous_arcs = []
 
-            # Add the arc control (vert div, div, vert div) to the top or bottom arc stack based on its direction,
-            # ... at the position based on its start and end date/x_position
-            # Work shortest to longest. Check for collisions with existing arcs, and increase the height of vertical dividers as needed
-            # - Add their control (divider) to that column based on length of arc. Longer arcs go on outside, shorter arcs go inside
+        # Go through our sorted top arcs
+        for arc in top_arcs:
+
+            # Make sure to reset our arcs bottom position
+            arc.timeline_control.bottom = 0
+            arc.timeline_control.top = None
+            # Clear our previous arcs list
+            previous_arcs.clear()
+
+            # Check all our previous arcs in the stack up to this one to see if we collide with any of them
+            for prev_arc in top_arcs:
+
+                # If we reach ourselves, stop checking
+                if prev_arc is arc:
+
+                    # Sort our previous_arcs list by lowest to highest bottom position
+                    previous_arcs.sort(key=lambda a: a.timeline_control.bottom)
+
+                    # Go through all our previous arcs
+                    for pa in previous_arcs:
+                        
+                        # If we still collide with a previous arc we saved for check later, raise us higher
+                        if pa.timeline_control.bottom == arc.timeline_control.bottom:
+                            arc.timeline_control.bottom += 25
+
+                        # Otherwise we don't collide, so break out
+                        else:
+                            break
+                    break 
+
+                # If we have not reached ourselves in the check yet
+                else:
+
+                    # If we Collide (start pos less than or equal to previous arc end pos)
+                    if arc.data['start_position'] <= prev_arc.data['end_position']:
+                        
+                        # If the arc is already raised, add it to the previous list to check back again later
+                        if prev_arc.timeline_control.bottom >= arc.timeline_control.bottom:
+                            previous_arcs.append(prev_arc)
+                            continue
+
+                        # Otherwise the previous arc is not raised, so raise us above it
+                        else:
+                            arc.timeline_control.bottom += 25
+
+                    # Otherwise continue checking previous arcs
+                    else:
+                        continue
+
+            # Add our arc control to the top arcs stack
+            top_arcs_stack.controls.append(arc.timeline_control)
+
+        # Go through our sorted top arcs
+        for arc in bottom_arcs:
+
+            # Make sure to reset our arcs bottom position
+            arc.timeline_control.top = 0
+            arc.timeline_control.bottom = None
+            # Clear our previous arcs list
+            previous_arcs.clear()
+
+            # Check all our previous arcs in the stack up to this one to see if we collide with any of them
+            for prev_arc in bottom_arcs:
+
+                # If we reach ourselves
+                if prev_arc is arc:
+
+                    # Sort our previous_arcs list by lowest to highest top position
+                    previous_arcs.sort(key=lambda a: a.timeline_control.top)
+
+                    # Go through all our previous arcs
+                    for pa in previous_arcs:
+                        
+                        # If we still collide with a previous arc we saved for check later, raise us higher
+                        if pa.timeline_control.top == arc.timeline_control.top:
+                            arc.timeline_control.top += 25
+                            
+                        # Otherwise we don't collide, so break out
+                        else:
+                            break
+
+                    # Break the loop since our lists are sorted, we don't need to check arcs after ourself
+                    break 
+
+                # If we have not reached ourselves in the check yet
+                else:
+
+                    # If we Collide (start pos less than or equal to previous arc end pos)
+                    if arc.data['start_position'] <= prev_arc.data['end_position']:
+                        
+                        # If the arc is already raised, add it to the previous list to check back again later
+                        if prev_arc.timeline_control.top >= arc.timeline_control.top:
+                            previous_arcs.append(prev_arc)
+                            continue
+
+                        # Otherwise the previous arc is not raised, so raise us above it
+                        else:
+                            arc.timeline_control.top += 25
+
+                    # Otherwise continue checking previous arcs
+                    else:
+                        continue
+
+            # Add our arc control to the top arcs stack
+            bottom_arcs_stack.controls.append(arc.timeline_control)
+
 
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES

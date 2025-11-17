@@ -40,7 +40,10 @@ class Plot_Point(Mini_Widget):
             },
         )
 
-        self.timeline_control = ft.Container(left=self.data['x_position'], bottom=0, top=0, content=ft.CircleAvatar(radius=6, bgcolor=self.data['color']))
+        self.timeline_control = ft.Container(
+            left=self.data['x_position'],                                       # X position on the timeline
+            bottom=0, top=0,                                                    # Stick it vertically in middle of the stack
+            content=ft.CircleAvatar(radius=6, bgcolor=self.data['color']))      # Visual representation on the timeline
 
         self.reload_mini_widget()
 

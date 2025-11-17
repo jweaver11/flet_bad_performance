@@ -28,7 +28,6 @@ class Arc(Mini_Widget):
             {   
                 'tag': "arc",                               # Tag to identify what type of object this is
                 'is_timeskip': bool,                        # If this arc is a time skip (skips ahead in time on the timeline)   
-                'x_position': int,                          # X position on the timeline
                 'branch_direction': "top",                  # Direction the arc branches off (top or bottom) from the timeline
                 'start_date': str,                          # Start and end date of the branch, for timeline view
                 'end_date': str,                            # Start and end date of the branch, for timeline view
@@ -56,7 +55,13 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
-        self.timeline_control = ft.Divider()
+        self.timeline_control = ft.Container(
+            height=20, 
+            left=self.data['start_position'],                                       # X position on the timeline
+            bottom=0,
+
+            content=ft.Row([ft.VerticalDivider(color="red"), ft.Text(self.title), ft.VerticalDivider(color="blue")])
+        )      
 
         # Loads our three mini widgets into their dicts   
         self.load_plot_points() 
