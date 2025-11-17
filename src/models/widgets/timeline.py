@@ -327,6 +327,8 @@ class Timeline(Widget):
         - Add curved horizontal divider for duration of the arc
         '''
 
+        master_column = ft.Column()
+
 
         # The UI element that will display our filters
         filters = ft.Row(scroll="auto")
@@ -359,7 +361,7 @@ class Timeline(Widget):
             expand=True,
             controls=[
                 self.timeline_left_edge,
-                
+                self.timeline_control,
                 self.timeline_right_edge
             ]
         )
@@ -402,7 +404,10 @@ class Timeline(Widget):
         
         # Add our timeline control to the row
         #row.controls.insert(1, self.timeline_control)
-        row.controls.insert(1, self.timeline_control)
+        #row.controls.insert(1, self.timeline_control)
+
+        # Column that will hold our timeline and its arcs
+        content_column = ft.Column()
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our timeliness that that will display timeskips, etc. 
