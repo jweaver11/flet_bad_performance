@@ -358,7 +358,6 @@ class Timeline(Widget):
         # Row to hold our timeline edges and control
         timeline_row = ft.Row(
             spacing=0,
-            expand=True,
             controls=[
                 self.timeline_left_edge,
                 self.timeline_control,
@@ -387,17 +386,51 @@ class Timeline(Widget):
             else:
                 self.timeline_control.content.controls.append(vertical_line)
 
+
+        # Create a stack so we can sit our plotpoints on our timeline
+        timeline_stack = ft.Stack(controls=[timeline_row])
+
+        # Add our plot points to the timeline (They position themselves)
+        for plot_point in self.plot_points.values():
+            timeline_stack.controls.append(plot_point.timeline_control)
+
         
         
+
+        # Lists for organizing our arcs into top and bottom rows
+        top_arcs = []
+        bottom_arcs = []
+
+        # Stacks used to hold our arcs
+        top_arcs_stack = ft.Stack()
+        bottom_arcs_stack = ft.Stack()
 
         # Column that will hold our timeline and its arcs
-        master_column = ft.Column([timeline_row], spacing=0, alignment=ft.MainAxisAlignment.CENTER, expand=True)
+        master_column = ft.Column([timeline_stack], spacing=0, alignment=ft.MainAxisAlignment.CENTER, expand=True)
 
+        # Sort our arcs into top and bottom direction arcs
         for arc in self.arcs.values():
-            if arc.data['branch_direction'] == "up":
-                master_column.controls.insert(0, arc.arc_control)
+
+            # Add them to top list
+            if arc.data['branch_direction'] == "top":
+                top_arcs.append(arc)
+
+            # Or add themm to bottom list
             else:
-                master_column.controls.append(arc.arc_control)
+                bottom_arcs.append(arc)
+
+        # Sort our arcs from earliest start to latest start. If same start, shortest to longest
+        #top_arcs.sort(key=lambda a: a.data['end_position'] - a.data['start_position'])
+        #bottom_arcs.sort(key=lambda a: a.data['end_position'] - a.data['start_position'])
+
+
+            # Using stacks
+
+            # Add the arc control (vert div, div, vert div) to the top or bottom arc stack based on its direction,
+            # ... at the position based on its start and end date/x_position
+            # Work shortest to longest. Check for collisions with existing arcs, and increase the height of vertical dividers as needed
+            # - Add their control (divider) to that column based on length of arc. Longer arcs go on outside, shorter arcs go inside
+
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our timeliness that that will display timeskips, etc. 

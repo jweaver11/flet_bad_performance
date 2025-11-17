@@ -29,16 +29,18 @@ class Plot_Point(Mini_Widget):
                 'tag': "plot_point",           # Tag to identify what type of object this is
                 'description': str,
                 'events': list,                # Numbered list of events that occur at this plot point
-                'x_position': int,           # X position on the timeline
+                'x_position': int,             # X position on the timeline
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
-                'color': "primary",             # Color of the plot point on the timeline
+                'color': "primary",            # Color of the plot point on the timeline
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
             },
         )
+
+        self.timeline_control = ft.Container(left=self.data['x_position'], bottom=0, top=0, content=ft.CircleAvatar(radius=6, bgcolor=self.data['color']))
 
         self.reload_mini_widget()
 

@@ -27,11 +27,13 @@ class Arc(Mini_Widget):
             self,   # Pass in our own data so the function can see the actual data we loaded
             {   
                 'tag': "arc",                               # Tag to identify what type of object this is
-                'is_timeskip': bool,                       # If this arc is a time skip (skips ahead in time on the timeline)   
-                'x_position': int,                            # X position on the timeline
-                'branch_direction': "up",                 # Direction the arc branches off (top or bottom) from the timeline
+                'is_timeskip': bool,                        # If this arc is a time skip (skips ahead in time on the timeline)   
+                'x_position': int,                          # X position on the timeline
+                'branch_direction': "top",                  # Direction the arc branches off (top or bottom) from the timeline
                 'start_date': str,                          # Start and end date of the branch, for timeline view
                 'end_date': str,                            # Start and end date of the branch, for timeline view
+                'start_position': int,                      # Start position on the timeline
+                'end_position': int,                        # End position on the timeline 
                 'color': "primary",                         # Color of the arc in the timeline
                 'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
@@ -54,7 +56,7 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
-        self.arc_control = ft.Divider()
+        self.timeline_control = ft.Divider()
 
         # Loads our three mini widgets into their dicts   
         self.load_plot_points() 
