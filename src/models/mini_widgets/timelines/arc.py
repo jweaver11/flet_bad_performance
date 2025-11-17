@@ -2,6 +2,9 @@ import flet as ft
 from models.mini_widget import Mini_Widget
 from models.widget import Widget
 from handlers.verify_data import verify_data
+import flet.canvas as cv
+import math
+
 
 # Class for arcs (essentially sub-timelines that are connected) on a timeline. 
 # Arcs split off from the main timeline and can merge back in later. Exp: Characters going on different journeys that rejoin later
@@ -37,6 +40,7 @@ class Arc(Mini_Widget):
                 'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
                 'arcs_are_expanded': True,                  # If the arcs section is expanded
+                'height': 200,                            # Height of the arc on the timeline
                 
                 'plot_points': dict,                        # Dict of plot points in this branch
                 'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
@@ -55,13 +59,12 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
-        self.timeline_control = ft.Container(
-            height=20, 
+        self.timeline_control = ft.GestureDetector(
+            mouse_cursor=ft.MouseCursor.CLICK,
+            on_tap=lambda e: print(f"Arc {self.title} tapped"),
+            width=self.data['end_position'] - self.data['start_position'],
             left=self.data['start_position'],                                       # X position on the timeline
-            bottom=0,
-
-            content=ft.Row([ft.VerticalDivider(color="red"), ft.Text(self.title), ft.VerticalDivider(color="blue")])
-        )      
+        )    
 
         # Loads our three mini widgets into their dicts   
         self.load_plot_points() 
@@ -131,6 +134,44 @@ class Arc(Mini_Widget):
 
     # Called to reload our mini widget content
     def reload_mini_widget(self):
+
+        # Declare how we will draw our arc on the timeline
+        arc_start = 0
+        arc_sweep = math.pi
+
+        # If we are above the timeline, draw arc downwards. Defaults to drawing upwards
+        if self.data.get("branch_direction") == "top":
+            arc_start = math.pi              
+            arc_sweep = math.pi     
+
+        #self.timeline_control.height = self.arc_height
+        self.timeline_control.content = cv.Canvas(
+            width=self.data['end_position'] - self.data['start_position'],
+            height=self.data.get("height", 200),
+            content=ft.Stack(
+                controls=[
+                    ft.Container(bgcolor=ft.Colors.with_opacity(0.4, "red")),
+                    ft.Text(self.title, color=self.data['color'])
+                ]
+            ),
+            shapes=[
+                cv.Arc(
+                    x=0,
+                    y=0,
+                    width=self.data['end_position'] - self.data['start_position'],
+                    height=self.data.get("height", 200),
+                    start_angle=arc_start,
+                    sweep_angle=arc_sweep,
+                    paint=ft.Paint(
+                        color=self.data['color'],
+                        stroke_width=3,
+                        style=ft.PaintingStyle.STROKE
+                    )
+                )
+            ],
+        
+        )
+
 
         
         # Needs to show the owner
