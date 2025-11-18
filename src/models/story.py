@@ -16,13 +16,13 @@ from handlers.verify_data import verify_data
 class Story(ft.View):
     # Constructor.
     def __init__(
-            self, 
-            title: str,             # Title of our story
-            page: ft.Page,          # Page reference for updating UI elements
-            data: dict=None,        # Data to load our story with (if any)
-            template: str=None,     # Template to use when creating new story (sci-fi, fantasy, etc.)
-            type: str=None          # Type of story (novel, comic, etc.)
-        ):
+        self, 
+        title: str,             # Title of our story
+        page: ft.Page,          # Page reference for updating UI elements
+        data: dict=None,        # Data to load our story with (if any)
+        template: str=None,     # Template to use when creating new story (sci-fi, fantasy, etc.)
+        type: str=None          # Type of story (novel, comic, etc.)
+    ):
         
         # Parent constructor
         super().__init__(
@@ -37,6 +37,10 @@ class Story(ft.View):
         self.template = template        # Template for our story (sci-fi, fantasy, etc.)
         self.type = type                # Type of story, novel or comic. Affects how templates for creating new content will work
 
+        if self.data is None:
+            print("no data")
+        else:
+            print("Data: ", self.data)
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,           # Pass in our own data so the function can see the actual data we loaded
@@ -51,11 +55,11 @@ class Story(ft.View):
                 'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
                 'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
                 'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
-                'top_pin_height': int,
-                'left_pin_width': int,
-                'main_pin_height': int,
-                'right_pin_width': int,
-                'bottom_pin_height': int,
+                'top_pin_height': self.data.get('top_pin_height', 0),
+                'left_pin_width': self.data.get('left_pin_width', 0),
+                'main_pin_height': self.data.get('main_pin_height', 0),
+                'right_pin_width': self.data.get('right_pin_width', 0),
+                'bottom_pin_height': self.data.get('bottom_pin_height', 0),
                 'created_at': str,
                 'last_modified': str,
 

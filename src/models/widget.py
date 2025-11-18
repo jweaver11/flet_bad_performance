@@ -17,13 +17,13 @@ class Widget(ft.Container):
     
     # Constructor. All widgets require a title,  page reference, directory path, and story reference
     def __init__(
-            self, 
-            title: str,             # Title of our object
-            page: ft.Page,          # Grabs a page reference for updates
-            directory_path: str,    # Path to our directory that will contain our json file
-            story: Story,           # Reference to our story object that owns this widget
-            data: dict = None       # Our data passed in if loaded (or none if new object)
-        ):
+        self, 
+        title: str,             # Title of our object
+        page: ft.Page,          # Grabs a page reference for updates
+        directory_path: str,    # Path to our directory that will contain our json file
+        story: Story,           # Reference to our story object that owns this widget
+        data: dict = None       # Our data passed in if loaded (or none if new object)
+    ):
 
         # Sets uniformity for all widgets
         super().__init__(

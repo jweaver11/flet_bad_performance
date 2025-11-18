@@ -5,13 +5,35 @@ from handlers.verify_data import verify_data
 import flet.canvas as cv
 import math
 
-
 # Class for arcs (essentially sub-timelines that are connected) on a timeline. 
 # Arcs split off from the main timeline and can merge back in later. Exp: Characters going on different journeys that rejoin later
 class Arc(Mini_Widget):
 
-    # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, father, page: ft.Page, key: str, data: dict=None):
+    # Constructor.
+    def __init__(
+        self, 
+        title: str, 
+        owner: Widget, 
+        father, 
+        page: ft.Page, 
+        key: str, 
+        size: str = None,
+        data: dict = None
+    ):
+        
+        if size is None:
+            size = "medium"
+
+        if size == "small":
+            size = 4
+        elif size == "medium":
+            size = 3
+        elif size == "large":
+            size = 2
+        elif size == "x-large":
+            size = 1.5
+        else:
+            size = 3  
         
         # Parent constructor
         super().__init__(
@@ -23,7 +45,19 @@ class Arc(Mini_Widget):
             data=data,         
         ) 
 
+        location = self.owner.data.get("pin_location", "main")
+        print(location)
+
+
+        h = self.owner.story.data['bottom_pin_height']
+        print(h)
+
+        # TODO:
         # Type of arcs?? timeskips, normal, character arcs
+        # Arcs have 4 sizes: small, medium, large, x-large This determines their height.
+        # height = page height / by: S=4, M=3, L=2, XL=1.5
+
+        #height = self.owner.story.workspace.main_pin.height / size
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -34,13 +68,13 @@ class Arc(Mini_Widget):
                 'branch_direction': "top",                  # Direction the arc branches off (top or bottom) from the timeline
                 'start_date': str,                          # Start and end date of the branch, for timeline view
                 'end_date': str,                            # Start and end date of the branch, for timeline view
-                'start_position': int,                      # Start position on the timeline
-                'end_position': int,                        # End position on the timeline 
+                'start_position': 100,                      # Start position on the timeline
+                'end_position': 300,                        # End position on the timeline 
                 'color': "primary",                         # Color of the arc in the timeline
                 'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
                 'arcs_are_expanded': True,                  # If the arcs section is expanded
-                'height': 200,                              # Height of the arc on the timeline
+                'height': self.owner.p.height / size,                              # Height of the arc on the timeline. Can be small, medium, or large: S=200, M=400, L=600
                 
                 'plot_points': dict,                        # Dict of plot points in this branch
                 'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
@@ -59,19 +93,18 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
-        # The control we add to the timeline on its widget to display our arc
-        # NEED CUSTOM CONTROL??
-        self.timeline_control = ft.GestureDetector(
-            mouse_cursor=ft.MouseCursor.CLICK,
-            on_tap=lambda e: print(f"Arc {self.title} tapped"),
+        # The container we position on our timeline holding our arc drawing, and the gesture detector with logic for it
+        self.timeline_control = ft.Container(
             width=self.data['end_position'] - self.data['start_position'],
+            height=self.data.get("height", 200) / 2,
             left=self.data['start_position'],                                       # X position on the timeline
-            on_hover=self.on_hovers,
+            offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
         )    
 
         # Loads all our plot points on this arc from data
         self.load_plot_points() 
 
+        # Loads our mini widget
         self.reload_mini_widget()
 
     
@@ -137,36 +170,63 @@ class Arc(Mini_Widget):
 
     # Called when hovering over the arc on the timeline
     def on_hovers(self, e):
+        # Grab x position on the timeline
+        e.control.parent.bgcolor = ft.Colors.with_opacity(0.2, "red")
+        self.p.update()
         pass
 
-    # Called to reload our mini widget content
-    def reload_mini_widget(self):
 
+    def reload_timeline_control(self):
         # Declare how we will draw our arc on the timeline
         arc_start = 0
-        #arc_sweep = math.pi
 
         # If we are above the timeline, draw arc downwards. Defaults to drawing upwards
         if self.data.get("branch_direction") == "top":
-            arc_start = math.pi  
-            #arc_sweep = math.pi              
+            arc_start = math.pi               
 
         # Create our timeline control with the arc drawing
         self.timeline_control.content = cv.Canvas(
             width=self.data['end_position'] - self.data['start_position'],
-            height=self.data.get("height", 200),
-            content=ft.Text(self.title, color=self.data['color']),
-                
+            height=self.data.get("height", 200) / 2,
+            #content=ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title, color=self.data['color'])]),
+            content=ft.Container(
+                expand=True, 
+                bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
+                border_radius=ft.BorderRadius(
+                    top_left=200,      
+                    top_right=120,     
+                    bottom_left=10,   
+                    bottom_right=10
+                ),
+                #on_hover=self.on_hovers,
+                content = ft.GestureDetector(
+                    mouse_cursor=ft.MouseCursor.CLICK,
+                    on_tap=lambda e: print(f"Arc {self.title} tapped"),
+                    #width=self.data['end_position'] - self.data['start_position'],
+                    #height=self.data.get("height", 200) / 2,
+                    #left=self.data['start_position'],                                       # X position on the timeline
+                    on_hover=self.on_hovers,
+                    #offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
+                )    
+            ),
             
             shapes=[
-                cv.Arc(         # Give it the actual arc shape to draw
-                    x=0,
-                    y=0,
-                    width=self.data['end_position'] - self.data['start_position'],
-                    height=self.data.get("height", 200),
-                    start_angle=arc_start,
-                    sweep_angle=math.pi,
-                    paint=ft.Paint(
+
+                # Give it the actual arc shape to draw
+                cv.Arc(         
+                    
+                    # Width of the arc using our end position - start position
+                    width=self.data['end_position'] - self.data['start_position'], 
+
+                    height=self.data.get("height", 200) - 30,       # Height of our arc, minus some space to fit our name text
+                    x=0,            # Start at left side of canvas control
+
+                    # Y Shifting depeding if we are top or bottom arc. Needs offset of half of the height offset used to fit our name
+                    y=15 if self.data.get("branch_direction") == "top" else -(self.data.get("height", 200)) / 2 + 15,   
+                         
+                    start_angle=arc_start,      # Angles to draw arc from
+                    sweep_angle=math.pi,        # Sweep angle to make arc a half circle
+                    paint=ft.Paint(             # Paint used to draw the arc
                         color=self.data['color'],
                         stroke_width=3,
                         style=ft.PaintingStyle.STROKE
@@ -175,24 +235,13 @@ class Arc(Mini_Widget):
             ],
         )
 
-        if self.data.get("branch_direction") == "top":
-            self.timeline_control.content = ft.Column(
-                spacing=0, 
-                controls=[
-                    self.timeline_control.content,
-                    ft.Container(bgcolor=ft.Colors.BLUE, expand=True)
-                ]
-            )
-        else:
-            self.timeline_control.content = ft.Column(
-                spacing=0, 
-                controls=[
-                    ft.Container(bgcolor=ft.Colors.BLUE, expand=True),
-                    self.timeline_control.content,
-                ]
-            )
 
+    # Called to reload our mini widget content
+    def reload_mini_widget(self):
 
+        self.reload_timeline_control()
+
+        
         # Reload the mini widget content
         self.content = ft.Column(
             [
