@@ -373,8 +373,8 @@ class Timeline(Widget):
         for i in range(8):
 
             # Horizontal followed up by a vertical line
-            horizontal_line = ft.Container(expand=True, height=16, content=ft.Divider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3))
-            vertical_line = ft.Container(height=16, content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3, width=3))
+            horizontal_line = ft.Container(expand=True, height=16, content=ft.Divider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3))
+            vertical_line = ft.Container(height=16, content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3, width=3))
             
             # Add our horizontal segment
             self.timeline_gd.content.controls.append(horizontal_line)
