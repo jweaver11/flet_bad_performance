@@ -15,15 +15,22 @@ def verify_data(object, required_data: dict) -> bool:
 
             # If its a certain type and the data doesn't match, make it default value of that type (int=0, str="", etc.)
             if isinstance(value, type):
+
                 # Make sure the key doesn't already exist so we don't override it
-                if key not in current_data or not isinstance(current_data[key], value):
+                if key not in current_data:
                     current_data[key] = value()
+
+                # OLD
+                #if key not in current_data or not isinstance(current_data[key], value):
+                   #current_data[key] = value()
             
             # If its a dict, make sure our key our key is a dict too, then recurse through this function
             elif isinstance(value, dict):
+
                 # Make sure the key doesn't already exist so we don't override it
                 if key not in current_data or not isinstance(current_data[key], dict):
                     current_data[key] = {}
+                    
                 # Recurse through this function to verify the nested dict
                 _verify_data(current_data[key], value)
             

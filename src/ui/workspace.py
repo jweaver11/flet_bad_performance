@@ -174,6 +174,9 @@ class Workspace(ft.Container):
 
         # Apply to UI
         self.reload_workspace()
+
+        # Reload our widget to apply size changes that some of them need
+        widget.reload_widget()
         
         print(f"{pin_location} pin accepted")
 
@@ -413,6 +416,14 @@ class Workspace(ft.Container):
             #print("save top pin height called")
             self.story.data['top_pin_height'] = self.top_pin.height
             self.story.save_dict()
+
+            # Reload each widget in the top pin to apply size changes if they need it
+            for widget in self.top_pin.controls:
+                widget.reload_widget()  
+
+            # Also update the main pin widgets
+            for widget in self.main_pin.controls:
+                widget.reload_widget() 
             
 
         # The control that holds our divider, which we drag to resize the top pin
@@ -440,6 +451,11 @@ class Workspace(ft.Container):
             #print("save left pin width called")
             self.story.data['left_pin_width'] = self.left_pin.width
             self.story.save_dict()
+            # Reload each widget in the top pin to apply size changes if they need it
+            for widget in self.left_pin.controls:
+                widget.reload_widget()   
+            for widget in self.main_pin.controls:
+                widget.reload_widget() 
         left_pin_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,
@@ -466,6 +482,11 @@ class Workspace(ft.Container):
             print("save right pin width called")    
             self.story.data['right_pin_width'] = self.right_pin.width
             self.story.save_dict()
+            # Reload each widget in the top pin to apply size changes if they need it
+            for widget in self.right_pin.controls:
+                widget.reload_widget()   
+            for widget in self.main_pin.controls:
+                widget.reload_widget() 
         right_pin_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,
@@ -490,6 +511,11 @@ class Workspace(ft.Container):
             print("save bottom pin height called")
             self.story.data['bottom_pin_height'] = self.bottom_pin.height
             self.story.save_dict()
+            # Reload each widget in the top pin to apply size changes if they need it
+            for widget in self.bottom_pin.controls:
+                widget.reload_widget()  
+            for widget in self.main_pin.controls:
+                widget.reload_widget() 
         bottom_pin_resizer = ft.GestureDetector(
             content=ft.Container(
                 height=10,

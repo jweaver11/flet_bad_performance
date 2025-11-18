@@ -21,6 +21,19 @@ class Arc(Mini_Widget):
         data: dict = None
     ):
         
+        
+        # Parent constructor
+        super().__init__(
+            title=title,        
+            owner=owner,                    # Top most timeline this arc belongs too
+            father=father,                  # Immediate parent timeline or arc that thisarc belongs too
+            page=page,          
+            key=key,  
+            data=data,         
+        ) 
+
+        pin_location = self.owner.data.get("pin_location", "main")
+
         if size is None:
             size = "medium"
 
@@ -34,30 +47,19 @@ class Arc(Mini_Widget):
             size = 1.5
         else:
             size = 3  
-        
-        # Parent constructor
-        super().__init__(
-            title=title,        
-            owner=owner,                    # Top most timeline this arc belongs too
-            father=father,                  # Immediate parent timeline or arc that thisarc belongs too
-            page=page,          
-            key=key,  
-            data=data,         
-        ) 
+            
+        if pin_location == "top":
+            self.timeline_height = self.owner.story.data['top_pin_height']
+        elif pin_location == "bottom":
+            self.timeline_height = self.owner.story.data['bottom_pin_height']
 
-        location = self.owner.data.get("pin_location", "main")
-        print(location)
-
-
-        h = self.owner.story.data['bottom_pin_height']
-        print(h)
+        else:
+            self.timeline_height = self.owner.p.height
 
         # TODO:
         # Type of arcs?? timeskips, normal, character arcs
         # Arcs have 4 sizes: small, medium, large, x-large This determines their height.
         # height = page height / by: S=4, M=3, L=2, XL=1.5
-
-        #height = self.owner.story.workspace.main_pin.height / size
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -74,7 +76,8 @@ class Arc(Mini_Widget):
                 'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
                 'arcs_are_expanded': True,                  # If the arcs section is expanded
-                'height': self.owner.p.height / size,                              # Height of the arc on the timeline. Can be small, medium, or large: S=200, M=400, L=600
+                'size': size if size is not None else 3,    # Size of the arc on the timeline. Can be small, medium, or large: S=4, M=3, L=2, XL=1.5
+                'height': self.timeline_height / size,       # Height of the arc on the timeline calculated dynamically from pin location and size
                 
                 'plot_points': dict,                        # Dict of plot points in this branch
                 'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
@@ -96,7 +99,7 @@ class Arc(Mini_Widget):
         # The container we position on our timeline holding our arc drawing, and the gesture detector with logic for it
         self.timeline_control = ft.Container(
             width=self.data['end_position'] - self.data['start_position'],
-            height=self.data.get("height", 200) / 2,
+            
             left=self.data['start_position'],                                       # X position on the timeline
             offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
         )    
@@ -171,12 +174,30 @@ class Arc(Mini_Widget):
     # Called when hovering over the arc on the timeline
     def on_hovers(self, e):
         # Grab x position on the timeline
-        e.control.parent.bgcolor = ft.Colors.with_opacity(0.2, "red")
-        self.p.update()
+        #e.control.parent.bgcolor = ft.Colors.with_opacity(0.2, "red")
+        #self.p.update()
         pass
 
 
     def reload_timeline_control(self):
+
+        location = self.owner.data.get("pin_location", "main")
+
+        if location == "top":
+            self.timeline_height = self.owner.story.data['top_pin_height']
+        elif location == "bottom":
+            self.timeline_height = self.owner.story.data['bottom_pin_height']
+
+        else:
+            self.timeline_height = self.owner.p.height
+           
+
+        self.data['height'] = self.timeline_height / self.data['size']
+
+        print("New height amount for arc:", self.data['height'], "at location:", location)
+
+        self.timeline_control.height = self.data.get("height", 200) / 2,
+
         # Declare how we will draw our arc on the timeline
         arc_start = 0
 
@@ -187,7 +208,7 @@ class Arc(Mini_Widget):
         # Create our timeline control with the arc drawing
         self.timeline_control.content = cv.Canvas(
             width=self.data['end_position'] - self.data['start_position'],
-            height=self.data.get("height", 200) / 2,
+            height=self.data.get("height", 400) / 2,
             #content=ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title, color=self.data['color'])]),
             content=ft.Container(
                 expand=True, 

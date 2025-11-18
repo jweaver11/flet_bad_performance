@@ -396,6 +396,7 @@ class Timeline(Widget):
         
 
         for arc in self.arcs.values():
+            arc.reload_mini_widget()
             timeline_stack.controls.append(arc.timeline_control)
 
 
