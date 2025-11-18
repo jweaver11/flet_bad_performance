@@ -50,6 +50,9 @@ class Character(Widget):
                     'Build': str,    
                     'Distinguishing Features': str,  
                 },
+                'connections':{
+                    #TODO list of other characters and relationship types
+                },
                 'family':  { #TODO "connections" dropdown+tree/detective view?
                     'Love Interest': str,    
                     'Father': str,   
