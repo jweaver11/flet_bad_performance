@@ -28,7 +28,6 @@ class Settings(Widget):
             {
                 'tag': "settings",  # Tag for logic, should be overwritten by child classes
                 'active_story': "/",    # this works as a route for the correct story
-                'is_maximized': True,   # If the window is maximized or not
                 'tab_title_color': "primary",        # the tab color
                 'theme_mode': "system",       # the apps theme mode, dark or light
                 'active_rail_width': 200,  # Width of our active rail that we can resize
@@ -37,7 +36,9 @@ class Settings(Widget):
                 'workspaces_rail_order': list,      # Order of the workspace rail
                 'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
                 'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
-                'is_maximized': bool,   # If the window is maximized or not
+                'page_is_maximized': True,   # If the window is maximized or not
+                'page_width': int,     # Last known page width
+                'page_height': int,    # Last known page height
                 'workspaces_rail_order': [      # Order of the workspace rail
                     "content",
                     "characters",
@@ -62,6 +63,12 @@ class Settings(Widget):
             story.all_workspaces_rail.toggle_reorder_rail(story)
         except Exception as e:
             print(f"Error toggling rail reorderable: {e}")
+
+    # Called when the page is resized
+    def page_resized(self, e):
+        #print(self.p.width, self.p.height)
+        pass
+
 
     
     # Called when someone expands the drop down holding the color scheme options

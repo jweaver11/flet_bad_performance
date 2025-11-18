@@ -31,7 +31,8 @@ def main(page: ft.Page):
    
     # Sets the title of our app, padding, and maximizes the window
     page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    # non-desktop should have padding
-    page.window.maximized = app.settings.data.get('window_maximized', True)
+    page.window.maximized = app.settings.data.get('page_is_maximized', True)
+    page.on_resized = app.settings.page_resized
 
 
     # Called to create the page view if no stories exist

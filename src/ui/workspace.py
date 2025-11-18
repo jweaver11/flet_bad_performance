@@ -262,6 +262,7 @@ class Workspace(ft.Container):
     # Called when we need to reload our workspace content, especially after pin drags
     def reload_workspace(self):
         ''' Reloads our workspace content by clearing and re-adding our 5 pin locations to the master row '''
+        from models.widget import Widget
 
         # Make sure our widgets are arranged correctly
         self.arrange_widgets()
@@ -419,7 +420,8 @@ class Workspace(ft.Container):
 
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.top_pin.controls:
-                widget.reload_widget()  
+                if isinstance(widget, Widget):
+                    widget.reload_widget()   
 
             # Also update the main pin widgets
             for widget in self.main_pin.controls:
@@ -453,7 +455,8 @@ class Workspace(ft.Container):
             self.story.save_dict()
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.left_pin.controls:
-                widget.reload_widget()   
+                if isinstance(widget, Widget):
+                    widget.reload_widget()     
             for widget in self.main_pin.controls:
                 widget.reload_widget() 
         left_pin_resizer = ft.GestureDetector(
@@ -481,10 +484,12 @@ class Workspace(ft.Container):
         def save_right_pin_width(e: ft.DragEndEvent):
             print("save right pin width called")    
             self.story.data['right_pin_width'] = self.right_pin.width
+            print("right pin width saved as:", self.right_pin.width)
             self.story.save_dict()
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.right_pin.controls:
-                widget.reload_widget()   
+                if isinstance(widget, Widget):
+                    widget.reload_widget()   
             for widget in self.main_pin.controls:
                 widget.reload_widget() 
         right_pin_resizer = ft.GestureDetector(
@@ -513,7 +518,8 @@ class Workspace(ft.Container):
             self.story.save_dict()
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.bottom_pin.controls:
-                widget.reload_widget()  
+                if isinstance(widget, Widget):
+                    widget.reload_widget()   
             for widget in self.main_pin.controls:
                 widget.reload_widget() 
         bottom_pin_resizer = ft.GestureDetector(
