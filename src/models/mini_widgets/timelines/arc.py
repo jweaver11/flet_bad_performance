@@ -64,8 +64,6 @@ class Arc(Mini_Widget):
             #pin_height = self.owner.p.height
             pin_height = app.settings.data.get("page_height", self.owner.p.height)
 
-        print("Initial pin height for arc:", pin_height)
-
         # TODO:
         # Type of arcs?? timeskips, normal, character arcs
         # Arcs have 4 sizes: small, medium, large, x-large This determines their height.
@@ -186,13 +184,13 @@ class Arc(Mini_Widget):
         
         self.data['is_focused'] = True
         self.reload_mini_widget()
-        print("Hovering over arc:", self.title)
+        #print("Hovering over arc:", self.title)
         
 
     def on_stop_hover(self, e=None):
         self.data['is_focused'] = False
         self.reload_mini_widget()
-        print("Stopped hovering over arc:", self.title)
+        #print("Stopped hovering over arc:", self.title)
         
 
     def change_arc_height(self, e):
@@ -223,8 +221,9 @@ class Arc(Mini_Widget):
         # Update the UI
         self.p.update()
 
-
+    # Called from reload mini widget to update our timeline control
     def reload_timeline_control(self):
+        ''' Reloads our arc drawing on the timeline based on current/updated data, including page size '''
 
         # Set pin location to calculate sizes
         pin_location = self.owner.data.get("pin_location", "main")
@@ -245,9 +244,6 @@ class Arc(Mini_Widget):
         # Set the height of our timeline control container
         self.timeline_control.height = self.data.get("arch_height", 200) / 2
 
-        # Testing
-        print("New height amount for arc:", self.data['arch_height'], "at location:", pin_location)
-
         # Declare how we will draw our arc on the timeline
         arc_start = 0
 
@@ -262,7 +258,7 @@ class Arc(Mini_Widget):
             #content=ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title, color=self.data['color'])]),
             content=ft.Container(
                 expand=True, 
-                bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
+                #bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
                 border_radius=ft.BorderRadius(
                     top_left=1000,      
                     top_right=1000,     

@@ -66,7 +66,7 @@ class Settings(Widget):
 
     # Called when the page is resized
     def page_resized(self, e):
-        print("page resized")
+        #print("page resized")
         self.data['page_width'] = self.p.width
         self.data['page_height'] = self.p.height
         #print("width:", self.p.width, "height:", self.p.height)

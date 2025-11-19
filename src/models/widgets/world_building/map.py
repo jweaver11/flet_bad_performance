@@ -101,6 +101,11 @@ class Map(Widget):
                 on_pan_start=self.pan_start,
                 on_pan_update=self.pan_update,
                 drag_interval=10,
+                content=ft.Image(
+                    src="map_background.png",
+                    fit=ft.ImageFit.COVER,
+                    expand=True
+                ),
             ),
             expand=True
         )
@@ -336,7 +341,8 @@ class Map(Widget):
         display_container = ft.Container(
             content=display,
             expand=True,
-            bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.PURPLE),
+            #bgcolor=ft.Colors.with_opacity(0.5, ft.Colors.PURPLE),
+            
         )
 
         self.display = display_container

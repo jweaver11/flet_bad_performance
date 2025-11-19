@@ -107,6 +107,8 @@ class Story(ft.View):
         # Allows changable directory path for rail elements to pass in (May not need)
         self.active_directory_path: str = None
 
+        # State that we are not initialized yet, which will be changed at the end of startup method
+        self.is_initialized = False
         # Called outside of constructor to avoid circular import issues, or it would be called here
         #self.startup() # Called when opening our active story to load all its data and build its view
         

@@ -12,7 +12,7 @@ def init_settings(page: ft.Page):
     from models.app import app
     from constants import data_paths
 
-    # Path to our settings python
+    # Path to our settings file
     settings_file_path = os.path.join(data_paths.app_data_path, "settings.json")
 
     # Create settings.json with empty dict if it doesn't exist

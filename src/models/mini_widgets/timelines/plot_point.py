@@ -33,7 +33,7 @@ class Plot_Point(Mini_Widget):
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
-                'color': "primary",            # Color of the plot point on the timeline
+                'color': "on_secondary",       # Color of the plot point on the timeline
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
@@ -41,9 +41,13 @@ class Plot_Point(Mini_Widget):
         )
 
         self.timeline_control = ft.Container(
-            left=self.data['x_position'],                                       # X position on the timeline
+            #alignment=ft.Alignment(-1, 0),
+            left=self.data['x_position'],                                       # X position on the timeline                                     
             bottom=0, top=0,                                                    # Stick it vertically in middle of the stack
-            content=ft.CircleAvatar(radius=6, bgcolor=self.data['color']))      # Visual representation on the timeline
+            content=ft.CircleAvatar(radius=6, bgcolor=self.data['color'])      # Visual representation on the timeline
+            #content=ft.Container(shape=ft.BoxShape.CIRCLE, width=12, height=12, bgcolor=self.data['color'])
+            #content=ft.Icon(ft.Icons.LOCATION_SEARCHING_OUTLINED, color=self.data['color'], size=16)
+        )      
 
         self.reload_mini_widget()
 
