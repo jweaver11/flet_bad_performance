@@ -92,7 +92,8 @@ class Character(Widget):
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
-    
+        
+    new_item_textfield: ft.TextField = ft.TextField()  # Textfield for new custom field name input    
     #WIP Called when user wants to create a new text field in character
     def new_custom_textfield_clicked(self, e):
         ''' Handles setting our textfield for new custom textfield creation '''
