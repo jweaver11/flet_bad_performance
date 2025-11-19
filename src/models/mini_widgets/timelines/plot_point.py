@@ -29,7 +29,7 @@ class Plot_Point(Mini_Widget):
                 'tag': "plot_point",           # Tag to identify what type of object this is
                 'description': str,
                 'events': list,                # Numbered list of events that occur at this plot point
-                'x_position': int,             # X position on the timeline
+                'x_alignment': float,          # -1 -> 1 for left to right
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
@@ -41,18 +41,33 @@ class Plot_Point(Mini_Widget):
         )
 
         self.timeline_control = ft.Container(
-            #alignment=ft.Alignment(-1, 0),
-            left=self.data['x_position'],                                       # X position on the timeline                                     
-            bottom=0, top=0,                                                    # Stick it vertically in middle of the stack
+            alignment=ft.Alignment(self.data.get('x_alignment', 0), 0),
             content=ft.CircleAvatar(radius=6, bgcolor=self.data['color'])      # Visual representation on the timeline
-            #content=ft.Container(shape=ft.BoxShape.CIRCLE, width=12, height=12, bgcolor=self.data['color'])
-            #content=ft.Icon(ft.Icons.LOCATION_SEARCHING_OUTLINED, color=self.data['color'], size=16)
+            #ft.Icons.LOCATION_SEARCHING_OUTLINED
         )      
+
 
         self.reload_mini_widget()
 
+    def change_x_position(self, e):
+        new_position = float(e.control.value)
+        print("new position:", new_position)
+
+        self.data['x_alignment'] = new_position
+        self.save_dict()
+        
+        self.timeline_control.alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+        
+        self.owner.reload_widget()
+
 
     def reload_mini_widget(self):
+
+        self.content_control = ft.TextField(
+            hint_text="Change x position",
+            on_submit=self.change_x_position,
+            expand=True,
+        )
 
         self.content = ft.Column(
             [

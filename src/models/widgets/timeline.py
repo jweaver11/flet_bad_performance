@@ -268,6 +268,8 @@ class Timeline(Widget):
     def on_enter(self, e: ft.HoverEvent):
         ''' Highlights our timeline control for visual feedback '''
 
+        # Fix so this isn't being called constantly....
+
         # Make the edges highlight
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
         self.timeline_right_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
@@ -297,6 +299,9 @@ class Timeline(Widget):
     def on_hovers(self, e):
         ''' Sets our x position so we know where to add new items on the timeline '''
         self.x_position = e.local_x
+
+        # Find out where mouse is in relation to timeline in start and end dates, so we can align them correctly when adding new items
+        # And when they reload it'll be fine and dandy
 
     # Called when clicking on our timeline control
     def on_click(self, e):
@@ -379,7 +384,7 @@ class Timeline(Widget):
         timeline_stack = ft.Stack(
             expand=True, 
             alignment=ft.Alignment(0, 0),
-            controls=[timeline_row]
+            controls=[ft.Container(expand=True), timeline_row]
         )
         
         # Handler for timeline resize events
