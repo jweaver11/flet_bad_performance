@@ -100,7 +100,6 @@ class Workspace(ft.Container):
                 width=220,
                 right=0, top=0, bottom=0, 
             ),
-            
         ]
 
 
@@ -615,7 +614,10 @@ class Workspace(ft.Container):
         # Set the master_stack as the content of this container
         self.content = self.master_stack
         
+        
+        # Finally update the UI
         self.p.update()
+
 
         
 

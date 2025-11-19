@@ -66,8 +66,27 @@ class Settings(Widget):
 
     # Called when the page is resized
     def page_resized(self, e):
-        #print(self.p.width, self.p.height)
-        pass
+        #print("page resized")
+        self.data['page_width'] = self.p.width
+        self.data['page_height'] = self.p.height
+        #print("width:", self.p.width, "height:", self.p.height)
+
+        # Check if we're maximized or not
+        if self.p.window.maximized:
+            self.data['page_is_maximized'] = True
+            #print("maximized")
+        else:
+            self.data['page_is_maximized'] = False
+            #print("not maximized")
+
+        self.save_dict()
+
+        # OUTDATED
+        # Make sure the story is done loading to avoid any errors refreshing things that arent on page yet
+        #if self.story is not None:
+            #if self.story.is_initialized:
+                #for timeline in self.story.timelines.values():
+                    #timeline.reload_widget()
 
 
     

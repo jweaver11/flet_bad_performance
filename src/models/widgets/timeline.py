@@ -85,7 +85,7 @@ class Timeline(Widget):
         self.load_time_skips()
         
         # UI elements
-        self.timeline_gd = ft.GestureDetector(
+        self.timeline_control = ft.GestureDetector(
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
             on_exit=self.on_exit,
@@ -99,7 +99,7 @@ class Timeline(Widget):
         # Edges of our timeline
         self.timeline_left_edge = ft.GestureDetector(
             height=50,
-            content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3, width=3), 
+            content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3), 
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
@@ -107,7 +107,7 @@ class Timeline(Widget):
         )
         self.timeline_right_edge = ft.GestureDetector(
             height=50,
-            content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, ft.Colors.BLUE), thickness=3, width=3), 
+            content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3), 
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
@@ -268,14 +268,16 @@ class Timeline(Widget):
     def on_enter(self, e: ft.HoverEvent):
         ''' Highlights our timeline control for visual feedback '''
 
+        # Fix so this isn't being called constantly....
+
         # Make the edges highlight
-        self.timeline_left_edge.content.color = ft.Colors.with_opacity(1, ft.Colors.BLUE)
-        self.timeline_right_edge.content.color = ft.Colors.with_opacity(1, ft.Colors.BLUE)
+        self.timeline_left_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
+        self.timeline_right_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
 
         # Make the main timeline control highlight
-        for control in self.timeline_gd.content.controls:
+        for control in self.timeline_control.content.controls:
             if isinstance(control, ft.Container):
-                control.content.color = ft.Colors.with_opacity(1, ft.Colors.BLUE)
+                control.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
 
         # Apply the update
         self.p.update()
@@ -284,12 +286,12 @@ class Timeline(Widget):
     def on_exit(self, e: ft.HoverEvent):
         ''' Un-highlights our timeline control for visual feedback '''
         
-        self.timeline_left_edge.content.color = ft.Colors.with_opacity(.7, ft.Colors.BLUE)
-        self.timeline_right_edge.content.color = ft.Colors.with_opacity(.7, ft.Colors.BLUE)
+        self.timeline_left_edge.content.color = ft.Colors.with_opacity(.7, self.data.get('color', "primary"))
+        self.timeline_right_edge.content.color = ft.Colors.with_opacity(.7, self.data.get('color', "primary"))
 
-        for control in self.timeline_gd.content.controls:
+        for control in self.timeline_control.content.controls:
             if isinstance(control, ft.Container):
-                control.content.color = ft.Colors.with_opacity(0.7, ft.Colors.BLUE)
+                control.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
 
         self.p.update()
 
@@ -297,6 +299,9 @@ class Timeline(Widget):
     def on_hovers(self, e):
         ''' Sets our x position so we know where to add new items on the timeline '''
         self.x_position = e.local_x
+
+        # Find out where mouse is in relation to timeline in start and end dates, so we can align them correctly when adding new items
+        # And when they reload it'll be fine and dandy
 
     # Called when clicking on our timeline control
     def on_click(self, e):
@@ -309,23 +314,11 @@ class Timeline(Widget):
         # Rebuild our tab to reflect any changes
         self.reload_tab()
         
-        # TODO: Add marks along timeline
+        # TODO:
         # Clicking brings up a mini-menu in the timelines widget to show details and allow editing
-        # Data of the control ties back to the object
         # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object and all its children are gesture detectors
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
-
-        '''
-        Psuedocode for the timline control:
-
-        Generate the gesture detector for the timeline control.
-        Each gesture detector should only
-        - Add the plot points and timeskips based on the position (x value) on the timeline
-        - Iterate through arcs and...
-        - Find where arcs need to offshoot based on position, add vertical divider there
-        - Add curved horizontal divider for duration of the arc
-        '''
 
 
 
@@ -361,13 +354,13 @@ class Timeline(Widget):
             spacing=0,
             controls=[
                 self.timeline_left_edge,
-                self.timeline_gd,
+                self.timeline_control,
                 self.timeline_right_edge
             ]
         )
 
         # Reset the content of our timeline control so we can rebuild it
-        self.timeline_gd.content = ft.Row(spacing=0, expand=True)
+        self.timeline_control.content = ft.Row(spacing=0, expand=True)
 
         # Add line segments so our timeline control isn't just flat
         for i in range(8):
@@ -377,7 +370,7 @@ class Timeline(Widget):
             vertical_line = ft.Container(height=16, content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3, width=3))
             
             # Add our horizontal segment
-            self.timeline_gd.content.controls.append(horizontal_line)
+            self.timeline_control.content.controls.append(horizontal_line)
 
             # If we're last one, don't add vertical line
             if i == 7:
@@ -385,25 +378,47 @@ class Timeline(Widget):
 
             # Otherwise add vertical segment
             else:
-                self.timeline_gd.content.controls.append(vertical_line)
+                self.timeline_control.content.controls.append(vertical_line)
 
         # Create a stack so we can sit our plotpoints and arcs on our timeline
         timeline_stack = ft.Stack(
             expand=True, 
             alignment=ft.Alignment(0, 0),
-            controls=[timeline_row]
+            controls=[ft.Container(expand=True), timeline_row]
         )
         
-
+        # Handler for timeline resize events
         for arc in self.arcs.values():
-            arc.reload_mini_widget()
-            timeline_stack.controls.append(arc.timeline_control)
+            # Add a stack so we can position our plot point control correctly by grabbing its alignment
+            stack = ft.Stack(
+                alignment=arc.x_alignment,
+                expand=True,            # Make sure it fills the whole timeline width
+                controls=[
+                    ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
+                    arc.timeline_control,            # Add the plotpoint control
+                ]
+            )
+        
+            # Add this temporary stack to the timeline stack
+            timeline_stack.controls.append(stack)
 
 
 
         # Add our plot points to the timeline (They position themselves)
-        for plot_point in self.plot_points.values():
-            timeline_stack.controls.append(plot_point.timeline_control)
+        for plot_point in self.plot_points.values():    
+
+            # Add a stack so we can position our plot point control correctly by grabbing its alignment
+            stack = ft.Stack(
+                alignment=plot_point.x_alignment,
+                expand=True,            # Make sure it fills the whole timeline width
+                controls=[
+                    ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
+                    plot_point.timeline_control,            # Add the plotpoint control
+                ]
+            )
+        
+            # Add this temporary stack to the timeline stack
+            timeline_stack.controls.append(stack)
         
 
 
