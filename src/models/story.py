@@ -140,6 +140,9 @@ class Story(ft.View):
         self.data['is_new_story'] = False 
         self.save_dict()
 
+        # Declare the story loaded for loading purposes
+        self.is_initialized = True
+
 
     # Called whenever there are changes in our data that need to be saved
     def save_dict(self):

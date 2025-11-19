@@ -4,6 +4,7 @@ from models.widget import Widget
 from handlers.verify_data import verify_data
 import flet.canvas as cv
 import math
+from models.app import app
 
 # Class for arcs (essentially sub-timelines that are connected) on a timeline. 
 # Arcs split off from the main timeline and can merge back in later. Exp: Characters going on different journeys that rejoin later
@@ -60,7 +61,8 @@ class Arc(Mini_Widget):
 
         # Main, left, and right all take up the whole workspace, so we can use the page there
         else:
-            pin_height = self.owner.p.height
+            #pin_height = self.owner.p.height
+            pin_height = app.settings.data.get("page_height", self.owner.p.height)
 
         print("Initial pin height for arc:", pin_height)
 
@@ -260,7 +262,7 @@ class Arc(Mini_Widget):
             #content=ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title, color=self.data['color'])]),
             content=ft.Container(
                 expand=True, 
-                #bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
+                bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
                 border_radius=ft.BorderRadius(
                     top_left=1000,      
                     top_right=1000,     
