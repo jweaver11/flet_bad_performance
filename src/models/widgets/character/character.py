@@ -93,6 +93,20 @@ class Character(Widget):
         # Build our widget on start, but just reloads it later
         self.reload_widget()
     
+    #WIP Called when user wants to create a new text field in character
+    def new_custom_textfield_clicked(self, e):
+        ''' Handles setting our textfield for new custom textfield creation '''
+        
+        # Makes sure the right textfield is visible and the others are hidden
+        self.new_item_textfield.visible = True
+
+        # Set our textfield value to none, and the hint and data
+        self.new_item_textfield.value = None
+        self.new_item_textfield.hint_text = "TextField Name"
+        self.new_item_textfield.data = "custom_textfield"
+
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu() 
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
@@ -190,9 +204,14 @@ class Character(Widget):
                                 expand = False, #prevents stretching too wide
                             ),
                             ft.TextField(   # Text field for sexuality input
-                                            label ="Sexuality",
-                                            width=200,
-                                            expand = False,
+                                label ="Sexuality",
+                                width=200,
+                                expand = False,
+                            ),
+                            ft.IconButton(
+                                tooltip="New Field",
+                                icon=ft.Icons.NEW_LABEL_OUTLINED,
+                            on_click=self.new_custom_textfield_clicked
                             ),
                         ]
                     ),

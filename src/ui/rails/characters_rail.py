@@ -37,8 +37,7 @@ class Characters_Rail(Rail):
         self.new_item_textfield.data = "character"
 
         # Close the menu (if ones is open), which will update the page as well
-        self.story.close_menu()
-        
+        self.story.close_menu()   
 
     # Called to return our list of menu options for the content rail
     def get_menu_options(self) -> list[ft.Control]:
