@@ -29,7 +29,7 @@ class Plot_Point(Mini_Widget):
                 'tag': "plot_point",           # Tag to identify what type of object this is
                 'description': str,
                 'events': list,                # Numbered list of events that occur at this plot point
-                'x_alignment': float,          # -1 -> 1 for left to right
+                'x_alignment': float,          # Float between -1 and 1 on x axis of timeline. 0 is center
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
@@ -40,9 +40,19 @@ class Plot_Point(Mini_Widget):
             },
         )
 
+        self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+
         self.timeline_control = ft.Container(
-            alignment=ft.Alignment(self.data.get('x_alignment', 0), 0),
-            content=ft.CircleAvatar(radius=6, bgcolor=self.data['color'])      # Visual representation on the timeline
+            #alignment=ft.Alignment(self.data.get('x_alignment', 0), 0),
+            expand=False,
+            content=ft.GestureDetector(
+                mouse_cursor=ft.MouseCursor.CLICK,
+                on_enter=lambda e: print("hovered over plot point"),
+                expand=False,
+                #content=ft.CircleAvatar(radius=6, bgcolor=self.data['color'])      # Visual representation on the timeline
+                content=ft.Icon(
+                    ft.Icons.FIBER_MANUAL_RECORD,)
+            )
             #ft.Icons.LOCATION_SEARCHING_OUTLINED
         )      
 
@@ -55,8 +65,8 @@ class Plot_Point(Mini_Widget):
 
         self.data['x_alignment'] = new_position
         self.save_dict()
-        
-        self.timeline_control.alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+
+        self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
         
         self.owner.reload_widget()
 

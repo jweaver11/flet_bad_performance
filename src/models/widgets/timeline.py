@@ -388,16 +388,37 @@ class Timeline(Widget):
         )
         
         # Handler for timeline resize events
-
         for arc in self.arcs.values():
-            arc.reload_mini_widget()
-            timeline_stack.controls.append(arc.timeline_control)
+            # Add a stack so we can position our plot point control correctly by grabbing its alignment
+            stack = ft.Stack(
+                alignment=arc.x_alignment,
+                expand=True,            # Make sure it fills the whole timeline width
+                controls=[
+                    ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
+                    arc.timeline_control,            # Add the plotpoint control
+                ]
+            )
+        
+            # Add this temporary stack to the timeline stack
+            timeline_stack.controls.append(stack)
 
 
 
         # Add our plot points to the timeline (They position themselves)
-        for plot_point in self.plot_points.values():
-            timeline_stack.controls.append(plot_point.timeline_control)
+        for plot_point in self.plot_points.values():    
+
+            # Add a stack so we can position our plot point control correctly by grabbing its alignment
+            stack = ft.Stack(
+                alignment=plot_point.x_alignment,
+                expand=True,            # Make sure it fills the whole timeline width
+                controls=[
+                    ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
+                    plot_point.timeline_control,            # Add the plotpoint control
+                ]
+            )
+        
+            # Add this temporary stack to the timeline stack
+            timeline_stack.controls.append(stack)
         
 
 

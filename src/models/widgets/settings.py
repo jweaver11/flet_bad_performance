@@ -81,11 +81,12 @@ class Settings(Widget):
 
         self.save_dict()
 
+        # OUTDATED
         # Make sure the story is done loading to avoid any errors refreshing things that arent on page yet
-        if self.story is not None:
-            if self.story.is_initialized:
-                for timeline in self.story.timelines.values():
-                    timeline.reload_widget()
+        #if self.story is not None:
+            #if self.story.is_initialized:
+                #for timeline in self.story.timelines.values():
+                    #timeline.reload_widget()
 
 
     

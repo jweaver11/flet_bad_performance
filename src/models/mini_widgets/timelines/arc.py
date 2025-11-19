@@ -78,8 +78,8 @@ class Arc(Mini_Widget):
                 'branch_direction': "top",                  # Direction the arc branches off (top or bottom) from the timeline
                 'start_date': str,                          # Start and end date of the branch, for timeline view
                 'end_date': str,                            # Start and end date of the branch, for timeline view
-                'start_position': 100,                      # Start position on the timeline
-                'end_position': 300,                        # End position on the timeline 
+                'x_alignment_start': -.2,                   # Start position on the timeline
+                'x_alignment_end': .2,                      # End position on the timeline 
                 'color': "primary",                         # Color of the arc in the timeline
                 'dropdown_is_expanded': True,               # If the arc dropdown is expanded on the rail
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
@@ -106,10 +106,11 @@ class Arc(Mini_Widget):
         self.arcs: dict = {}
         self.plot_points: dict = {} 
 
+        self.x_alignment = ft.Alignment((self.data.get('x_alignment_start') + self.data.get('x_alignment_end')) / 2, 0)
+
         # The container we position on our timeline holding our arc drawing, and the gesture detector with logic for it
         self.timeline_control = ft.Container(
-            width=self.data['end_position'] - self.data['start_position'],
-            left=self.data['start_position'],                                       # X position on the timeline
+            bgcolor=ft.Colors.with_opacity(0.3, "red"),    # Invisible but needs a bgcolor to register clicks
             offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
         )    
 
@@ -253,12 +254,13 @@ class Arc(Mini_Widget):
 
         # Create our timeline control with the arc drawing
         self.timeline_control.content = cv.Canvas(
-            width=self.data['end_position'] - self.data['start_position'],
-            height=self.data.get("arch_height", 400) / 2,
+            #width=self.data['end_position'] - self.data['start_position'],
+            width=200,
+            #height=self.data.get("arch_height", 400) / 2,
             #content=ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title, color=self.data['color'])]),
             content=ft.Container(
-                expand=True, 
-                #bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
+                #expand=True, 
+                bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
                 border_radius=ft.BorderRadius(
                     top_left=1000,      
                     top_right=1000,     
@@ -275,7 +277,8 @@ class Arc(Mini_Widget):
                 cv.Arc(         
                     
                     # Width of the arc using our end position - start position
-                    width=self.data['end_position'] - self.data['start_position'], 
+                    #width=abs(self.data.get('x_alignment_start') - self.data.get('x_alignment_end')),
+                    width=200, 
 
                     height=self.data.get("arch_height", 200) - 30,       # Height of our arc, minus some space to fit our name text
                     x=0,            # Start at left side of canvas control
@@ -286,7 +289,7 @@ class Arc(Mini_Widget):
                     start_angle=arc_start,      # Angles to draw arc from
                     sweep_angle=math.pi,        # Sweep angle to make arc a half circle
                     paint=ft.Paint(             # Paint used to draw the arc
-                        color=self.data['color'] if self.data.get('is_focused', False) else ft.Colors.with_opacity(.5, self.data['color']) ,
+                        color=self.data['color'] if self.data.get('is_focused', False) else ft.Colors.with_opacity(.5, self.data['color']),
                         stroke_width=3,
                         style=ft.PaintingStyle.STROKE
                     )
