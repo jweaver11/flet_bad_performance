@@ -33,28 +33,43 @@ class Plot_Point(Mini_Widget):
                 'is_major': bool,              # If this plot point is a major event
                 'date': str,                   # Date of the plot point
                 'time': str,                   # Time of the plot point
-                'color': "on_secondary",       # Color of the plot point on the timeline
+                'color': "white",         # Color of the plot point on the timeline
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
+                'new_x_alignment': 5000,       # Used as integer between -10,000-10,000 to calculate float x_alignment
             },
         )
 
-        self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+        self.x_alignment = ft.Alignment(self.data.get('new_x_alignment', 0) /  10000, 0)
+        print("Initial x alignment:", self.x_alignment)
 
-        self.timeline_control = ft.Container(
-            #alignment=ft.Alignment(self.data.get('x_alignment', 0), 0),
-            expand=False,
-            content=ft.GestureDetector(
-                mouse_cursor=ft.MouseCursor.CLICK,
-                on_enter=lambda e: print("hovered over plot point"),
-                expand=False,
-                #content=ft.CircleAvatar(radius=6, bgcolor=self.data['color'])      # Visual representation on the timeline
-                content=ft.Icon(
-                    ft.Icons.FIBER_MANUAL_RECORD,)
-            )
-            #ft.Icons.LOCATION_SEARCHING_OUTLINED
-        )      
+        # state used during dragging
+        self.drag_x_change = 0
+        self._drag_parent_width = None
+
+        self.timeline_control = ft.Stack(
+            alignment=self.x_alignment,
+            expand=True,            # Make sure it fills the whole timeline width
+            controls=[
+                ft.Container(expand=True, ignore_interactions=True),
+                ft.Container(
+                    #left=0, right=0, top=0, bottom=0,
+                    expand=False,
+                    content=ft.GestureDetector(
+                        mouse_cursor=ft.MouseCursor.CLICK,
+                        #on_enter=lambda e: print(self.data['color']),
+                        expand=False,   
+                        content=ft.CircleAvatar(radius=6, bgcolor=self.data.get('color', "white")),      # Visual representation on the timeline
+                        #content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD)
+                        on_horizontal_drag_update=self.is_dragging,
+                        on_horizontal_drag_end=self.end_drag,
+                        on_horizontal_drag_start=self.start_drag,
+                    )
+                    #ft.Icons.LOCATION_SEARCHING_OUTLINED
+                )     
+            ]
+        ) 
 
 
         self.reload_mini_widget()
@@ -70,8 +85,77 @@ class Plot_Point(Mini_Widget):
         
         self.owner.reload_widget()
 
+    def start_drag(self, e):
+        # remember starting alignment for this drag
+        print("mouse x and y")
+        print(self.owner.story.mouse_x)
+        print(self.owner.story.mouse_y)
+        
+
+
+
+    def is_dragging(self, e: ft.DragUpdateEvent):
+
+        #print(e)
+
+        self.drag_x_change += e.delta_x
+
+
+        print(e.local_x)
+
+        #print("drag x change:", self.drag_x_change)
+
+        #old_alignment = self.data.get("x_alignment", 0.0)
+        #print("old x value:", old_alignment)
+
+        #print(e)
+
+        #new_alignment = old_alignment + (e.delta_x / 100)
+        #print("new x value:", new_alignment)
+
+        #self.data['x_alignment'] = new_alignment
+        #self.save_dict()
+
+        #self.x_alignment = ft.Alignment(new_alignment, 0)
+        
+        
+        #self.reload_mini_widget()
+        #self.owner.reload_widget()
+        #self.reload_mini_widget()
+
+    def end_drag(self, e):
+        print("Ended drag!")
+
+    def reload_timeline_control(self):
+        self.timeline_control = ft.Stack(
+            alignment=self.x_alignment,
+            expand=True,            # Make sure it fills the whole timeline width
+            controls=[
+                ft.Container(expand=True, ignore_interactions=True),
+                ft.Container(
+                    expand=False,
+                    content=ft.GestureDetector(
+                        mouse_cursor=ft.MouseCursor.CLICK,
+                        #on_enter=lambda e: print(self.data['color']),
+                        expand=False,   
+                        content=ft.CircleAvatar(radius=6, bgcolor=self.data.get('color', "white")),      # Visual representation on the timeline
+                        #content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD)
+                        on_horizontal_drag_update=self.is_dragging,
+                        on_horizontal_drag_end=self.end_drag,
+                        on_horizontal_drag_start=self.start_drag,
+                    )
+                    #ft.Icons.LOCATION_SEARCHING_OUTLINED
+                )     
+            ]
+        ) 
+
+        #self.p.update()
+        #pass
+
 
     def reload_mini_widget(self):
+
+        self.reload_timeline_control()
 
         self.content_control = ft.TextField(
             hint_text="Change x position",
