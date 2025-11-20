@@ -85,29 +85,71 @@ class Character(Widget):
                 'backstory': str,
                 'abilities': str,
                 'is_dead': bool,    # Defaults to false
+                'custom_fields': {},    # Dict to store custom text fields
             },
         )
         
         self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
+        self.custom_field_controls = {}  # Store references to custom field TextFields
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
-        
-    new_item_textfield: ft.TextField = ft.TextField()  # Textfield for new custom field name input    
-    #WIP Called when user wants to create a new text field in character
+
+    # Called when user wants to create a new text field in character
     def new_custom_textfield_clicked(self, e):
-        ''' Handles setting our textfield for new custom textfield creation '''
+        ''' Handles prompting user for custom textfield name and creating it '''
         
-        # Makes sure the right textfield is visible and the others are hidden
-        self.new_item_textfield.visible = True
-
-        # Set our textfield value to none, and the hint and data
-        self.new_item_textfield.value = None
-        self.new_item_textfield.hint_text = "TextField Name"
-        self.new_item_textfield.data = "custom_textfield"
-
-        # Close the menu (if ones is open), which will update the page as well
-        self.story.close_menu() 
+        # Create a dialog to ask for the field name
+        field_name_input = ft.TextField(
+            label="Field Name",
+            hint_text="e.g., Notes, Hobbies, etc.",
+            autofocus=True
+        )
+        
+        def close_dialog(e):
+            '''Close the dialog'''
+            dlg.open = False
+            self.page.update()
+        
+        def create_field(e):
+            '''Called when user confirms the field name'''
+            try:
+                field_name = field_name_input.value.strip()
+                
+                if not field_name:
+                    close_dialog(None)
+                    return  # Don't create if empty
+                
+                # Add the field to data if it doesn't exist
+                if field_name not in self.data['custom_fields']:
+                    self.data['custom_fields'][field_name] = ""
+                
+                # Save and reload
+                self.save_dict()
+                self.reload_widget()
+                
+                # Close dialog
+                dlg.open = False
+                self.page.update()
+            except Exception as ex:
+                print(f"Error creating custom field: {ex}")
+                close_dialog(None)
+        
+        dlg = ft.AlertDialog(
+            title=ft.Text("Create New Custom Field"),
+            content=field_name_input,
+            actions=[
+                ft.TextButton("Cancel", on_click=close_dialog),
+                ft.TextButton("Create", on_click=create_field),
+            ],
+        )
+        
+        try:
+            dlg.open = True
+            self.page.overlay.append(dlg)
+            self.page.update()
+        except Exception as ex:
+            print(f"Error opening dialog: {ex}") 
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
@@ -212,7 +254,7 @@ class Character(Widget):
                             ft.IconButton(
                                 tooltip="New Field",
                                 icon=ft.Icons.NEW_LABEL_OUTLINED,
-                            on_click=self.new_custom_textfield_clicked
+                                on_click=self.new_custom_textfield_clicked
                             ),
                         ]
                     ),
@@ -220,11 +262,41 @@ class Character(Widget):
             )
         )     
         
+        # After the main body, add a section for custom fields if any exist
+        if self.data['custom_fields']:
+            # Create a column to hold all custom fields
+            custom_fields_column = ft.Column(
+                spacing=8,
+                controls=[]
+            )
+            
+            # Add each custom field
+            for field_name, field_value in self.data['custom_fields'].items():
+                custom_textfield = ft.TextField(
+                    label=field_name,
+                    value=field_value,
+                    width=300,
+                    expand=False,
+                    on_change=lambda e, name=field_name: self._on_custom_field_change(name, e.control.value)
+                )
+                self.custom_field_controls[field_name] = custom_textfield
+                custom_fields_column.controls.append(custom_textfield)
+            
+            # Add custom fields to the body
+            body.content.controls.append(ft.Divider())
+            body.content.controls.append(ft.Text("Custom Fields", weight=ft.FontWeight.BOLD, size=12))
+            body.content.controls.append(custom_fields_column)
+        
         # Set our content to the body_container (from Widget class) as the body we just built
         self.body_container.content = body
 
         # Call render widget (from Widget class) to update the UI
         self._render_widget()
+    
+    def _on_custom_field_change(self, field_name: str, value: str):
+        '''Called when a custom field is modified'''
+        self.data['custom_fields'][field_name] = value
+        self.save_dict()
             
 
 
