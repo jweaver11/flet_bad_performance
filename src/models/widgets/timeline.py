@@ -441,7 +441,7 @@ class Timeline(Widget):
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
                     #ft.Container(expand=True,),
-                    timeline_stack,
+                    timeline_stack,   
                     #ft.Container(expand=True,),
                 ]
             )

@@ -42,11 +42,26 @@ class Plot_Point(Mini_Widget):
         )
 
         self.x_alignment = ft.Alignment(self.data.get('new_x_alignment', 0) /  10000, 0)
-        print("Initial x alignment:", self.x_alignment)
+        #print("Initial x alignment:", self.x_alignment)
 
         # state used during dragging
-        self.drag_x_change = 0
-        self._drag_parent_width = None
+        self.drag_bar = ft.Slider(
+                    min=-100, 
+                    visible=True,
+                    max=100, 
+                    value=50, 
+                    divisions=200, 
+                    interaction=ft.SliderInteraction.SLIDE_ONLY,
+                    autofocus=False,
+                    active_color=ft.Colors.TRANSPARENT,
+                    inactive_color=ft.Colors.TRANSPARENT,
+                    overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "primary")),
+                    thumb_color=self.data.get('color', "primary"),
+                    on_focus=lambda e: print("focused slider"),
+                    on_change_start=lambda e: print("started changing slider"),     # Works as on_click method
+                )
+            
+        
 
         self.timeline_control = ft.Stack(
             alignment=self.x_alignment,
@@ -55,19 +70,22 @@ class Plot_Point(Mini_Widget):
                 ft.Container(expand=True, ignore_interactions=True),
                 ft.Container(
                     #left=0, right=0, top=0, bottom=0,
+                    #on_click=self.tapped,
                     expand=False,
                     content=ft.GestureDetector(
                         mouse_cursor=ft.MouseCursor.CLICK,
                         #on_enter=lambda e: print(self.data['color']),
                         expand=False,   
                         content=ft.CircleAvatar(radius=6, bgcolor=self.data.get('color', "white")),      # Visual representation on the timeline
-                        #content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD)
+                        #content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD),
                         on_horizontal_drag_update=self.is_dragging,
                         on_horizontal_drag_end=self.end_drag,
                         on_horizontal_drag_start=self.start_drag,
+                        on_tap=self.tapped,
                     )
                     #ft.Icons.LOCATION_SEARCHING_OUTLINED
-                )     
+                ),
+                self.drag_bar
             ]
         ) 
 
@@ -84,6 +102,14 @@ class Plot_Point(Mini_Widget):
         self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
         
         self.owner.reload_widget()
+
+
+    def tapped(self, e):
+        print("Clicked plot point!")
+        #self.p.overlay.append(ft.Slider(min=-100, max=100, value=50, divisions=200))
+        self.drag_bar.visible = not self.drag_bar.visible
+        #self.p.overlay.append(ft.Container(expand=True, bgcolor=ft.colors.BLACK54, content=ft.Center(content=ft.Slider(min=-100, max=100, value=50, divisions=200))))
+        self.p.update()
 
     def start_drag(self, e):
         # remember starting alignment for this drag
@@ -143,9 +169,11 @@ class Plot_Point(Mini_Widget):
                         on_horizontal_drag_update=self.is_dragging,
                         on_horizontal_drag_end=self.end_drag,
                         on_horizontal_drag_start=self.start_drag,
+                        on_tap=self.tapped,
                     )
                     #ft.Icons.LOCATION_SEARCHING_OUTLINED
-                )     
+                ),
+                self.drag_bar
             ]
         ) 
 
