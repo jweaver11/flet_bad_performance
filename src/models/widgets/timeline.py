@@ -60,6 +60,9 @@ class Timeline(Widget):
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
+
+                'left_edge_label': 0,                    # Label for the left edge of the timeline
+                'right_edge_label': 10,                   # Label for the right edge of the timeline
             },
         ) 
 
@@ -319,11 +322,12 @@ class Timeline(Widget):
         # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object and all its children are gesture detectors
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
+        # Time label is optional. Label vertial markers along the timeline with int and label if user provided
 
 
 
         # UI elements
-        filters = ft.Row(scroll="auto")     # Row to hold our filter options
+        filters = ft.Row(scroll="auto", alignment=ft.MainAxisAlignment.START)     # Row to hold our filter options
         show_information_display = ft.Checkbox(         # Checkbox to show/hide information display
             label="Show Information Display",
             value=self.data['information_display']['visibility'], 
@@ -342,12 +346,10 @@ class Timeline(Widget):
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
             scroll="auto",
-            controls=[show_information_display, reset_zoom_button],
+            controls=[show_information_display, reset_zoom_button, filters],
         )
 
-            
-        # Add our filters to the headers
-        header.controls.append(filters)
+        
 
         # Row to hold our timeline edges and control
         timeline_row = ft.Row(
@@ -356,6 +358,7 @@ class Timeline(Widget):
                 self.timeline_left_edge,
                 self.timeline_control,
                 self.timeline_right_edge
+                
             ]
         )
 
@@ -363,7 +366,7 @@ class Timeline(Widget):
         self.timeline_control.content = ft.Row(spacing=0, expand=True)
 
         # Add line segments so our timeline control isn't just flat
-        for i in range(8):
+        for i in range(10):
 
             # Horizontal followed up by a vertical line
             horizontal_line = ft.Container(expand=True, height=16, content=ft.Divider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3))
@@ -373,7 +376,7 @@ class Timeline(Widget):
             self.timeline_control.content.controls.append(horizontal_line)
 
             # If we're last one, don't add vertical line
-            if i == 7:
+            if i == 9:
                 break
 
             # Otherwise add vertical segment
@@ -389,6 +392,11 @@ class Timeline(Widget):
         
         # Handler for timeline resize events
         for arc in self.arcs.values():
+
+            # Positions itself, so just determines its width each load based on proportions of timeline_stack and the current width?
+            #arc.timeline_control.width = arc.data['end_position'] - arc.data['start_position']
+
+
             # Add a stack so we can position our plot point control correctly by grabbing its alignment
             stack = ft.Stack(
                 alignment=arc.x_alignment,
@@ -409,7 +417,7 @@ class Timeline(Widget):
 
             # Add a stack so we can position our plot point control correctly by grabbing its alignment
             stack = ft.Stack(
-                alignment=plot_point.x_alignment,
+                #alignment=plot_point.x_alignment,
                 expand=True,            # Make sure it fills the whole timeline width
                 controls=[
                     ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
@@ -418,7 +426,7 @@ class Timeline(Widget):
             )
         
             # Add this temporary stack to the timeline stack
-            timeline_stack.controls.append(stack)
+            timeline_stack.controls.append(plot_point.timeline_control)
         
 
 
