@@ -110,21 +110,53 @@ class Arc(Mini_Widget):
 
         # The container we position on our timeline holding our arc drawing, and the gesture detector with logic for it
         self.timeline_control = ft.Container(
-            bgcolor=ft.Colors.with_opacity(0.3, "red"),    # Invisible but needs a bgcolor to register clicks
+            bgcolor=ft.Colors.with_opacity(0.3, "yellow"),    # Testing
             offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
+            width=200,
+            #expand=True,
+            height=200,
+            padding=ft.Padding(0,0,0,0),
+            #height=None/proportions of width
+            border=ft.border.all(2, self.data.get('color', "primary")),
+            border_radius=ft.BorderRadius(
+                top_left=1000,      
+                top_right=1000,     
+                bottom_left=0,   
+                bottom_right=0
+            ),
         )    
+
+        self.left_connector = ft.GestureDetector(
+            content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD),
+            mouse_cursor=ft.MouseCursor.CLICK,
+            #alignment=ft.Alignment(-1,-1),
+            on_hover=lambda e: print("hovered over left connector")
+        )
+        self.right_connector = ft.Container(
+            alignment=ft.Alignment(1,-1),
+            padding=ft.Padding(0,0,0,0),
+            content=ft.GestureDetector(
+                mouse_cursor=ft.MouseCursor.CLICK,
+                content=ft.IconButton(ft.Icons.FIBER_MANUAL_RECORD),
+                #content=ft.Container(shape=ft.BoxShape.CIRCLE, width=16, height=16, bgcolor=ft.Colors.BLUE),
+                on_hover=lambda e: print("hovered over right connector")
+            )
+        )
 
         # Gesture detector to handle clicks and hovers on the arc. 
         self.gd = ft.GestureDetector(
             mouse_cursor=ft.MouseCursor.CLICK,
             on_tap=lambda e: print(f"Arc {self.title} tapped"),
-            #width=self.data['end_position'] - self.data['start_position'],
-            #arch_height=self.data.get("arch_height", 200) / 2,
-            #left=self.data['start_position'],                                       # X position on the timeline
+            #expand=True,
             #on_hover=self.on_hovers,
             on_enter=lambda e: self.on_start_hover(e),
             on_exit=self.on_stop_hover,
-            #offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
+            content=ft.Stack(
+                expand=True, controls=[
+                ft.Container(ignore_interactions=True, expand=True),
+                self.left_connector,
+                self.right_connector,
+            ])
         )   
 
         # Loads all our plot points on this arc from data
@@ -183,15 +215,13 @@ class Arc(Mini_Widget):
     # Called when hovering over the arc on the timeline
     def on_start_hover(self, e=None):
         
-        self.data['is_focused'] = True
-        self.reload_mini_widget()
-        #print("Hovering over arc:", self.title)
+        self.timeline_control.border = ft.border.all(2, self.data.get('color', "primary"))
+        self.p.update()
         
 
     def on_stop_hover(self, e=None):
-        self.data['is_focused'] = False
-        self.reload_mini_widget()
-        #print("Stopped hovering over arc:", self.title)
+        self.timeline_control.border = ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "primary")))
+        self.p.update()
         
 
     def change_arc_height(self, e):
@@ -225,77 +255,8 @@ class Arc(Mini_Widget):
     # Called from reload mini widget to update our timeline control
     def reload_timeline_control(self):
         ''' Reloads our arc drawing on the timeline based on current/updated data, including page size '''
-
-        # Set pin location to calculate sizes
-        pin_location = self.owner.data.get("pin_location", "main")
+        self.timeline_control.content = self.gd
             
-        # Determine our 'timelines height' based on the pin its in.
-        if pin_location == "top":
-            pin_height = self.owner.story.data['top_pin_height']
-        elif pin_location == "bottom":
-            pin_height = self.owner.story.data['bottom_pin_height']
-
-        # Main, left, and right all take up the whole workspace, so we can use the page there
-        else:
-            pin_height = self.owner.p.height
-           
-        # Recalculate height based on size
-        self.data['arch_height'] = pin_height / self.data.get('size_int', 3)
-
-        # Set the height of our timeline control container
-        self.timeline_control.height = self.data.get("arch_height", 200) / 2
-
-        # Declare how we will draw our arc on the timeline
-        arc_start = 0
-
-        # If we are above the timeline, draw arc downwards. Defaults to drawing upwards
-        if self.data.get("branch_direction") == "top":
-            arc_start = math.pi               
-
-        # Create our timeline control with the arc drawing
-        self.timeline_control.content = cv.Canvas(
-            #width=self.data['end_position'] - self.data['start_position'],
-            width=200,
-            #height=self.data.get("arch_height", 400) / 2,
-            #content=ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title, color=self.data['color'])]),
-            content=ft.Container(
-                #expand=True, 
-                bgcolor=ft.Colors.with_opacity(0.4, "yellow"), 
-                border_radius=ft.BorderRadius(
-                    top_left=1000,      
-                    top_right=1000,     
-                    bottom_left=0,   
-                    bottom_right=0
-                ),
-                #on_hover=self.on_hovers,
-                content = self.gd 
-            ),
-            
-            shapes=[
-
-                # Give it the actual arc shape to draw
-                cv.Arc(         
-                    
-                    # Width of the arc using our end position - start position
-                    #width=abs(self.data.get('x_alignment_start') - self.data.get('x_alignment_end')),
-                    width=200, 
-
-                    height=self.data.get("arch_height", 200) - 30,       # Height of our arc, minus some space to fit our name text
-                    x=0,            # Start at left side of canvas control
-
-                    # Y Shifting depeding if we are top or bottom arc. Needs offset of half of the height offset used to fit our name
-                    y=15 if self.data.get("branch_direction") == "top" else -(self.data.get("arch_height", 200)) / 2 + 15,   
-                         
-                    start_angle=arc_start,      # Angles to draw arc from
-                    sweep_angle=math.pi,        # Sweep angle to make arc a half circle
-                    paint=ft.Paint(             # Paint used to draw the arc
-                        color=self.data['color'] if self.data.get('is_focused', False) else ft.Colors.with_opacity(.5, self.data['color']),
-                        stroke_width=3,
-                        style=ft.PaintingStyle.STROKE
-                    )
-                )
-            ],
-        )
 
 
     # Called to reload our mini widget content
