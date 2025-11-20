@@ -42,6 +42,8 @@ class Character(Widget):
                 'sexuality': str, #text input
                 'physical_description': {
                     'Race': str,
+                    'Species': str,
+                    'Ethnicity': str,
                     'Skin Color': str,
                     'Hair Color': str,   
                     'Eye Color': str,    
@@ -166,8 +168,11 @@ class Character(Widget):
         # Body of the tab, which is the content of flet container
         body = ft.Container(
             expand=True,                # Takes up maximum space allowed in its parent container
-            padding=6,                  # Padding around everything inside the container
-            content=ft.Column([                 # The column that will hold all our stuff top down
+            padding=5,                  # Padding around everything inside the container
+            content=ft.Column(           # The column that will hold all our stuff top down
+                scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
+                spacing=2,               # Reduce spacing between elements
+                controls=[
                 self.icon,                          # The icon above the name
                 ft.Text("hi from " + self.title),           # Text that shows the title
                 ft.Row(                     # The row that will hold our dropdowns
@@ -177,7 +182,6 @@ class Character(Widget):
                             ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
                                 label="alignment1",           # Label at top of dropdown 
                                 value=self.data['alignment1'],        # Value selected in the drop down
-                                #padding=ft.padding.all(0),
                                 color=self.data['name_color'],      # Color of the dropdown text
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
                                 options=[           # Options for the dropdown
@@ -193,7 +197,6 @@ class Character(Widget):
                             ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                 label="alignment2",           # Label at top of dropdown 
                                 value=self.data['alignment2'],        # Value selected in the drop down
-                                #padding=ft.padding.all(0),
                                 color=self.data['name_color'],      # Color of the dropdown text
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
                                 options=[           # Options for the dropdown
@@ -210,7 +213,6 @@ class Character(Widget):
                             ft.Dropdown(      # Sex of each character
                                 label="Sex",
                                 value=self.data['sex'],
-                                #padding=ft.padding.all(0),
                                 color=self.data['sex_color'],
                                 text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                 options=[
@@ -227,6 +229,8 @@ class Character(Widget):
                                 max_length=7,#allows for things like "unknown" or "ancient"
                                 width=100,
                                 expand = False,
+                                #content_padding=ft.padding.symmetric(vertical=5, horizontal=6),
+                                #dense=True,
                             ),  
                             #ft.Dropdown(       # Dropdown selection of relatives (other characters)
                             #    label="Connections",
@@ -245,11 +249,15 @@ class Character(Widget):
                                 label ="Race",
                                 width=250,
                                 expand = False, #prevents stretching too wide
+                                #content_padding=ft.padding.symmetric(vertical=5, horizontal=6),
+                                #dense=True,
                             ),
                             ft.TextField(   # Text field for sexuality input
                                 label ="Sexuality",
                                 width=200,
                                 expand = False,
+                                #content_padding=ft.padding.symmetric(vertical=5, horizontal=6),
+                                #dense=True,
                             ),
                             ft.IconButton(
                                 tooltip="New Field",
