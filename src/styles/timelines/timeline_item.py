@@ -32,10 +32,10 @@ class Timeline_Item(ft.GestureDetector):
 
         # Check our tag and set our icon accordingly
         if tag is None:
-            self.icon = ft.Icons.GPS_FIXED_OUTLINED
+            self.icon = ft.Icons.ADD_LOCATION_OUTLINED
 
         elif tag == "plot_point":
-            self.icon = ft.Icons.GPS_FIXED_OUTLINED
+            self.icon = ft.Icons.LOCATION_ON_OUTLINED
 
         else:
             self.icon = ft.Icons.ERROR_OUTLINE

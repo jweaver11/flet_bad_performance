@@ -1,0 +1,1 @@
+# Custom canvas for the arc and the add-arc icons

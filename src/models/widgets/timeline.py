@@ -82,7 +82,6 @@ class Timeline(Widget):
         self.connections: dict = {}  # Needed????
 
 
-
         # Loads our three mini widgets into their dicts
         self.load_arcs()
         self.load_plot_points()
@@ -92,17 +91,15 @@ class Timeline(Widget):
         self.timeline_control = ft.GestureDetector(
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
-            on_exit=self.on_exit,
-            #on_enter=self.on_enter,
-            #on_hover=lambda e: self.on_hovers(e),         
-            on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
-            on_tap=self.on_click,
+            on_exit=self.on_exit,        
+            on_tap=self.on_clicked,
             hover_interval=20,
         )
 
         # Edges of our timeline
         self.timeline_left_edge = ft.GestureDetector(
             height=50,
+            data=0,
             content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3), 
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
@@ -111,6 +108,7 @@ class Timeline(Widget):
         )
         self.timeline_right_edge = ft.GestureDetector(
             height=50,
+            data=200,
             content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3), 
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
@@ -267,7 +265,7 @@ class Timeline(Widget):
                 #on_click=self.new_timeline_clicked,
                 data="arc",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.ADD_ROUNDED),
+                    ft.Icon(ft.Icons.CIRCLE_OUTLINED),
                     ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
@@ -275,7 +273,7 @@ class Timeline(Widget):
                 #on_click=self.new_timeline_clicked,
                 data="plot_point",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.ADD_ROUNDED),
+                    ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
                     ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
@@ -286,10 +284,7 @@ class Timeline(Widget):
         ''' Highlights our timeline control for visual feedback '''
 
         # During hover, set our x position so we know where to add new items on the timeline
-        x_alignment = (e.control.data - 100) / 100
-        print(x_alignment)
-
-            # Set x_alignment here
+        self.x_alignment = (e.control.data - 100) / 100
 
         # Make the edges highlight
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
@@ -316,21 +311,12 @@ class Timeline(Widget):
 
         self.p.update()
 
-    # Called during hover over our timeline area
-    def on_hovers(self, e):
-        ''' Sets our x position so we know where to add new items on the timeline '''
-
-        # NOT NEEDED?
-        #self.x_position = e.local_x
-
-        #print(e.control.data)
-
-        #print(e.control)
 
 
     # Called when clicking on our timeline control
-    def on_click(self, e):
+    def on_clicked(self, e):
         ''' Shows our timeline information display '''
+        print("Timeline clicked")
         
 
     # Called when we need to rebuild out timeline UI
@@ -388,23 +374,26 @@ class Timeline(Widget):
         # Reset the content of our timeline control so we can rebuild it
         self.timeline_control.content = ft.Row(spacing=0, expand=True)
 
+        # Called right after this to give us our list of division positions
+        def _set_division_list(total: int)-> list[int]:
 
-        def _calc_divisions(total: int)-> list[int]:
-
-        
+            # Calculate step size based on total width and number of divisions
             step = total / self.data.get('divisions', 10)
 
             # Our list may initially a float if not divisible evenly
             float_list = [i * step for i in range(self.data.get('divisions', 10) + 1)]
 
+            # Convert to int list
             int_list = [int(i) for i in float_list]
 
             # Remove first and last item in list so we don't double up edges
             int_list = int_list[1:-1]
 
+            # Return our list
             return int_list
 
-        division_list = _calc_divisions(200)
+        # Set our division list
+        division_list = _set_division_list(200)
 
         # Add line segments so our timeline control isn't just flat
         for i in range(200):
@@ -417,7 +406,8 @@ class Timeline(Widget):
                 if i == num:
                     # Vertical line only
                     vertical_line = ft.GestureDetector(
-                        height=16, expand=True, on_enter=self.on_enter, on_exit=self.on_exit,
+                        on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+                        height=16, expand=True, 
                         content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3, width=3),
                         data=i      # Set our data so we know where to add new items
                     )
@@ -430,7 +420,8 @@ class Timeline(Widget):
 
                 # Horizontal followed up by a vertical line
                 horizontal_line = ft.GestureDetector(
-                    on_enter=self.on_enter, on_exit=self.on_exit, expand=True, height=16, 
+                    on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+                    expand=True, height=16, 
                     content=ft.Divider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3), 
                     data=i      # Set our data so we know where to add new items
                 )

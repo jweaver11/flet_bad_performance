@@ -89,8 +89,7 @@ class Arc(Mini_Widget):
                 'arch_height': pin_height / size_int,       # Height of the arc on the timeline calculated dynamically from pin location and size
                 'is_focused': bool,                         # If this arc is currently focused/selected. True when mini widget visible, or mouse hovering over arc
                 
-                'plot_points': dict,                        # Dict of plot points in this branch
-                'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
+
                 'connections': dict,                        # Connect points, arcs, branch, etc.???
                 'rail_dropdown_is_expanded': True,          # If the rail dropdown is expanded  
                 'content': str,
