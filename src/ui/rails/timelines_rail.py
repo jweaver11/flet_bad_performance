@@ -166,7 +166,7 @@ class Timelines_Rail(Rail):
                     on_click=self.new_plotpoint_clicked,
                     data="plot_point",
                     content=ft.Row([
-                        ft.Icon(ft.Icons.ADD_ROUNDED),
+                        ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
                         ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                     ])
                 ),

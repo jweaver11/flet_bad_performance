@@ -478,8 +478,7 @@ class Timeline(Widget):
 
 
         timeline_stack.controls.append(self.new_item_container)
-        
-
+    
 
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
@@ -496,6 +495,7 @@ class Timeline(Widget):
             )
         )
 
+        # Make it so not have to rebuild interactive viewer every time??
 
         # The body that is our interactive viewer, allowing zoom in and out and moving around
         interactive_viewer = ft.InteractiveViewer(

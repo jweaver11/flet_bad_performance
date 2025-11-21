@@ -40,69 +40,18 @@ class Plot_Point(Mini_Widget):
             },
         )
 
-        self.is_dragging = False
-
         # Set our x alignment to position on our timeline. -1 is left, 0 is center, 1 is right. Default 0
         self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
 
-        # state used during dragging
-        self.slider = ft.Column(
-            spacing=0,
-            visible=False,                                      # Start hidden until we hover over plot point
-            controls=[
-                ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far up
-                ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
-                    on_secondary_tap=lambda e: print("Right click on slider"),
-                    content=ft.Slider(
-                        min=-100, max=100,                                  # Min and max values on each end of slider
-                        adaptive=True,                                      # Make sure it looks good on all devices
-                        value=self.data.get('x_alignment', 0) * 100,        # Where we start on the slider
-                        divisions=200,                                      # Number of spots on the slider
-                        interaction=ft.SliderInteraction.SLIDE_THUMB,       # Make sure you can only drag the plot point, and not click the slider to move it
-                        active_color=ft.Colors.TRANSPARENT,                 # Get rid of the background colors
-                        inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
-                        thumb_color=self.data.get('color', "secondary"),    # Color of our actual dot on the slider
-                        overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging      
-                        on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
-                        on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
-                        on_change_start=self.toggle_visibility(value=True),          # Make sure we're visible
-                        on_blur=self.hide_slider                            # Hide the slider if we click away from it
-                    ),
-                ),
-                ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far down
-        ])
+        # UI elements
+        self.timeline_point: ft.Container = None    # Circle container to show our plot point on the timeline
+        self.slider: ft.Column = None               # Slider to drag our plot point along the timeline
+        self.timeline_control: ft.Stack = None      # Stack that holds our timeline point and slider
 
+        # State variables
+        self.is_dragging: bool = False              # If we are currently dragging our plot point
 
-        # ADD CONTAINERS 1=EXPAND, 2= WIDTH OF LIKE 20, 3=EXPAND TO HANDLE OVERTOP GD
- 
-        # Gesture detector for our plot point on the timeline, so we can hover over it to show the slider
-        self.gd = ft.GestureDetector(
-            mouse_cursor=ft.MouseCursor.CLICK,
-            expand=False,   
-            content=ft.Container(
-                padding=ft.Padding(20,0,20,0),                  # Gives us necessary padding so we look pretty on our timeline
-                expand=False, ignore_interactions=True,         # Make sure this container doesn't mess with our gesture detector interactions
-                content=ft.CircleAvatar(radius=8, bgcolor=self.data.get('color', "secondary"))      # Dot on the timeline
-            ),      
-            
-            on_enter=self.show_slider,               # Show the slider when we hover over our plot point
-            on_secondary_tap=lambda e: print("Right click on plot point")
-            #TODO: Make sure we can right click, including move. Long left click allows us to move
-        )
-            
-        
-        # Stack that holds our 
-        self.timeline_control = ft.Stack(
-            alignment=self.x_alignment,
-            expand=True,            # Make sure it fills the whole timeline width
-            controls=[
-                ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to the full width of the timeline
-                self.gd,                                                    # Our plot point on the timeline
-                self.slider                                                 # Our slider that appears when we hover over the plot point
-            ]
-        ) 
-
-
+        # Build our slider for moving our plot point
         self.reload_mini_widget()
 
     # Called at the end of dragging our point on the slider to update it
@@ -120,41 +69,147 @@ class Plot_Point(Mini_Widget):
         
     # Called when hovering over our plot point to show the slider
     def show_slider(self, e=None):
-        ''' Shows our slider and hides our gesture detector. Makes sure all other sliders are hidden '''
-        
-        # Set slider to visible and hide our plot point on the timeline
-        if not self.slider.visible:
-            self.slider.visible = True
-            self.gd.visible = False
+        ''' Shows our slider and hides our timeline_point. Makes sure all other sliders are hidden '''
+
+        # Check all other plot points
+        for pp in self.owner.plot_points.values():
+
+            # If they are dragging, we don't wanna also start dragging ours, so return out
+            if pp.is_dragging and pp != self:
+                return
             
-            # Apply it to the UI
-            self.p.update()
+            # Also check if they have a slider visible. This matter for very close together plot points. Make sure only one is ready to drag at a time
+            elif pp.slider.visible and pp != self:
+                return
+            
+        
+        # If we didn't return out, show our slider and hide our timeline point
+        self.slider.visible = True
+        self.timeline_point.visible = False
+        
+        # Apply it to the UI
+        self.p.update()
 
-        # If we're already visible, skip all the logic and just return
-        else:
-            return
 
-    # Called when we stop dragging our plotpoint, or when we drag too hight or low from slider
+    # Called when we stop dragging our slider thumb, or when we drag too high or low from slider
     def hide_slider(self, e=None):
         ''' Hides our slider and puts our dot back on the timeline. Saves our new position to the file '''
-        
-        if self.is_dragging:
-            return
-        
+    
         # Hide slider
         self.slider.visible = False
-        self.gd.visible = True
-        self.is_dragging = False
+        self.timeline_point.visible = True      # Set our point to visible again
+        self.is_dragging = False                # No longer dragging
 
-        # Update our alignment based on our correct data
+        # Update our alignment based on our correct data. This is updated when dragging, so no need to set it here
         self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
 
-        # Save new position to the file
+        # Save new x_alignment to file
         self.save_dict()
         
         # Must reload our plot point to apply the change to ourself, then reload the parent widget to apply the change to the page
         self.reload_mini_widget()
         self.owner.reload_widget()
+
+    # Called to determine if we want to hide our slider
+    def may_hide_slider(self, e=None):
+        ''' Checks our dragging state. If we are dragging, don't hide the slider '''
+
+        # Check if we're dragging
+        if self.is_dragging:
+            return
+        
+        # If we're not dragging, hide the slider
+        else:
+    
+            # Hide slider
+            self.slider.visible = False
+            self.timeline_point.visible = True      # Set our point to visible again
+            self.is_dragging = False
+
+            # Since no data changed, just update the page to apply changes
+            self.p.update()
+            
+
+    # Called when mouse clicks the thumb on the slider to start drag, or just clicks it
+    def start_dragging(self, e=None):
+        ''' Sets our state to dragging so may_hide_slider knows not to hide us. Also makes sure we're visible if clicking'''
+        self.is_dragging = True
+        self.toggle_visibility(value=True)
+
+    # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
+    def reload_slider(self):
+
+        # Give us a ratio for integers for our left and right expand values to catch hover off of our plot pont
+        ratio = (self.data.get('x_alignment', 0) + 1) / 2     # Convert -1 -> 1 to 0 -> 1
+    
+        # Set the left and right ratio
+        left_ratio = int(ratio * 1000)
+        right_ratio = 1000 - left_ratio
+
+        # state used during dragging
+        self.slider = ft.Column(
+            spacing=0,
+            visible=False,                                      # Start hidden until we hover over plot point
+            controls=[
+                ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far up
+                ft.Stack(
+                    alignment=ft.Alignment(0,0),
+                    controls=[
+                    ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
+                        on_secondary_tap=lambda e: print("Right click on slider"),
+                        content=ft.Slider(
+                            min=-100, max=100,                                  # Min and max values on each end of slider
+                            adaptive=True,                                      # Make sure it looks good on all devices
+                            value=self.data.get('x_alignment', 0) * 100,        # Where we start on the slider
+                            divisions=200,                                      # Number of spots on the slider
+                            interaction=ft.SliderInteraction.SLIDE_THUMB,       # Make sure you can only drag the plot point, and not click the slider to move it
+                            active_color=ft.Colors.TRANSPARENT,                 # Get rid of the background colors
+                            inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
+                            thumb_color=self.data.get('color', "secondary"),    # Color of our actual dot on the slider
+                            overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging      
+                            on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
+                            on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
+                            on_change_start=self.start_dragging,                # Make sure we're visible
+                            on_blur=self.hide_slider                            # Hide the slider if we click away from it
+                        ),
+                    ),
+                    # Sitting overtop the slider, is a row with expand based on our proportions
+                    ft.Row(
+                        spacing=0,
+                        expand=True,
+                        height=100,
+                        controls=[
+                            ft.GestureDetector(         # Catch our hovers to the left of the thumb
+                                on_hover=self.may_hide_slider,
+                                expand=left_ratio,
+                                content=ft.Container(expand=True)
+                            ),
+                            ft.Column(
+                                width=50,
+                                spacing=0,
+                                controls=[
+                                    # Catch above and below the thumb
+                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
+
+                                    # Reserve safe space for the thumb
+                                    ft.Container(       # Safe area
+                                        ignore_interactions=True,
+                                        shape=ft.BoxShape.CIRCLE,
+                                        width=50, height=50, 
+                                    ),
+                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
+                                ]
+                            ),
+                            ft.GestureDetector(         # Catch our hovers to the right of the thumb
+                                on_hover=self.may_hide_slider,
+                                expand=right_ratio,
+                                content=ft.Container(expand=True)
+                            ),
+                        ]
+                    )
+                ]),
+                ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far down
+        ])
 
 
 
@@ -162,8 +217,34 @@ class Plot_Point(Mini_Widget):
     def reload_mini_widget(self):
         ''' Rebuilds any parts of our UI and information that may have changed when we update our data '''
 
-        # Update our timeline control alignment based on our x alignment
-        self.timeline_control.alignment = self.x_alignment
+        # Reload our slider 
+        self.reload_slider()
+
+        # Our container that is our plot point on the timeline, and contains our gesture detector for hovering and right clicking
+        self.timeline_point = ft.Container(
+            margin=ft.Margin(20,0,20,0),        # Set a margin away from the edges so we line up with our slider
+            expand=False,         
+            bgcolor=self.data.get('color', "secondary"),
+            width=20,       # Sizing
+            height=20,
+            shape=ft.BoxShape.CIRCLE,           # Make us a circle
+            content=ft.GestureDetector(         # GD so we can detect hovers and right clicks
+                expand=True,
+                on_enter=self.show_slider,               # Show the slider when we hover over our plot point. This also hides timeline_point
+                on_secondary_tap=lambda e: print("Right click on plot point"),  # Pop open our menu options when right clicking
+            )
+        )       
+
+        # Rebuild our stack to hold our timeline point and slider
+        self.timeline_control = ft.Stack(
+            alignment=self.x_alignment,
+            expand=True,            # Make sure it fills the whole timeline width
+            controls=[
+                ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
+                self.timeline_point,                                        # Our plot point on the timeline
+                self.slider,                                                # Our slider that appears when we hover over the plot point
+            ]
+        ) 
 
         # Rebuild our information display
         self.content_control = ft.TextField(
