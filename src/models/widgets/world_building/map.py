@@ -3,10 +3,13 @@ The map class for all maps inside our story
 Maps are widgets that have their own drawing canvas, and info display. they can contain nested sub maps as well.
 '''
 
+#TODO: 
 # BLANK NO TEMPLATE MAPS EXIST AS WELL
 # ADD DUPLICATE OPTION AS WELL
 # Users can choose to create their image or use some default ones, or upload their own
 # When hovering over a map, display it on the rail as well so we can see where new sub maps would
+
+# THERES A MAP DISPLAY DUMMY, HB U CHECK THAT OUT!!!!!
 
 
 import os

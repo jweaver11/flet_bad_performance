@@ -60,14 +60,15 @@ class Timeline(Widget):
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
+                'divisions': 10,                            # Number of divisions on the timeline
 
                 'left_edge_label': 0,                    # Label for the left edge of the timeline
-                'right_edge_label': 10,                   # Label for the right edge of the timeline
+                'right_edge_label': 10,                  # Label for the right edge of the timeline
             },
         ) 
 
         # For tracking mouse position on timeline when adding new items
-        self.x_position: int = 0
+        self.x_alignment: float = 0.00
 
         # Declare and create our information display, which is our timelines mini widget 
         self.information_display: ft.Container = None
@@ -92,8 +93,8 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
             on_exit=self.on_exit,
-            on_enter=self.on_enter,
-            on_hover=lambda e: self.on_hovers(e),         
+            #on_enter=self.on_enter,
+            #on_hover=lambda e: self.on_hovers(e),         
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
             on_tap=self.on_click,
             hover_interval=20,
@@ -116,11 +117,24 @@ class Timeline(Widget):
             on_enter=self.on_enter,
             on_tap=self.on_click,
         )
+
+        # Text field for adding new items
+        self.new_item_text_field = ft.TextField(hint_text="Add new item here", )
+        #on_blur=self.hide_new_item_container
+
+        # Container that contains text box for adding new items
+        self.new_item_container = ft.Stack(
+            expand=True,
+            visible=False,
+            alignment=ft.Alignment(0, 0),
+            controls=[self.new_item_text_field]
+        )
         
 
         # Builds/reloads our timeline UI
         self.reload_widget()
 
+    # Called in the constructor
     def create_information_display(self):
         ''' Creates our timeline information display mini widget '''
         from models.mini_widgets.timelines.timeline_information_display import Timeline_Information_Display
@@ -268,10 +282,14 @@ class Timeline(Widget):
         ]
     
     # Called when mouse enters our timeline area
-    def on_enter(self, e: ft.HoverEvent):
+    def on_enter(self, e: ft.HoverEvent = None):
         ''' Highlights our timeline control for visual feedback '''
 
-        # Fix so this isn't being called constantly....
+        # During hover, set our x position so we know where to add new items on the timeline
+        x_alignment = (e.control.data - 100) / 100
+        print(x_alignment)
+
+            # Set x_alignment here
 
         # Make the edges highlight
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
@@ -279,7 +297,7 @@ class Timeline(Widget):
 
         # Make the main timeline control highlight
         for control in self.timeline_control.content.controls:
-            if isinstance(control, ft.Container):
+            if isinstance(control, ft.GestureDetector):
                 control.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
 
         # Apply the update
@@ -293,7 +311,7 @@ class Timeline(Widget):
         self.timeline_right_edge.content.color = ft.Colors.with_opacity(.7, self.data.get('color', "primary"))
 
         for control in self.timeline_control.content.controls:
-            if isinstance(control, ft.Container):
+            if isinstance(control, ft.GestureDetector):
                 control.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
 
         self.p.update()
@@ -301,10 +319,14 @@ class Timeline(Widget):
     # Called during hover over our timeline area
     def on_hovers(self, e):
         ''' Sets our x position so we know where to add new items on the timeline '''
-        self.x_position = e.local_x
 
-        # Find out where mouse is in relation to timeline in start and end dates, so we can align them correctly when adding new items
-        # And when they reload it'll be fine and dandy
+        # NOT NEEDED?
+        #self.x_position = e.local_x
+
+        #print(e.control.data)
+
+        #print(e.control)
+
 
     # Called when clicking on our timeline control
     def on_click(self, e):
@@ -360,43 +382,77 @@ class Timeline(Widget):
                 self.timeline_control,
                 self.timeline_right_edge,
                 ft.Container(width=20),
-                
             ]
         )
 
         # Reset the content of our timeline control so we can rebuild it
         self.timeline_control.content = ft.Row(spacing=0, expand=True)
 
+
+        def _calc_divisions(total: int)-> list[int]:
+
+        
+            step = total / self.data.get('divisions', 10)
+
+            # Our list may initially a float if not divisible evenly
+            float_list = [i * step for i in range(self.data.get('divisions', 10) + 1)]
+
+            int_list = [int(i) for i in float_list]
+
+            # Remove first and last item in list so we don't double up edges
+            int_list = int_list[1:-1]
+
+            return int_list
+
+        division_list = _calc_divisions(200)
+
         # Add line segments so our timeline control isn't just flat
-        for i in range(10):
+        for i in range(200):
 
-            # Horizontal followed up by a vertical line
-            horizontal_line = ft.Container(expand=True, height=16, content=ft.Divider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3))
-            vertical_line = ft.Container(height=16, content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3, width=3))
+            # Track if we are on a division
+            not_division = True
+
+            # Go through our divisions list. If we are on there, add vertical line, then break and continue
+            for num in division_list:
+                if i == num:
+                    # Vertical line only
+                    vertical_line = ft.GestureDetector(
+                        height=16, expand=True, on_enter=self.on_enter, on_exit=self.on_exit,
+                        content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3, width=3),
+                        data=i      # Set our data so we know where to add new items
+                    )
+                    self.timeline_control.content.controls.append(vertical_line)
+                    not_division = False
+                    break
+
+            # If we are not a division, add a horizontal line segment
+            if not_division:
+
+                # Horizontal followed up by a vertical line
+                horizontal_line = ft.GestureDetector(
+                    on_enter=self.on_enter, on_exit=self.on_exit, expand=True, height=16, 
+                    content=ft.Divider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3), 
+                    data=i      # Set our data so we know where to add new items
+                )
+                self.timeline_control.content.controls.append(horizontal_line)
+
+            else:  
+                continue
             
-            # Add our horizontal segment
-            self.timeline_control.content.controls.append(horizontal_line)
 
-            # If we're last one, don't add vertical line
-            if i == 9:
-                break
-
-            # Otherwise add vertical segment
-            else:
-                self.timeline_control.content.controls.append(vertical_line)
 
         # Create a stack so we can sit our plotpoints and arcs on our timeline
         timeline_stack = ft.Stack(
             expand=True, 
             alignment=ft.Alignment(0, 0),
-            controls=[ft.Container(expand=True, ignore_interactions=True), timeline_row]
+            controls=[
+                ft.Container(expand=True, ignore_interactions=True),    # Make sure we're expanded
+                timeline_row
+            ]
         )
         
         # Handler for timeline resize events
         for arc in self.arcs.values():
-
-            # Positions itself, so just determines its width each load based on proportions of timeline_stack and the current width?
-            #arc.timeline_control.width = arc.data['end_position'] - arc.data['start_position']
 
 
             # Add a stack so we can position our plot point control correctly by grabbing its alignment
@@ -419,7 +475,6 @@ class Timeline(Widget):
 
             # Add a stack so we can position our plot point control correctly by grabbing its alignment
             stack = ft.Stack(
-                #alignment=plot_point.x_alignment,
                 expand=True,            # Make sure it fills the whole timeline width
                 controls=[
                     ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
@@ -429,6 +484,9 @@ class Timeline(Widget):
         
             # Add this temporary stack to the timeline stack
             timeline_stack.controls.append(plot_point.timeline_control)
+
+
+        timeline_stack.controls.append(self.new_item_container)
         
 
 
@@ -442,9 +500,7 @@ class Timeline(Widget):
                 expand=True,
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
-                    #ft.Container(expand=True,),
                     timeline_stack,   
-                    #ft.Container(expand=True,),
                 ]
             )
         )

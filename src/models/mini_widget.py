@@ -29,7 +29,7 @@ class Mini_Widget(ft.Container):
         super().__init__(
             expand=True,
             border_radius=ft.border_radius.all(6),
-            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.GREEN),
+            bgcolor=ft.Colors.with_opacity(1, ft.Colors.ON_INVERSE_SURFACE),
             data=data,      # Sets our data.
         )
 

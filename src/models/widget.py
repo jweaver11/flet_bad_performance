@@ -321,21 +321,23 @@ class Widget(ft.Container):
             print(f"Error focusing widget {self.title}.  {e}")
 
     # Called when app clicks the hide icon in the tab
-    def toggle_visibility(self):
+    def toggle_visibility(self, e=None, value: bool=None):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
-        try:
+        # If we want to specify we're visible or not, we can pass it in
+        if value is not None:
+            self.data['visible'] = value
+            self.visible = value
+        
+        else:
             # Change our visibility data, save it, then apply it
             self.data['visible'] = not self.data['visible']
-            self.save_dict()
             self.visible = self.data['visible']
 
-            # Reload the UI
-            self.story.workspace.reload_workspace()
+        # Save our changes and reload the UI
+        self.save_dict()
+        self.story.workspace.reload_workspace()
 
-        # Catch errors
-        except Exception as e:
-            print(f"Error toggling visibility of widget {self.title}. {e}")
 
     # Called at end of constructor
     def reload_tab(self):
