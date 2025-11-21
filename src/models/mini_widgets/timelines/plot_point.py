@@ -26,164 +26,141 @@ class Plot_Point(Mini_Widget):
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {   
-                'tag': "plot_point",           # Tag to identify what type of object this is
+                'tag': "plot_point",            # Tag to identify what type of object this is
                 'description': str,
-                'events': list,                # Numbered list of events that occur at this plot point
-                'x_alignment': float,          # Float between -1 and 1 on x axis of timeline. 0 is center
-                'is_major': bool,              # If this plot point is a major event
-                'date': str,                   # Date of the plot point
-                'time': str,                   # Time of the plot point
-                'color': "white",         # Color of the plot point on the timeline
+                'events': list,                 # Numbered list of events that occur at this plot point
+                'x_alignment': float,           # Float between -1 and 1 on x axis of timeline. 0 is center
+                'is_major': bool,               # If this plot point is a major event
+                'date': str,                    # Date of the plot point
+                'time': str,                    # Time of the plot point
+                'color': "secondary",           # Color of the plot point on the timeline
                 'involved_characters': list,
                 'related_locations': list,
                 'related_items': list,
-                'new_x_alignment': 5000,       # Used as integer between -10,000-10,000 to calculate float x_alignment
             },
         )
 
-        self.x_alignment = ft.Alignment(self.data.get('new_x_alignment', 0) /  10000, 0)
-        #print("Initial x alignment:", self.x_alignment)
+        # Set our x alignment to position on our timeline. -1 is left, 0 is center, 1 is right. Default 0
+        self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
 
         # state used during dragging
-        self.drag_bar = ft.Slider(
-                    min=-100, 
-                    visible=True,
-                    max=100, 
-                    value=50, 
-                    divisions=200, 
-                    interaction=ft.SliderInteraction.SLIDE_ONLY,
-                    autofocus=False,
-                    active_color=ft.Colors.TRANSPARENT,
-                    inactive_color=ft.Colors.TRANSPARENT,
-                    overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "primary")),
-                    thumb_color=self.data.get('color', "primary"),
-                    on_focus=lambda e: print("focused slider"),
-                    on_change_start=lambda e: print("started changing slider"),     # Works as on_click method
-                )
+        self.slider = ft.Column(
+            spacing=0,
+            controls=[
+                ft.Container(on_hover=self.hide_slider, expand=True, bgcolor=ft.Colors.TRANSPARENT),    # Invisible container to hide slider when going too far up
+                ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
+                    on_secondary_tap=lambda e: print("Right click on slider"),
+                    content=ft.Slider(
+                        min=-100, max=100,                                  # Min and max values on each end of slider
+                        adaptive=True,                                      # Make sure it looks good on all devices
+                        value=self.data.get('x_alignment', 0) * 100,        # Where we start on the slider
+                        divisions=200,                                      # Number of spots on the slider
+                        interaction=ft.SliderInteraction.SLIDE_THUMB,       # Make sure you can only drag the plot point, and not click the slider to move it
+                        active_color=ft.Colors.TRANSPARENT,                 # Get rid of the background colors
+                        inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
+                        thumb_color=self.data.get('color', "secondary"),    # Color of our actual dot on the slider
+                        overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging      
+                        on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
+                        on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
+                        on_change_start=self.timeline_control_click,        # Show the slider when we click on the plot point
+                        on_blur=self.hide_slider
+                    ),
+                ),
+                ft.Container(on_hover=self.hide_slider, expand=True, bgcolor=ft.Colors.TRANSPARENT),    # Invisible container to hide slider when going too far down
+        ])
+ 
+        # Gesture detector for our plot point on the timeline, so we can hover over it to show the slider
+        self.gd = ft.GestureDetector(
+            mouse_cursor=ft.MouseCursor.CLICK,
+            expand=False,   
+            content=ft.Container(
+                padding=ft.Padding(20,0,20,0),                  # Gives us necessary padding so we look pretty on our timeline
+                expand=False, ignore_interactions=True,         # Make sure this container doesn't mess with our gesture detector interactions
+                content=ft.CircleAvatar(radius=8, bgcolor=self.data.get('color', "secondary"))      # Dot on the timeline
+            ),      
+            
+            on_enter=self.timeline_control_click,               # Show the slider when we hover over our plot point
+            on_secondary_tap=lambda e: print("Right click on plot point")
+            #TODO: Make sure we can right click, including move. Long left click allows us to move
+        )
             
         
-
+        # Stack that holds our 
         self.timeline_control = ft.Stack(
             alignment=self.x_alignment,
             expand=True,            # Make sure it fills the whole timeline width
             controls=[
-                ft.Container(expand=True, ignore_interactions=True),
-                ft.Container(
-                    #left=0, right=0, top=0, bottom=0,
-                    #on_click=self.tapped,
-                    expand=False,
-                    content=ft.GestureDetector(
-                        mouse_cursor=ft.MouseCursor.CLICK,
-                        #on_enter=lambda e: print(self.data['color']),
-                        expand=False,   
-                        content=ft.CircleAvatar(radius=6, bgcolor=self.data.get('color', "white")),      # Visual representation on the timeline
-                        #content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD),
-                        on_horizontal_drag_update=self.is_dragging,
-                        on_horizontal_drag_end=self.end_drag,
-                        on_horizontal_drag_start=self.start_drag,
-                        on_tap=self.tapped,
-                    )
-                    #ft.Icons.LOCATION_SEARCHING_OUTLINED
-                ),
-                self.drag_bar
+                ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to the full width of the timeline
+                self.gd,                                                    # Our plot point on the timeline
+                self.slider                                                 # Our slider that appears when we hover over the plot point
             ]
         ) 
 
 
         self.reload_mini_widget()
 
+    # Called at the end of dragging our point on the slider to update it
     def change_x_position(self, e):
+        ''' Changes our x position on the slider, and saves it to our data dictionary, but not to our file yet '''
+
+        # Grab our new position as a flot of whatever number division we're on (-100 -> 100)
         new_position = float(e.control.value)
-        print("new position:", new_position)
 
-        self.data['x_alignment'] = new_position
-        self.save_dict()
+        # Convert that float between -1 -> 1 for our alignment to work
+        np = new_position / 100
 
-        self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+        # Save the new position to data, but don't needlessly write to file until we stop dragging
+        self.data['x_alignment'] = np
         
+    # Called when hovering over our plot point to show the slider
+    def show_slider(self, e=None):
+        ''' Shows our slider and hides our gesture detector. Makes sure all other sliders are hidden '''
+        
+        # Set slider to visible and hide our plot point on the timeline
+        if not self.slider.visible:
+            self.slider.visible = True
+            self.gd.visible = False
+            
+            # Apply it to the UI
+            self.p.update()
+
+        # If we're already visible, skip all the logic and just return
+        else:
+            return
+
+    # Called when we stop dragging our plotpoint, or when we drag too hight or low from slider
+    def hide_slider(self, e=None):
+        ''' Hides our slider and puts our dot back on the timeline. Saves our new position to the file '''
+        print("Hide slider called")
+        # Hide slider
+        self.slider.visible = False
+        self.gd.visible = True
+
+        # Update our alignment based on our correct data
+        self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+
+        # Save new position to the file
+        self.save_dict()
+        
+        # Must reload our plot point to apply the change to ourself, then reload the parent widget to apply the change to the page
+        self.reload_mini_widget()
         self.owner.reload_widget()
 
 
-    def tapped(self, e):
-        print("Clicked plot point!")
-        #self.p.overlay.append(ft.Slider(min=-100, max=100, value=50, divisions=200))
-        self.drag_bar.visible = not self.drag_bar.visible
-        #self.p.overlay.append(ft.Container(expand=True, bgcolor=ft.colors.BLACK54, content=ft.Center(content=ft.Slider(min=-100, max=100, value=50, divisions=200))))
-        self.p.update()
+    def timeline_control_click(self, e=None):
+        ''' Called when we click on our plot point on the timeline. Shows our slider and hides the plot point '''
+        self.show_slider()
 
-    def start_drag(self, e):
-        # remember starting alignment for this drag
-        print("mouse x and y")
-        print(self.owner.story.mouse_x)
-        print(self.owner.story.mouse_y)
-        
+        self.toggle_visibility(value=True)
 
 
 
-    def is_dragging(self, e: ft.DragUpdateEvent):
-
-        #print(e)
-
-        self.drag_x_change += e.delta_x
-
-
-        print(e.local_x)
-
-        #print("drag x change:", self.drag_x_change)
-
-        #old_alignment = self.data.get("x_alignment", 0.0)
-        #print("old x value:", old_alignment)
-
-        #print(e)
-
-        #new_alignment = old_alignment + (e.delta_x / 100)
-        #print("new x value:", new_alignment)
-
-        #self.data['x_alignment'] = new_alignment
-        #self.save_dict()
-
-        #self.x_alignment = ft.Alignment(new_alignment, 0)
-        
-        
-        #self.reload_mini_widget()
-        #self.owner.reload_widget()
-        #self.reload_mini_widget()
-
-    def end_drag(self, e):
-        print("Ended drag!")
-
-    def reload_timeline_control(self):
-        self.timeline_control = ft.Stack(
-            alignment=self.x_alignment,
-            expand=True,            # Make sure it fills the whole timeline width
-            controls=[
-                ft.Container(expand=True, ignore_interactions=True),
-                ft.Container(
-                    expand=False,
-                    content=ft.GestureDetector(
-                        mouse_cursor=ft.MouseCursor.CLICK,
-                        #on_enter=lambda e: print(self.data['color']),
-                        expand=False,   
-                        content=ft.CircleAvatar(radius=6, bgcolor=self.data.get('color', "white")),      # Visual representation on the timeline
-                        #content=ft.Icon(ft.Icons.FIBER_MANUAL_RECORD)
-                        on_horizontal_drag_update=self.is_dragging,
-                        on_horizontal_drag_end=self.end_drag,
-                        on_horizontal_drag_start=self.start_drag,
-                        on_tap=self.tapped,
-                    )
-                    #ft.Icons.LOCATION_SEARCHING_OUTLINED
-                ),
-                self.drag_bar
-            ]
-        ) 
-
-        #self.p.update()
-        #pass
-
-
+    # Called when reloading changes to our plot point and in constructor
     def reload_mini_widget(self):
+        ''' Rebuilds any parts of our UI and information that may have changed when we update our data '''
 
-        self.reload_timeline_control()
+        #self.reload_timeline_control()
+        self.timeline_control.alignment = self.x_alignment
 
         self.content_control = ft.TextField(
             hint_text="Change x position",

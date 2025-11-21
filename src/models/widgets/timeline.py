@@ -355,9 +355,11 @@ class Timeline(Widget):
         timeline_row = ft.Row(
             spacing=0,
             controls=[
+                ft.Container(width=20),
                 self.timeline_left_edge,
                 self.timeline_control,
-                self.timeline_right_edge
+                self.timeline_right_edge,
+                ft.Container(width=20),
                 
             ]
         )
@@ -387,7 +389,7 @@ class Timeline(Widget):
         timeline_stack = ft.Stack(
             expand=True, 
             alignment=ft.Alignment(0, 0),
-            controls=[ft.Container(expand=True), timeline_row]
+            controls=[ft.Container(expand=True, ignore_interactions=True), timeline_row]
         )
         
         # Handler for timeline resize events

@@ -128,12 +128,19 @@ class Mini_Widget(ft.Container):
         
 
     # Called when clicking x to hide the mini widget
-    def toggle_visibility(self, e):
+    def toggle_visibility(self, e=None, value: bool=None):
         ''' Shows or hides our mini widget, depending on current state '''
+
+        # If we want to specify we're visible or not, we can pass it in
+        if value is not None:
+            self.data['visible'] = value
+            self.visible = value
+
+        else:
        
-        # Switch our visibility in data, then apply it
-        self.data['visible'] = not self.data['visible']
-        self.visible = self.data['visible']
+            # Switch our visibility in data, then apply it
+            self.data['visible'] = not self.data['visible']
+            self.visible = self.data['visible']
         
         # Save the switch and reflect it in the UI
         self.save_dict()
