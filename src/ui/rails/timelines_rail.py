@@ -282,6 +282,16 @@ class Timelines_Rail(Rail):
                     icon=ft.Icons.TIMELINE_OUTLINED,
                     on_click=self.new_timeline_clicked
                 ),
+                ft.IconButton(
+                    tooltip="New Arc",
+                    icon=ft.Icons.ADD_ROUNDED,
+                    on_click=self.new_arc_clicked
+                ),
+                ft.IconButton(
+                    tooltip="New Plot Point",
+                    icon=ft.Icons.ADD_LOCATION_OUTLINED,
+                    on_click=self.new_plotpoint_clicked
+                ),
                 
                 ft.Container(expand=True),
             ]

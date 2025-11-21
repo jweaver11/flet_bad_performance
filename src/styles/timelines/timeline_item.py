@@ -4,7 +4,7 @@ from models.mini_widget import Mini_Widget
 from styles.menu_option_style import Menu_Option_Style
 
 
-# Rail items representing plotpoints, and timelines if there is only 1
+# RAIL ITEMS FOR PLOTPOINTS AND ARCS
 class Timeline_Item(ft.GestureDetector):
     
     # Constructor

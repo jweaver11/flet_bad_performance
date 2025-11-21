@@ -7,7 +7,7 @@ from styles.menu_option_style import Menu_Option_Style
 from models.story import Story
 from models.widgets.timeline import Timeline
 
-# Expansion tiles used for timelines and arcs in the timelines rail, and for their plot points and sub-arcs
+# Expansion tiles USED ONLY FOR TIMELINES, AND THE PP/ARC DROPDOWNS. PHASE OUT TIMELINE_LABEL
 class Timeline_Dropdown(ft.GestureDetector):
 
     # Constructor
