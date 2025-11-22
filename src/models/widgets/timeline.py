@@ -393,13 +393,15 @@ class Timeline(Widget):
             return int_list
 
         # Set our division list
-        division_list = _set_division_list(200)
+        division_list = _set_division_list(201)
 
         # Add line segments so our timeline control isn't just flat
-        for i in range(200):
+        for i in range(201):
 
             # Track if we are on a division
             not_division = True
+
+            print(i)
 
             # Go through our divisions list. If we are on there, add vertical line, then break and continue
             for num in division_list:

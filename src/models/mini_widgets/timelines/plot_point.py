@@ -222,7 +222,7 @@ class Plot_Point(Mini_Widget):
 
         # Our container that is our plot point on the timeline, and contains our gesture detector for hovering and right clicking
         self.timeline_point = ft.Container(
-            margin=ft.Margin(20,0,20,0),        # Set a margin away from the edges so we line up with our slider
+            margin=ft.Margin(16,0,16,0),        # Magic margin to match the margin on slider so they line up
             expand=False,         
             bgcolor=self.data.get('color', "secondary"),
             width=20,       # Sizing
