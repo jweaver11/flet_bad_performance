@@ -91,12 +91,17 @@ class Character(Widget):
             },
         )
         
-        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False)    # Icon of character
+        self.icon = ft.Icon(ft.Icons.PERSON, size=100, expand=False),
+        
         self.custom_field_controls = {}  # Store references to custom field TextFields
 
         # Build our widget on start, but just reloads it later
         self.reload_widget()
-
+    # Called when user wants to edit character
+    def edit_character_clicked(self, e):
+        ''' Handles editing character details '''
+        # For now, just reload the widget to reflect any changes
+        print("Editing character:", self.title)
     # Called when user wants to create a new text field in character
     def new_custom_textfield_clicked(self, e):
         ''' Handles prompting user for custom textfield name and creating it '''
@@ -113,7 +118,9 @@ class Character(Widget):
             dlg.open = False
             self.page.update()
         
-        def create_field(e):
+
+
+        def create_field(e): #show in edit view
             '''Called when user confirms the field name'''
             try:
                 field_name = field_name_input.value.strip()
@@ -156,7 +163,8 @@ class Character(Widget):
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
         ''' Reloads/Rebuilds our widget based on current data '''
-
+        # 2 cases: edit view vs normal view
+        
         # Rebuild out tab to reflect any changes
         self.reload_tab()
 
@@ -164,8 +172,20 @@ class Character(Widget):
             self.icon = ft.Icon(ft.Icons.PERSON, size=100, color="primary", expand=False)
         else:
             self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE, size=100, color="disabled", expand=False)
-
+        #WIP this will be the edit view 
+        
         # Body of the tab, which is the content of flet container
+        edit_button = ft.Row([
+            self.icon,
+            ft.IconButton(
+                                tooltip="Edit Character",
+                                icon=ft.Icons.EDIT_OUTLINED,
+                                on_click=self.edit_character_clicked
+                            ),
+        ]
+            
+        )
+        
         body = ft.Container(
             expand=True,                # Takes up maximum space allowed in its parent container
             padding=5,                  # Padding around everything inside the container
@@ -173,7 +193,8 @@ class Character(Widget):
                 scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
                 spacing=2,               # Reduce spacing between elements
                 controls=[
-                self.icon,                          # The icon above the name
+                edit_button,
+                #self.icon,                          # The icon above the name
                 ft.Text("hi from " + self.title),           # Text that shows the title
                 ft.Row(                     # The row that will hold our dropdowns
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
