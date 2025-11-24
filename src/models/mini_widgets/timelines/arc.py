@@ -34,40 +34,8 @@ class Arc(Mini_Widget):
         ) 
 
 
-        # Set pin location to calculate sizes
-        pin_location = self.owner.data.get("pin_location", "main")
-
-        # Check if a size was passed in, otherwise default to medium
-        if size is None:
-            size = "medium"
-
-        # Set our size calculation int based on size string
-        if size == "small":
-            size_int = 4
-        elif size == "medium":
-            size_int = 3
-        elif size == "large":
-            size_int = 2
-        elif size == "x-large":
-            size_int = 1.5
-        else:
-            size_int = 3  
-            
-        # Determine our 'timelines height' based on the pin its in.
-        if pin_location == "top":
-            pin_height = self.owner.story.data['top_pin_height']
-        elif pin_location == "bottom":
-            pin_height = self.owner.story.data['bottom_pin_height']
-
-        # Main, left, and right all take up the whole workspace, so we can use the page there
-        else:
-            #pin_height = self.owner.p.height
-            pin_height = app.settings.data.get("page_height", self.owner.p.height)
-
         # TODO:
         # Type of arcs?? timeskips, normal, character arcs
-        # Arcs have 4 sizes: small, medium, large, x-large This determines their height.
-        # height = page height / by: S=4, M=3, L=2, XL=1.5
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -85,8 +53,6 @@ class Arc(Mini_Widget):
                 'plot_points_are_expanded': True,           # If the plotpoints section is expanded
                 'arcs_are_expanded': True,                  # If the arcs section is expanded
                 'size': size,                               # Size of the arc on the timeline. Can be Small, Medium, Large, or X-Large
-                'size_int': size_int,                       # S=4, M=3, L=2, XL=1.5
-                'arc_height': pin_height / size_int,       # Height of the arc on the timeline calculated dynamically from pin location and size
                 'is_focused': bool,                         # If this arc is currently focused/selected. True when mini widget visible, or mouse hovering over arc
                 
 
@@ -123,7 +89,7 @@ class Arc(Mini_Widget):
             expand=True,
             #on_enter=self.show_slider,
             on_tap=self.show_slider,
-            on_exit=self.hide_slider,
+            #on_exit=self.hide_slider,
         )   
 
         # State variables
@@ -138,7 +104,8 @@ class Arc(Mini_Widget):
     # Called when hovering over our plot point to show the slider
     def show_slider(self, e=None):
         ''' Shows our slider and hides our timeline_point. Makes sure all other sliders are hidden '''
-        return
+
+        print("Showing slider for arc: ", self.title)
 
         # Check all other plot points
         for arc in self.owner.arcs.values():
@@ -154,16 +121,18 @@ class Arc(Mini_Widget):
         
         # If we didn't return out, show our slider and hide our timeline point
         self.slider.visible = True
-        self.timeline_arc.visible = False
+        #self.timeline_arc.visible = False
         
         # Apply it to the UI
         self.p.update()
+
+        self.owner.reload_widget()
 
 
     # Called when we stop dragging our slider thumb, or when we drag too high or low from slider
     def hide_slider(self, e=None):
         ''' Hides our slider and puts our dot back on the timeline. Saves our new position to the file '''
-        return
+        
     
         # Hide slider
         self.slider.visible = False
@@ -177,7 +146,7 @@ class Arc(Mini_Widget):
         self.save_dict()
         
         # Must reload our plot point to apply the change to ourself, then reload the parent widget to apply the change to the page
-        #self.reload_mini_widget()
+        self.reload_mini_widget()
         #self.owner.reload_widget()
 
     # Called to determine if we want to hide our slider
@@ -220,66 +189,69 @@ class Arc(Mini_Widget):
         # state used during dragging
         self.slider = ft.Column(
             spacing=0,
-            visible=True,                                      # Start hidden until we hover over plot point
+            visible=False,                                      # Start hidden until we hover over plot point
             controls=[
-                ft.GestureDetector(on_enter=self.hide_slider, expand=True, content=ft.Container(bgcolor=ft.Colors.with_opacity(.3, "yellow"))),    # Invisible container to hide slider when going too far up
                 ft.Stack(
                     alignment=ft.Alignment(0,0),
+                    expand=True,
                     controls=[
-                    ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
-                        on_secondary_tap=lambda e: print("Right click on slider"),
-                        content=ft.RangeSlider(
-                            min=-100, max=100,                                  # Min and max values on each end of slider
-                            start_value=self.data.get('x_alignment_start', 0) * 100,        # Where we start on the slider
-                            end_value=self.data.get('x_alignment_end', 0) * 100,            # Where we end on the slider
-                            divisions=200,                                      # Number of spots on the slider
-                            active_color=self.data.get('color', "secondary"),                 # Get rid of the background colors
-                            inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
-                            overlay_color=ft.Colors.TRANSPARENT,    # Color of plot point when hovering over it or dragging    
-                            #on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
-                            #on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
-                            #on_change_start=self.start_dragging,                # Make sure we're visible
-                            #on_blur=self.hide_slider                            # Hide the slider if we click away from it
-                        ),
-                    ),
-                    # Sitting overtop the slider, is a row with expand based on our proportions
-                    ft.Row(
-                        spacing=0,
-                        expand=True,
-                        height=100,
-                        controls=[
-                            #ft.GestureDetector(         # Catch our hovers to the left of the thumb
-                                #on_hover=self.may_hide_slider,
-                                #expand=left_ratio,
-                                #content=ft.Container(expand=True),
-                                #content=ft.Container(expand=True, bgcolor=ft.Colors.with_opacity(.3, "red"))
-                            #),
-                            ft.Column(
-                                width=50,
-                                spacing=0,
-                                controls=[
-                                    # Catch above and below the thumb
-                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
-
-                                    # Reserve safe space for the thumb
-                                    ft.Container(       # Safe area
-                                        ignore_interactions=True,
-                                        shape=ft.BoxShape.CIRCLE,
-                                        width=50, height=50, 
-                                    ),
-                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
-                                ]
+                        ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
+                        ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
+                            on_secondary_tap=lambda e: print("Right click on slider"),
+                            #expand=True,
+                            height=100,
+                            content=ft.RangeSlider(
+                                min=-100, max=100,                                  # Min and max values on each end of slider
+                                start_value=self.data.get('x_alignment_start', 0) * 100,        # Where we start on the slider
+                                end_value=self.data.get('x_alignment_end', 0) * 100,            # Where we end on the slider
+                                divisions=200,                                      # Number of spots on the slider
+                                active_color=self.data.get('color', "secondary"),                 # Get rid of the background colors
+                                inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
+                                overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging    
+                                #on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
+                                #on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
+                                #on_change_start=self.start_dragging,                # Make sure we're visible
+                                #on_blur=self.hide_slider                            # Hide the slider if we click away from it
                             ),
-                            #ft.GestureDetector(         # Catch our hovers to the right of the thumb
-                                #on_hover=self.may_hide_slider,
-                                #expand=right_ratio,
-                                #content=ft.Container(expand=True),
-                                #content=ft.Container(expand=True, bgcolor=ft.Colors.with_opacity(.3, "red"))
-                            #),
-                        ]
-                    )
+                        ),
+                        # Sitting overtop the slider, is a row with expand based on our proportions
+                        ft.Row(
+                            spacing=0,
+                            expand=True,
+                            height=100,
+                            controls=[
+                                #ft.GestureDetector(         # Catch our hovers to the left of the thumb
+                                    #on_hover=self.may_hide_slider,
+                                    #expand=left_ratio,
+                                    #content=ft.Container(expand=True),
+                                    #content=ft.Container(expand=True, bgcolor=ft.Colors.with_opacity(.3, "red"))
+                                #),
+                                ft.Column(
+                                    width=50,
+                                    spacing=0,
+                                    controls=[
+                                        # Catch above and below the thumb
+                                        #ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
+
+                                        # Reserve safe space for the thumb
+                                        ft.Container(       # Safe area
+                                            ignore_interactions=True,
+                                            shape=ft.BoxShape.CIRCLE,
+                                            width=50, height=50, 
+                                        ),
+                                        #ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
+                                    ]
+                                ),
+                                #ft.GestureDetector(         # Catch our hovers to the right of the thumb
+                                    #on_hover=self.may_hide_slider,
+                                    #expand=right_ratio,
+                                    #content=ft.Container(expand=True),
+                                    #content=ft.Container(expand=True, bgcolor=ft.Colors.with_opacity(.3, "red"))
+                                #),
+                            ]
+                        )
                 ]),
-                ft.GestureDetector(on_enter=self.hide_slider, expand=True, content=ft.Container(bgcolor=ft.Colors.with_opacity(.3, "yellow"))),    # Invisible container to hide slider when going too far down
+                
         ])
 
     # Called from reload mini widget to update our timeline control
@@ -343,7 +315,6 @@ class Arc(Mini_Widget):
         # Row for our spacing containers, and rebuilt timeline_arc
         row = ft.Row(
             expand=True,
-            visible=False,
             spacing=0,
             controls=[
                 spacing_left,

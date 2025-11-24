@@ -226,6 +226,9 @@ class Widget(ft.Container):
         elif tag == "map":
             self.story.maps.pop(old_key, None)
             self.story.maps[self.data['key']] = self  
+        elif tag == "timeline":
+            self.story.timelines.pop(old_key, None)
+            self.story.timelines[self.data['key']] = self
 
 
         # Re-applies visibility to what it was before rename
@@ -336,7 +339,8 @@ class Widget(ft.Container):
 
         # Save our changes and reload the UI
         self.save_dict()
-        self.story.workspace.reload_workspace()
+        self.reload_widget()
+        #self.story.workspace.reload_workspace()
 
 
     # Called at end of constructor
@@ -360,6 +364,12 @@ class Widget(ft.Container):
 
         elif tag == "settings":
             icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
+        
+        elif tag == "timeline":
+            icon = ft.Icon(ft.Icons.TIMELINE_OUTLINED)
+
+        elif tag == "map":
+            icon = ft.Icon(ft.Icons.MAP_OUTLINED)
 
         else:
             icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
