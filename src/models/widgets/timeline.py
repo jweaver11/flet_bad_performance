@@ -401,8 +401,6 @@ class Timeline(Widget):
             # Track if we are on a division
             not_division = True
 
-            print(i)
-
             # Go through our divisions list. If we are on there, add vertical line, then break and continue
             for num in division_list:
                 if i == num:

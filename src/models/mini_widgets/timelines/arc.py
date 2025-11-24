@@ -158,51 +158,11 @@ class Arc(Mini_Widget):
             ])
         )   
 
-        # Loads all our plot points on this arc from data
-        self.load_plot_points() 
+      
 
         # Loads our mini widget
         self.reload_mini_widget()
 
-    
-    # Called in the constructor
-    def load_plot_points(self):
-        ''' Loads plotpoints from data into self.plotpoints  '''
-        from models.mini_widgets.timelines.plot_point import Plot_Point
-
-        # Looks up our plotpoints in our data, then passes in that data to create a live object
-        for key, data in self.data['plot_points'].items():
-            self.plot_points[key] = Plot_Point(
-                title=key, 
-                owner=self.owner, 
-                father=self,
-                page=self.p, 
-                key="plot_points", 
-                data=data
-            )
-            self.owner.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
-        
-        
-    # Called when creating a new plotpoint
-    def create_plot_point(self, title: str):
-        ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
-        from models.mini_widgets.timelines.plot_point import Plot_Point
-
-        # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
-        self.plot_points[title.capitalize()] = Plot_Point(
-            title=title.capitalize(), 
-            owner=self.owner, 
-            father=self,
-            page=self.p, 
-            key="plot_points", 
-            data=None
-        )
-        self.owner.mini_widgets.append(self.plot_points[title])
-
-        # Apply our changes in the UI
-        self.reload_mini_widget()
-        self.owner.story.active_rail.content.reload_rail()
-        self.owner.reload_widget()
 
     # Called when hovering over the arc on the timeline
     def on_hovers(self, e):
