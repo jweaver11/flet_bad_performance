@@ -178,7 +178,6 @@ class Character(Widget):
                 ft.Row(                     # The row that will hold our dropdowns
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
-                           #TODO addition of second dropdown for alignment
                             ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
                                 label="alignment1",           # Label at top of dropdown 
                                 value=self.data['alignment1'],        # Value selected in the drop down
@@ -207,7 +206,7 @@ class Character(Widget):
                                     ft.DropdownOption(text="None"),
                                     
                                 ],
-                                #n_change=self.submit_alignment1_change,
+                                #n_change=self.submit_alignment2_change,
                             ),
                                
                             ft.Dropdown(      # Sex of each character
@@ -224,14 +223,20 @@ class Character(Widget):
                                 #TODO on "other" selection, open a text field to specify
                                 #on_change=self.submit_sex_change,
                             ),
+                            ft.TextField(   # Text field for sexuality input
+                                label ="Gender Identity",
+                                width=200,
+                                expand = False,
+                            ),
                             ft.TextField(  # Text field for age input
                                 label ="Age",
                                 max_length=7,#allows for things like "unknown" or "ancient"
                                 width=100,
                                 expand = False,
-                                #content_padding=ft.padding.symmetric(vertical=5, horizontal=6),
-                                #dense=True,
-                            ),  
+                            ),
+                            #TODO add a dropdown for connections (other characters)
+                            #should open another dropdown or text field to specify relationship
+                            # #WIP  
                             #ft.Dropdown(       # Dropdown selection of relatives (other characters)
                             #    label="Connections",
                             #    #TODO value needs to be a list of connections
@@ -241,23 +246,15 @@ class Character(Widget):
                             #    #TODO populate options with other characters in story
                             #    ],
                             #),
-                           
-                            #TODO add a dropdown for connections (other characters)
-                            #should open another dropdown or text field to specify relationship
-            
                             ft.TextField(   # Text field for race input
                                 label ="Race",
                                 width=250,
                                 expand = False, #prevents stretching too wide
-                                #content_padding=ft.padding.symmetric(vertical=5, horizontal=6),
-                                #dense=True,
                             ),
                             ft.TextField(   # Text field for sexuality input
                                 label ="Sexuality",
                                 width=200,
                                 expand = False,
-                                #content_padding=ft.padding.symmetric(vertical=5, horizontal=6),
-                                #dense=True,
                             ),
                             ft.IconButton(
                                 tooltip="New Field",
