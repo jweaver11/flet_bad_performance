@@ -899,6 +899,7 @@ class Story(ft.View):
             on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
             on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
             on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
+            drag_interval=10,
         )
 
         # Save our 2 rails, divers, and our workspace container in a row

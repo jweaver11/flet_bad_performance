@@ -449,7 +449,6 @@ class Timeline(Widget):
             timeline_stack.controls.append(arc.timeline_control)
 
 
-
         # Add our plot points to the timeline (They position themselves)
         for plot_point in self.plot_points.values():    
             
@@ -458,7 +457,6 @@ class Timeline(Widget):
 
 
         timeline_stack.controls.append(self.new_item_container)
-    
 
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES

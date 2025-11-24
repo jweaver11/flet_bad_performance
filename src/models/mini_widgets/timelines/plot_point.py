@@ -54,11 +54,11 @@ class Plot_Point(Mini_Widget):
         # Build our slider for moving our plot point
         self.reload_mini_widget()
 
-    # Called at the end of dragging our point on the slider to update it
+    # Called when actively dragging our slider thumb to change our x position
     def change_x_position(self, e):
         ''' Changes our x position on the slider, and saves it to our data dictionary, but not to our file yet '''
 
-        # Grab our new position as a flot of whatever number division we're on (-100 -> 100)
+        # Grab our new position as a float of whatever number division we're on (-100 -> 100)
         new_position = float(e.control.value)
 
         # Convert that float between -1 -> 1 for our alignment to work
