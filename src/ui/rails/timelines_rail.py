@@ -213,6 +213,7 @@ class Timelines_Rail(Rail):
 
         return options
     
+    # Refreshes our top row buttons based on our active dropdown
     def refresh_buttons(self, no_active_dropdown: bool=False):
         ''' Refreshes the top row buttons based on our active dropdown/timeline to update our colors and disabled states '''
 
@@ -253,12 +254,7 @@ class Timelines_Rail(Rail):
     def reload_rail(self) -> ft.Control:
         ''' Reloads the plot and timeline rail, useful when switching stories '''
 
-        # TIMELINES RAIL ONLY HAS THE ABILITY TO CREATE NEW TIMELINES, PLOTPOINTS, ETC. AND VIEW HOW THEY ARE ORGANIZED
-        # ALTERING THEIR DATA IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
-
-        # TODO:
-        # OR HAVE HIGHLIGHT TO SHOW OUR SELECTED TIMELINE AND KEEP THE BUTTONS AT TOP AS WELL
 
         self.refresh_buttons()
 
@@ -280,13 +276,15 @@ class Timelines_Rail(Rail):
         for timeline in self.story.timelines.values():
 
             # Create an expansion tile for our timeline that we need in order to load its data
-            timeline_dropdown = Timeline_Dropdown(
+            timeline.timeline_dropdown = Timeline_Dropdown(
                 title=timeline.title, 
                 story=self.story, 
                 timeline=timeline, 
                 additional_menu_options=self.get_sub_menu_options(),
                 rail=self
             )
+
+            # Create our timeline dropdowns here in 
 
             # Load our timeline data
             # New drop down for our plotpoints
@@ -296,7 +294,7 @@ class Timelines_Rail(Rail):
                 additional_menu_options=self.get_sub_menu_options(tag="plot_points_label", is_label=True),
                 timeline=timeline,
                 rail=self,
-                timeline_dropdown=timeline_dropdown
+                timeline_dropdown=timeline.timeline_dropdown
             )
 
         
@@ -309,7 +307,7 @@ class Timelines_Rail(Rail):
             plot_points_dropdown.content.controls.append(plot_points_dropdown.new_item_textfield)
 
             # Add our plot points dropdown to the timeline dropdown
-            timeline_dropdown.content.controls.append(plot_points_dropdown)
+            timeline.timeline_dropdown.content.controls.append(plot_points_dropdown)
 
             # New drop down for our arcs
             arcs_dropdown = Label_Dropdown(
@@ -318,7 +316,7 @@ class Timelines_Rail(Rail):
                 additional_menu_options=self.get_sub_menu_options(tag="arcs_label", is_label=True),
                 timeline=timeline,
                 rail=self,
-                timeline_dropdown=timeline_dropdown
+                timeline_dropdown=timeline.timeline_dropdown
             )
             
 
@@ -333,24 +331,24 @@ class Timelines_Rail(Rail):
 
 
             # Add our arcs dropdown to the timeline dropdown
-            timeline_dropdown.content.controls.append(arcs_dropdown)
+            timeline.timeline_dropdown.content.controls.append(arcs_dropdown)
 
 
             # Add some padding under it between timelines
-            timeline_dropdown.content.controls.append(ft.Container(height=10))
+            timeline.timeline_dropdown.content.controls.append(ft.Container(height=10))
 
             # If theres only one timeline, no need to add the parent expansion to the page.
             if len(self.story.timelines) == 1:
 
                 # If only one timeline, just add its content directly to the rail rather than making it a dropdown
-                content.controls.extend(timeline_dropdown.content.controls)
+                content.controls.extend(timeline.timeline_dropdown.content.controls)
 
                 # Set our active_dropdown if we only have one
-                self.active_dropdown = timeline_dropdown
+                self.active_dropdown = timeline.timeline_dropdown
 
             # Otherwise, add the full expansion panel
             else:
-                content.controls.append(timeline_dropdown)
+                content.controls.append(timeline.timeline_dropdown)
     
 
 
@@ -362,7 +360,7 @@ class Timelines_Rail(Rail):
             expand=True,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
             content=content,
-            on_tap=lambda e: self.refresh_buttons(no_active_dropdown=True)
+            #on_tap=lambda e: self.refresh_buttons(no_active_dropdown=True)
         )
 
         # Set our content to be a column

@@ -61,6 +61,8 @@ class Timeline_Dropdown(ft.GestureDetector):
             text_style=self.text_style
         )
 
+        self.expansion_tile: ft.ExpansionTile = None
+
         
         # Parent constructor
         super().__init__(
@@ -103,13 +105,22 @@ class Timeline_Dropdown(ft.GestureDetector):
         self.timeline.data["dropdown_is_expanded"] = self.is_expanded
         self.timeline.save_dict()
 
+        #print("Active dropdown before:", self.rail.active_dropdown)
+        if self.rail.active_dropdown is not None:
+            if hasattr(self.rail.active_dropdown, "is_focused"):
+                
+                self.rail.active_dropdown.is_focused = False
+                self.rail.active_dropdown.refresh_expansion_tile()
+            
+            else:
+                self.rail.active_dropdown.timeline_dropdown.is_focused = False
+                self.rail.active_dropdown.timeline_dropdown.refresh_expansion_tile()
+
         self.rail.active_dropdown = self
         self.rail.refresh_buttons()
 
-
-        #self.reload()
-
-        # Save the changes
+        self.is_focused = True
+        self.refresh_expansion_tile()
         
 
     # Called when creating a new plot point or arc only
@@ -275,6 +286,16 @@ class Timeline_Dropdown(ft.GestureDetector):
         return color_controls
 
 
+    def refresh_expansion_tile(self):
+        if self.is_focused:
+            self.expansion_tile.bgcolor = ft.Colors.with_opacity(.1, "primary")
+            self.expansion_tile.collapsed_bgcolor = ft.Colors.with_opacity(.1, "primary")
+        else:
+            self.expansion_tile.bgcolor = ft.Colors.TRANSPARENT
+            self.expansion_tile.collapsed_bgcolor = ft.Colors.TRANSPARENT
+
+        self.timeline.p.update()
+
 
     # Called when we need to reload this directory tile
     def reload(self):
@@ -282,7 +303,7 @@ class Timeline_Dropdown(ft.GestureDetector):
         # Set our icon to a timeline unless we are labeld for Plot Points or Arcs dropdown
         icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=self.color) if self.title != "Plot Points" and self.title != "Arcs" else None
 
-        expansion_tile = ft.ExpansionTile(
+        self.expansion_tile = ft.ExpansionTile(
             title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
             dense=True,
             initially_expanded=self.is_expanded,
@@ -293,7 +314,8 @@ class Timeline_Dropdown(ft.GestureDetector):
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             adaptive=True,
-            bgcolor=ft.Colors.TRANSPARENT,
+            bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
+            collapsed_bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
             shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
         )
@@ -303,12 +325,12 @@ class Timeline_Dropdown(ft.GestureDetector):
         if self.content is not None:        # Protects against first loads
             if self.content.controls is not None:       # Re-add our controls when we reload
                 for control in self.content.controls:
-                    expansion_tile.controls.append(control)
+                    self.expansion_tile.controls.append(control)
 
         
         # Set the content
-        self.content = expansion_tile
+        self.content = self.expansion_tile
 
-
+        self.refresh_expansion_tile()
 
         self.timeline.p.update()

@@ -91,16 +91,36 @@ class Label_Dropdown(ft.GestureDetector):
     def toggle_expand(self):
         ''' Makes sure our state and data match the updated expanded/collapsed state '''
 
-        # Updates our data
+        # Update our expanded state and data to match, and save it to file
         self.is_expanded = not self.is_expanded
-
         self.timeline.data["plot_points_dropdown_expanded" if self.title == "Plot Points" else "arcs_dropdown_expanded"] = self.is_expanded
         self.timeline.save_dict()
 
+
+        # If a different timeline is active, we unfocus it and focuse our parent instead
+        if self.rail.active_dropdown is not None:
+
+            # Check that its a timeline dropdown
+            if hasattr(self.rail.active_dropdown, "is_focused"):
+                
+                # Unfocus it and apply the changes
+                self.rail.active_dropdown.is_focused = False
+                self.rail.active_dropdown.refresh_expansion_tile()
+            
+            # If not a timeline dropdown, it must be a label dropdown, so we grab its parent timeline dropdown
+            else:
+
+                # Unfocus its parent timeline dropdown and apply the changes
+                self.rail.active_dropdown.timeline_dropdown.is_focused = False
+                self.rail.active_dropdown.timeline_dropdown.refresh_expansion_tile()
+
+        # Set ourselves as the active dropdown and refresh the rail buttons
         self.rail.active_dropdown = self
         self.rail.refresh_buttons()
 
-        
+        # Focus our timeline dropdown parent as well
+        self.timeline_dropdown.is_focused = True
+        self.timeline_dropdown.refresh_expansion_tile()
         
 
     # Called when creating new category or when additional menu items are clicked

@@ -125,6 +125,9 @@ class Timeline(Widget):
             alignment=ft.Alignment(0, 0),
             controls=[self.new_item_text_field]
         )
+
+        # Dropdown on the rail. We don't use it here, let the rail handle it
+        self.timeline_dropdown =  None      #'Timeline_Dropdown'
         
 
         # Builds/reloads our timeline UI
