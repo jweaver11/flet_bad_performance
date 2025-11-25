@@ -42,7 +42,7 @@ class Character(Widget):
                 'age': str, #text input
                 'sexuality': str, #text input
                 'physical_description': {
-                    'Race': str,
+                    'Race': str, #having this in a dict sort of complicates the on_change handlers
                     'Species': str,
                     'Ethnicity': str,
                     'Skin Color': str,
@@ -331,11 +331,6 @@ class Character(Widget):
         self.data['custom_fields'][field_name] = value
         self.save_dict()
     
-    #def _on_age_change(self, value: str):
-    #    '''Called when age field is modified'''
-    #    self.data['age'] = value
-    #    self.save_dict()
-    
     def _on_field_change(self, field_name: str, value: str):
         '''Generic handler for any field change - saves to data and persists'''
         self.data[field_name] = value
@@ -345,10 +340,7 @@ class Character(Widget):
         '''Handler for race field which is nested in physical_description'''
         self.data['physical_description']['Race'] = value
         self.save_dict()
-    #def _on_sex_change(self, value: str):
-    #    '''Called when sex dropdown is changed'''
-    #    self.data['sex'] = value
-    #    self.save_dict()
+
             
 
 
