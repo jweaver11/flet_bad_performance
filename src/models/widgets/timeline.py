@@ -45,10 +45,9 @@ class Timeline(Widget):
                 'end_date': str,                            # Start and end date of the branch, for timeline view
                 'color': "primary",                         # Color of the branch in the timeline
                 'dropdown_is_expanded': True,               # If the branch dropdown is expanded on the rail
-                'plot_points_are_expanded': True,           # If the plotpoints section is expanded
-                'plot_points_dropdown_color': "primary",    # Color of the plot points dropdown in the rail
-                'arcs_are_expanded': True,                  # If the arcs section is expanded
-                'arcs_dropdown_color': "primary",           # Color of the arcs dropdown in the rail
+                'plot_points_dropdown_expanded': True,      # If the plotpoints section is expanded
+                'arcs_dropdown_expanded': True,             # If the arcs section is expanded
+                
 
                 'plot_points': dict,                        # Dict of plot points in this branch
                 'time_skips': dict,                         # Dict of time skips in this branch
@@ -62,8 +61,8 @@ class Timeline(Widget):
                 'related_items': list,
                 'divisions': 10,                            # Number of divisions on the timeline
 
-                'left_edge_label': 0,                    # Label for the left edge of the timeline
-                'right_edge_label': 10,                  # Label for the right edge of the timeline
+                'left_edge_label': float,                   # Label for the left edge of the timeline
+                'right_edge_label': float,                  # Label for the right edge of the timeline
             },
         ) 
 
@@ -74,7 +73,6 @@ class Timeline(Widget):
         self.information_display: ft.Container = None
         self.create_information_display()
         
-
         # Declare dicts of our data types   
         self.arcs: dict = {}        # TODO: No more infinite arcs
         self.plot_points: dict = {} 

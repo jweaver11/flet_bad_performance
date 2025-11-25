@@ -13,12 +13,12 @@ class Rail(ft.Container):
 
     # Constructor
     def __init__(
-            self, 
-            page: ft.Page,                  # Page reference
-            story: Story,                   # Story reference
-            directory_path: str,            # Root path that loads this rails content
-            timeline: Timeline = None,      # Timeline reference for creating plot points and arcs on timeline rail
-        ):
+        self, 
+        page: ft.Page,                  # Page reference
+        story: Story,                   # Story reference
+        directory_path: str,            # Root path that loads this rails content
+        timeline: Timeline = None,      # Timeline reference for creating plot points and arcs on timeline rail
+    ):
         
         # Initialize the parent Container class first
         super().__init__(
@@ -256,11 +256,13 @@ class Rail(ft.Container):
             # New plot points and arcs on timelines or arcs
             elif tag == "plot_point":
                 if self.timeline is not None:
+                    print("Creating plot point:", title)
                     self.timeline.create_plot_point(title)
 
             # New arcs on timelines
             elif tag == "arc":
                 if self.timeline is not None:
+                    print("Creating arc:", title)
                     self.timeline.create_arc(title)
 
             # New Maps

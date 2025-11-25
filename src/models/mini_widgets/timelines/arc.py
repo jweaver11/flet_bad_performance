@@ -185,14 +185,7 @@ class Arc(Mini_Widget):
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
     def reload_slider(self):
 
-        # Give us a ratio for integers for our left and right expand values to catch hover off of our plot pont
-        ratio = (self.data.get('x_alignment', 0) + 1) / 2     # Convert -1 -> 1 to 0 -> 1
-    
-        # Set the left and right ratio
-        left_ratio = int(ratio * 1000)
-        right_ratio = 1000 - left_ratio
-
-        # state used during dragging
+        # Rebuild our slider
         self.slider = ft.Column(
             spacing=0,
             visible=self.visible,                                      # Start hidden until we hover over plot point
@@ -204,7 +197,6 @@ class Arc(Mini_Widget):
                         ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
                         ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
                             on_secondary_tap=lambda e: print("Right click on slider"),
-                            #expand=True,
                             height=100,
                             content=ft.RangeSlider(
                                 min=-100, max=100,                                  # Min and max values on each end of slider
@@ -212,49 +204,15 @@ class Arc(Mini_Widget):
                                 end_value=self.data.get('x_alignment_end', 0) * 100,            # Where we end on the slider
                                 divisions=200,                                      # Number of spots on the slider
                                 active_color=self.data.get('color', "secondary"),                 # Get rid of the background colors
+                                tooltip="",
                                 inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
                                 overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging    
                                 on_change=self.change_x_positions,       # Update our data with new x position as we drag
                                 on_change_end=self.finished_dragging,                     # Save the new position, but don't write it yet                      
                             ),
                         ),
-                        # Sitting overtop the slider, is a row with expand based on our proportions
-                        ft.Row(
-                            spacing=0,
-                            expand=True,
-                            height=100,
-                            controls=[
-                                #ft.GestureDetector(         # Catch our hovers to the left of the thumb
-                                    #on_hover=self.may_hide_slider,
-                                    #expand=left_ratio,
-                                    #content=ft.Container(expand=True),
-                                    #content=ft.Container(expand=True, bgcolor=ft.Colors.with_opacity(.3, "red"))
-                                #),
-                                ft.Column(
-                                    width=50,
-                                    spacing=0,
-                                    controls=[
-                                        # Catch above and below the thumb
-                                        #ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
-
-                                        # Reserve safe space for the thumb
-                                        ft.Container(       # Safe area
-                                            ignore_interactions=True,
-                                            shape=ft.BoxShape.CIRCLE,
-                                            width=50, height=50, 
-                                        ),
-                                        #ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
-                                    ]
-                                ),
-                                #ft.GestureDetector(         # Catch our hovers to the right of the thumb
-                                    #on_hover=self.may_hide_slider,
-                                    #expand=right_ratio,
-                                    #content=ft.Container(expand=True),
-                                    #content=ft.Container(expand=True, bgcolor=ft.Colors.with_opacity(.3, "red"))
-                                #),
-                            ]
-                        )
-                ]),
+                    ]
+                ),
                 
         ])
 

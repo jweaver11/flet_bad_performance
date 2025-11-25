@@ -1,18 +1,13 @@
-'''
-Extended flet controls that implement the same styling for easy access
-'''
+# Class used for our Plot Points and Arcs dropdowns in the timeline rail, that sit inside of the timeline dropdowns
+
 
 import flet as ft
 from styles.menu_option_style import Menu_Option_Style
 from models.story import Story
 from models.widgets.timeline import Timeline
 
-
-# TODO: When clicking and expanding, make sure to set the active_timeline to this timeline, 
-# so we can use the buttons at top of rail when there are multiple timelines
-
 # Expansion tiles used for timelines (when more than 1), plotpoints labels, and arcs labels
-class Timeline_Dropdown(ft.GestureDetector):
+class Label_Dropdown(ft.GestureDetector):
 
     # Constructor
     def __init__(
@@ -32,7 +27,7 @@ class Timeline_Dropdown(ft.GestureDetector):
 
         # Set other variables
         self.color = ft.Colors.PRIMARY
-        self.is_expanded = self.timeline.data.get("dropdown_is_expanded", True)
+        self.is_expanded = self.timeline.data.get("plot_points_dropdown_expanded", True) if self.title == "Plot Points" else self.timeline.data.get("arcs_dropdown_expanded", True)
 
         # State tracking variables
         self.are_submitting = False
@@ -92,21 +87,21 @@ class Timeline_Dropdown(ft.GestureDetector):
     def toggle_expand(self):
         ''' Makes sure our state and data match the updated expanded/collapsed state '''
 
-        #print("Toggling expand for ", self.title)
-
+        # Updates our data
         self.is_expanded = not self.is_expanded
 
-        self.timeline.data["dropdown_is_expanded"] = self.is_expanded
+        self.timeline.data["plot_points_dropdown_expanded" if self.title == "Plot Points" else "arcs_dropdown_expanded"] = self.is_expanded
         self.timeline.save_dict()
 
-        #self.reload()
-
-        # Save the changes
+        
         
 
-    # Called when creating a new plot point or arc only
+    # Called when creating new category or when additional menu items are clicked
     def new_item_clicked(self, e=None, tag: str=None):
         ''' Shows the textfield for creating new item. Requires what type of item (category, chapter, note, etc.) '''
+
+        # Clear out any previous value
+        self.new_item_textfield.value = None
 
         # If this is called from outside our object, pass in a tag instead
         if e is not None: 
@@ -114,25 +109,28 @@ class Timeline_Dropdown(ft.GestureDetector):
         else:
             data = tag
         
+         
+        # If the data passed in is a plotpoint
+        if data == "plot_point":
+            self.new_item_textfield.visible = True
+            self.new_item_textfield.data = "plot_point"
+            self.new_item_textfield.hint_text = "Plot Point Title"
+            self.new_item_textfield.value = None
+        elif data == "arc":
+            self.new_item_textfield.visible = True
+            self.new_item_textfield.data = "arc"
+            self.new_item_textfield.hint_text = "Arc Title"
+            self.new_item_textfield.value = None
+
         # Check our expanded state. Rebuild if needed
         if self.is_expanded == False:
             self.toggle_expand()
             self.reload()
-         
-        # If the data passed in is a plotpoint
-        if data == "plot_point":
-
-            self.content.controls[0].new_item_clicked(tag="plot_point")
-
-        # Otherwise we're an arc
-        else:
-
-            self.content.controls[1].new_item_clicked(tag="arc")
 
         # Close the menu, which will also update the page
         self.story.close_menu()
 
-    # Called when our new item textfield changes
+
     def new_item_check(self, e):
         ''' Checks if our new item is unique in our timeline's dicts '''
 
@@ -141,6 +139,8 @@ class Timeline_Dropdown(ft.GestureDetector):
 
         # Either plotpoint or arc, whatever we're submitting
         type = e.control.data
+
+        print(type)
 
         # Check for plot points
         if type == "plot_point":
@@ -222,59 +222,12 @@ class Timeline_Dropdown(ft.GestureDetector):
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.story.p.update()
 
-
-    def get_color_options(self) -> list[ft.Control]:
-        ''' Returns a list of all available colors for icon changing '''
-
-        # Called when a color option is clicked on popup menu to change icon color
-        def _change_icon_color(color: str):
-            ''' Passes in our kwargs to the widget, and applies the updates '''
-
-            # Change the data
-            self.story.change_folder_data(self.full_path, 'color', color)
-            self.color = color
-            
-            # Change our icon to match, apply the update
-            self.story.active_rail.content.reload_rail()
-            #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
-
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
-
-        # List for our colors when formatted
-        color_controls = [] 
-
-        # Create our controls for our color options
-        for color in colors:
-            color_controls.append(
-                ft.PopupMenuItem(
-                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
-                    on_click=lambda e, col=color: _change_icon_color(col)
-                )
-            )
-
-        return color_controls
-
-
-
     # Called when we need to reload this directory tile
     def reload(self):
 
 
         # TODO: Add button to add new plot point or timeline on the tile
-
-        print("Expanded: ", self.is_expanded, " for ", self.title)
+        print(f"{self.title} is expanded: {self.is_expanded}")
 
         # Set our icon to a timeline unless we are labeld for Plot Points or Arcs dropdown
         icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=self.color) if self.title != "Plot Points" and self.title != "Arcs" else None
@@ -295,17 +248,18 @@ class Timeline_Dropdown(ft.GestureDetector):
             on_change=lambda e: self.toggle_expand(),
         )
 
-        # Our controls should always be 3. Plot point dropdown, arcs dropdown, and a spacing container
-        # Re-adds our content controls so we can keep states
-        if self.content is not None:        # Protects against first loads
-            if self.content.controls is not None:       # Re-add our controls when we reload
-                for control in self.content.controls:
+        # Re-adds our content controls in the correct order
+        if self.content is not None and self.content.controls is not None:
+
+            # Add all controls except the textfield first
+            for control in self.content.controls:
+                if control != self.new_item_textfield:
                     expansion_tile.controls.append(control)
+
+            # Finally add our new item textfield at the bottom
+            expansion_tile.controls.append(self.new_item_textfield)
+    
 
         
         # Set the content
         self.content = expansion_tile
-
-
-
-        self.timeline.p.update()
