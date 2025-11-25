@@ -2,6 +2,7 @@ import flet as ft
 from styles.timelines.timeline_dropdown import Timeline_Dropdown
 from models.mini_widget import Mini_Widget
 from styles.menu_option_style import Menu_Option_Style
+from models.mini_widgets.timelines.plot_point import Plot_Point
 
 
 # RAIL ITEMS FOR PLOTPOINTS AND ARCS
@@ -23,22 +24,22 @@ class Timeline_Item(ft.GestureDetector):
         self.mini_widget = mini_widget
         self.title = title
         self.color = ft.Colors.PRIMARY
-        #self.father = father
-        #tag = mini_widget.data.get('tag', None)
+        
 
-        tag = None
+        # Check if we're a plot point or an arc for icon purposes
+        if isinstance(self.mini_widget, Plot_Point): 
+            tag = "plot_point"
+        else:
+            tag = "arc"
 
         self.additional_menu_options = additional_menu_options
 
-        # Check our tag and set our icon accordingly
-        if tag is None:
-            self.icon = ft.Icons.LOCATION_ON_OUTLINED
 
-        elif tag == "plot_point":
+        if tag == "plot_point":
             self.icon = ft.Icons.LOCATION_ON_OUTLINED
 
         else:
-            self.icon = ft.Icons.ERROR_OUTLINE
+            self.icon = ft.Icons.CIRCLE_OUTLINED
 
         if icon is not None:
             self.icon = icon

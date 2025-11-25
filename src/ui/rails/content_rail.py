@@ -164,6 +164,9 @@ class Content_Rail(Rail):
         # Append our hiddent textfields for creating new categories, chapters, and notes
         content.controls.append(self.new_item_textfield)
 
+        # Add container to the bottom to make sure the drag target and gesture detector fill the rest of the space
+        content.controls.append(ft.Container(expand=True))
+
 
         # Wrap the gd in a drag target so we can move characters here
         dt = ft.DragTarget(

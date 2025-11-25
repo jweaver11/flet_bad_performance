@@ -50,6 +50,7 @@ class Rail(ft.Container):
             on_blur=self.on_new_item_blur,                      # Called when clicking off the textfield and after submitting
             on_change=self.on_new_item_change,                  # Called on every key input
             on_submit=self.submit_item,                         # Called when enter is pressed and textfield is focused
+            dense=True,
         )
 
 

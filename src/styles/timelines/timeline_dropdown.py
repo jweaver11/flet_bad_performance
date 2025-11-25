@@ -58,7 +58,8 @@ class Timeline_Dropdown(ft.GestureDetector):
             on_blur=self.on_new_item_blur,
             on_submit=self.new_item_submit,
             visible=False,
-            text_style=self.text_style
+            text_style=self.text_style,
+            dense=True,
         )
 
         self.expansion_tile: ft.ExpansionTile = None
@@ -288,8 +289,8 @@ class Timeline_Dropdown(ft.GestureDetector):
 
     def refresh_expansion_tile(self):
         if self.is_focused:
-            self.expansion_tile.bgcolor = ft.Colors.with_opacity(.1, "primary")
-            self.expansion_tile.collapsed_bgcolor = ft.Colors.with_opacity(.1, "primary")
+            self.expansion_tile.bgcolor = ft.Colors.with_opacity(.05, "primary")
+            self.expansion_tile.collapsed_bgcolor = ft.Colors.with_opacity(.05, "primary")
         else:
             self.expansion_tile.bgcolor = ft.Colors.TRANSPARENT
             self.expansion_tile.collapsed_bgcolor = ft.Colors.TRANSPARENT
