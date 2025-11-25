@@ -15,7 +15,9 @@ class Label_Dropdown(ft.GestureDetector):
         title: str,                                              # Title of this folder
         story: Story,                                            # Story reference for mouse positions and other logic
         additional_menu_options: list[ft.Control],               # Additional menu options when right clicking a category, depending on the rail
-        timeline: Timeline,                                      # Reference to the timeline this dropdown represents                    
+        timeline: Timeline,                                      # Reference to the timeline this dropdown represents
+        rail,                    
+        timeline_dropdown,
     ):
 
         # Set our parameters
@@ -23,6 +25,8 @@ class Label_Dropdown(ft.GestureDetector):
         self.story = story
         self.timeline = timeline
         self.additional_menu_options = additional_menu_options
+        self.rail = rail
+        self.timeline_dropdown = timeline_dropdown
 
 
         # Set other variables
@@ -92,6 +96,9 @@ class Label_Dropdown(ft.GestureDetector):
 
         self.timeline.data["plot_points_dropdown_expanded" if self.title == "Plot Points" else "arcs_dropdown_expanded"] = self.is_expanded
         self.timeline.save_dict()
+
+        self.rail.active_dropdown = self
+        self.rail.refresh_buttons()
 
         
         
@@ -224,22 +231,27 @@ class Label_Dropdown(ft.GestureDetector):
 
     # Called when we need to reload this directory tile
     def reload(self):
-
-
-        # TODO: Add button to add new plot point or timeline on the tile
-        print(f"{self.title} is expanded: {self.is_expanded}")
-
-        # Set our icon to a timeline unless we are labeld for Plot Points or Arcs dropdown
-        icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=self.color) if self.title != "Plot Points" and self.title != "Arcs" else None
+        
+        # Set our button for either plot ploints or
+        new_item_button = ft.IconButton(
+            ft.Icons.ADD_CIRCLE_OUTLINE_OUTLINED, visual_density=ft.VisualDensity.COMPACT, icon_color=ft.Colors.PRIMARY, padding=ft.Padding(0,0,0,0),
+            size_constraints=ft.BoxConstraints(max_width=24, max_height=24),
+            on_click=lambda e: self.new_item_clicked(tag="plot_point" if self.title == "Plot Points" else "arc"),
+            hover_color=ft.Colors.with_opacity(.2, ft.Colors.PRIMARY)
+        ) 
 
         expansion_tile = ft.ExpansionTile(
             title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
+            #title=ft.Row([
+                #new_item_button,
+                #ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
+            #]),
             dense=True,
             initially_expanded=self.is_expanded,
             visual_density=ft.VisualDensity.COMPACT,
             tile_padding=ft.Padding(6, 0, 0, 0),      # If no leading icon, give us small indentation
-            controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented
-            leading=icon,
+            #tile_padding=ft.Padding(0, 0, 0, 0),      # If leading icon, no indentation
+            controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indente
             maintain_state=True,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             adaptive=True,

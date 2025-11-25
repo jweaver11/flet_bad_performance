@@ -324,6 +324,7 @@ class Timeline(Widget):
         self.reload_tab()
         
         # TODO:
+        # Don't let delete timeline if only one left
         # Clicking brings up a mini-menu in the timelines widget to show details and allow editing
         # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object and all its children are gesture detectors

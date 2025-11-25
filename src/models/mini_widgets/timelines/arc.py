@@ -240,10 +240,12 @@ class Arc(Mini_Widget):
 
         spacing_left = ft.Container(
             expand=left_ratio, 
+            ignore_interactions=True,
             #bgcolor=ft.Colors.with_opacity(0.3, "red")
         )
         spacing_right = ft.Container(
             expand=right_ratio, 
+            ignore_interactions=True,
             #bgcolor=ft.Colors.with_opacity(0.3, "red")
         )
         

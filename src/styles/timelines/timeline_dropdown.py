@@ -20,7 +20,8 @@ class Timeline_Dropdown(ft.GestureDetector):
         title: str,                                              # Title of this folder
         story: Story,                                            # Story reference for mouse positions and other logic
         additional_menu_options: list[ft.Control],               # Additional menu options when right clicking a category, depending on the rail
-        timeline: Timeline,                                      # Reference to the timeline this dropdown represents                    
+        timeline: Timeline,                                      # Reference to the timeline this dropdown represents 
+        rail,     
     ):
 
         # Set our parameters
@@ -28,6 +29,7 @@ class Timeline_Dropdown(ft.GestureDetector):
         self.story = story
         self.timeline = timeline
         self.additional_menu_options = additional_menu_options
+        self.rail = rail
 
 
         # Set other variables
@@ -37,6 +39,7 @@ class Timeline_Dropdown(ft.GestureDetector):
         # State tracking variables
         self.are_submitting = False
         self.item_is_unique = True
+        self.is_focused = False
         
         # Set our text style
         self.text_style = ft.TextStyle(
@@ -66,6 +69,7 @@ class Timeline_Dropdown(ft.GestureDetector):
             #on_exit=self.on_stop_hover,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
         )
+        
 
         self.reload()
 
@@ -98,6 +102,10 @@ class Timeline_Dropdown(ft.GestureDetector):
 
         self.timeline.data["dropdown_is_expanded"] = self.is_expanded
         self.timeline.save_dict()
+
+        self.rail.active_dropdown = self
+        self.rail.refresh_buttons()
+
 
         #self.reload()
 
@@ -270,11 +278,6 @@ class Timeline_Dropdown(ft.GestureDetector):
 
     # Called when we need to reload this directory tile
     def reload(self):
-
-
-        # TODO: Add button to add new plot point or timeline on the tile
-
-        print("Expanded: ", self.is_expanded, " for ", self.title)
 
         # Set our icon to a timeline unless we are labeld for Plot Points or Arcs dropdown
         icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=self.color) if self.title != "Plot Points" and self.title != "Arcs" else None

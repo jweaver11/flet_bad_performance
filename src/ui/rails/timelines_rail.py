@@ -24,6 +24,32 @@ class Timelines_Rail(Rail):
 
         # Drop down we reference when adding new items to that dropdown
         self.active_dropdown: Timeline_Dropdown = None
+
+        # UI elements
+        self.top_row_buttons = [
+            ft.IconButton(
+                tooltip="New Timeline",
+                icon=ft.Icons.TIMELINE_OUTLINED,
+                on_click=self.new_item_clicked,
+                data="timeline"
+            ),
+            ft.IconButton(
+                tooltip="New Plot Point",
+                icon=ft.Icons.ADD_LOCATION_OUTLINED,
+                icon_color=ft.Colors.PRIMARY if len(self.story.timelines) == 1 else ft.Colors.ON_SURFACE_VARIANT,
+                disabled=len(self.story.timelines) != 1,    # Set to if no active timeline
+                on_click=self.new_item_clicked,
+                data="plot_point"
+            ),
+            ft.IconButton(
+                tooltip="New Arc",
+                icon=ft.Icons.ADD_CIRCLE_OUTLINE_OUTLINED,
+                icon_color=ft.Colors.PRIMARY if len(self.story.timelines) == 1 else ft.Colors.ON_SURFACE_VARIANT,
+                disabled=len(self.story.timelines) != 1,
+                on_click=self.new_item_clicked,
+                data="arc"
+            )
+        ]
  
         # Reload our rail to show timelines
         self.reload_rail()
@@ -186,6 +212,41 @@ class Timelines_Rail(Rail):
             ])
 
         return options
+    
+    def refresh_buttons(self, no_active_dropdown: bool=False):
+        ''' Refreshes the top row buttons based on our active dropdown/timeline to update our colors and disabled states '''
+
+        # When clicking on the rail, get rid of our active dropdown
+        if no_active_dropdown and len(self.story.timelines) != 1:
+            self.active_dropdown = None
+
+        # Next, see if our dropdown is just a label. If it is, make the timeline_dropdown it sits inside as our active dropdown
+        # We do this so we can add plot points and arcs even from the opposite label dropdown
+        if self.active_dropdown is not None:
+            if isinstance(self.active_dropdown, Label_Dropdown):
+                self.active_dropdown = self.active_dropdown.timeline_dropdown
+
+        # Go through each button and update their color, disabled state, and on click function
+        for i, button in enumerate(self.top_row_buttons):
+
+            # Skip the timelines button, its always active and needs no changes
+            if i == 0:
+                continue
+
+            else:
+                
+                # Color is primary if we have an active dropdown, otherwise its grey-ish
+                button.icon_color = ft.Colors.PRIMARY if self.active_dropdown is not None else ft.Colors.ON_SURFACE_VARIANT
+
+                # Button is disabled if no active dropdown and more than one timeline
+                button.disabled = self.active_dropdown is None and len(self.story.timelines) != 1
+
+                # On click function goes to active dropdown logic if we have one, otherwise goes to rail logic
+                button.on_click = self.active_dropdown.new_item_clicked if self.active_dropdown is not None else self.new_item_clicked
+    
+        # Finally, update the page
+        self.p.update()
+           
 
 
     # Reload the rail whenever we need
@@ -196,42 +257,16 @@ class Timelines_Rail(Rail):
         # ALTERING THEIR DATA IS DONE IN THEIR MINI WIDGETS
         # WHEN CREATING NEW PP OR ARC, ADD IT DEFAULT TO MIDDLE OF TIMELINE AND BE ABLE TO BE DRAGGED AROUND
 
-        # TODO: ADD NEW PP AND ARC BUTTONS TO TOP OF RAIL AS WELL WHEN ONLY 1 TIMELINE. ELSE
-        # THEY GET ADDED TO TIMELINE DROPDOWN ONLY
+        # TODO:
         # OR HAVE HIGHLIGHT TO SHOW OUR SELECTED TIMELINE AND KEEP THE BUTTONS AT TOP AS WELL
 
+        self.refresh_buttons()
 
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=ft.MainAxisAlignment.CENTER,
             
-            controls=[
-
-                # Add here, story name, and buttons to create new stuff.
-                # As well as right click options here that work like normal.
-
-                ft.Container(expand=True),
-
-                ft.IconButton(
-                    tooltip="New Timeline",
-                    icon=ft.Icons.TIMELINE_OUTLINED,
-                    on_click=self.new_item_clicked,
-                    data="timeline"
-                ),
-                ft.IconButton(
-                    tooltip="New Plot Point",
-                    icon=ft.Icons.ADD_LOCATION_OUTLINED,
-                    on_click=self.new_item_clicked,
-                    data="plot_point"
-                ),
-                ft.IconButton(
-                    tooltip="New Arc",
-                    icon=ft.Icons.CIRCLE_OUTLINED,
-                    on_click=self.new_item_clicked,
-                    data="arc"
-                ),
-                
-                ft.Container(expand=True),
-            ]
+            controls=self.top_row_buttons
         )
 
         # Build the content of our rail
@@ -249,7 +284,8 @@ class Timelines_Rail(Rail):
                 title=timeline.title, 
                 story=self.story, 
                 timeline=timeline, 
-                additional_menu_options=self.get_sub_menu_options()
+                additional_menu_options=self.get_sub_menu_options(),
+                rail=self
             )
 
             # Load our timeline data
@@ -258,7 +294,9 @@ class Timelines_Rail(Rail):
                 title="Plot Points",
                 story=self.story,
                 additional_menu_options=self.get_sub_menu_options(tag="plot_points_label", is_label=True),
-                timeline=timeline
+                timeline=timeline,
+                rail=self,
+                timeline_dropdown=timeline_dropdown
             )
 
         
@@ -278,7 +316,9 @@ class Timelines_Rail(Rail):
                 title="Arcs",
                 story=self.story,
                 additional_menu_options=self.get_sub_menu_options(tag="arcs_label", is_label=True),
-                timeline=timeline
+                timeline=timeline,
+                rail=self,
+                timeline_dropdown=timeline_dropdown
             )
             
 
@@ -322,6 +362,7 @@ class Timelines_Rail(Rail):
             expand=True,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
             content=content,
+            on_tap=lambda e: self.refresh_buttons(no_active_dropdown=True)
         )
 
         # Set our content to be a column
@@ -334,6 +375,9 @@ class Timelines_Rail(Rail):
                 gd
             ]
         )
+
+        # Make sure our buttons are refreshed
+        self.refresh_buttons()
 
         # Apply the changes to the page
         self.p.update()
