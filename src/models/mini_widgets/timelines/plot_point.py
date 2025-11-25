@@ -54,11 +54,11 @@ class Plot_Point(Mini_Widget):
         # Build our slider for moving our plot point
         self.reload_mini_widget()
 
-    # Called at the end of dragging our point on the slider to update it
+    # Called when actively dragging our slider thumb to change our x position
     def change_x_position(self, e):
         ''' Changes our x position on the slider, and saves it to our data dictionary, but not to our file yet '''
 
-        # Grab our new position as a flot of whatever number division we're on (-100 -> 100)
+        # Grab our new position as a float of whatever number division we're on (-100 -> 100)
         new_position = float(e.control.value)
 
         # Convert that float between -1 -> 1 for our alignment to work
@@ -211,11 +211,9 @@ class Plot_Point(Mini_Widget):
                 ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far down
         ])
 
-
-
-    # Called when reloading changes to our plot point and in constructor
-    def reload_mini_widget(self):
-        ''' Rebuilds any parts of our UI and information that may have changed when we update our data '''
+    # Called from reload_mini_widget
+    def reload_timeline_control(self):
+        ''' Rebuilds our timeline control that holds our plot point and slider '''
 
         # Reload our slider 
         self.reload_slider()
@@ -245,6 +243,17 @@ class Plot_Point(Mini_Widget):
                 self.slider,                                                # Our slider that appears when we hover over the plot point
             ]
         ) 
+
+
+
+    # Called when reloading changes to our plot point and in constructor
+    def reload_mini_widget(self):
+        ''' Rebuilds any parts of our UI and information that may have changed when we update our data '''
+
+        # Reload our timeline control
+        self.reload_timeline_control()
+
+        
 
         # Rebuild our information display
         self.content_control = ft.TextField(

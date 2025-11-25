@@ -438,6 +438,7 @@ class Workspace(ft.Container):
             on_pan_update=move_top_pin_divider,
             on_pan_end=save_top_pin_height,
             on_hover=show_vertical_cursor,
+            drag_interval=10,
         )
 
         # Left pin reisizer method and variable
@@ -468,6 +469,7 @@ class Workspace(ft.Container):
             on_pan_update=move_left_pin_divider,
             on_pan_end=save_left_pin_width,
             on_hover=show_horizontal_cursor,
+            drag_interval=10,
         )
         
         # No resizer for main pin, as it is always expanded and takes up the rest of the space
@@ -501,6 +503,7 @@ class Workspace(ft.Container):
             on_pan_update=move_right_pin_divider,
             on_pan_end=save_right_pin_width,
             on_hover=show_horizontal_cursor,
+            drag_interval=10,
         )
 
         # Bottom pin resizer method and variable
@@ -531,6 +534,7 @@ class Workspace(ft.Container):
             on_pan_update=move_bottom_pin_divider,
             on_pan_end=save_bottom_pin_height,
             on_hover=show_vertical_cursor,
+            drag_interval=10,
         )
 
 

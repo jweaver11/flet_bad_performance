@@ -445,40 +445,18 @@ class Timeline(Widget):
         # Handler for timeline resize events
         for arc in self.arcs.values():
 
-
-            # Add a stack so we can position our plot point control correctly by grabbing its alignment
-            stack = ft.Stack(
-                alignment=arc.x_alignment,
-                expand=True,            # Make sure it fills the whole timeline width
-                controls=[
-                    ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
-                    arc.timeline_control,            # Add the plotpoint control
-                ]
-            )
-        
-            # Add this temporary stack to the timeline stack
-            timeline_stack.controls.append(stack)
-
+            # Add the arc control to the timeline stack
+            timeline_stack.controls.append(arc.timeline_control)
 
 
         # Add our plot points to the timeline (They position themselves)
         for plot_point in self.plot_points.values():    
-
-            # Add a stack so we can position our plot point control correctly by grabbing its alignment
-            stack = ft.Stack(
-                expand=True,            # Make sure it fills the whole timeline width
-                controls=[
-                    ft.Container(expand=True, ignore_interactions=True),        # Make sure it fills the whole timeline width so alignment works
-                    plot_point.timeline_control,            # Add the plotpoint control
-                ]
-            )
-        
-            # Add this temporary stack to the timeline stack
+            
+            # Add the plot point control to the timeline stack
             timeline_stack.controls.append(plot_point.timeline_control)
 
 
         timeline_stack.controls.append(self.new_item_container)
-    
 
 
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES

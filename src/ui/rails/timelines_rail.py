@@ -25,15 +25,13 @@ class Timelines_Rail(Rail):
         self.reload_rail()
 
     # Called recursively to load arcs (and sub arcs) and plotpoings within a timeline. Called in reload_rail
-    def load_timeline_or_arc_data(
+    def load_timeline_data(
         self,                                           
         father,                                             # Either timeline or an arc
         father_dropdown: Timeline_Dropdown,                 # Dropdown created for parent arc
         arcs_dropdown_title: str = "Sub Arcs",              # Title for the arcs dropdown. We can overwrite this to 'arcs' for timelines
     ):    
-        ''' Recursively loads the sub-arcs, plotpoints, and timeskips of an arc. Parent must be either arc or timeline'''
-
-
+        ''' Loads our data for a timeline '''
         
 
         # Create our label for plotpoints
@@ -71,30 +69,13 @@ class Timelines_Rail(Rail):
         # Go through all the arcs/sub arcs held in our parent arc or timeline
         for arc in father.arcs.values():
 
-            # Create a new parent expansion tile we'll need for recursion
-            sub_arc_expansion_tile = Timeline_Dropdown(arc.title, self.story, type="arc", father=father, additional_menu_options=self.get_sub_menu_options())
-            
-            # Create our label for plotpoints
-            plot_points_label = Timeline_Label(
-                title="Plot Points:",
-                icon=ft.Icons.LOCATION_SEARCHING_OUTLINED,
-                story=self.story,
-                father=arc,
-            )       #Icons.LOCATION_PIN
+            father_dropdown.content.controls.append(
+                Timeline_Item(title=arc.title, mini_widget=arc)
+            )
 
-            # Add our label to the father dropdown and add the textfield for new plotpoints
-            sub_arc_expansion_tile.content.controls.append(plot_points_label)
-            sub_arc_expansion_tile.content.controls.append(ft.Divider())
-            sub_arc_expansion_tile.content.controls.append(father_dropdown.new_plot_point_textfield)
+        # Add some padding under it between timelines
+        father_dropdown.content.controls.append(ft.Container(height=10))
 
-            for plot_point in arc.plot_points.values():
-                sub_arc_expansion_tile.content.controls.append(
-                    Timeline_Item(title=plot_point.title, mini_widget=plot_point)
-                )
-
-            # Add the new parent expansion tile to our current parents expansion tile controls
-            #arcs_expansion_tile.content.controls.append(sub_arc_expansion_tile)
-            father_dropdown.content.controls.append(sub_arc_expansion_tile)
             
 
     # Called when a new timeline button is clicked
@@ -318,7 +299,7 @@ class Timelines_Rail(Rail):
 
 
             # Pass our timeline into the recursive loaded function to load its data
-            self.load_timeline_or_arc_data( 
+            self.load_timeline_data( 
                 father=timeline, 
                 father_dropdown=timeline_dropdown,
                 arcs_dropdown_title="Arcs"
@@ -333,6 +314,8 @@ class Timelines_Rail(Rail):
             # Otherwise, add the full expansion panel
             else:
                 content.controls.append(timeline_dropdown)
+
+            
 
 
         # Finally, add our new item textfield at the bottom
