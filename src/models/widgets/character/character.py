@@ -97,12 +97,14 @@ class Character(Widget):
         self.custom_field_controls = {}  # Store references to custom field TextFields
 
         # Build our widget on start, but just reloads it later
-        self.reload_widget()
+        #self.reload_widget()
+        self.working_titleRegularView()
     # Called when user wants to edit character
     def edit_character_clicked(self, e):
         ''' Handles editing character details '''
         # For now, just reload the widget to reflect any changes
         print("Editing character:", self.title)
+        self.reload_widget()
     # Called when user wants to create a new text field in character
     def new_custom_textfield_clicked(self, e):
         ''' Handles prompting user for custom textfield name and creating it '''
@@ -134,7 +136,8 @@ class Character(Widget):
                 
                 # Save and reload
                 self.save_dict()
-                self.reload_widget()
+                #self.reload_widget()
+                self.working_titleRegularView()
                 
                 # Close dialog
                 dlg.open = False
@@ -177,16 +180,17 @@ class Character(Widget):
         edit_button = ft.Row([
             self.icon,
             ft.IconButton(
-                tooltip="Edit Character",
+                tooltip="regular View",
                 icon=ft.Icons.EDIT_OUTLINED,
-                on_click=self.edit_character_clicked
+                on_click=self.working_titleRegularView()
+                #this will trigger the regular view
             ),
         ]   
         )
         #all of this needs to be the edit view
         body = ft.Container(
             expand=True,                # Takes up maximum space allowed in its parent container
-            padding=5,                  # Padding around everything inside the container
+            padding=2,                  # Padding around everything inside the container
             content=ft.Column(           # The column that will hold all our stuff top down
                 scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
                 spacing=2,               # Reduce spacing between elements
@@ -194,7 +198,7 @@ class Character(Widget):
                 edit_button,
                 #self.icon,                          # The icon above the name
                 ft.Text("hi from " + self.title),           # Text that shows the title
-                #ft.Text("data " + self.data['sexuality']), #test for me 
+                #ft.Text(self.data['physical_description']), #test for me 
                 ft.Row(                     # The row that will hold our dropdowns
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
@@ -341,6 +345,56 @@ class Character(Widget):
         self.data['physical_description']['Race'] = value
         self.save_dict()
 
-            
+    def working_titleRegularView(self):
+        ''' Example function for character details '''
+        self.reload_tab()
 
+        if self.data['is_active_tab']:
+            self.icon = ft.Icon(ft.Icons.PERSON, size=100, color="primary", expand=False)
+        else:
+            self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE, size=100, color="disabled", expand=False)
+        
+        edit_button = ft.Row([
+            self.icon,
+            ft.IconButton(
+                tooltip="Edit Character",
+                icon=ft.Icons.EDIT_OUTLINED,
+                on_click=self.edit_character_clicked
+                #this will trigger the edit view
+            ),
+        ]   
+        )
+        body = ft.Container(
+            expand=True,                # Takes up maximum space allowed in its parent container
+            padding=5,                  # Padding around everything inside the container
+            content=ft.Column(           # The column that will hold all our stuff top down
+                scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
+                spacing=1,               # Reduce spacing between elements
+                controls=[
+                edit_button,
+                #self.icon,                          # The icon above the name
+                ft.Text("hi from " + self.title),           # Text that shows the title
+                #ft.Text(self.data['physical_description']), #test for me 
+                ft.Row(                     # The row that will hold our dropdowns
+                        wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
+                        controls=[          # All flet controls inside our Row
+                            ft.Text("Character details go here"),
+                            ft.Text("Alignment: " + self.data['alignment1'] + " " + self.data['alignment2']),
+                            ft.Text("Sex: " + self.data['sex']),
+                            ft.Text("Gender Identity: " + self.data['gender_identity']),
+                            ft.Text("Age: " + self.data['age']),  
+                            ft.Text("Race: " + self.data['physical_description'].get('Race', '')),
+                            ft.Text("Sexuality: " + self.data['sexuality']),
+                            ft.Text("Custom Fields: " + str(self.data['custom_fields'])),
+                            
+                        ]
+                    ),
+                ]
+            )
+        )
+        # Set our content to the body_container (from Widget class) as the body we just built
+        self.body_container.content = body
+
+        # Call render widget (from Widget class) to update the UI
+        self._render_widget()
 
