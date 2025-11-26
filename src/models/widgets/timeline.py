@@ -259,6 +259,30 @@ class Timeline(Widget):
         self.story.active_rail.content.reload_rail()
         self.reload_widget()
 
+    def delete_plot_point(self, plot_point):
+        ''' Deletes a plot point from our timeline '''
+        
+        # Remove from our dict
+        if plot_point.title in self.plot_points:
+            self.plot_points.pop(plot_point.title)
+            self.data['plot_points'].pop(plot_point.title, None)
+            self.save_dict()
+
+        # Apply changes
+        self.reload_widget()
+
+    def delete_arc(self, arc):
+        ''' Deletes an arc from our timeline '''
+        
+        # Remove from our dict
+        if arc.title in self.arcs:
+            self.arcs.pop(arc.title)
+            self.data['arcs'].pop(arc.title, None)
+            self.save_dict()
+
+        # Apply changes
+        self.reload_widget()
+
     # Called when right clicking our controls for either timeline or an arc
     def get_menu_options(self) -> list[ft.Control]:
         return [

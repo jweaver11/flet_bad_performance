@@ -125,6 +125,52 @@ class Mini_Widget(ft.Container):
         # Catch errors
         except Exception as e:
             print(f"Error deleting mini widget {self.title}: {e}")
+
+    # Called for little data changes
+    def change_data(self, **kwargs):
+        ''' Changes a key/value pair in our data and saves the json file '''
+        # Called by:
+        # mini_widget.change_data(**{'key': value, 'key2': value2})
+
+        try:
+            for key, value in kwargs.items():
+                self.data.update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
+
+
+    def rename(self, new_name: str):
+        ''' Renames our mini widget, updating all references and data accordingly '''
+
+        try:
+
+            # Store old name for reference
+            old_name = self.title
+
+            # Update our title and data
+            self.title = new_name.capitalize()
+            self.data['title'] = new_name
+
+            # Update our fathers data to match
+            self.father.data[self.key][new_name] = self.father.data[self.key].pop(old_name)
+
+            # Save the changes up the chain
+            self.save_dict()
+
+            # Reload the UI to reflect changes
+            self.reload_mini_widget()
+            self.owner.reload_widget()
+
+            # Also reload the active rail to reflect changes
+            self.owner.story.active_rail.content.reload_rail() 
+
+        # Catch errors
+        except Exception as e:
+            print(f"Error renaming mini widget {old_name} to {new_name}: {e}")
         
 
     # Called when clicking x to hide the mini widget

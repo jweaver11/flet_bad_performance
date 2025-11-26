@@ -119,7 +119,7 @@ class Characters_Rail(Rail):
             directory=self.directory_path,
             column=content,
             additional_directory_menu_options=self.get_directory_menu_options()
-        )
+        ) 
 
         # Append our hidden textfield for creating new items
         content.controls.append(self.new_item_textfield)

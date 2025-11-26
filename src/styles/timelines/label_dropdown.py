@@ -54,7 +54,8 @@ class Label_Dropdown(ft.GestureDetector):
             on_blur=self.on_new_item_blur,
             on_submit=self.new_item_submit,
             visible=False,
-            text_style=self.text_style
+            text_style=self.text_style,
+            dense=True,
         )
 
         

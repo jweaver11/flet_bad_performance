@@ -226,6 +226,10 @@ class Rail(ft.Container):
 
         # Grab our title from the textfield
         title = e.control.value
+
+        # Protect against empty titles. They break things
+        if title is None or title.strip() == "":
+            return
             
         # If our new title unique (check from on_new_item_change), create the new item
         if self.item_is_unique:

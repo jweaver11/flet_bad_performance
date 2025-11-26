@@ -250,7 +250,7 @@ class Arc(Mini_Widget):
             #bgcolor=ft.Colors.with_opacity(0.3, "red")
         )
 
-        
+        self.gd.content = ft.Column(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title)])])
 
         self.timeline_arc = ft.Container(
             bgcolor=ft.Colors.with_opacity(0.2, "yellow"),    # Testing

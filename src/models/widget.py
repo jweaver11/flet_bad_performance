@@ -105,6 +105,8 @@ class Widget(ft.Container):
     # Called for little data changes
     def change_data(self, **kwargs):
         ''' Changes a key/value pair in our data and saves the json file '''
+        # Called by:
+        # widget.change_data(**{'key': value, 'key2': value2})
 
         try:
             for key, value in kwargs.items():
