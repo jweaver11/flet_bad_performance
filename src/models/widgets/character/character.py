@@ -163,9 +163,8 @@ class Character(Widget):
             print(f"Error opening dialog: {ex}") 
 
     # Called after any changes happen to the data that need to be reflected in the UI
-    def reload_widget(self):
+    def reload_widget(self): #this is the edit view currently
         ''' Reloads/Rebuilds our widget based on current data '''
-        # 2 cases: edit view vs normal view
         
         # Rebuild out tab to reflect any changes
         self.reload_tab()
@@ -203,7 +202,7 @@ class Character(Widget):
                     scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
                     spacing=2,               # Reduce spacing between elements
                     controls=[
-                    edit_button,
+                    regView_button,
                     #self.icon,                          # The icon above the name
                     ft.Text("hi from " + self.title),           # Text that shows the title
                     #ft.Text(self.data['physical_description']), #test for me 
@@ -312,7 +311,7 @@ class Character(Widget):
         else:
 
             # Build the edit view like this. 
-            body = self.edit_mode_view(edit_button=edit_button)
+            body = self.edit_mode_view(edit_button=regView_button)
         
         # After the main body, add a section for custom fields if any exist
         if self.data['custom_fields']:
