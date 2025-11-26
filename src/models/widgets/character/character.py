@@ -204,7 +204,6 @@ class Character(Widget):
                     regView_button,
                     #self.icon,                          # The icon above the name
                     ft.Text("hi from " + self.title),           # Text that shows the title
-                    #ft.Text(self.data['physical_description']), #test for me 
                     ft.Row(                     # The row that will hold our dropdowns
                             wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                             controls=[          # All flet controls inside our Row
@@ -313,6 +312,7 @@ class Character(Widget):
                     label=field_name,
                     value=field_value,
                     width=300,
+                    dense = True,
                     expand=False,
                     on_change=lambda e, name=field_name: self._on_custom_field_change(name, e.control.value)
                 )
@@ -348,7 +348,7 @@ class Character(Widget):
 
     # Called when not in edit mode FROM reload_widget
     def edit_mode_view(self, edit_button) -> ft.Container:
-        ''' Example function for character details '''
+        ''' Plain view for character details '''
         
         body = ft.Container(
             expand=True,                # Takes up maximum space allowed in its parent container
@@ -362,15 +362,38 @@ class Character(Widget):
                 ft.Text("hi from " + self.title),           # Text that shows the title
                 #ft.Text(self.data['physical_description']), #test for me 
                 ft.Row(                     # The row that will hold our dropdowns
-                        wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
+                        wrap=True,
+                        spacing=2,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
-                            ft.Text("Character details go here"),
-                            ft.Text("Alignment: " + self.data['alignment1'] + " " + self.data['alignment2']),
-                            ft.Text("Gender: " + self.data['gender']),
-                            ft.Text("Age: " + self.data['age']),  
-                            ft.Text("Race: " + self.data['physical_description'].get('Race', '')),
-                            ft.Text("Sexuality: " + self.data['sexuality']),
-                            ft.Text("Custom Fields: " + str(self.data['custom_fields'])),
+
+                            ft.Text(
+                                    "Alignment: ",
+                                    weight=ft.FontWeight.BOLD
+                            ), 
+                            ft.Text(
+                                self.data['alignment1'] + " " + self.data['alignment2'],
+                                ),
+
+                            ft.Text("Gender: ",
+                                    weight=ft.FontWeight.BOLD
+                            ), 
+                            ft.Text(self.data['gender']),
+                            ft.Text("Age: ",
+                                    weight=ft.FontWeight.BOLD,
+                            ), 
+                            ft.Text(self.data['age']),  
+                            ft.Text("Race: ",
+                                    weight=ft.FontWeight.BOLD
+                            ), 
+                            ft.Text(self.data['physical_description'].get('Race', '')),
+                            ft.Text("Sexuality: ",
+                                    weight=ft.FontWeight.BOLD
+                            ), 
+                            ft.Text(self.data['sexuality']),
+                            ft.Text("Custom Fields: ",
+                                    weight=ft.FontWeight.BOLD
+                            ), 
+                            ft.Text(str(self.data['custom_fields'])),
                             
                         ]
                     ),
