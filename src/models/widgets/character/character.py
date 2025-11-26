@@ -177,7 +177,7 @@ class Character(Widget):
         #WIP this will be the edit view 
         
         # Body of the tab, which is the content of flet container
-        edit_button = ft.Row([
+        regView_button = ft.Row([
             self.icon,
             ft.IconButton(
                 tooltip="regular View",
@@ -195,7 +195,7 @@ class Character(Widget):
                 scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
                 spacing=2,               # Reduce spacing between elements
                 controls=[
-                edit_button,
+                regView_button,
                 #self.icon,                          # The icon above the name
                 ft.Text("hi from " + self.title),           # Text that shows the title
                 #ft.Text(self.data['physical_description']), #test for me 
