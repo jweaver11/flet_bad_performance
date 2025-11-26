@@ -37,8 +37,7 @@ class Character(Widget):
                 'sex_color': "primary",
                 'alignment1': str, #lawful, neutral, chaotic, none
                 'alignment2': str, #good, neutral, evil, none
-                'sex': str, #male,female,other,none
-                'gender_identity': str, #text input
+                'gender': str, #text input
                 'age': str, #text input
                 'sexuality': str, #text input
                 'edit_mode': bool,  # Whether we are in edit mode or not
@@ -240,26 +239,13 @@ class Character(Widget):
                                     on_change=lambda e,name='alignment2': self._on_field_change(name,e.control.value),
                                 ),
                                 
-                                ft.Dropdown(      # Sex of each character
-                                    label="Sex",
-                                    value=self.data['sex'],
-                                    color=self.data['sex_color'],
-                                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                                    options=[
-                                        ft.DropdownOption(text="Male"),
-                                        ft.DropdownOption(text="Female"),
-                                        ft.DropdownOption(text="Other"),
-                                        ft.DropdownOption(text="None"),
-                                    ],
-                                    #TODO on "other" selection, open a text field to specify
-                                    on_change=lambda e,name='sex': self._on_field_change(name,e.control.value),
-                                ),
+                                
                                 ft.TextField(   # Text field for sexuality input
-                                    label ="Gender Identity",
-                                    value=self.data['gender_identity'],  # Load saved sexuality data
+                                    label ="Gender",
+                                    value=self.data['gender'],  # Load saved sexuality data
                                     width=200,
                                     expand = False,
-                                    on_change=lambda e, name='gender_identity': self._on_field_change(name, e.control.value),  # Save on change
+                                    on_change=lambda e, name='gender': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
                                 ft.TextField(  # Text field for age input
                                     label ="Age",
@@ -380,8 +366,7 @@ class Character(Widget):
                         controls=[          # All flet controls inside our Row
                             ft.Text("Character details go here"),
                             ft.Text("Alignment: " + self.data['alignment1'] + " " + self.data['alignment2']),
-                            ft.Text("Sex: " + self.data['sex']),
-                            ft.Text("Gender Identity: " + self.data['gender_identity']),
+                            ft.Text("Gender: " + self.data['gender']),
                             ft.Text("Age: " + self.data['age']),  
                             ft.Text("Race: " + self.data['physical_description'].get('Race', '')),
                             ft.Text("Sexuality: " + self.data['sexuality']),
