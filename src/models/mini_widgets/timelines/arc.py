@@ -90,6 +90,7 @@ class Arc(Mini_Widget):
             on_tap=self.toggle_slider_visibility,
             on_enter=self.on_start_hover,
             on_exit=self.on_stop_hover,
+            content=ft.Column(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title)])]),
         )   
 
         # State variables
@@ -248,20 +249,21 @@ class Arc(Mini_Widget):
             ignore_interactions=True,
             #bgcolor=ft.Colors.with_opacity(0.3, "red")
         )
-        
+
+        self.gd.content = ft.Column(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title)])])
 
         self.timeline_arc = ft.Container(
-            #bgcolor=ft.Colors.with_opacity(0.3, "yellow"),    # Testing
+            bgcolor=ft.Colors.with_opacity(0.2, "yellow"),    # Testing
             offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
             expand=mid_ratio,
             height=200,
-            padding=ft.Padding(0,0,0,0),
+            padding=ft.Padding(2,2,2,2),
 
             #height=None/proportions of width
             border=ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "secondary"))),
             
             #border=ft.border.only(
-                #top=ft.BorderSide(2, self.data.get('color', "primary")),
+                #top=ft.BorderSide(0, ft.Colors.TRANSPARENT),
                 #left=ft.BorderSide(2, self.data.get('color', "primary")),
                 #right=ft.BorderSide(2, self.data.get('color', "primary")),
                 #bottom=ft.BorderSide(0, ft.Colors.TRANSPARENT),

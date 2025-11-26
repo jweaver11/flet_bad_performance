@@ -156,9 +156,9 @@ class Content_Rail(Rail):
         load_directory_data(
             page=self.p,
             story=self.story,
-            directory=self.story.data['content_directory_path'],
+            directory=self.directory_path,
             column=content,
-            additional_directory_menu_options=self.get_sub_menu_options()
+            additional_directory_menu_options=self.get_directory_menu_options()
         )
 
         # Append our hiddent textfields for creating new categories, chapters, and notes

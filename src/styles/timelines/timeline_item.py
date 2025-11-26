@@ -19,23 +19,22 @@ class Timeline_Item(ft.GestureDetector):
         additional_menu_options: list[ft.Control] = None
     ):
         
-        
+         
         # Set our widget reference and tag
         self.mini_widget = mini_widget
         self.title = title
-        self.color = ft.Colors.PRIMARY
+        self.color = self.mini_widget.data.get('color', ft.Colors.PRIMARY)
+        self.additional_menu_options = additional_menu_options
         
 
         # Check if we're a plot point or an arc for icon purposes
         if isinstance(self.mini_widget, Plot_Point): 
-            tag = "plot_point"
+            self.tag = "plot_point"
         else:
-            tag = "arc"
-
-        self.additional_menu_options = additional_menu_options
+            self.tag = "arc"
 
 
-        if tag == "plot_point":
+        if self.tag == "plot_point":
             self.icon = ft.Icons.LOCATION_ON_OUTLINED
 
         else:
@@ -57,10 +56,10 @@ class Timeline_Item(ft.GestureDetector):
 
         # Parent constructor
         super().__init__(
-            #on_enter = self.on_hover,
-            #on_exit = self.on_stop_hover,
-            #on_secondary_tap = lambda e: self.mini_widget.owner.story.open_menu(self.get_menu_options()),
-            #on_tap = lambda e: self.widget.focus(),
+            on_enter = self.on_hover,
+            on_exit = self.on_stop_hover,
+            on_secondary_tap = lambda e: self.mini_widget.owner.story.open_menu(self.get_menu_options()),
+            #on_tap = lambda e: self.widget.focus(),    # Open up timeline if not opened, focus our mini widget
             mouse_cursor = ft.MouseCursor.CLICK,
         )
 
@@ -84,20 +83,7 @@ class Timeline_Item(ft.GestureDetector):
                         color=ft.Colors.ON_SURFACE
                     ), 
                 ]),
-            )
-        ]
-        
-        # Run through our additional menu options if we have any, and set their on_click methods
-        #for option in self.additional_menu_options or []:
-
-            # Set their on_click to call our on_click method, which can handle any type of widget
-            #option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
-
-            # Add them to the list
-            #menu_options.append(option)
-
-        # Color changing popup menu
-        menu_options.append(
+            ),
             Menu_Option_Style(
                 content=ft.PopupMenuButton(
                     expand=True,
@@ -113,11 +99,7 @@ class Timeline_Item(ft.GestureDetector):
                     ),
                     items=self.get_color_options()
                 ),
-            )
-        )
-
-        # Delete button
-        menu_options.append(
+            ),
             Menu_Option_Style(
                 on_click=lambda e: self.delete_clicked(e),
                 content=ft.Row([
@@ -125,7 +107,18 @@ class Timeline_Item(ft.GestureDetector):
                     ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
                 ]),
             )
-        )
+        ]
+        
+        # Run through our additional menu options if we have any, and set their on_click methods
+        #for option in self.additional_menu_options or []:
+
+            # Set their on_click to call our on_click method, which can handle any type of widget
+            #option.on_tap = lambda e, t=option.data: self.father.new_item_clicked(type=t)
+
+            # Add them to the list
+            #menu_options.append(option)
+
+
 
         return menu_options
 
@@ -133,12 +126,12 @@ class Timeline_Item(ft.GestureDetector):
     # Called when hovering mouse over a tree view item
     def on_hover(self, e):
         self.content.bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.WHITE)
-        self.widget.p.update()
+        self.mini_widget.p.update()
 
     # Called when stopping hover over a tree view item
     def on_stop_hover(self, e):
         self.content.bgcolor = ft.Colors.TRANSPARENT
-        self.widget.p.update()
+        self.mini_widget.p.update()
 
     # Called when rename button is clicked
     def rename_clicked(self, e):
@@ -150,7 +143,7 @@ class Timeline_Item(ft.GestureDetector):
         submitting = False
 
         # Grab our current name for comparison
-        current_name = self.widget.title.lower()
+        current_name = self.mini_widget.title.lower()
 
         # Called when clicking outside the input field to cancel renaming
         def _cancel_rename(e):
@@ -168,7 +161,7 @@ class Timeline_Item(ft.GestureDetector):
             else:
 
                 self.reload()
-                self.widget.p.update()
+                self.mini_widget.p.update()
 
         # Called everytime a change in textbox occurs
         def _name_check(e):
@@ -176,7 +169,7 @@ class Timeline_Item(ft.GestureDetector):
 
             # Grab the new name, and tag
             name = e.control.value.lower()
-            tag = self.widget.data.get('tag', None)
+            tag = self.mini_widget.data.get('tag', None)
 
             # Nonlocal variables
             nonlocal is_unique
@@ -190,29 +183,18 @@ class Timeline_Item(ft.GestureDetector):
             # Check our widgets tag, and then check for uniqueness accordingly
             if tag is not None:
 
-                # Chapters check 
-                if tag == "chapter":
-                    for chapter in self.widget.story.chapters.values():
-                        if chapter.title.lower() == name and chapter.title.lower() != current_name:
+                # Plot points
+                if tag == "plot_point":
+                    for pp in self.mini_widget.owner.plot_points.values():
+                        if pp.title.lower() == name and pp.title.lower() != current_name:
                             is_unique = False
 
-                # Notes
-                elif tag == "note":
-                    for note in self.widget.story.notes.values():
-                        if note.title.lower() == name and note.title.lower() != current_name:
+                # Arcs
+                elif tag == "arc":
+                    for arc in self.mini_widget.owner.arcs.values():
+                        if arc.title.lower() == name and arc.title.lower() != current_name:
                             is_unique = False
 
-                # Characters
-                elif tag == "character":
-                    for character in self.widget.story.characters.values():
-                        if character.title.lower() == name and character.title.lower() != current_name:
-                            is_unique = False
-
-                # Maps
-                elif tag == "map":
-                    for map_ in self.widget.story.maps.values():
-                        if map_.title.lower() == name and map_.title.lower() != current_name:
-                            is_unique = False
 
             # Give us our error text if not unique
             if not is_unique:
@@ -221,7 +203,7 @@ class Timeline_Item(ft.GestureDetector):
                 e.control.error_text = None
 
             # Apply the update
-            self.widget.p.update()
+            self.mini_widget.p.update()
 
         # Called when submitting our textfield.
         def _submit_name(e):
@@ -240,17 +222,18 @@ class Timeline_Item(ft.GestureDetector):
 
             # If it is, call the rename function. It will do everything else
             if is_unique:
-                self.widget.rename(name)
+                self.mini_widget.rename(name)
+                
                 
             # Otherwise make sure we show our error
             else:
                 text_field.error_text = "Name already exists"
                 text_field.focus()                                  # Auto focus the textfield
-                self.widget.p.update()
+                self.mini_widget.p.update()
                 
         # Our text field that our functions use for renaming and referencing
         text_field = ft.TextField(
-            value=self.widget.title,
+            value=self.mini_widget.title,
             expand=True,
             dense=True,
             autofocus=True,
@@ -263,11 +246,11 @@ class Timeline_Item(ft.GestureDetector):
         )
 
         # Replaces our name text with a text field for renaming
-        self.content.content.content.content.controls[1] = text_field
+        self.content.content.content.controls[1] = text_field
 
         # Clears our popup menu button and applies to the UI
-        self.widget.p.overlay.clear()
-        self.widget.p.update()
+        self.mini_widget.p.overlay.clear()
+        self.mini_widget.p.update()
 
     def get_color_options(self) -> list[ft.Control]:
         ''' Returns a list of all available colors for icon changing '''
@@ -277,13 +260,14 @@ class Timeline_Item(ft.GestureDetector):
             ''' Passes in our kwargs to the widget, and applies the updates '''
 
             # Change the data
-            self.widget.change_data(**{'color': color})
-            self.icon_color = color
+            self.mini_widget.change_data(**{'color': color})
+            self.color = color
             
             # Change our icon to match, apply the update
             self.reload()
-            self.widget.reload_widget()
-            self.widget.story.workspace.reload_workspace()
+            self.mini_widget.reload_mini_widget()
+            self.mini_widget.owner.reload_widget()
+            #self.mini_widget.story.workspace.reload_workspace()
 
             
 
@@ -322,17 +306,24 @@ class Timeline_Item(ft.GestureDetector):
         def _delete_confirmed(e):
             ''' Deletes the widget after confirmation '''
 
-            self.widget.p.close(dlg)
-            self.widget.story.delete_widget(self.widget)
+            self.mini_widget.p.close(dlg)
+
+            if self.tag == "plot_point":
+                self.mini_widget.owner.delete_plot_point(self.mini_widget)
+            else:
+                self.mini_widget.owner.delete_arc(self.mini_widget)
+
+            self.mini_widget.owner.story.active_rail.content.reload_rail()
+            self.mini_widget.owner.story.close_menu()
             
 
         # Append an overlay to confirm the deletion
         dlg = ft.AlertDialog(
-            title=ft.Text(f"Are you sure you want to delete '{self.widget.title}' forever?", weight=ft.FontWeight.BOLD),
+            title=ft.Text(f"Are you sure you want to delete {self.mini_widget.title} forever?", weight=ft.FontWeight.BOLD),
             alignment=ft.alignment.center,
             title_padding=ft.padding.all(25),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.widget.p.close(dlg)),
+                ft.TextButton("Cancel", on_click=lambda e: self.mini_widget.p.close(dlg)),
                 ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
             ]
         )

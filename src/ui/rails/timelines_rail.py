@@ -78,7 +78,7 @@ class Timelines_Rail(Rail):
 
 
     # Called to return our list of menu options when right clicking on the timeline rail
-    def get_menu_options(self, dropdown: Timeline_Dropdown = None) -> list[ft.Control]:
+    def get_menu_options(self) -> list[ft.Control]:
         ''' Returns our menu options for the timelines rail. In this case just timelines '''
 
         if len(self.story.timelines) == 1:
@@ -171,43 +171,6 @@ class Timelines_Rail(Rail):
                         ft.Icon(ft.Icons.CIRCLE_OUTLINED),
                         ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                     ])
-                ),
-                # Rename button
-                Menu_Option_Style(
-                    #on_click=self.rename_clicked,
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
-                        ft.Text(
-                            "Rename", 
-                            weight=ft.FontWeight.BOLD, 
-                            color=ft.Colors.ON_SURFACE
-                        ), 
-                    ]),
-                ),
-                # Color changing popup menu
-                Menu_Option_Style(
-                    content=ft.PopupMenuButton(
-                        expand=True,
-                        tooltip="",
-                        padding=None,
-                        content=ft.Row(
-                            expand=True,
-                            controls=[
-                                ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
-                                ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
-                                ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
-                            ]
-                        ),
-                        #items=self.get_color_options()
-                    )
-                ),
-                # Delete button
-                Menu_Option_Style(
-                    #on_click=lambda e: self.delete_clicked(e),
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
-                        ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
-                    ]),
                 ),
             ])
 

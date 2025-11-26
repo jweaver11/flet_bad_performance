@@ -255,9 +255,12 @@ class Story(ft.View):
 
         try:
 
-            folder_path = os.path.join(directory_path, name)
+            # Clean up name
+            name = name.capitalize()    # Capitalize first letter
+            name = name.rstrip()        # Remove trailing spaces
 
-            name = name.capitalize()
+            # Create the full folder path
+            folder_path = os.path.join(directory_path, name)
 
             # Make the folder in our storage if it doesn't already exist
             os.makedirs(folder_path, exist_ok=True) 

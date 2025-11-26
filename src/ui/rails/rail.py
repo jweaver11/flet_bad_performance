@@ -124,6 +124,8 @@ class Rail(ft.Container):
         nk = self.directory_path + "\\" + title
         new_key = os.path.normcase(os.path.normpath(nk))
 
+        title = title.rstrip() if title is not None else ""
+
         # Check all our folders and compare them to the new key
         if tag == "category":
             for key in self.story.data['folders'].keys():
@@ -226,6 +228,10 @@ class Rail(ft.Container):
 
         # Grab our title from the textfield
         title = e.control.value
+
+        # Protect against empty titles. They break things
+        if title is None or title.rstrip() == "":
+            return
             
         # If our new title unique (check from on_new_item_change), create the new item
         if self.item_is_unique:

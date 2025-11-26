@@ -6,6 +6,7 @@ import flet as ft
 from styles.menu_option_style import Menu_Option_Style
 from models.story import Story
 from models.widgets.timeline import Timeline
+import os
 
 
 # TODO: When clicking and expanding, make sure to set the active_timeline to this timeline, 
@@ -33,7 +34,7 @@ class Timeline_Dropdown(ft.GestureDetector):
 
 
         # Set other variables
-        self.color = ft.Colors.PRIMARY
+        self.color = self.timeline.data.get("color", "primary")
         self.is_expanded = self.timeline.data.get("dropdown_is_expanded", True)
 
         # State tracking variables
@@ -86,12 +87,48 @@ class Timeline_Dropdown(ft.GestureDetector):
         # Run through our additional menu options if we have any, and set their on_click methods
         for option in self.additional_menu_options or []:
 
-            # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_tap = lambda e: self.new_item_clicked(e)
-
             # Add to our menu options list
             menu_options.append(option)
 
+        # Add our other three buttons
+        menu_options.extend([
+            Menu_Option_Style(
+                on_click=self.rename_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
+                    ft.Text(
+                        "Rename", 
+                        weight=ft.FontWeight.BOLD, 
+                        color=ft.Colors.ON_SURFACE
+                    ), 
+                ]),
+            ),
+            # Color changing popup menu
+            Menu_Option_Style(
+                content=ft.PopupMenuButton(
+                    expand=True,
+                    tooltip="",
+                    padding=None,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
+                            ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                            ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
+                        ]
+                    ),
+                    items=self.get_color_options()
+                )
+            ),
+            # Delete button
+            Menu_Option_Style(
+                on_click=lambda e: self.delete_clicked(e),
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
+                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
+                ]),
+            ),
+        ])
         # Return our menu options list
         return menu_options
     
@@ -99,12 +136,14 @@ class Timeline_Dropdown(ft.GestureDetector):
     def toggle_expand(self):
         ''' Makes sure our state and data match the updated expanded/collapsed state '''
 
-        #print("Toggling expand for ", self.title)
-
         self.is_expanded = not self.is_expanded
 
         self.timeline.data["dropdown_is_expanded"] = self.is_expanded
         self.timeline.save_dict()
+
+        # Make the timeline widget visible if its not
+        if not self.timeline.visible:
+            self.timeline.toggle_visibility()
 
         #print("Active dropdown before:", self.rail.active_dropdown)
         if self.rail.active_dropdown is not None:
@@ -217,6 +256,7 @@ class Timeline_Dropdown(ft.GestureDetector):
 
 
     def new_item_submit(self, e):
+
         # Get our name and check if its unique
         title = e.control.value
 
@@ -242,6 +282,112 @@ class Timeline_Dropdown(ft.GestureDetector):
             self.new_item_textfield.focus()                                  # Auto focus the textfield
             self.story.p.update()
 
+        
+    # Called when rename button is clicked
+    def rename_clicked(self, e):
+
+        # Track if our name is unique for checks, and if we're submitting or not
+        self.is_unique = True
+        self.are_submitting = False
+
+        # Called when clicking outside the input field to cancel renaming
+        def _cancel_rename(e):
+            ''' Puts our name back to static and unalterable '''
+
+            # Grab our submitting state
+
+            # Since this auto calls on submit, we need to check. If it is cuz of a submit, do nothing
+            if self.are_submitting:
+                self.are_submitting = not self.are_submitting     # Change submit status to False so we can de-select the textbox
+                return
+            
+            # Otherwise we're not submitting (just clicking off the textbox), so we cancel the rename
+            else:
+
+                self.story.active_rail.content.reload_rail()
+                
+
+        # Called everytime a change in textbox occurs
+        def _name_check(e):
+            ''' Checks if the name is unique within its type of widget '''
+
+            nonlocal text_field
+
+            # Grab the new name
+            new_name = text_field.value
+
+             # Set submitting to false, and unique to True
+            self.are_submitting = False
+            self.is_unique = True
+        
+
+            for timeline in self.story.timelines.values():
+
+                # If there is no change, skip the checks
+                if new_name.capitalize() == self.title:
+                    break
+
+                elif new_name.capitalize() == timeline.title:
+                    self.is_unique = False
+                    break
+           
+
+            # Give us our error text if not unique
+            if not self.is_unique:
+                e.control.error_text = "Timeline already exists"
+            else:
+                e.control.error_text = None
+
+            # Apply the update
+            self.timeline.p.update()
+
+        # Called when submitting our textfield.
+        def _submit_name(e):
+            ''' Checks that we're unique and renames the widget if so. on_blur is auto called after this, so we handle that as well '''
+
+            nonlocal text_field
+
+            # Get our name and check if its unique
+            new_name = text_field.value
+            
+            # Set submitting to True
+            self.are_submitting = True
+
+            # If it is, call the rename function. It will do everything else
+            if self.is_unique:
+
+                #new_path = self.full_path[:self.full_path.rfind("\\")+1] + new_name
+
+                self.timeline.rename(new_name)
+
+                self.story.active_rail.content.reload_rail()
+                
+                
+            # Otherwise make sure we show our error
+            else:
+                text_field.error_text = "Name already exists"
+                text_field.focus()                                  # Auto focus the textfield
+                self.timeline.p.update()
+                
+        # Our text field that our functions use for renaming and referencing
+        text_field = ft.TextField(
+            value=self.title,
+            expand=True,
+            dense=True,
+            autofocus=True,
+            adaptive=True,
+            text_size=14,
+            text_style=self.text_style,
+            on_submit=_submit_name,
+            on_change=_name_check,
+            on_blur=_cancel_rename,
+        )
+
+        # Replaces our name text with a text field for renaming
+        self.expansion_tile.title = text_field
+
+        # Clears our popup menu button and applies to the UI
+        self.story.close_menu()
 
     def get_color_options(self) -> list[ft.Control]:
         ''' Returns a list of all available colors for icon changing '''
@@ -251,11 +397,16 @@ class Timeline_Dropdown(ft.GestureDetector):
             ''' Passes in our kwargs to the widget, and applies the updates '''
 
             # Change the data
-            self.story.change_folder_data(self.full_path, 'color', color)
+            self.timeline.data['color'] = color
+            self.timeline.save_dict()
+
             self.color = color
+
+            self.reload()
             
             # Change our icon to match, apply the update
-            self.story.active_rail.content.reload_rail()
+            #self.story.active_rail.content.reload_rail()
+            self.timeline.reload_widget()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
         # List of available colors
@@ -285,12 +436,36 @@ class Timeline_Dropdown(ft.GestureDetector):
             )
 
         return color_controls
+    
+    # Called when the delete button is clicked in the menu options
+    def delete_clicked(self, e):
+        ''' Deletes this file from the story '''
+
+        def _delete_confirmed(e):
+            ''' Deletes the widget after confirmation '''
+
+            self.timeline.p.close(dlg)
+            self.timeline.story.delete_widget(self.timeline)
+            
+
+        # Append an overlay to confirm the deletion
+        dlg = ft.AlertDialog(
+            title=ft.Text(f"Are you sure you want to delete {self.timeline.title} forever?", weight=ft.FontWeight.BOLD),
+            alignment=ft.alignment.center,
+            title_padding=ft.padding.all(25),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: self.timeline.p.close(dlg)),
+                ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+            ]
+        )
+
+        self.timeline.p.open(dlg)
 
 
     def refresh_expansion_tile(self):
         if self.is_focused:
-            self.expansion_tile.bgcolor = ft.Colors.with_opacity(.05, "primary")
-            self.expansion_tile.collapsed_bgcolor = ft.Colors.with_opacity(.05, "primary")
+            self.expansion_tile.bgcolor = ft.Colors.with_opacity(.1, "primary")
+            self.expansion_tile.collapsed_bgcolor = ft.Colors.with_opacity(.1, "primary")
         else:
             self.expansion_tile.bgcolor = ft.Colors.TRANSPARENT
             self.expansion_tile.collapsed_bgcolor = ft.Colors.TRANSPARENT
@@ -302,7 +477,7 @@ class Timeline_Dropdown(ft.GestureDetector):
     def reload(self):
 
         # Set our icon to a timeline unless we are labeld for Plot Points or Arcs dropdown
-        icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=self.color) if self.title != "Plot Points" and self.title != "Arcs" else None
+        icon = ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=self.color) if self.title != "Plot Points" and self.title != "Arcs" else None
 
         self.expansion_tile = ft.ExpansionTile(
             title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),

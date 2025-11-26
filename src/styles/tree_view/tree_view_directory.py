@@ -9,7 +9,7 @@ class Tree_View_Directory(ft.GestureDetector):
 
     def __init__(
         self, 
-        full_path: str,                                    # Full path to this directory
+        full_path: str,                                         # Full path to this directory
         title: str,                                             # Title of this folder
         story: Story,                                           # Story reference for mouse positions and other logic
         page: ft.Page,                                          # Page reference for overlay menu
@@ -49,7 +49,8 @@ class Tree_View_Directory(ft.GestureDetector):
             capitalization=ft.TextCapitalization.SENTENCES,
             on_blur=self.on_new_item_blur,
             visible=False,
-            text_style=self.text_style
+            text_style=self.text_style,
+            dense=True
         )
 
         # Parent constructor
