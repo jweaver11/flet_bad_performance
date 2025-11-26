@@ -334,6 +334,8 @@ class Timeline(Widget):
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
         # Time label is optional. Label vertial markers along the timeline with int and label if user provided
 
+        self.reload_tab()
+
 
 
         # UI elements
@@ -358,6 +360,9 @@ class Timeline(Widget):
             scroll="auto",
             controls=[show_information_display, reset_zoom_button, filters],
         )
+
+        self.timeline_left_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
+        self.timeline_right_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
 
         
 
@@ -410,7 +415,7 @@ class Timeline(Widget):
                     vertical_line = ft.GestureDetector(
                         on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
                         height=16, expand=True, 
-                        content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3, width=3),
+                        content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3),
                         data=i      # Set our data so we know where to add new items
                     )
                     self.timeline_control.content.controls.append(vertical_line)
@@ -424,7 +429,7 @@ class Timeline(Widget):
                 horizontal_line = ft.GestureDetector(
                     on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
                     expand=True, height=16, 
-                    content=ft.Divider(color=ft.Colors.with_opacity(0.7, "primary"), thickness=3), 
+                    content=ft.Divider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3), 
                     data=i      # Set our data so we know where to add new items
                 )
                 self.timeline_control.content.controls.append(horizontal_line)
@@ -444,8 +449,12 @@ class Timeline(Widget):
             ]
         )
         
+
+        # Order arcs by from longest to shortest, so longer arcs are in back (temp)
+        sorted_arcs = dict(sorted(self.arcs.items(), key=lambda item: item[1].data['x_alignment_end'] - item[1].data['x_alignment_start'], reverse=True))
+
         # Handler for timeline resize events
-        for arc in self.arcs.values():
+        for arc in sorted_arcs.values():
 
             # Add the arc control to the timeline stack
             timeline_stack.controls.append(arc.timeline_control)
@@ -491,7 +500,7 @@ class Timeline(Widget):
 
         self.body_container.content = ft.Column([
             header,
-            interactive_viewer
+            timeline
         ])
 
         self._render_widget()

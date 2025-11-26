@@ -366,7 +366,8 @@ class Widget(ft.Container):
             icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
         
         elif tag == "timeline":
-            icon = ft.Icon(ft.Icons.TIMELINE_OUTLINED)
+            #icon = ft.Icon(ft.Icons.TIMELINE_OUTLINED)
+            icon = ft.Icon(ft.Icons.TIMELINE)
 
         elif tag == "map":
             icon = ft.Icon(ft.Icons.MAP_OUTLINED)
