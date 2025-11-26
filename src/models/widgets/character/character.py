@@ -41,6 +41,7 @@ class Character(Widget):
                 'gender_identity': str, #text input
                 'age': str, #text input
                 'sexuality': str, #text input
+                'edit_mode': bool,  # Whether we are in edit mode or not
                 'physical_description': {
                     'Race': str, #having this in a dict sort of complicates the on_change handlers
                     'Species': str,
@@ -97,8 +98,8 @@ class Character(Widget):
         self.custom_field_controls = {}  # Store references to custom field TextFields
 
         # Build our widget on start, but just reloads it later
-        #self.reload_widget()
-        self.working_titleRegularView()
+        self.reload_widget()
+
     # Called when user wants to edit character
     def edit_character_clicked(self, e):
         ''' Handles editing character details '''
@@ -108,13 +109,6 @@ class Character(Widget):
     # Called when user wants to create a new text field in character
     def new_custom_textfield_clicked(self, e):
         ''' Handles prompting user for custom textfield name and creating it '''
-        
-        # Create a dialog to ask for the field name
-        field_name_input = ft.TextField(
-            label="Field Name",
-            hint_text="e.g., Notes, Hobbies, etc.",
-            autofocus=True
-        )
 
         def close_dialog(e):
             '''Close the dialog'''
@@ -136,15 +130,21 @@ class Character(Widget):
                 
                 # Save and reload
                 self.save_dict()
-                #self.reload_widget()
-                self.working_titleRegularView()
+                self.reload_widget()
                 
                 # Close dialog
-                dlg.open = False
-                self.page.update()
+                self.p.close(dlg)
             except Exception as ex:
                 print(f"Error creating custom field: {ex}")
                 close_dialog(None)
+
+        # Create a dialog to ask for the field name
+        field_name_input = ft.TextField(
+            label="Field Name",
+            hint_text="e.g., Notes, Hobbies, etc.",
+            autofocus=True,
+            on_submit=create_field,     # Closes the overlay when submitting
+        )
         
         dlg = ft.AlertDialog(
             title=ft.Text("Create New Custom Field"),
@@ -157,8 +157,8 @@ class Character(Widget):
         
         try:
             dlg.open = True
-            self.page.overlay.append(dlg)
-            self.page.update()
+            self.p.open(dlg)
+            #self.page.update()
         except Exception as ex:
             print(f"Error opening dialog: {ex}") 
 
@@ -182,122 +182,137 @@ class Character(Widget):
             ft.IconButton(
                 tooltip="regular View",
                 icon=ft.Icons.EDIT_OUTLINED,
-                on_click=self.working_titleRegularView()
+                on_click=self.edit_mode_clicked
                 #this will trigger the regular view
             ),
         ]   
         )
-        #all of this needs to be the edit view
-        body = ft.Container(
-            expand=True,                # Takes up maximum space allowed in its parent container
-            padding=2,                  # Padding around everything inside the container
-            content=ft.Column(           # The column that will hold all our stuff top down
-                scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
-                spacing=2,               # Reduce spacing between elements
-                controls=[
-                regView_button,
-                #self.icon,                          # The icon above the name
-                ft.Text("hi from " + self.title),           # Text that shows the title
-                #ft.Text(self.data['physical_description']), #test for me 
-                ft.Row(                     # The row that will hold our dropdowns
-                        wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
-                        controls=[          # All flet controls inside our Row
-                            ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
-                                label="alignment1",           # Label at top of dropdown 
-                                value=self.data['alignment1'],        # Value selected in the drop down
-                                color=self.data['name_color'],      # Color of the dropdown text
-                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
-                                options=[           # Options for the dropdown
-                                    ft.DropdownOption(text="Undecided"),
-                                    ft.DropdownOption(text="Lawful"),
-                                    ft.DropdownOption(text="Neutral"),
-                                    ft.DropdownOption(text="Chaotic"),
-                                    ft.DropdownOption(text="None"),
-                                    
-                                ],
-                                on_change=lambda e,name='alignment1': self._on_field_change(name,e.control.value),
-                            ),
-                            ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
-                                label="alignment2",           # Label at top of dropdown 
-                                value=self.data['alignment2'],        # Value selected in the drop down
-                                color=self.data['name_color'],      # Color of the dropdown text
-                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
-                                options=[           # Options for the dropdown
-                                    ft.DropdownOption(text="Undecided"),
-                                    ft.DropdownOption(text="Good"),
-                                    ft.DropdownOption(text="Neutral"),
-                                    ft.DropdownOption(text="Evil"),
-                                    ft.DropdownOption(text="None"),
-                                    
-                                ],
-                                on_change=lambda e,name='alignment2': self._on_field_change(name,e.control.value),
-                            ),
-                               
-                            ft.Dropdown(      # Sex of each character
-                                label="Sex",
-                                value=self.data['sex'],
-                                color=self.data['sex_color'],
-                                text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                                options=[
-                                    ft.DropdownOption(text="Male"),
-                                    ft.DropdownOption(text="Female"),
-                                    ft.DropdownOption(text="Other"),
-                                    ft.DropdownOption(text="None"),
-                                ],
-                                #TODO on "other" selection, open a text field to specify
-                                on_change=lambda e,name='sex': self._on_field_change(name,e.control.value),
-                            ),
-                            ft.TextField(   # Text field for sexuality input
-                                label ="Gender Identity",
-                                value=self.data['gender_identity'],  # Load saved sexuality data
-                                width=200,
-                                expand = False,
-                                on_change=lambda e, name='gender_identity': self._on_field_change(name, e.control.value),  # Save on change
-                            ),
-                            ft.TextField(  # Text field for age input
-                                label ="Age",
-                                value=self.data['age'],  # Load saved age data
-                                max_length=7,#allows for things like "unknown" or "ancient"
-                                width=100,
-                                expand = False,
-                                on_change=lambda e, name='age': self._on_field_change(name, e.control.value),  # Save on change
-                            ),
-                            #TODO add a dropdown for connections (other characters)
-                            #should open another dropdown or text field to specify relationship
-                            # #WIP  
-                            #ft.Dropdown(       # Dropdown selection of relatives (other characters)
-                            #    label="Connections",
-                            #    #TODO value needs to be a list of connections
-                            #    color=self.data[connections_color],
-                            #    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                            #    options=[
-                            #    #TODO populate options with other characters in story
-                            #    ],
-                            #),
-                            ft.TextField(   # Text field for race input
-                                label ="Race",
-                                value=self.data['physical_description'].get('Race', ''),  # Load saved race data
-                                width=250,
-                                expand = False, #prevents stretching too wide
-                                on_change=lambda e, name='physical_description': self._on_race_change(name, e.control.value),  # Save on change
-                            ),
-                            ft.TextField(   # Text field for sexuality input
-                                label ="Sexuality",
-                                value=self.data['sexuality'],  # Load saved sexuality data
-                                width=200,
-                                expand = False,
-                                on_change=lambda e, name='sexuality': self._on_field_change(name, e.control.value),  # Save on change
-                            ),
-                            ft.IconButton(
-                                tooltip="New Field",
-                                icon=ft.Icons.NEW_LABEL_OUTLINED,
-                                on_click=self.new_custom_textfield_clicked
-                            ),
-                        ]
-                    ),
-                ]
-            )
-        )     
+
+        print("Edit mode for ", self.title, ": ", self.data['edit_mode'])
+
+
+
+        # Check if we're in edit mode or not. If yes, build the edit view like this
+        if self.data.get('edit_mode', False):
+
+            #all of this needs to be the edit view
+            body = ft.Container(
+                expand=True,                # Takes up maximum space allowed in its parent container
+                padding=2,                  # Padding around everything inside the container
+                content=ft.Column(           # The column that will hold all our stuff top down
+                    scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
+                    spacing=2,               # Reduce spacing between elements
+                    controls=[
+                    edit_button,
+                    #self.icon,                          # The icon above the name
+                    ft.Text("hi from " + self.title),           # Text that shows the title
+                    #ft.Text(self.data['physical_description']), #test for me 
+                    ft.Row(                     # The row that will hold our dropdowns
+                            wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
+                            controls=[          # All flet controls inside our Row
+                                ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
+                                    label="alignment1",           # Label at top of dropdown 
+                                    value=self.data['alignment1'],        # Value selected in the drop down
+                                    color=self.data['name_color'],      # Color of the dropdown text
+                                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
+                                    options=[           # Options for the dropdown
+                                        ft.DropdownOption(text="Undecided"),
+                                        ft.DropdownOption(text="Lawful"),
+                                        ft.DropdownOption(text="Neutral"),
+                                        ft.DropdownOption(text="Chaotic"),
+                                        ft.DropdownOption(text="None"),
+                                        
+                                    ],
+                                    on_change=lambda e,name='alignment1': self._on_field_change(name,e.control.value),
+                                ),
+                                ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
+                                    label="alignment2",           # Label at top of dropdown 
+                                    value=self.data['alignment2'],        # Value selected in the drop down
+                                    color=self.data['name_color'],      # Color of the dropdown text
+                                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
+                                    options=[           # Options for the dropdown
+                                        ft.DropdownOption(text="Undecided"),
+                                        ft.DropdownOption(text="Good"),
+                                        ft.DropdownOption(text="Neutral"),
+                                        ft.DropdownOption(text="Evil"),
+                                        ft.DropdownOption(text="None"),
+                                        
+                                    ],
+                                    on_change=lambda e,name='alignment2': self._on_field_change(name,e.control.value),
+                                ),
+                                
+                                ft.Dropdown(      # Sex of each character
+                                    label="Sex",
+                                    value=self.data['sex'],
+                                    color=self.data['sex_color'],
+                                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                                    options=[
+                                        ft.DropdownOption(text="Male"),
+                                        ft.DropdownOption(text="Female"),
+                                        ft.DropdownOption(text="Other"),
+                                        ft.DropdownOption(text="None"),
+                                    ],
+                                    #TODO on "other" selection, open a text field to specify
+                                    on_change=lambda e,name='sex': self._on_field_change(name,e.control.value),
+                                ),
+                                ft.TextField(   # Text field for sexuality input
+                                    label ="Gender Identity",
+                                    value=self.data['gender_identity'],  # Load saved sexuality data
+                                    width=200,
+                                    expand = False,
+                                    on_change=lambda e, name='gender_identity': self._on_field_change(name, e.control.value),  # Save on change
+                                ),
+                                ft.TextField(  # Text field for age input
+                                    label ="Age",
+                                    value=self.data['age'],  # Load saved age data
+                                    max_length=7,#allows for things like "unknown" or "ancient"
+                                    width=100,
+                                    expand = False,
+                                    on_change=lambda e, name='age': self._on_field_change(name, e.control.value),  # Save on change
+                                ),
+                                #TODO add a dropdown for connections (other characters)
+                                #should open another dropdown or text field to specify relationship
+                                # #WIP  
+                                #ft.Dropdown(       # Dropdown selection of relatives (other characters)
+                                #    label="Connections",
+                                #    #TODO value needs to be a list of connections
+                                #    color=self.data[connections_color],
+                                #    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                                #    options=[
+                                #    #TODO populate options with other characters in story
+                                #    ],
+                                #),
+                                ft.TextField(   # Text field for race input
+                                    label ="Race",
+                                    value=self.data['physical_description'].get('Race', ''),  # Load saved race data
+                                    width=250,
+                                    expand = False, #prevents stretching too wide
+                                    on_change=lambda e, name='physical_description': self._on_race_change(name, e.control.value),  # Save on change
+                                ),
+                                ft.TextField(   # Text field for sexuality input
+                                    label ="Sexuality",
+                                    value=self.data['sexuality'],  # Load saved sexuality data
+                                    width=200,
+                                    expand = False,
+                                    on_change=lambda e, name='sexuality': self._on_field_change(name, e.control.value),  # Save on change
+                                ),
+                                ft.IconButton(
+                                    tooltip="New Field",
+                                    icon=ft.Icons.NEW_LABEL_OUTLINED,
+                                    on_click=self.new_custom_textfield_clicked
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            )     
+
+
+        # If NOT in edit mode
+        else:
+
+            # Build the edit view like this. 
+            body = self.edit_mode_view(edit_button=edit_button)
         
         # After the main body, add a section for custom fields if any exist
         if self.data['custom_fields']:
@@ -345,25 +360,11 @@ class Character(Widget):
         self.data['physical_description']['Race'] = value
         self.save_dict()
 
-    def working_titleRegularView(self):
-        ''' Example function for character details '''
-        self.reload_tab()
 
-        if self.data['is_active_tab']:
-            self.icon = ft.Icon(ft.Icons.PERSON, size=100, color="primary", expand=False)
-        else:
-            self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE, size=100, color="disabled", expand=False)
+    # Called when not in edit mode FROM reload_widget
+    def edit_mode_view(self, edit_button) -> ft.Container:
+        ''' Example function for character details '''
         
-        edit_button = ft.Row([
-            self.icon,
-            ft.IconButton(
-                tooltip="Edit Character",
-                icon=ft.Icons.EDIT_OUTLINED,
-                on_click=self.edit_character_clicked
-                #this will trigger the edit view
-            ),
-        ]   
-        )
         body = ft.Container(
             expand=True,                # Takes up maximum space allowed in its parent container
             padding=5,                  # Padding around everything inside the container
@@ -371,7 +372,7 @@ class Character(Widget):
                 scroll=ft.ScrollMode.AUTO,  # Enable scrolling when content overflows
                 spacing=1,               # Reduce spacing between elements
                 controls=[
-                edit_button,
+                edit_button,            # Just pass in the edit button for now so we don't build it twice
                 #self.icon,                          # The icon above the name
                 ft.Text("hi from " + self.title),           # Text that shows the title
                 #ft.Text(self.data['physical_description']), #test for me 
@@ -392,9 +393,24 @@ class Character(Widget):
                 ]
             )
         )
-        # Set our content to the body_container (from Widget class) as the body we just built
-        self.body_container.content = body
+        
+        return body
 
-        # Call render widget (from Widget class) to update the UI
-        self._render_widget()
 
+
+    # CORY NOTES:
+    # Added edit mode clicked function to toggle edit mode on or off
+    # Always use reload widget to simplify UI rebuilding when needed. Let the reload widget handle the differences
+
+    # Called when clicking the edit mode button
+    def edit_mode_clicked(self, e=None):
+        ''' Switches between edit mode and not for the character '''
+
+        print("Switching to edit mode for character:", self.title)
+
+        # Change our edit mode data flag, and save it to file
+        self.data['edit_mode'] = not self.data['edit_mode']
+        self.save_dict()
+
+        # Reload the widget. The reload widget should load differently depending on if we're in edit mode or not
+        self.reload_widget()
