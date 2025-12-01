@@ -204,6 +204,7 @@ class Character(Widget):
                     regView_button,
                     #self.icon,                          # The icon above the name
                     ft.Text("hi from " + self.title),           # Text that shows the title
+                    #ft.Text(self.data['physical_description']), #test for me 
                     ft.Row(                     # The row that will hold our dropdowns
                             wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                             controls=[          # All flet controls inside our Row
@@ -237,14 +238,26 @@ class Character(Widget):
                                     ],
                                     on_change=lambda e,name='alignment2': self._on_field_change(name,e.control.value),
                                 ),
-                                
+                                #TODO add a dropdown for connections (other characters)
+                                #should open another dropdown or text field to specify relationship
+                                # #WIP  
+                                ft.Dropdown(       # Dropdown selection of relatives (other characters)
+                                    label="Connections",
+                                #    #TODO value needs to be a list of connections
+                                #    color=self.data[connections_color],
+                                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                                    options=[
+                                #    #TODO populate options with other characters in story
+                                        ft.DropdownOption(text="(WIP) Select Character"),
+                                    ],
+                                    on_change=lambda e,name='connections': self._on_field_change(name,e.control.value),
+                                ),
                                 
                                 ft.TextField(   # Text field for sexuality input
                                     label ="Gender",
                                     value=self.data['gender'],  # Load saved sexuality data
                                     width=200,
                                     expand = False,
-                                    dense=True,
                                     on_change=lambda e, name='gender': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
                                 ft.TextField(  # Text field for age input
@@ -252,27 +265,14 @@ class Character(Widget):
                                     value=self.data['age'],  # Load saved age data
                                     max_length=7,#allows for things like "unknown" or "ancient"
                                     width=100,
-                                    dense=True,
                                     expand = False,
                                     on_change=lambda e, name='age': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
-                                #TODO add a dropdown for connections (other characters)
-                                #should open another dropdown or text field to specify relationship
-                                # #WIP  
-                                #ft.Dropdown(       # Dropdown selection of relatives (other characters)
-                                #    label="Connections",
-                                #    #TODO value needs to be a list of connections
-                                #    color=self.data[connections_color],
-                                #    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                                #    options=[
-                                #    #TODO populate options with other characters in story
-                                #    ],
-                                #),
+                                
                                 ft.TextField(   # Text field for race input
                                     label ="Race",
                                     value=self.data['physical_description'].get('Race', ''),  # Load saved race data
                                     width=250,
-                                    dense=True,
                                     expand = False, #prevents stretching too wide
                                     on_change=lambda e, name='physical_description': self._on_race_change(name, e.control.value),  # Save on change
                                 ),
@@ -280,7 +280,6 @@ class Character(Widget):
                                     label ="Sexuality",
                                     value=self.data['sexuality'],  # Load saved sexuality data
                                     width=200,
-                                    dense=True,
                                     expand = False,
                                     on_change=lambda e, name='sexuality': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
@@ -316,7 +315,6 @@ class Character(Widget):
                     label=field_name,
                     value=field_value,
                     width=300,
-                    dense = True,
                     expand=False,
                     on_change=lambda e, name=field_name: self._on_custom_field_change(name, e.control.value)
                 )
@@ -352,7 +350,7 @@ class Character(Widget):
 
     # Called when not in edit mode FROM reload_widget
     def edit_mode_view(self, edit_button) -> ft.Container:
-        ''' Plain view for character details '''
+        ''' Example function for character details '''
         
         body = ft.Container(
             expand=True,                # Takes up maximum space allowed in its parent container
@@ -366,38 +364,16 @@ class Character(Widget):
                 ft.Text("hi from " + self.title),           # Text that shows the title
                 #ft.Text(self.data['physical_description']), #test for me 
                 ft.Row(                     # The row that will hold our dropdowns
-                        wrap=True,
-                        spacing=2,          # Allows moving into columns/multiple lines if dropdowns don't fit
+                        wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
-
-                            ft.Text(
-                                    "Alignment: ",
-                                    weight=ft.FontWeight.BOLD
-                            ), 
-                            ft.Text(
-                                self.data['alignment1'] + " " + self.data['alignment2'],
-                                ),
-
-                            ft.Text("Gender: ",
-                                    weight=ft.FontWeight.BOLD
-                            ), 
-                            ft.Text(self.data['gender']),
-                            ft.Text("Age: ",
-                                    weight=ft.FontWeight.BOLD,
-                            ), 
-                            ft.Text(self.data['age']),  
-                            ft.Text("Race: ",
-                                    weight=ft.FontWeight.BOLD
-                            ), 
-                            ft.Text(self.data['physical_description'].get('Race', '')),
-                            ft.Text("Sexuality: ",
-                                    weight=ft.FontWeight.BOLD
-                            ), 
-                            ft.Text(self.data['sexuality']),
-                            ft.Text("Custom Fields: ",
-                                    weight=ft.FontWeight.BOLD
-                            ), 
-                            ft.Text(str(self.data['custom_fields'])),
+                            ft.Text("Character details go here"),
+                            ft.Text("Alignment: " + self.data['alignment1'] + " " + self.data['alignment2']),
+                            ft.Text("Gender: " + self.data['gender']),
+                            ft.Text("Age: " + self.data['age']),  
+                            ft.Text("Race: " + self.data['physical_description'].get('Race', '')),
+                            ft.Text("Sexuality: " + self.data['sexuality']),
+                            ft.Text("Connections: " + str(self.data['connections'])),
+                            ft.Text("Custom Fields: " + str(self.data['custom_fields'])),
                             
                         ]
                     ),
