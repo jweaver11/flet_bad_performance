@@ -843,6 +843,7 @@ class Story(ft.View):
         self.p.overlay.append(menu)
         self.p.update()
 
+
     # Called when new story object is created, either by program or by being loaded from storage
     def build_view(self) -> list[ft.Control]:
         ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''

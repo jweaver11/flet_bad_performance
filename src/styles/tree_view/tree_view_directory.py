@@ -3,6 +3,7 @@ from models.story import Story
 import os
 import json
 from styles.menu_option_style import Menu_Option_Style
+from styles.colors import colors
 
 # Expansion tile for all sub directories (folders) in a directory
 class Tree_View_Directory(ft.GestureDetector):
@@ -584,20 +585,6 @@ class Tree_View_Directory(ft.GestureDetector):
             # Change our icon to match, apply the update
             self.story.active_rail.content.reload_rail()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
-
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
 
         # List for our colors when formatted
         color_controls = [] 

@@ -7,6 +7,7 @@ from styles.menu_option_style import Menu_Option_Style
 from models.story import Story
 from models.widgets.timeline import Timeline
 import os
+from styles.colors import colors
 
 
 # TODO: When clicking and expanding, make sure to set the active_timeline to this timeline, 
@@ -86,6 +87,8 @@ class Timeline_Dropdown(ft.GestureDetector):
 
         # Run through our additional menu options if we have any, and set their on_click methods
         for option in self.additional_menu_options or []:
+
+            option.on_tap = self.new_item_clicked
 
             # Add to our menu options list
             menu_options.append(option)
@@ -408,20 +411,6 @@ class Timeline_Dropdown(ft.GestureDetector):
             #self.story.active_rail.content.reload_rail()
             self.timeline.reload_widget()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
-
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
 
         # List for our colors when formatted
         color_controls = [] 

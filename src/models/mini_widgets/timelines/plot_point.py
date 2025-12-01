@@ -156,7 +156,7 @@ class Plot_Point(Mini_Widget):
                     alignment=ft.Alignment(0,0),
                     controls=[
                     ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
-                        on_secondary_tap=lambda e: print("Right click on slider"),
+                        on_secondary_tap=lambda e: print("Right clicked plotpoint"),
                         content=ft.Slider(
                             min=-100, max=100,                                  # Min and max values on each end of slider
                             adaptive=True,                                      # Make sure it looks good on all devices
@@ -188,6 +188,7 @@ class Plot_Point(Mini_Widget):
                                 width=50,
                                 spacing=0,
                                 controls=[
+                                    
                                     # Catch above and below the thumb
                                     ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
 

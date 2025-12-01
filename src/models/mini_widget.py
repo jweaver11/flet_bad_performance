@@ -163,7 +163,6 @@ class Mini_Widget(ft.Container):
 
             # Reload the UI to reflect changes
             self.reload_mini_widget()
-            self.owner.reload_widget()
 
             # Also reload the active rail to reflect changes
             self.owner.story.active_rail.content.reload_rail() 

@@ -3,6 +3,7 @@ from styles.timelines.timeline_dropdown import Timeline_Dropdown
 from models.mini_widget import Mini_Widget
 from styles.menu_option_style import Menu_Option_Style
 from models.mini_widgets.timelines.plot_point import Plot_Point
+from styles.colors import colors
 
 
 # RAIL ITEMS FOR PLOTPOINTS AND ARCS
@@ -268,22 +269,6 @@ class Timeline_Item(ft.GestureDetector):
             self.mini_widget.reload_mini_widget()
             self.mini_widget.owner.reload_widget()
             #self.mini_widget.story.workspace.reload_workspace()
-
-            
-
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
 
         # List for our colors when formatted
         color_controls = [] 

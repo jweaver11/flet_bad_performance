@@ -88,6 +88,7 @@ class Arc(Mini_Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
             on_tap=self.toggle_slider_visibility,
+            on_secondary_tap=lambda e: print("Right clicked arc"), 
             on_enter=self.on_start_hover,
             on_exit=self.on_stop_hover,
             content=ft.Column(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title)])]),
@@ -197,7 +198,9 @@ class Arc(Mini_Widget):
                     controls=[
                         ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
                         ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
-                            on_secondary_tap=lambda e: print("Right click on slider"),
+                            on_secondary_tap=lambda e: self.owner.story.open_menu(self.owner.get_menu_options()),  # Open our parent timeline menu options
+                            on_enter=lambda e: self.owner.on_enter(e=None),     # Highlight the timeline on hover
+                            on_exit=lambda e: self.owner.on_exit(e=None),       # Remove highlight when not hovering
                             height=100,
                             content=ft.RangeSlider(
                                 min=-100, max=100,                                  # Min and max values on each end of slider
@@ -227,7 +230,6 @@ class Arc(Mini_Widget):
         # Make sure our alignment are correct
         self.x_alignment_start = ft.Alignment(self.data.get('x_alignment_start', -.2), 0)
         self.x_alignment_end = ft.Alignment(self.data.get('x_alignment_end', .2), 0)
-
 
         # Give us a ratio for integers for our left and right expand values to catch hover off of our plot pont
         left_ratio = (self.data.get('x_alignment_start', 0) + 1) / 2     # Convert -1 -> 1 to 0 -> 1
@@ -309,6 +311,12 @@ class Arc(Mini_Widget):
 
         # Reload our timeline control and all associated components 
         self.reload_timeline_control()
+
+        # Control for our title
+        self.title_control = ft.TextField(
+            value=self.title,
+            label=None,
+        )
 
 
         
