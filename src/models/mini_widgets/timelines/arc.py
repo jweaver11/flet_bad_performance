@@ -115,8 +115,6 @@ class Arc(Mini_Widget):
         ''' Changes the arc control to unfocused '''
 
         self.timeline_arc.border = ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "secondary")))
-        #self.toggle_slider_visibility()
-        #self.hide_slider()
         self.p.update()
 
 

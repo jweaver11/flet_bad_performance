@@ -90,7 +90,7 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
             on_exit=self.on_exit,        
-            on_tap=self.on_clicked,
+            on_tap=lambda e: self.information_display.toggle_visibility(value=True),
             hover_interval=20,
         )
 
@@ -102,7 +102,7 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_tap=self.on_click,
+            on_tap=lambda e: self.information_display.toggle_visibility(value=True),
         )
         self.timeline_right_edge = ft.GestureDetector(
             height=50,
@@ -111,7 +111,7 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_tap=self.on_click,
+            on_tap=lambda e: self.information_display.toggle_visibility(value=True),
         )
 
         # Dropdown on the rail. We don't use it here, let the rail handle it
@@ -359,12 +359,7 @@ class Timeline(Widget):
         else:
             print("Error: No tag found for new item creation")
 
-        
-
-    # Called when clicking on our timeline control
-    def on_clicked(self, e):
-        ''' Shows our timeline information display '''
-        print("Timeline clicked")
+    
 
 
     # Called when rename button is clicked
@@ -456,11 +451,6 @@ class Timeline(Widget):
 
         # UI elements
         filters = ft.Row(scroll="auto", alignment=ft.MainAxisAlignment.START)     # Row to hold our filter options
-        show_information_display = ft.Checkbox(         # Checkbox to show/hide information display
-            label="Show Information Display",
-            value=self.data['information_display']['visibility'], 
-            on_change=lambda e: self.information_display.toggle_visibility(e)
-        )
         filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True)      # Checkbox to filter plot points
         filter_arcs = ft.Checkbox(label="Show Arcs", value=True)                    # Checkbox to filter arcs
         reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))         # Button to reset zoom level
@@ -474,7 +464,7 @@ class Timeline(Widget):
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
             scroll="auto",
-            controls=[show_information_display, reset_zoom_button, filters],
+            controls=[reset_zoom_button, filters],
         )
 
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
@@ -529,6 +519,7 @@ class Timeline(Widget):
                     # Vertical line only
                     vertical_line = ft.GestureDetector(
                         on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+                        on_tap=lambda e: self.information_display.toggle_visibility(value=True),
                         height=16, expand=True, 
                         content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3),
                         data=i      # Set our data so we know where to add new items
@@ -543,6 +534,7 @@ class Timeline(Widget):
                 # Horizontal followed up by a vertical line
                 horizontal_line = ft.GestureDetector(
                     on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+                    on_tap=lambda e: self.information_display.toggle_visibility(value=True),
                     expand=True, height=16, 
                     content=ft.Divider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3), 
                     data=i      # Set our data so we know where to add new items
