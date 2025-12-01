@@ -58,7 +58,8 @@ class Note(Widget):
         )
 
         # Assign the body_container content as whatever view you have built in the widget
-        self.body_container.content = body
+        self.body_container.controls.clear()
+        self.body_container.controls.append(body)
         
         # Build in widget function that will handle loading our mini widgets and rendering the whole thing
         self._render_widget()

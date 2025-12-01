@@ -68,6 +68,7 @@ class Chapter(Widget):
         self.reload_tab()
         
         # BUILDING BODY - the inside the body container of our widget
+        
         self.body_container.content = ft.Column(
             expand=True,
             controls=[
@@ -80,6 +81,7 @@ class Chapter(Widget):
                 )
             ]
         )
+        
 
         self._render_widget()
 

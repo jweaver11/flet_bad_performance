@@ -112,7 +112,7 @@ class Character(Widget):
         def close_dialog(e):
             '''Close the dialog'''
             dlg.open = False
-            self.page.update()
+            self.p.update()
 
         def create_field(e): #show in edit view
             '''Called when user confirms the field name'''
@@ -157,7 +157,7 @@ class Character(Widget):
         try:
             dlg.open = True
             self.p.open(dlg)
-            #self.page.update()
+
         except Exception as ex:
             print(f"Error opening dialog: {ex}") 
 
@@ -186,7 +186,7 @@ class Character(Widget):
         ]   
         )
 
-        print("Edit mode for ", self.title, ": ", self.data['edit_mode'])
+        #print("Edit mode for ", self.title, ": ", self.data['edit_mode'])
 
 
 
@@ -210,6 +210,7 @@ class Character(Widget):
                                 ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
                                     label="alignment1",           # Label at top of dropdown 
                                     value=self.data['alignment1'],        # Value selected in the drop down
+                                    dense=True,
                                     color=self.data['name_color'],      # Color of the dropdown text
                                     text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
                                     options=[           # Options for the dropdown
@@ -225,6 +226,7 @@ class Character(Widget):
                                 ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                     label="alignment2",           # Label at top of dropdown 
                                     value=self.data['alignment2'],        # Value selected in the drop down
+                                    dense=True,
                                     color=self.data['name_color'],      # Color of the dropdown text
                                     text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
                                     options=[           # Options for the dropdown
@@ -417,7 +419,7 @@ class Character(Widget):
     def edit_mode_clicked(self, e=None):
         ''' Switches between edit mode and not for the character '''
 
-        print("Switching to edit mode for character:", self.title)
+        #print("Switching to edit mode for character:", self.title)
 
         # Change our edit mode data flag, and save it to file
         self.data['edit_mode'] = not self.data['edit_mode']

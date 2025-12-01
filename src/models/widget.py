@@ -39,10 +39,7 @@ class Widget(ft.Container):
         self.title = title                          
         self.p = page                               
         self.directory_path = directory_path        
-        self.story = story    
-
-        # Declare our mini widgets list                      
-        self.mini_widgets: list = []                     
+        self.story = story                      
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -73,12 +70,19 @@ class Widget(ft.Container):
         self.hide_tab_icon_button = ft.IconButton()    # 'X' icon button to hide widget from workspace'
 
         # UI ELEMENTS - Body
-        self.mini_widgets_column = ft.Column(spacing=4)  # Column for our mini widgets on the side of our main content. Nests inside of self.mini_widgets_container
-        self.mini_widgets_container = ft.Container(expand=1)  # Control to display our mini widgets. Nests inside of self.content_row
-        self.body_container = ft.Container(expand=2)  # Control to diplay our body content. Nests inside of self.content_row
-        self.content_row = ft.Row(spacing=2, expand=True)   # Row for our body and mini widgets containers. Nests inside of self.tab.content
 
-        # Called at end of constructor for all child widgets to build their view
+        # Declare our mini widgets list                      
+        self.mini_widgets: list = []   
+
+        # Currently active mini widget being focused on
+        self.active_mini_widget: ft.Control = None
+
+        # Column for displaying our mini widgets on the left, right, or both sides of our body
+        self.mini_widgets_row: ft.Row = ft.Column(spacing=4)  
+        
+        self.body_container: ft.Container = ft.Container(expand=True)  # Stack to hold our body content, with mini widgets overlaid on top
+
+        # Called at end of constructor for all child widgets to build their view (not here tho since we're not on page yet)
         #self.reload_widget()
 
     # Called whenever there are changes in our data
@@ -244,6 +248,7 @@ class Widget(ft.Container):
     # Called on many actions to make this the active tab if in the main pin
     def set_active_tab(self):
         ''' Sets this widgets tab as the active tab in the main pin'''
+
         self.data['is_active_tab'] = True
         self.save_dict()
 
@@ -300,30 +305,28 @@ class Widget(ft.Container):
     def focus(self):
         ''' Focuses the widget in the workspace if it is not already visible '''
 
-        try:
-            # If we're not focused already, run our logic
-            if not self.focused:
+      
+        # If we're not focused already, run our logic
+        if not self.focused:
 
-                # If we're note visible, make us visible
-                if not self.visible:
-                    self.data['visible'] = True
-                    self.save_dict()
-                    self.visible = self.data['visible']
+            # If we're note visible, make us visible
+            if not self.visible:
+                self.data['visible'] = True
+                self.save_dict()
+                self.visible = self.data['visible']
 
-                # Apply our focus stuff
-                # Apply our focused tab UI outline around widget
+            # Apply our focus stuff
+            # Apply our focused tab UI outline around widget
 
-                # Apply to the UI
-                self.p.update()
-                self.story.workspace.reload_workspace()
+            # Apply to the UI
+            self.p.update()
+            self.story.workspace.reload_workspace()
 
-            # We are focused, do nothing
-            else:
-                pass
+        # We are focused, do nothing
+        else:
+            pass
 
-        # Catch errors
-        except Exception as e:
-            print(f"Error focusing widget {self.title}.  {e}")
+        
 
     # Called when app clicks the hide icon in the tab
     def toggle_visibility(self, e=None, value: bool=None):
@@ -368,8 +371,7 @@ class Widget(ft.Container):
             icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
         
         elif tag == "timeline":
-            #icon = ft.Icon(ft.Icons.TIMELINE_OUTLINED)
-            icon = ft.Icon(ft.Icons.TIMELINE)
+            icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED)
 
         elif tag == "map":
             icon = ft.Icon(ft.Icons.MAP_OUTLINED)
@@ -457,6 +459,16 @@ class Widget(ft.Container):
             ),                       
         )
 
+    # Called to set the active mini widget in this widget
+    def set_active_mini_widget(self, mini_widget):
+        
+        if self.active_mini_widget is not None:
+            if self.active_mini_widget != mini_widget:
+                self.active_mini_widget.toggle_visibility(value=False, not_active=True)
+
+        self.active_mini_widget = mini_widget
+        self.reload_widget()
+
     # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
     def reload_widget(self):
         ''' Children build their own content of the widget in their own reload_widget functions '''
@@ -467,7 +479,7 @@ class Widget(ft.Container):
         self.reload_tab()
 
         # Set the body container.content to whatever control you build in the child
-        self.body_container.content = ft.Text(f"hello from: {self.title}")
+        self.body_container.content = ft.Container(expand=True, content=ft.Text(f"hello from: {self.title}"))
             
         # Call Render widget to handle the rest of the heavy lifting
         self._render_widget()
@@ -477,31 +489,47 @@ class Widget(ft.Container):
         ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it '''
 
         # Set the mini widgets visibility to false so we can check later if we want to add it to the page
-        self.mini_widgets_container.visible = False
-        self.content_row.controls.clear()   # Clear our content row so we can rebuild it
+        #self.mini_widgets_container.visible = False
+        #self.content_row.controls.clear()   # Clear our content row so we can rebuild it
 
 
         # Add the body container to our content row
-        self.content_row.controls.append(self.body_container)
+        #self.content_row.controls.append(self.body_container)
 
 
         # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
-        self.mini_widgets_column.controls = self.mini_widgets   
+        #self.mini_widgets_column.controls = self.mini_widgets   
         
         # Add our column that we build to our mini widgets container
-        self.mini_widgets_container.content = self.mini_widgets_column
+        #self.mini_widgets_container.content = self.mini_widgets_column
 
         # Check if we are showing any mini widgets. If we are, add the container to our content row
-        for mini_widget in self.mini_widgets_column.controls:
+        #for mini_widget in self.mini_widgets_column.controls:
             # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
-            if mini_widget.visible:
-                self.mini_widgets_container.visible = True
-                self.content_row.controls.append(self.mini_widgets_container)
-                break
+            #if mini_widget.visible:
+                #self.mini_widgets_container.visible = True
+                #self.content_row.controls.append(self.mini_widgets_container)
+                #break
+
+
+        # Overlay mini widget stuf on top of body container
+        # Using ratio starting with 10, render mini widgets on right or left side depending on setting
+        # Keep our mini widgets using the mini widgets list
+
+        # Set ratio for our body container and mini widgets
+        self.body_container.expand = 6
+
+        # Put our mini widgets on the right side
+        row = ft.Row(expand=True, spacing=0, controls=[self.body_container])
+
+        # Add our mini widget if we have one active
+        if self.active_mini_widget is not None:
+            #self.active_mini_widget.expand = 4
+            row.controls.append(self.active_mini_widget)
             
         
         # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
-        self.tab.content = self.content_row  # We add this in combo with our 'tabs' later
+        self.tab.content = row  # We add this in combo with our 'tabs' later
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]

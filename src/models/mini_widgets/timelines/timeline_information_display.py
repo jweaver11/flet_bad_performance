@@ -36,13 +36,21 @@ class Timeline_Information_Display(Mini_Widget):
             print(f"Error saving timeline information display data to {self.owner.title}: {e}")
 
     # Called when toggling our visibility
-    def toggle_visibility(self, e):
+    def toggle_visibility(self, e=None, value: bool=None):
         ''' Custom toggles our visibility for our information display '''
 
-        # Update our visibility (stored in owners data)
-        self.owner.data['information_display']['visibility'] = not self.owner.data['information_display']['visibility']
-        self.visible = self.owner.data['information_display']['visibility']
-        self.owner.save_dict()
+        if value is not None:
+            self.visible = value
+            self.owner.data['information_display']['visibility'] = value
+            self.owner.save_dict()
+
+        else:
+
+            # Update our visibility (stored in owners data)
+            self.owner.data['information_display']['visibility'] = not self.owner.data['information_display']['visibility']
+            self.visible = self.owner.data['information_display']['visibility']
+            self.owner.save_dict()
+
 
         # Apply the update
         self.p.update()

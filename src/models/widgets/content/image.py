@@ -55,7 +55,8 @@ class Image(Widget):
         )
         
         # Content of our widget (ft.Container) is our created tabs content
-        self.content = content
+        self.body_container.controls.clear()
+        self.body_container.controls.append(content)
 
         self._render_widget()
 

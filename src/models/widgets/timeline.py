@@ -116,6 +116,12 @@ class Timeline(Widget):
 
         # Dropdown on the rail. We don't use it here, let the rail handle it
         self.timeline_dropdown = None      # 'Timeline_Dropdown'
+
+        # Set the active mini widget if we have one visible
+        for mini_widget in self.mini_widgets:
+            if mini_widget.visible:
+                self.set_active_mini_widget(mini_widget)
+                break
         
         # Builds/reloads our timeline UI
         self.reload_widget()
@@ -188,6 +194,7 @@ class Timeline(Widget):
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
+        self.active_mini_widget = self.arcs[title]
         self.reload_widget()
         
     # Called when creating a new plotpoint
@@ -202,12 +209,14 @@ class Timeline(Widget):
             father=self,
             page=self.p, 
             key="plot_points", 
+            x_alignment=self.x_alignment,
             data=None
         )
         self.mini_widgets.append(self.plot_points[title])
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
+        self.active_mini_widget = self.plot_points[title]
         self.reload_widget()
 
 
@@ -330,7 +339,6 @@ class Timeline(Widget):
 
     def new_item_clicked(self, e):
         ''' Called when new arc is clicked from timeline context menu '''
-        print("New arc clicked")
         #self.create_arc("New Arc")
         #self.new_item_container.visible = True
         self.story.close_menu()
@@ -445,9 +453,6 @@ class Timeline(Widget):
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
         # Time label is optional. Label vertial markers along the timeline with int and label if user provided
 
-        self.reload_tab()
-
-
 
         # UI elements
         filters = ft.Row(scroll="auto", alignment=ft.MainAxisAlignment.START)     # Row to hold our filter options
@@ -476,7 +481,6 @@ class Timeline(Widget):
         self.timeline_right_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
 
         
-
         # Row to hold our timeline edges and control
         timeline_row = ft.Row(
             spacing=0,
@@ -597,7 +601,7 @@ class Timeline(Widget):
         # The body that is our interactive viewer, allowing zoom in and out and moving around
         interactive_viewer = ft.InteractiveViewer(
             min_scale=0.1,
-            max_scale=15,
+            max_scale=5,
             expand=True,
             boundary_margin=ft.margin.all(20),
             #on_interaction_start=lambda e: print(e),
@@ -606,9 +610,10 @@ class Timeline(Widget):
             content=timeline,
         )
 
+        
         self.body_container.content = ft.Column([
             header,
-            timeline
+            timeline,
         ])
 
         self._render_widget()

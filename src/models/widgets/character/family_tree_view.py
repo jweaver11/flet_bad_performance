@@ -68,7 +68,8 @@ class Character(Widget):
         )     
         
         # Set our content to the body_container (from Widget class) as the body we just built
-        self.body_container.content = body
+        self.body_container.controls.clear()
+        self.body_container.controls.append(body)
 
         # Call render widget (from Widget class) to update the UI
         self._render_widget()
