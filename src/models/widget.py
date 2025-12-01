@@ -342,7 +342,7 @@ class Widget(ft.Container):
         # Save our changes and reload the UI
         self.save_dict()
         self.reload_widget()
-        #self.story.workspace.reload_workspace()
+        self.story.workspace.reload_workspace()
 
 
     # Called at end of constructor

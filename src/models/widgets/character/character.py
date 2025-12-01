@@ -244,6 +244,7 @@ class Character(Widget):
                                     value=self.data['gender'],  # Load saved sexuality data
                                     width=200,
                                     expand = False,
+                                    dense=True,
                                     on_change=lambda e, name='gender': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
                                 ft.TextField(  # Text field for age input
@@ -251,6 +252,7 @@ class Character(Widget):
                                     value=self.data['age'],  # Load saved age data
                                     max_length=7,#allows for things like "unknown" or "ancient"
                                     width=100,
+                                    dense=True,
                                     expand = False,
                                     on_change=lambda e, name='age': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
@@ -270,6 +272,7 @@ class Character(Widget):
                                     label ="Race",
                                     value=self.data['physical_description'].get('Race', ''),  # Load saved race data
                                     width=250,
+                                    dense=True,
                                     expand = False, #prevents stretching too wide
                                     on_change=lambda e, name='physical_description': self._on_race_change(name, e.control.value),  # Save on change
                                 ),
@@ -277,6 +280,7 @@ class Character(Widget):
                                     label ="Sexuality",
                                     value=self.data['sexuality'],  # Load saved sexuality data
                                     width=200,
+                                    dense=True,
                                     expand = False,
                                     on_change=lambda e, name='sexuality': self._on_field_change(name, e.control.value),  # Save on change
                                 ),
