@@ -443,7 +443,6 @@ class Timeline(Widget):
         # TODO:
         # Don't let delete timeline if only one left
         # Clicking brings up a mini-menu in the timelines widget to show details and allow editing
-        # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object and all its children are gesture detectors
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
         # Time label is optional. Label vertial markers along the timeline with int and label if user provided
@@ -588,7 +587,7 @@ class Timeline(Widget):
             )
         )
 
-        # Make it so not have to rebuild interactive viewer every time??
+        # TODO: Make it so not have to rebuild interactive viewer every time??
 
         # The body that is our interactive viewer, allowing zoom in and out and moving around
         interactive_viewer = ft.InteractiveViewer(

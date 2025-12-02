@@ -32,14 +32,12 @@ class Widget(ft.Container):
             data=data,                              # Sets our data. 
         )
 
-        # Make sure it capital
-        title = title.capitalize()
     
         # Set our parameters
-        self.title = title                          
-        self.p = page                               
-        self.directory_path = directory_path        
-        self.story = story                      
+        self.title: str = title.capitalize()                          
+        self.p: ft.Page = page                               
+        self.directory_path: str = directory_path        
+        self.story: Story = story                
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -54,6 +52,7 @@ class Widget(ft.Container):
                 'is_active_tab': True,                          # Whether this widget's tab is the active tab in the main pin
                 'color': "primary",                             # Color of the icon on the rail and next to title on rail
                 'mini_widgets_location': "right",               # Side of the widget the mini widgets show up on (left or right)
+                'custom_fields': dict,                          # Dictionary for any custom fields the widget wants to store
             },
         )
 
@@ -121,6 +120,21 @@ class Widget(ft.Container):
         # Handle errors
         except Exception as e:
             print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
+
+    def change_custom_field(self, **kwargs):
+        ''' Changes a key/value pair in our custom fields dictionary and saves the json file '''
+        # Called by:
+        # widget.change_custom_field(**{'key': value, 'key2': value2})
+
+        try:
+            for key, value in kwargs.items():
+                self.data['custom_fields'].update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing custom field {key}:{value} in widget {self.title}: {e}")
 
     # Called when moving widget files
     def delete_file(self, old_file_path: str) -> bool:

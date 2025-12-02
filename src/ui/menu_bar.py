@@ -204,7 +204,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-                ft.TextButton("Open", on_click=open_selected_story),
+                ft.TextButton("Open", on_click=open_selected_story, style=ft.ButtonStyle(color=ft.Colors.INVERSE_SURFACE)),
             ]
         )
 

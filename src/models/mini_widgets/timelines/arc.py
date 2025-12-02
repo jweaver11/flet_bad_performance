@@ -218,7 +218,7 @@ class Arc(Mini_Widget):
             self.owner.set_active_mini_widget(self)
 
         print(f"Toggling visibility of mini widget {self.title}. We are visible: {self.visible}")
-        
+
 
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
     def reload_slider(self):
@@ -318,11 +318,11 @@ class Arc(Mini_Widget):
             expand=True,
             spacing=0,
             controls=[
-                ft.Container(width=24),
+                ft.Container(width=24),     # Padding to match Timeline padding left
                 spacing_left,
                 self.timeline_arc,
                 spacing_right,
-                ft.Container(width=24),
+                ft.Container(width=24),     # Padding to match Timeline padding right
             ]
         )
     
@@ -362,7 +362,7 @@ class Arc(Mini_Widget):
         # Rebuild our information display
         self.content_control = ft.TextField(
             hint_text="Arc",
-            
+            on_submit=lambda e: self.change_custom_field(**{'new_key': e.control.value}),
             expand=True,
         )
 

@@ -30,28 +30,34 @@ class Mini_Widget(ft.Container):
         super().__init__(
             expand=4,
             border_radius=ft.border_radius.all(6),
-            bgcolor=ft.Colors.with_opacity(1, ft.Colors.ON_INVERSE_SURFACE),
+            border=ft.border.all(2, ft.Colors.SECONDARY_CONTAINER),
+            padding=ft.padding.all(8),
+            #animate=ft.Animation(600, ft.AnimationCurve.EASE_OUT_CUBIC),
+            #scale=ft.transform.Scale(0, alignment=ft.alignment.center_right),
+            #bgcolor=ft.Colors.with_opacity(1, ft.Colors.ON_INVERSE_SURFACE),
+            #shadow=ft.BoxShadow(blur_radius=4, color=ft.Colors.BLACK38, offset=ft.Offset(2, 2)),
             data=data,      # Sets our data.
         )
 
         
         # Set our parameters
-        self.title = title.capitalize()                        
-        self.owner = owner                          
+        self.title: str = title.capitalize()                        
+        self.owner: Widget = owner                          
         self.father = father                        
-        self.p = page                               
-        self.key = key     
+        self.p: ft.Page = page                               
+        self.key: str = key     
 
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our object so we can access its data and change it
             {   
-                'title': self.title,        # Title of the mini widget, should match the object title
-                'tag': "mini_widget",       # Default mini widget tag, but should be overwritten by child classes
-                'visible': True,            # If the widget is visible
-                'is_selected': bool,        # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
-                'side_location': 'right',   # Side of the widget the mini widget shows on
+                'title': self.title,          # Title of the mini widget, should match the object title
+                'tag': "mini_widget",         # Default mini widget tag, but should be overwritten by child classes
+                'visible': True,              # If the widget is visible
+                'is_selected': bool,          # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+                'side_location': 'right',     # Side of the widget the mini widget shows on
+                'custom_fields': dict,        # Dictionary for any custom fields the mini widget wants to store
             },
         )
 
@@ -143,6 +149,21 @@ class Mini_Widget(ft.Container):
         # Handle errors
         except Exception as e:
             print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
+
+    def change_custom_field(self, **kwargs):
+        ''' Changes a key/value pair in our custom fields dictionary and saves the json file '''
+        # Called by:
+        # widget.change_custom_field(**{'key': value, 'key2': value2})
+
+        try:
+            for key, value in kwargs.items():
+                self.data['custom_fields'].update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing custom field {key}:{value} in widget {self.title}: {e}")
 
 
     def rename(self, new_name: str):

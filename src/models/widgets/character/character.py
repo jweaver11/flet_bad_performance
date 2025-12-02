@@ -88,7 +88,6 @@ class Character(Widget):
                 'backstory': str,
                 'abilities': str,
                 'is_dead': bool,    # Defaults to false
-                'custom_fields': {},    # Dict to store custom text fields
             },
         )
         
