@@ -475,13 +475,14 @@ class Widget(ft.Container):
 
     # Called to set the active mini widget in this widget
     def set_active_mini_widget(self, mini_widget):
-        
+        print(f"Setting active mini widget to {mini_widget.title} in widget {self.title}")
         if self.active_mini_widget is not None:
             if self.active_mini_widget != mini_widget:
                 self.active_mini_widget.toggle_visibility(value=False, not_active=True)
 
         self.active_mini_widget = mini_widget
-        self.reload_widget()
+
+        #self.reload_widget()
 
     # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
     def reload_widget(self):

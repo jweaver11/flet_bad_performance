@@ -313,7 +313,7 @@ class Timelines_Rail(Rail):
             else:
                 content.controls.append(timeline.timeline_dropdown)
     
-
+        content.controls.append(ft.Container(height=6))
 
         # Finally, add our new item textfield at the bottom
         content.controls.append(self.new_item_textfield)

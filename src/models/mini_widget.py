@@ -32,10 +32,6 @@ class Mini_Widget(ft.Container):
             border_radius=ft.border_radius.all(6),
             border=ft.border.all(2, ft.Colors.SECONDARY_CONTAINER),
             padding=ft.padding.all(8),
-            #animate=ft.Animation(600, ft.AnimationCurve.EASE_OUT_CUBIC),
-            #scale=ft.transform.Scale(0, alignment=ft.alignment.center_right),
-            #bgcolor=ft.Colors.with_opacity(1, ft.Colors.ON_INVERSE_SURFACE),
-            #shadow=ft.BoxShadow(blur_radius=4, color=ft.Colors.BLACK38, offset=ft.Offset(2, 2)),
             data=data,      # Sets our data.
         )
 
@@ -213,7 +209,7 @@ class Mini_Widget(ft.Container):
         self.save_dict()
 
         # Reload our mini w
-        #self.reload_mini_widget()
+        self.reload_mini_widget()
 
         if not_active:
             pass
@@ -251,5 +247,6 @@ class Mini_Widget(ft.Container):
         # Give Uniform mini titles and styling
 
         self.p.update()
+        
 
         

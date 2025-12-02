@@ -161,6 +161,8 @@ class Content_Rail(Rail):
             additional_directory_menu_options=self.get_directory_menu_options()
         )
 
+        content.controls.append(ft.Container(height=6))
+
         # Append our hiddent textfields for creating new categories, chapters, and notes
         content.controls.append(self.new_item_textfield)
 

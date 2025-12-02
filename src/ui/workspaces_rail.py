@@ -44,7 +44,7 @@ class Workspaces_Rail(ft.Container):
             destinations=[  # Each rail only has one destination
                 # We do it this way so we can change the order when re-ordering the rail
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED, color=ft.Colors.PRIMARY), # Icon on the rail
+                    icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED), # Icon on the rail
                     selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), # Selected icon on the rail
                     padding=ft.padding.only(top=10, bottom=10), # Padding for spacing
                     # Label underneath the icon and the data we will use to identify the rail
@@ -60,7 +60,7 @@ class Workspaces_Rail(ft.Container):
             on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED, color=ft.Colors.PRIMARY), 
+                    icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED), 
                     selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
                     label="Characters", data="characters"
@@ -75,7 +75,7 @@ class Workspaces_Rail(ft.Container):
             on_change=lambda e: self.on_workspace_change(e, story),   
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, color=ft.Colors.PRIMARY, scale=1.2), 
+                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, scale=1.2), 
                     selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
                     padding=ft.padding.only(top=10, bottom=10),
                     label="Timelines", data="timelines"
@@ -90,7 +90,7 @@ class Workspaces_Rail(ft.Container):
             on_change=lambda e: self.on_workspace_change(e, story),    
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED, color=ft.Colors.PRIMARY), 
+                    icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
                     label="World Building", data="world_building"
@@ -105,7 +105,7 @@ class Workspaces_Rail(ft.Container):
             on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.DRAW_OUTLINED, color=ft.Colors.PRIMARY), 
+                    icon=ft.Icon(ft.Icons.DRAW_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.DRAW, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
                     label="Drawing Board", data="drawing_board",
@@ -120,7 +120,7 @@ class Workspaces_Rail(ft.Container):
             on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED, color=ft.Colors.PRIMARY), 
+                    icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
                     label="Planning", data="planning",
