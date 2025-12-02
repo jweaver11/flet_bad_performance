@@ -28,8 +28,13 @@ class Widget(ft.Container):
         # Sets uniformity for all widgets
         super().__init__(
             expand=True, 
-            bgcolor=ft.Colors.TRANSPARENT, 
+            #bgcolor=ft.Colors.TRANSPARENT, 
             data=data,                              # Sets our data. 
+            border_radius=ft.border_radius.all(8),
+            border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
+            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+            margin=ft.margin.all(0),
+            padding=ft.padding.all(8),
         )
 
     
@@ -48,6 +53,7 @@ class Widget(ft.Container):
                 'directory_path': self.directory_path,          # Directory path to the file this widget's data is stored in
                 'tag': str,                                     # Tag to identify what type of widget this is
                 'pin_location': "main" if data is None else data.get('pin_location', "main"),       # Pin location this widget is rendered in the workspace (main, left, right, top, or bottom)
+                'index': int,                                   # Index of this widget in its pin location
                 'visible': True,                                # Whether this widget is visible in the workspace or not
                 'is_active_tab': True,                          # Whether this widget's tab is the active tab in the main pin
                 'color': "primary",                             # Color of the icon on the rail and next to title on rail
@@ -549,4 +555,6 @@ class Widget(ft.Container):
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]
         self.content = self.tabs
+
+        #self.content = row
         self.p.update()
