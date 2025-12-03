@@ -27,7 +27,8 @@ class Active_Rail(ft.Container):
         # Consistent styling for all our rails
         super().__init__(
             alignment=ft.alignment.top_left,
-            padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
+            padding=ft.padding.only(top=10, bottom=10, left=8, right=8),
+            border_radius=ft.border_radius.only(top_right=8, bottom_right=8),
             #bgcolor=ft.Colors.with_opacity(.4, ft.Colors.ON_INVERSE_SURFACE),
             gradient=ft.LinearGradient(
                 begin=ft.alignment.top_center,

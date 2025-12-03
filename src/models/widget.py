@@ -28,11 +28,8 @@ class Widget(ft.Container):
         # Sets uniformity for all widgets
         super().__init__(
             expand=True, 
-            #bgcolor=ft.Colors.TRANSPARENT, 
             data=data,                              # Sets our data. 
             border_radius=ft.border_radius.all(8),
-            #border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT),
-            #bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
             gradient=ft.LinearGradient(
                 begin=ft.alignment.top_center,
                 end=ft.alignment.bottom_center,
@@ -43,7 +40,7 @@ class Widget(ft.Container):
                 ],
             ),
             margin=ft.margin.all(0),
-            padding=ft.padding.all(8),
+            padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
             #on_click=lambda e: print("Pressed widget")
             #TODO: Make bgcolor gradiant, slightly brighter at top
         )

@@ -23,7 +23,7 @@ class Rail(ft.Container):
         # Initialize the parent Container class first
         super().__init__(
             #padding=None,
-            padding=ft.Padding(10, 0, 0, 0),        # Adds padding left to match divider on the right
+            padding=ft.Padding(0, 0, 0, 0),        # Adds padding left to match divider on the right
         )
             
         # Store our parameters
