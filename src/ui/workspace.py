@@ -170,7 +170,7 @@ class Workspace(ft.Container):
     def on_hover_pin_drag_target(self, e):
         ''' Makes the drag target visible for so visual feedback '''
 
-        e.control.content.opacity = .4
+        e.control.content.opacity = .3
         e.control.content.update()
        
     # Called when a draggable leaves a drag target
