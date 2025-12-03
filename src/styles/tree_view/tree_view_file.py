@@ -58,7 +58,7 @@ class Tree_View_File(ft.GestureDetector):
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
             on_secondary_tap = lambda e: self.widget.story.open_menu(self.get_menu_options()),
-            on_tap = lambda e: self.widget.focus(),
+            on_tap = lambda e: self.widget.toggle_visibility(value=True),
             mouse_cursor = ft.MouseCursor.CLICK,
         )
 

@@ -39,11 +39,11 @@ class Widget(ft.Container):
                 colors=[
                     ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
                     ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+                    #ft.Colors.CYAN_400, ft.Colors.PURPLE_500
                 ],
             ),
             margin=ft.margin.all(0),
-            #padding=ft.padding.all(8),
-            padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
+            padding=ft.padding.all(8),
             #on_click=lambda e: print("Pressed widget")
             #TODO: Make bgcolor gradiant, slightly brighter at top
         )
@@ -346,32 +346,6 @@ class Widget(ft.Container):
 
         self.p.update()
 
-    # Called when widget is selected on a rail or workspace
-    def focus(self):
-        ''' Focuses the widget in the workspace if it is not already visible '''
-
-      
-        # If we're not focused already, run our logic
-        if not self.focused:
-
-            # If we're note visible, make us visible
-            if not self.visible:
-                self.data['visible'] = True
-                self.save_dict()
-                self.visible = self.data['visible']
-
-            # Apply our focus stuff
-            # Apply our focused tab UI outline around widget
-
-            # Apply to the UI
-            self.p.update()
-            self.story.workspace.reload_workspace()
-
-        # We are focused, do nothing
-        else:
-            pass
-
-        
 
     # Called when app clicks the hide icon in the tab
     def toggle_visibility(self, e=None, value: bool=None):
@@ -390,8 +364,37 @@ class Widget(ft.Container):
         # Save our changes and reload the UI
         self.save_dict()
         self.reload_widget()
-        self.story.workspace.reload_workspace()
 
+        # Protect first launch
+        if self.story.workspace is not None:
+            self.story.workspace.reload_workspace()
+
+
+    # Called to set the active mini widget in this widget
+    def set_active_mini_widget(self, mini_widget):
+        print(f"Setting active mini widget to {mini_widget.title} in widget {self.title}")
+        if self.active_mini_widget is not None:
+            if self.active_mini_widget != mini_widget:
+                self.active_mini_widget.toggle_visibility(value=False, not_active=True)
+
+        self.active_mini_widget = mini_widget
+
+        #self.reload_widget()
+
+
+    def focus(self):
+        self.focused = True
+
+        for widget in self.story.widgets:
+            if widget != self:
+                if widget.focused:
+                    widget.padding = ft.padding.all(0)
+                    widget.focused = False
+                    break
+
+        self.padding = ft.padding.all(2)
+        self.p.update()
+        
 
     # Called at end of constructor
     def reload_tab(self):
@@ -507,16 +510,6 @@ class Widget(ft.Container):
             )                    
         )
 
-    # Called to set the active mini widget in this widget
-    def set_active_mini_widget(self, mini_widget):
-        print(f"Setting active mini widget to {mini_widget.title} in widget {self.title}")
-        if self.active_mini_widget is not None:
-            if self.active_mini_widget != mini_widget:
-                self.active_mini_widget.toggle_visibility(value=False, not_active=True)
-
-        self.active_mini_widget = mini_widget
-
-        #self.reload_widget()
 
     # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
     def reload_widget(self):
@@ -567,6 +560,8 @@ class Widget(ft.Container):
 
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
+        #self.body_container.padding = ft.padding.only(left=6, right=6, top=0, bottom=6)
+        self.body_container.border_radius = ft.border_radius.all(8)
 
 
         
@@ -586,6 +581,29 @@ class Widget(ft.Container):
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]
+
+        outer_container = ft.Container(
+            expand=True,
+            border_radius=ft.border_radius.all(8),
+            padding=ft.padding.only(top=0, bottom=6, left=6, right=6),
+            gradient=ft.LinearGradient(
+                colors=[
+                    
+                    ft.Colors.ON_INVERSE_SURFACE,
+                    ft.Colors.SURFACE
+                ]
+            ),
+            content=self.tabs
+        )
+
+        # For adding focus outline
+        hover_gd = ft.GestureDetector(
+            mouse_cursor=ft.MouseCursor.CLICK,
+            
+            on_tap_down=lambda e: self.focus(),
+            #on_exit=self.stop_hover_tab,
+            content=outer_container
+        )
 
         self.content = self.tabs
 

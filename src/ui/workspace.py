@@ -43,65 +43,67 @@ class Workspace(ft.Container):
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
 
-        # Master stack that holds our widgets ^ row. We add our drag targets overtop our widgets, so we use a stack here
-        # And our drag targets when we start dragging widgets.
-        # We use global stack like this so there is always a drag target, even if a pin is empty
-        self.master_stack = ft.Stack(expand=True, controls=[self.widgets])
-
         # Pin drag targets
         self.top_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, bgcolor=ft.Colors.WHITE, opacity=0), 
+            content=ft.Container(expand=True, height=self.story.data.get('top_pin_height', 200), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8, margin=ft.margin.only(left=8, right=8),), 
             on_accept=lambda e: self.pin_drag_accept(e, "top"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.left_pin_drag_target = ft.DragTarget(
             group="widgets",
-            content=ft.Container(expand=True, width=self.minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
+            content=ft.Container(expand=True, width=self.story.data.get('left_pin_width', 230), bgcolor=ft.Colors.ON_SURFACE, border_radius=8, opacity=0), 
             on_accept=lambda e: self.pin_drag_accept(e, "left"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
-        self.main_pin_drag_target = ft.DragTarget(
-            group="widgets", 
-            content=ft.Container(expand=True, height=self.minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0), 
-            on_accept=lambda e: self.pin_drag_accept(e, "main"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
-        )
+
         self.right_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, width=self.minimum_pin_width, bgcolor=ft.Colors.WHITE, opacity=0), 
+            content=ft.Container(expand=True, width=self.story.data.get('right_pin_width', 230), bgcolor=ft.Colors.ON_SURFACE, border_radius=8, opacity=0), 
             on_accept=lambda e: self.pin_drag_accept(e, "right"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.bottom_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, height=self.minimum_pin_height, bgcolor=ft.Colors.WHITE, opacity=0),
+            content=ft.Container(expand=True, height=self.story.data.get('bottom_pin_height', 200), margin=ft.margin.only(left=8, right=8), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8),
             on_accept=lambda e: self.pin_drag_accept(e, "bottom"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
 
-        self.pin_drag_targets = [
-            ft.Container(
+        # Weird flet rendering logic, this one needs a container around the drag target to work properly
+        self.main_pin_drag_target = ft.Container(
+            expand=True,
+            padding=ft.padding.all(8),
+            content=ft.DragTarget(
+            group="widgets", 
+            on_accept=lambda e: self.pin_drag_accept(e, "main"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
+            content=ft.Container(expand=True,  bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8)
+            )
+        )
+
+        self.pin_drag_targets = ft.Container(
+            visible=False,
+            expand=True,
+            content=ft.Row(
+                spacing=0,
                 expand=True,
-                content=self.main_pin_drag_target,
-                top=200, left=200, right=200, bottom=200, 
-            ),
-            ft.Container(
-                content=self.top_pin_drag_target,
-                height=200,
-                top=0, left=0, right=0, 
-            ),
-            ft.Container(
-                content=self.bottom_pin_drag_target,
-                height=200,
-                bottom=0, left=0, right=0,
-            ),
-            ft.Container(
-                content=self.left_pin_drag_target,
-                width=220,
-                left=0, top=0, bottom=0,
-            ),
-            ft.Container(
-                content=self.right_pin_drag_target,
-                width=220,
-                right=0, top=0, bottom=0, 
-            ),
-        ]
+                controls=[
+                    self.left_pin_drag_target,
+                    ft.Column(
+                        expand=True,
+                        spacing=0,
+                        controls=[
+                            self.top_pin_drag_target,
+                            self.main_pin_drag_target,  
+                            self.bottom_pin_drag_target,
+                        ]
+                    ),
+                    self.right_pin_drag_target,
+                ]
+            )
+        )
+
+
+        # Master stack that holds our widgets ^ row. We add our drag targets overtop our widgets, so we use a stack here
+        # And our drag targets when we start dragging widgets.
+        # We use global stack like this so there is always a drag target, even if a pin is empty
+        self.master_stack = ft.Stack(expand=True, controls=[self.widgets, self.pin_drag_targets])
 
 
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
@@ -111,28 +113,43 @@ class Workspace(ft.Container):
     def show_pin_drag_targets(self):
         ''' Adds our drag targets to the master stack so we can drop our widgets into pin locations '''
 
-        # Add logic here. pin drag targets.width = left_pin.width if left_pin.width > minimum_pin_width else minimum_pin_width
+        self.pin_drag_targets.visible = True
 
-        if self.pin_drag_targets not in self.master_stack.controls:
-            self.master_stack.controls.extend(self.pin_drag_targets)
-            self.master_stack.update()
+        visible_top_pin_controls = [control for control in self.top_pin.controls if getattr(control, 'visible', True)]
+
+        # If no visible in the top pin
+        if len(visible_top_pin_controls) == 0:
+            self.top_pin_drag_target.content.height = self.minimum_pin_height
+
+        visible_left_pin_controls = [control for control in self.left_pin.controls if getattr(control, 'visible', True)]
+        # If no visible in the left pin
+        if len(visible_left_pin_controls) == 0:
+            self.left_pin_drag_target.content.width = self.minimum_pin_width
+
+        visible_right_pin_controls = [control for control in self.right_pin.controls if getattr(control, 'visible', True)]
+        # If no visible in the right pin
+        if len(visible_right_pin_controls) == 0:
+            self.right_pin_drag_target.content.width = self.minimum_pin_width
+
+        visible_bottom_pin_controls = [control for control in self.bottom_pin.controls if getattr(control, 'visible', True)]
+        # If no visible in the bottom pin
+        if len(visible_bottom_pin_controls) == 0:
+            self.bottom_pin_drag_target.content.height = self.minimum_pin_height
+        
 
         self.p.update()
 
     # Called whenever a drag target accepts a draggable
     def remove_drag_targets(self):
         ''' Removes our drag targets from the master stack, otherwise they sit overtop our widgets and get in the way '''
-
-        for target in self.pin_drag_targets:
-            if target in self.master_stack.controls:
-                self.master_stack.controls.remove(target)
+        self.pin_drag_targets.visible = False
         self.master_stack.update()
 
     # Called when a draggable hovers over a drag target before dropping
     def on_hover_pin_drag_target(self, e):
         ''' Makes the drag target visible for so visual feedback '''
 
-        e.control.content.opacity = .5
+        e.control.content.opacity = .4
         e.control.content.update()
        
     # Called when a draggable leaves a drag target
@@ -334,7 +351,7 @@ class Workspace(ft.Container):
         # Updates the size of our pin in the story object
         def move_top_pin_divider(e: ft.DragUpdateEvent):
             #print("move top pin divider called")
-            if (e.delta_y > 0 and self.top_pin.height < self.p.height/2) or (e.delta_y < 0 and self.top_pin.height > 200):
+            if (e.delta_y > 0 and self.top_pin.height < self.p.height/2) or (e.delta_y < 0 and self.top_pin.height >= self.minimum_pin_height):
                 self.top_pin.height += e.delta_y
                 self.top_pin_drag_target.content.height = self.top_pin.height  # Update the drag target height to match the pin height
             formatted_top_pin.update()
@@ -343,6 +360,7 @@ class Workspace(ft.Container):
         def save_top_pin_height(e: ft.DragEndEvent):
             #print("save top pin height called")
             self.story.data['top_pin_height'] = self.top_pin.height
+            self.top_pin_drag_target.content.height = self.top_pin.height  # Update the drag target height to match the pin height
             self.story.save_dict()
 
             # Reload each widget in the top pin to apply size changes if they need it
@@ -372,7 +390,7 @@ class Workspace(ft.Container):
         # Left pin reisizer method and variable
         def move_left_pin_divider(e: ft.DragUpdateEvent):
             #print("move left pin divider called")
-            if (e.delta_x > 0 and self.left_pin.width < self.p.width/2) or (e.delta_x < 0 and self.left_pin.width > 200):
+            if (e.delta_x > 0 and self.left_pin.width < self.p.width/2) or (e.delta_x < 0 and self.left_pin.width >= self.minimum_pin_width):
                 self.left_pin.width += e.delta_x
             formatted_left_pin.update()
             self.widgets.update()
@@ -380,6 +398,7 @@ class Workspace(ft.Container):
         def save_left_pin_width(e: ft.DragEndEvent):
             #print("save left pin width called")
             self.story.data['left_pin_width'] = self.left_pin.width
+            self.left_pin_drag_target.content.width = self.left_pin.width  # Update the drag target height to match the pin height
             self.story.save_dict()
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.left_pin.controls:
@@ -405,7 +424,7 @@ class Workspace(ft.Container):
         # Right pin resizer method and variable
         def move_right_pin_divider(e: ft.DragUpdateEvent):
             #print("move right pin divider called")
-            if (e.delta_x < 0 and self.right_pin.width < self.p.width/2) or (e.delta_x > 0 and self.right_pin.width > 200):
+            if (e.delta_x < 0 and self.right_pin.width < self.p.width/2) or (e.delta_x > 0 and self.right_pin.width >= self.minimum_pin_width):
                 self.right_pin.width -= e.delta_x
             formatted_right_pin.update()
             self.widgets.update()
@@ -413,7 +432,7 @@ class Workspace(ft.Container):
         def save_right_pin_width(e: ft.DragEndEvent):
             print("save right pin width called")    
             self.story.data['right_pin_width'] = self.right_pin.width
-            print("right pin width saved as:", self.right_pin.width)
+            self.right_pin_drag_target.content.width = self.right_pin.width
             self.story.save_dict()
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.right_pin.controls:
@@ -437,7 +456,7 @@ class Workspace(ft.Container):
         # Bottom pin resizer method and variable
         def move_bottom_pin_divider(e: ft.DragUpdateEvent):
             #print("move bottom pin divider called")
-            if (e.delta_y < 0 and self.bottom_pin.height < self.p.height/2) or (e.delta_y > 0 and self.bottom_pin.height > 200):
+            if (e.delta_y < 0 and self.bottom_pin.height < self.p.height/2) or (e.delta_y > 0 and self.bottom_pin.height >= self.minimum_pin_height):
                 self.bottom_pin.height -= e.delta_y
             formatted_bottom_pin.update()
             self.widgets.update()
@@ -445,6 +464,7 @@ class Workspace(ft.Container):
         def save_bottom_pin_height(e: ft.DragEndEvent):
             print("save bottom pin height called")
             self.story.data['bottom_pin_height'] = self.bottom_pin.height
+            self.bottom_pin_drag_target.content.height = self.bottom_pin.height
             self.story.save_dict()
             # Reload each widget in the top pin to apply size changes if they need it
             for widget in self.bottom_pin.controls:
@@ -543,12 +563,6 @@ class Workspace(ft.Container):
         else:
             formatted_main_pin = self.main_pin
 
-
-        print("Initial selected main pin tab index:", getattr(self.main_pin_tabs, 'selected_index', 'N/A')  )
-
-        
-
-
         
         # Formatted pin locations that hold our pins, and our resizer gesture detectors.
         # Main pin is always expanded and has no resizer, so it doesnt need to be formatted
@@ -612,6 +626,9 @@ class Workspace(ft.Container):
             if self.bottom_pin.height < self.minimum_pin_height:
                 self.bottom_pin.height = self.minimum_pin_height
 
+
+        
+
         # Format our pins on the page
         self.widgets.controls.clear()
         self.widgets.controls = [
@@ -623,6 +640,7 @@ class Workspace(ft.Container):
                     #self.main_pin,     # main work area with widgets
                     formatted_main_pin,   # formatted main pin
                     formatted_bottom_pin,     # formatted bottom pin
+
             ]),
             formatted_right_pin,    # formatted right pin
         ]
