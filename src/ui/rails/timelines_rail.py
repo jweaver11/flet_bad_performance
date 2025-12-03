@@ -298,7 +298,7 @@ class Timelines_Rail(Rail):
 
 
             # Add some padding under it between timelines
-            timeline.timeline_dropdown.content.controls.append(ft.Container(height=10))
+            #timeline.timeline_dropdown.content.controls.append(ft.Container(height=10))
 
             # If theres only one timeline, no need to add the parent expansion to the page.
             if len(self.story.timelines) == 1:

@@ -64,7 +64,7 @@ class Timeline_Dropdown(ft.GestureDetector):
             dense=True,
         )
 
-        self.expansion_tile: ft.ExpansionTile = None
+        self.expansion_tile: ft.ExpansionTile = None    # Placeholder for our expansion tile
 
         
         # Parent constructor
@@ -481,7 +481,7 @@ class Timeline_Dropdown(ft.GestureDetector):
             adaptive=True,
             bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
             collapsed_bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
-            shape=ft.RoundedRectangleBorder(),
+            #shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
         )
 

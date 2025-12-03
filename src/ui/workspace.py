@@ -161,6 +161,16 @@ class Workspace(ft.Container):
             
         # Set object variable to our object
         widget = draggable.data
+
+        old_pin_location = widget.data['pin_location']
+
+        # If we were dragged from the main pin and we were the active tab, set the first tab to new active
+        if old_pin_location == "main" and widget.data['is_active_tab'] == True:
+
+            # If there are other widgets in the main pin, set the first one to active tab
+            self.story.workspace.main_pin.controls[0].data['is_active_tab'] = True
+            self.story.workspace.main_pin.controls[0].save_dict()
+                
                 
 
         # Set our objects pin location to the correct new location
@@ -169,14 +179,26 @@ class Workspace(ft.Container):
         # Even though we're not in the new pin location until we reload, we can just use the length to find our index
         if pin_location == "top":
             widget.data['index'] = len(self.story.workspace.top_pin.controls)
+        
         elif pin_location == "left":
             widget.data['index'] = len(self.story.workspace.left_pin.controls)
+        
         elif pin_location == "main":
-            widget.data['index'] = len(self.story.workspace.main_pin.controls)
+            widget.data['index'] = len(self.story.workspace.main_pin.controls)   
+
+            # Set other tabs to inactive, and new one to active              
+            for w in self.story.workspace.main_pin.controls:
+                w.data['is_active_tab'] = False        # Deselect all other main pin widgets
+
+            widget.data['is_active_tab'] = True
+
         elif pin_location == "right":
             widget.data['index'] = len(self.story.workspace.right_pin.controls)
+
         elif pin_location == "bottom":
             widget.data['index'] = len(self.story.workspace.bottom_pin.controls)
+
+
         
         # Make sure our widget is visible if it was dragged from the rail
         if not widget.visible:
@@ -447,17 +469,21 @@ class Workspace(ft.Container):
         def main_pin_tab_change(e: ft.ControlEvent):
             ''' Updates the widgets data to reflect the new active tab '''
 
+
             # Run through our visible main pin widgets
             for widget in visible_main_controls:
 
                 # If the widgets tab is selected, make the widget data match, otherwise deselect the rest
                 if widget.tab == e.control.tabs[e.control.selected_index]:
                     widget.data['is_active_tab'] = True
+                    self.main_pin_tabs.indicator_color = widget.data.get('color', ft.Colors.PRIMARY)
                 else:
                     widget.data['is_active_tab'] = False
 
                 # Save the data. This allows for selected main pin tabs to save between sessions
                 widget.save_dict()
+
+            self.p.update()
 
 
 
@@ -487,6 +513,7 @@ class Workspace(ft.Container):
                 # Sets the selected tab to the active one in the main pin
                 if widget.data['is_active_tab']:
                     self.main_pin_tabs.selected_index = self.main_pin_tabs.tabs.index(widget.tab)
+                    self.main_pin_tabs.indicator_color =  ft.Colors.with_opacity(0.8, widget.data.get('color', ft.Colors.PRIMARY))
                     
 
             # Stick it in a container for styling
@@ -515,6 +542,9 @@ class Workspace(ft.Container):
 
         else:
             formatted_main_pin = self.main_pin
+
+
+        print("Initial selected main pin tab index:", getattr(self.main_pin_tabs, 'selected_index', 'N/A')  )
 
         
 

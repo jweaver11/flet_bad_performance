@@ -22,12 +22,21 @@ class Active_Rail(ft.Container):
     def __init__(self, page: ft.Page, story: Story):
     
         self.p = page  # Store the page reference
+        self.story = story  # Store the story reference
   
         # Consistent styling for all our rails
         super().__init__(
             alignment=ft.alignment.top_left,
             padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
-            bgcolor=ft.Colors.with_opacity(.4, ft.Colors.ON_INVERSE_SURFACE),
+            #bgcolor=ft.Colors.with_opacity(.4, ft.Colors.ON_INVERSE_SURFACE),
+            gradient=ft.LinearGradient(
+                begin=ft.alignment.top_center,
+                end=ft.alignment.bottom_center,
+                colors=[
+                    ft.Colors.with_opacity(.6, ft.Colors.ON_INVERSE_SURFACE),
+                    ft.Colors.with_opacity(.2, ft.Colors.ON_INVERSE_SURFACE),
+                ],
+            ),
             width=app.settings.data['active_rail_width'],  # Sets the width
         )
 
@@ -59,6 +68,11 @@ class Active_Rail(ft.Container):
 
             elif story.workspaces_rail.selected_rail == "timelines":
                 self.content = self.timelines_rail
+
+                # Make sure our timeline is shown if there is only one
+                if len(self.story.timelines) == 1:
+                    for tl in self.story.timelines.values():
+                        tl.toggle_visibility(value=True)
 
             elif story.workspaces_rail.selected_rail == "world_building":
                 self.content = self.world_building_rail
