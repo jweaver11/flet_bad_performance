@@ -12,6 +12,7 @@ from models.widget import Widget
 from models.mini_widgets.timelines.arc import Arc
 from handlers.verify_data import verify_data
 import flet.canvas as cv
+from styles.colors import colors
 
 
 class Timeline(Widget):
@@ -83,14 +84,13 @@ class Timeline(Widget):
         # Loads our three mini widgets into their dicts
         self.load_arcs()
         self.load_plot_points()
-        self.load_time_skips()
         
         # UI elements
         self.timeline_control = ft.GestureDetector(
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
             on_exit=self.on_exit,        
-            on_tap=self.on_clicked,
+            on_tap=lambda e: self.information_display.toggle_visibility(value=True),
             hover_interval=20,
         )
 
@@ -102,7 +102,7 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_tap=self.on_click,
+            on_tap=lambda e: self.information_display.toggle_visibility(value=True),
         )
         self.timeline_right_edge = ft.GestureDetector(
             height=50,
@@ -111,25 +111,18 @@ class Timeline(Widget):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_exit=self.on_exit,
             on_enter=self.on_enter,
-            on_tap=self.on_click,
-        )
-
-        # Text field for adding new items
-        self.new_item_text_field = ft.TextField(hint_text="Add new item here", )
-        #on_blur=self.hide_new_item_container
-
-        # Container that contains text box for adding new items
-        self.new_item_container = ft.Stack(
-            expand=True,
-            visible=False,
-            alignment=ft.Alignment(0, 0),
-            controls=[self.new_item_text_field]
+            on_tap=lambda e: self.information_display.toggle_visibility(value=True),
         )
 
         # Dropdown on the rail. We don't use it here, let the rail handle it
-        self.timeline_dropdown =  None      #'Timeline_Dropdown'
-        
+        self.timeline_dropdown = None      # 'Timeline_Dropdown'
 
+        # Set the active mini widget if we have one visible
+        for mini_widget in self.mini_widgets:
+            if mini_widget.visible:
+                self.set_active_mini_widget(mini_widget)
+                break
+        
         # Builds/reloads our timeline UI
         self.reload_widget()
 
@@ -183,22 +176,6 @@ class Timeline(Widget):
             self.mini_widgets.append(self.plot_points[key])  # Plot points need to be in the owners mini widgets list to show up in the UI
         
     
-    # Called in the constructor
-    def load_time_skips(self):
-        ''' Loads timeskips from data into self.time_skips  '''
-        from models.mini_widgets.timelines.time_skip import Time_Skip
-
-        for key, data in self.data['time_skips'].items():
-            self.time_skips[key] = Time_Skip(
-                title=key, 
-                owner=self, 
-                father=self,
-                page=self.p, 
-                key="time_skips",
-                data=data
-            )
-            self.mini_widgets.append(self.time_skips[key])  # Time skips need to be in the owners mini widgets list to show up in the UI
-    
     # Called when creating a new arc
     def create_arc(self, title: str):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
@@ -217,6 +194,7 @@ class Timeline(Widget):
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
+        self.active_mini_widget = self.arcs[title]
         self.reload_widget()
         
     # Called when creating a new plotpoint
@@ -231,33 +209,16 @@ class Timeline(Widget):
             father=self,
             page=self.p, 
             key="plot_points", 
+            x_alignment=self.x_alignment,
             data=None
         )
         self.mini_widgets.append(self.plot_points[title])
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
+        self.active_mini_widget = self.plot_points[title]
         self.reload_widget()
 
-    # Called when creating a new timeskip
-    def create_time_skip(self, title: str):
-        ''' Creates a new timeskip inside of our timeline object, and updates the data to match '''
-        from models.mini_widgets.timelines.time_skip import Time_Skip
-
-        # Add our new Time Skip mini widget object to our time_skips dict, and to our owners mini widgets
-        self.time_skips[title] = Time_Skip(
-            title=title, 
-            owner=self, 
-            father=self,
-            page=self.p, 
-            key="time_skips", 
-            data=None
-        )
-        self.mini_widgets.append(self.time_skips[title])
-
-        # Apply our changes in the UI
-        self.story.active_rail.content.reload_rail()
-        self.reload_widget()
 
     def delete_plot_point(self, plot_point):
         ''' Deletes a plot point from our timeline '''
@@ -285,9 +246,13 @@ class Timeline(Widget):
 
     # Called when right clicking our controls for either timeline or an arc
     def get_menu_options(self) -> list[ft.Control]:
+
+        # Color, rename, delete
         return [
+            # Delete button
+        
             Menu_Option_Style(
-                #on_click=self.new_timeline_clicked,
+                on_click=self.new_item_clicked,
                 data="arc",
                 content=ft.Row([
                     ft.Icon(ft.Icons.CIRCLE_OUTLINED),
@@ -295,12 +260,47 @@ class Timeline(Widget):
                 ])
             ),
             Menu_Option_Style(
-                #on_click=self.new_timeline_clicked,
+                on_click=self.new_item_clicked,
                 data="plot_point",
                 content=ft.Row([
                     ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
                     ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
+            ),
+            Menu_Option_Style(
+                on_click=self.rename_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
+                    ft.Text(
+                        "Rename", 
+                        weight=ft.FontWeight.BOLD, 
+                        color=ft.Colors.ON_SURFACE
+                    ), 
+                ]),
+            ),
+            # Color changing popup menu
+            Menu_Option_Style(
+                content=ft.PopupMenuButton(
+                    expand=True,
+                    tooltip="",
+                    padding=None,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
+                            ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                            ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
+                        ]
+                    ),
+                    items=self.get_color_options()
+                )
+            ),
+            Menu_Option_Style(
+                on_click=lambda e: self.delete_clicked(e),
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
+                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
+                ]),
             ),
         ]
     
@@ -309,7 +309,8 @@ class Timeline(Widget):
         ''' Highlights our timeline control for visual feedback '''
 
         # During hover, set our x position so we know where to add new items on the timeline
-        self.x_alignment = (e.control.data - 100) / 100
+        if e is not None:
+            self.x_alignment = (e.control.data - 100) / 100
 
         # Make the edges highlight
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(1, self.data.get('color', "primary"))
@@ -336,13 +337,102 @@ class Timeline(Widget):
 
         self.p.update()
 
+    def new_item_clicked(self, e):
+        ''' Called when new arc is clicked from timeline context menu '''
+        #self.create_arc("New Arc")
+        #self.new_item_container.visible = True
+        self.story.close_menu()
+
+        tag = e.control.data
+
+        #self.story.open_new_item_input(self.new_item_container)
+        #self.p.update()
+
+        # Show our textfield to enter the name of the new item, giving it default based name on length of those num items
+        # On submit runs its rename function to create the new item
+
+        if tag is not None:
+            if tag == "arc":
+                self.create_arc(f"Arc {len(self.arcs) + 1}")
+            elif tag == "plot_point":
+                self.create_plot_point(f"Plot Point {len(self.plot_points) + 1}")
+        else:
+            print("Error: No tag found for new item creation")
+
+    
 
 
-    # Called when clicking on our timeline control
-    def on_clicked(self, e):
-        ''' Shows our timeline information display '''
-        print("Timeline clicked")
+    # Called when rename button is clicked
+    def rename_clicked(self, e):
+        ''' Makes sure our information display is visible, and focuses the title control for renaming '''
+
+        # Close the menu
+        self.story.close_menu()
+
+        # Make sure our information display is visible
+        if not self.information_display.visible:
+            self.information_display.toggle_visibility(value=True)
+
+        # Focus the title control for renaming
+        self.information_display.title_control.focus()
+
+    # Called when color button is clicked
+    def get_color_options(self) -> list[ft.Control]:
+        ''' Returns a list of all available colors for icon changing '''
+
+        # Called when a color option is clicked on popup menu to change icon color
+        def _change_icon_color(color: str):
+            ''' Passes in our kwargs to the widget, and applies the updates '''
+
+            # Change the data
+            self.data['color'] = color
+            self.save_dict()
+            
+            # Change our icon to match, apply the update
+            self.story.active_rail.content.reload_rail()
+            self.reload_widget()
+            
+
+        # List for our colors when formatted
+        color_controls = [] 
+
+        # Create our controls for our color options
+        for color in colors:
+            color_controls.append(
+                ft.PopupMenuItem(
+                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
+                    on_click=lambda e, col=color: _change_icon_color(col)
+                )
+            )
+
+        return color_controls
         
+
+    # Called when the delete button is clicked in the menu options
+    def delete_clicked(self, e):
+        ''' Deletes this file from the story '''
+
+        def _delete_confirmed(e):
+            ''' Deletes the widget after confirmation '''
+
+            self.p.close(dlg)
+            self.story.delete_widget(self)
+
+        self.story.close_menu()
+            
+
+        # Append an overlay to confirm the deletion
+        dlg = ft.AlertDialog(
+            title=ft.Text(f"Are you sure you want to delete {self.title} forever?", weight=ft.FontWeight.BOLD),
+            alignment=ft.alignment.center,
+            title_padding=ft.padding.all(25),
+            actions=[
+                ft.TextButton("Cancel", on_click=lambda e: self.p.close(dlg)),
+                ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+            ]
+        )
+
+        self.p.open(dlg)
 
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):
@@ -353,22 +443,13 @@ class Timeline(Widget):
         # TODO:
         # Don't let delete timeline if only one left
         # Clicking brings up a mini-menu in the timelines widget to show details and allow editing
-        # Drag pp, arcs, timeskips to change their date/time??
         # Timeline object and all its children are gesture detectors
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
         # Time label is optional. Label vertial markers along the timeline with int and label if user provided
 
-        self.reload_tab()
-
-
 
         # UI elements
         filters = ft.Row(scroll="auto", alignment=ft.MainAxisAlignment.START)     # Row to hold our filter options
-        show_information_display = ft.Checkbox(         # Checkbox to show/hide information display
-            label="Show Information Display",
-            value=self.data['information_display']['visibility'], 
-            on_change=lambda e: self.information_display.toggle_visibility(e)
-        )
         filter_plot_points = ft.Checkbox(label="Show Plot Points", value=True)      # Checkbox to filter plot points
         filter_arcs = ft.Checkbox(label="Show Arcs", value=True)                    # Checkbox to filter arcs
         reset_zoom_button = ft.ElevatedButton("Reset Zoom", on_click=lambda e: print("reset zoom pressed"))         # Button to reset zoom level
@@ -382,14 +463,13 @@ class Timeline(Widget):
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
             scroll="auto",
-            controls=[show_information_display, reset_zoom_button, filters],
+            controls=[reset_zoom_button, filters],
         )
 
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
         self.timeline_right_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
 
         
-
         # Row to hold our timeline edges and control
         timeline_row = ft.Row(
             spacing=0,
@@ -438,6 +518,7 @@ class Timeline(Widget):
                     # Vertical line only
                     vertical_line = ft.GestureDetector(
                         on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+                        on_tap=lambda e: self.information_display.toggle_visibility(value=True),
                         height=16, expand=True, 
                         content=ft.VerticalDivider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3, width=3),
                         data=i      # Set our data so we know where to add new items
@@ -452,6 +533,7 @@ class Timeline(Widget):
                 # Horizontal followed up by a vertical line
                 horizontal_line = ft.GestureDetector(
                     on_enter=self.on_enter, on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
+                    on_tap=lambda e: self.information_display.toggle_visibility(value=True),
                     expand=True, height=16, 
                     content=ft.Divider(color=ft.Colors.with_opacity(0.7, self.data.get('color', "primary")), thickness=3), 
                     data=i      # Set our data so we know where to add new items
@@ -491,9 +573,6 @@ class Timeline(Widget):
             timeline_stack.controls.append(plot_point.timeline_control)
 
 
-        timeline_stack.controls.append(self.new_item_container)
-
-
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our timeliness that that will display timeskips, etc. 
         timeline = ft.Container(
@@ -508,12 +587,12 @@ class Timeline(Widget):
             )
         )
 
-        # Make it so not have to rebuild interactive viewer every time??
+        # TODO: Make it so not have to rebuild interactive viewer every time??
 
         # The body that is our interactive viewer, allowing zoom in and out and moving around
         interactive_viewer = ft.InteractiveViewer(
             min_scale=0.1,
-            max_scale=15,
+            max_scale=5,
             expand=True,
             boundary_margin=ft.margin.all(20),
             #on_interaction_start=lambda e: print(e),
@@ -522,9 +601,10 @@ class Timeline(Widget):
             content=timeline,
         )
 
+        
         self.body_container.content = ft.Column([
             header,
-            timeline
+            timeline,
         ])
 
         self._render_widget()

@@ -52,9 +52,9 @@ class Story(ft.View):
                 'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
                 'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
                 'top_pin_height': 200,
-                'left_pin_width': 200,
+                'left_pin_width': 230,
                 'main_pin_height': int,
-                'right_pin_width': 200,
+                'right_pin_width': 230,
                 'bottom_pin_height': 200,
                 'created_at': str,
                 'last_modified': str,
@@ -843,6 +843,7 @@ class Story(ft.View):
         self.p.overlay.append(menu)
         self.p.update()
 
+
     # Called when new story object is created, either by program or by being loaded from storage
     def build_view(self) -> list[ft.Control]:
         ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
@@ -894,9 +895,17 @@ class Story(ft.View):
         active_rail_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,   # Total width of the GD, so its easier to find with mouse
-                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                #bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                #gradient=ft.LinearGradient(
+                    #begin=ft.alignment.top_center,
+                    #end=ft.alignment.bottom_center,
+                    #colors=[
+                        #ft.Colors.with_opacity(.6, ft.Colors.ON_INVERSE_SURFACE),
+                        #ft.Colors.with_opacity(.2, ft.Colors.ON_INVERSE_SURFACE),
+                    #],
+                #),
                 # Thin vertical divider, which is what the app will actually drag
-                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
+                #content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
                 padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
             ),
             on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer

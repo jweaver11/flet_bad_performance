@@ -156,6 +156,8 @@ class World_Building_Rail(Rail):
             additional_file_menu_options=self.get_file_menu_options()
         )
 
+        content.controls.append(ft.Container(height=6))
+
         # Append our hidden textfield for creating new items
         content.controls.append(self.new_item_textfield)
 

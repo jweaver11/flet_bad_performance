@@ -7,6 +7,7 @@ import flet as ft
 from models.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
+from styles.colors import colors
 
 
 class Settings(Widget):
@@ -98,26 +99,17 @@ class Settings(Widget):
         def get_color_scheme_options():
             ''' Adds our choices to the color scheme dropdown control'''
 
-            # Our dropdown options for our color scheme dropdown control
-            color_scheme_options = [
-                ft.Colors.RED,
-                ft.Colors.BLUE,
-                ft.Colors.YELLOW,
-                ft.Colors.PURPLE,
-                ft.Colors.LIME,
-                ft.Colors.CYAN,
-            ]
 
             # Create a list to hold our dropdown options
             options = []
 
             # Runs through our colors above and adds them to the dropdown
-            for color in color_scheme_options:
+            for color in colors:
                 options.append(
                     ft.DropdownOption(
-                        key=color.value.capitalize(),
+                        key=color.capitalize(),
                         content=ft.Text(
-                            value=color.value.capitalize(),
+                            value=color.capitalize(),
                             color=color,
                         ),
                     )

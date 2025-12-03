@@ -68,6 +68,7 @@ class Chapter(Widget):
         self.reload_tab()
         
         # BUILDING BODY - the inside the body container of our widget
+        
         self.body_container.content = ft.Column(
             expand=True,
             controls=[
@@ -77,9 +78,17 @@ class Chapter(Widget):
                     hint_text="Comment Title",
                     expand=True,
                     on_submit=self.submit_comment,
-                )
+                ),
+                ft.TextField(
+                    label="Chapter Summary",
+                    hint_text="A brief summary of what happens in this chapter.",
+                    expand=True,
+                    multiline=True,
+                    value=self.data['summary'],
+                ),
             ]
         )
+        
 
         self._render_widget()
 

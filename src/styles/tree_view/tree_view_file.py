@@ -3,6 +3,7 @@ from models.widget import Widget
 from styles.menu_option_style import Menu_Option_Style
 from styles.tree_view.tree_view_directory import Tree_View_Directory
 import math
+from styles.colors import colors
 
 # Class for items within a tree view on the rail
 class Tree_View_File(ft.GestureDetector):
@@ -57,7 +58,7 @@ class Tree_View_File(ft.GestureDetector):
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
             on_secondary_tap = lambda e: self.widget.story.open_menu(self.get_menu_options()),
-            on_tap = lambda e: self.widget.focus(),
+            on_tap = lambda e: self.widget.toggle_visibility(value=True),
             mouse_cursor = ft.MouseCursor.CLICK,
         )
 
@@ -280,21 +281,6 @@ class Tree_View_File(ft.GestureDetector):
             self.widget.reload_widget()
             self.widget.story.workspace.reload_workspace()
 
-            
-
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
 
         # List for our colors when formatted
         color_controls = [] 

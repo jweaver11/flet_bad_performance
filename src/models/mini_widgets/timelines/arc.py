@@ -87,16 +87,16 @@ class Arc(Mini_Widget):
         self.gd = ft.GestureDetector(
             mouse_cursor=ft.MouseCursor.CLICK,
             expand=True,
-            on_tap=self.toggle_slider_visibility,
-            on_enter=self.on_start_hover,
-            on_exit=self.on_stop_hover,
+            on_tap=lambda e: self.toggle_visibility(value=True),    # Focus this mini widget when clicked
+            on_secondary_tap=lambda e: print("Right clicked arc"), 
+            on_enter=self.on_start_hover,      # Highlight container
+            on_exit=self.on_stop_hover,        # Stop highlight
             content=ft.Column(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title)])]),
         )   
 
         # State variables
         self.is_dragging: bool = False              # If we are currently dragging our arc slider
       
-
         # Loads our mini widget
         self.reload_mini_widget()
 
@@ -107,6 +107,7 @@ class Arc(Mini_Widget):
 
         # Change its border opacity and update the page
         self.timeline_arc.border = ft.border.all(2, self.data.get('color', "secondary"))
+        #self.toggle_slider_visibility(value=True)
         self.p.update()
 
     # Called when we stop hovering over our arc on the timeline
@@ -116,32 +117,44 @@ class Arc(Mini_Widget):
         self.timeline_arc.border = ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "secondary")))
         self.p.update()
 
+
+    def hide_slider(self):
+        ''' Hides our slider '''
+
+        self.slider.visible = False
+        self.p.update()
+
         
-    # Called when hovering over our plot point to show the slider
-    def toggle_slider_visibility(self, e=None):
+    # Called when hovering over our arc to show the slider
+    def toggle_slider_visibility(self, e=None, value: bool = None):
         ''' Shows our slider and hides our timeline_point. Makes sure all other sliders are hidden '''
 
-        # Check all other plot points
+        # Check all other arcs
         for arc in self.owner.arcs.values():
 
             # If they are dragging, we don't wanna also start dragging ours, so return out
             if arc.is_dragging and arc != self:
                 return
             
-            # Also check if they have a slider visible. This matter for very close together plot points. Make sure only one is ready to drag at a time
+            # Also check if they have a slider visible. This matters for very close together arcs. Make sure only one is ready to drag at a time
             elif arc.slider.visible and arc != self:
                 return
             
+        # If we didn't return out, set our visibility based on value passed in
+        if value is not None:
+            self.slider.visible = value
+            self.save_dict()
+            self.p.update()
         
-        # If we didn't return out, show our slider and hide our timeline point
-        self.visible = not self.visible
-        self.data['visible'] = self.visible
-        self.slider.visible = self.visible
-
-        self.save_dict()
-        
-        # Apply it to the UI
-        self.p.update()
+        else:
+            # If no value passed in, just toggle it
+            self.visible = not self.visible
+            self.data['visible'] = self.visible
+            self.slider.visible = self.visible
+            self.save_dict()
+            
+            # Apply it to the UI
+            self.p.update()
             
 
     # Called at the end of dragging our point on the slider to update it
@@ -183,39 +196,62 @@ class Arc(Mini_Widget):
         self.reload_mini_widget()
         self.owner.reload_widget()
 
+    def toggle_visibility(self, e=None, value: bool=None, not_active: bool=False):
+        # If we passed in a value, use it
+        if value is not None:
+            self.data['visible'] = value
+            self.visible = value
+
+        # Otherwise, toggle our current state
+        else:
+            self.data['visible'] = not self.data['visible']
+            self.visible = self.data['visible']
+
+        # Save switch to file
+        self.save_dict()
+
+        self.slider.visible = self.visible
+
+        if not_active:
+            pass
+        else:
+            self.owner.set_active_mini_widget(self)
+
+        print(f"Toggling visibility of mini widget {self.title}. We are visible: {self.visible}")
+
+
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
     def reload_slider(self):
 
         # Rebuild our slider
-        self.slider = ft.Column(
-            spacing=0,
-            visible=self.visible,                                      # Start hidden until we hover over plot point
+        self.slider = ft.Stack(
+            alignment=ft.Alignment(0,0),
+            expand=True,
+            visible=self.visible,
             controls=[
-                ft.Stack(
-                    alignment=ft.Alignment(0,0),
-                    expand=True,
-                    controls=[
-                        ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
-                        ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
-                            on_secondary_tap=lambda e: print("Right click on slider"),
-                            height=100,
-                            content=ft.RangeSlider(
-                                min=-100, max=100,                                  # Min and max values on each end of slider
-                                start_value=self.data.get('x_alignment_start', 0) * 100,        # Where we start on the slider
-                                end_value=self.data.get('x_alignment_end', 0) * 100,            # Where we end on the slider
-                                divisions=200,                                      # Number of spots on the slider
-                                active_color=self.data.get('color', "secondary"),                 # Get rid of the background colors
-                                tooltip="",
-                                inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
-                                overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging    
-                                on_change=self.change_x_positions,       # Update our data with new x position as we drag
-                                on_change_end=self.finished_dragging,                     # Save the new position, but don't write it yet                      
-                            ),
-                        ),
-                    ]
+                ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
+                ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
+                    on_secondary_tap=lambda e: self.owner.story.open_menu(self.owner.get_menu_options()),  # Open our parent timeline menu options
+                    on_enter=lambda e: self.owner.on_enter(e=None),     # Highlight the timeline on hover
+                    on_exit=lambda e: self.owner.on_exit(e=None),       # Remove highlight when not hovering
+                    height=100,
+                    content=ft.RangeSlider(
+                        min=-100, max=100,                                  # Min and max values on each end of slider
+                        start_value=self.data.get('x_alignment_start', 0) * 100,        # Where we start on the slider
+                        end_value=self.data.get('x_alignment_end', 0) * 100,            # Where we end on the slider
+                        divisions=200,                                      # Number of spots on the slider
+                        active_color=self.data.get('color', "secondary"),                 # Get rid of the background colors
+                        tooltip="",
+                        inactive_color=ft.Colors.TRANSPARENT,               # Get rid of the background colors
+                        overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging    
+                        on_change=self.change_x_positions,       # Update our data with new x position as we drag
+                        on_change_end=self.finished_dragging,                     # Save the new position, but don't write it yet                      
+                    ),
                 ),
-                
-        ])
+            ]
+        )
+                  
+        
 
     # Called from reload mini widget to update our timeline control
     def reload_timeline_control(self):
@@ -227,7 +263,6 @@ class Arc(Mini_Widget):
         # Make sure our alignment are correct
         self.x_alignment_start = ft.Alignment(self.data.get('x_alignment_start', -.2), 0)
         self.x_alignment_end = ft.Alignment(self.data.get('x_alignment_end', .2), 0)
-
 
         # Give us a ratio for integers for our left and right expand values to catch hover off of our plot pont
         left_ratio = (self.data.get('x_alignment_start', 0) + 1) / 2     # Convert -1 -> 1 to 0 -> 1
@@ -283,11 +318,11 @@ class Arc(Mini_Widget):
             expand=True,
             spacing=0,
             controls=[
-                ft.Container(width=24),
+                ft.Container(width=24),     # Padding to match Timeline padding left
                 spacing_left,
                 self.timeline_arc,
                 spacing_right,
-                ft.Container(width=24),
+                ft.Container(width=24),     # Padding to match Timeline padding right
             ]
         )
     
@@ -310,14 +345,25 @@ class Arc(Mini_Widget):
         # Reload our timeline control and all associated components 
         self.reload_timeline_control()
 
+        self.title_control = ft.Row([
+            ft.Text(self.data['title'], weight=ft.FontWeight.BOLD),
+            ft.Container(expand=True),
+            ft.IconButton(
+                icon=ft.Icons.CLOSE,
+                tooltip="Close Mini Widget",
+                on_click=lambda e: self.toggle_visibility(value=False),
+            ),
+        ])
+
 
         
 
         
-        # Build the information display of this mini widget
+        # Rebuild our information display
         self.content_control = ft.TextField(
-            #on_submit=self.change_arc_height,
-            hint_text="Arc Size (Small, Medium, Large, X-Large)",
+            hint_text="Arc",
+            on_submit=lambda e: self.change_custom_field(**{'new_key': e.control.value}),
+            expand=True,
         )
 
         
