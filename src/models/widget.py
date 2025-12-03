@@ -31,10 +31,21 @@ class Widget(ft.Container):
             #bgcolor=ft.Colors.TRANSPARENT, 
             data=data,                              # Sets our data. 
             border_radius=ft.border_radius.all(8),
-            border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
-            bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+            #border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT),
+            #bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
+            gradient=ft.LinearGradient(
+                begin=ft.alignment.top_center,
+                end=ft.alignment.bottom_center,
+                colors=[
+                    ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
+                    ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+                ],
+            ),
             margin=ft.margin.all(0),
-            padding=ft.padding.all(8),
+            #padding=ft.padding.all(8),
+            padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
+            #on_click=lambda e: print("Pressed widget")
+            #TODO: Make bgcolor gradiant, slightly brighter at top
         )
 
     
@@ -70,9 +81,11 @@ class Widget(ft.Container):
         self.focused = False
 
         # UI ELEMENTS - Tab
-        self.tabs = ft.Tabs()   # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
-        self.tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
-        self.hide_tab_icon_button = ft.IconButton()    # 'X' icon button to hide widget from workspace'
+        self.tabs: ft.Tabs = ft.Tabs() # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
+        self.tab: ft.Tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
+        self.icon: ft.Icon = ft.Icon()
+        self.tab_text: ft.Text = ft.Text()
+        self.hide_tab_icon_button: ft.IconButton = ft.IconButton()    # 'X' icon button to hide widget from workspace'
 
         # UI ELEMENTS - Body
 
@@ -311,7 +324,11 @@ class Widget(ft.Container):
     def hover_tab(self, e):
         ''' Changes the hide icon button color slightly for more interactivity '''
 
-        self.hide_tab_icon_button.icon_color = ft.Colors.ON_PRIMARY_CONTAINER
+        self.hide_tab_icon_button.icon_color = ft.Colors.ON_SURFACE
+        self.tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
+        
+
+
         self.p.update()
 
     # Called when mouse stops hovering over the tab part of the widget
@@ -319,6 +336,12 @@ class Widget(ft.Container):
         ''' Reverts the color change of the hide icon button '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.OUTLINE
+        self.tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
+
+
+        
+
+
         self.p.update()
 
     # Called when widget is selected on a rail or workspace
@@ -376,32 +399,40 @@ class Widget(ft.Container):
         tag = self.data.get('tag', None)
 
         if tag is None:
-            icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
+            self.icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
 
         elif tag == "chapter":
-            icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
+            self.icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
 
         elif tag == "note":
-            icon = ft.Icon(ft.Icons.COMMENT_OUTLINED)
+            self.icon = ft.Icon(ft.Icons.COMMENT_OUTLINED)
 
         elif tag == "character":
-            icon = ft.Icon(ft.Icons.PERSON_OUTLINE)
+            self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE)
 
         elif tag == "settings":
-            icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
+            self.icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
         
         elif tag == "timeline":
-            icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED)
+            self.icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED)
 
         elif tag == "map":
-            icon = ft.Icon(ft.Icons.MAP_OUTLINED)
+            self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)
 
         else:
-            icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
+            self.icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
         
         # Set the color and size
-        icon.color = self.data['color']
-        icon.scale = 0.8
+        self.icon.color = self.data.get('color', ft.Colors.PRIMARY)
+        #self.icon.scale = 0.8
+
+        self.tab_text = ft.Text(
+            weight=ft.FontWeight.BOLD, # Make the text bold
+            #color=ft.,   # Set our color to the tab color
+            theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
+            value=self.title,   # Set the text to our title
+            
+        )
 
         # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
         self.tabs = ft.Tabs(
@@ -411,6 +442,9 @@ class Widget(ft.Container):
             padding=ft.padding.all(0),
             label_padding=ft.padding.all(0),
             mouse_cursor=ft.MouseCursor.BASIC,
+            #indicator_color = "transparent",
+            indicator_color = ft.Colors.with_opacity(0.7, self.data.get('color', ft.Colors.PRIMARY)),
+            divider_color=ft.Colors.TRANSPARENT,
         )
 
         # Our icon button that will hide the widget when clicked in the workspace
@@ -419,6 +453,7 @@ class Widget(ft.Container):
             on_click=lambda e: self.toggle_visibility(),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
+            tooltip="Hide",
         )
 
         self.tab_title_color = ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
@@ -430,6 +465,7 @@ class Widget(ft.Container):
 
             # Initialize the content. This will be our content of the body of the widget
             #content=ft.Stack(), 
+            
 
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
             tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
@@ -455,28 +491,18 @@ class Widget(ft.Container):
                     on_exit=self.stop_hover_tab,
 
                     # Content of the gesture detector. This has our actual title and hide icon
-                    content=ft.Row(
-
-                        # The controls of the row that are now left to right
-                        controls=[
+                    content=ft.Row([
         
-                            icon,
+                        self.icon,
 
-                            # The text control that holds our title of the object
-                            ft.Text(
-                                weight=ft.FontWeight.BOLD, # Make the text bold
-                                #color=ft.,   # Set our color to the tab color
-                                theme_style=ft.TextThemeStyle.TITLE_MEDIUM,     # Set to a built in theme (mostly for font size)
-                                value=self.title,   # Set the text to our title
-                                
-                            ),
+                        # The text control that holds our title of the object
+                        self.tab_text,
 
-                            # Our icon button that hides the widget when clicked
-                            self.hide_tab_icon_button, 
-                        ]
-                    )
-                ),
-            ),                       
+                        # Our icon button that hides the widget when clicked
+                        self.hide_tab_icon_button, 
+                    ])
+                )
+            )                    
         )
 
     # Called to set the active mini widget in this widget
@@ -540,8 +566,12 @@ class Widget(ft.Container):
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
 
+
+        
+
         # Put our mini widgets on the right side
         row = ft.Row(expand=True, spacing=0, controls=[self.body_container])
+        
 
         # Add our mini widget if we have one active
         if self.active_mini_widget is not None:
@@ -554,6 +584,7 @@ class Widget(ft.Container):
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]
+
         self.content = self.tabs
 
         #self.content = row

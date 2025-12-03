@@ -27,7 +27,7 @@ class Active_Rail(ft.Container):
         super().__init__(
             alignment=ft.alignment.top_left,
             padding=ft.padding.only(top=10, bottom=10, left=4, right=4),
-            bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+            bgcolor=ft.Colors.with_opacity(.4, ft.Colors.ON_INVERSE_SURFACE),
             width=app.settings.data['active_rail_width'],  # Sets the width
         )
 

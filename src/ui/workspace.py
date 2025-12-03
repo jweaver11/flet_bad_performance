@@ -165,10 +165,22 @@ class Workspace(ft.Container):
 
         # Set our objects pin location to the correct new location
         widget.data['pin_location'] = pin_location  
+
+        # Even though we're not in the new pin location until we reload, we can just use the length to find our index
+        if pin_location == "top":
+            widget.data['index'] = len(self.story.workspace.top_pin.controls)
+        elif pin_location == "left":
+            widget.data['index'] = len(self.story.workspace.left_pin.controls)
+        elif pin_location == "main":
+            widget.data['index'] = len(self.story.workspace.main_pin.controls)
+        elif pin_location == "right":
+            widget.data['index'] = len(self.story.workspace.right_pin.controls)
+        elif pin_location == "bottom":
+            widget.data['index'] = len(self.story.workspace.bottom_pin.controls)
         
         # Make sure our widget is visible if it was dragged from the rail
         if not widget.visible:
-            widget.toggle_visibility()      # This will save dict as well
+            widget.toggle_visibility(value=True)      # This will save dict as well
         else:
             widget.save_dict()  
 
@@ -431,6 +443,81 @@ class Workspace(ft.Container):
             drag_interval=10,
         )
 
+        # Called when selected new tab in the main pin
+        def main_pin_tab_change(e: ft.ControlEvent):
+            ''' Updates the widgets data to reflect the new active tab '''
+
+            # Run through our visible main pin widgets
+            for widget in visible_main_controls:
+
+                # If the widgets tab is selected, make the widget data match, otherwise deselect the rest
+                if widget.tab == e.control.tabs[e.control.selected_index]:
+                    widget.data['is_active_tab'] = True
+                else:
+                    widget.data['is_active_tab'] = False
+
+                # Save the data. This allows for selected main pin tabs to save between sessions
+                widget.save_dict()
+
+
+
+        # Main pin is rendered as a tab control, so we won't use dividers and will use different logic
+        visible_main_controls = [control for control in self.main_pin.controls if getattr(control, 'visible', True)]
+        #print(f"Visible main pin controls: {len(visible_main_controls)}")
+        if len(visible_main_controls) > 1:
+
+
+            # PC: Save tabs as variable, change active color to match widget color when tab change
+                
+            # Temporary
+            self.main_pin_tabs = ft.Tabs(
+                animation_duration=0,
+                on_change=main_pin_tab_change,
+                expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
+                #divider_color=ft.Colors.TRANSPARENT,
+                padding=ft.padding.all(0),
+                label_padding=ft.padding.all(0),
+                mouse_cursor=ft.MouseCursor.BASIC,
+                
+                tabs=[]    # Gives our tab control here   
+            )
+            for widget in visible_main_controls:
+                self.main_pin_tabs.tabs.append(widget.tab)
+                #print("Added tab for widget:", widget.data.get('title', 'Untitled'))
+                # Sets the selected tab to the active one in the main pin
+                if widget.data['is_active_tab']:
+                    self.main_pin_tabs.selected_index = self.main_pin_tabs.tabs.index(widget.tab)
+                    
+
+            # Stick it in a container for styling
+            formatted_main_pin = ft.Container(
+                
+                expand=True, 
+            
+                border_radius=ft.border_radius.all(8),
+            
+                gradient=ft.LinearGradient(
+                    begin=ft.alignment.top_center,
+                    end=ft.alignment.bottom_center,
+                    colors=[
+                        ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
+                        ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+                    ],
+                ),
+                animate=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
+                margin=ft.margin.all(0),
+                #padding=ft.padding.all(8),
+                padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
+                    content=self.main_pin_tabs
+                )
+
+            #print(len(tabs.tabs), " tabs added to main pin")
+
+        else:
+            formatted_main_pin = self.main_pin
+
+        
+
 
         
         # Formatted pin locations that hold our pins, and our resizer gesture detectors.
@@ -503,7 +590,8 @@ class Workspace(ft.Container):
                 expand=True, spacing=0, 
                 controls=[
                     formatted_top_pin,    # formatted top pin
-                    self.main_pin,     # main work area with widgets
+                    #self.main_pin,     # main work area with widgets
+                    formatted_main_pin,   # formatted main pin
                     formatted_bottom_pin,     # formatted bottom pin
             ]),
             formatted_right_pin,    # formatted right pin

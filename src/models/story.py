@@ -895,9 +895,9 @@ class Story(ft.View):
         active_rail_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,   # Total width of the GD, so its easier to find with mouse
-                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
                 # Thin vertical divider, which is what the app will actually drag
-                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
+                #content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
                 padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
             ),
             on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
