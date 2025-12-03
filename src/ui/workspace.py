@@ -106,6 +106,16 @@ class Workspace(ft.Container):
         # We use global stack like this so there is always a drag target, even if a pin is empty
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets, self.pin_drag_targets])
 
+        self.safety_gd = ft.GestureDetector(  # Safety gesture detector to prevent drag issues
+            expand=True,
+
+            content=self.master_stack,
+            hover_interval=20,
+            on_exit=lambda e: self.remove_drag_targets(),
+            #on_enter=lambda e: self.show_pin_drag_targets()
+            on_enter=lambda e: self.may_show_pin_drag_targets(),
+        )
+
 
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
         #self.reload_workspace() 
@@ -118,6 +128,7 @@ class Workspace(ft.Container):
 
         visible_top_pin_controls = [control for control in self.top_pin.controls if getattr(control, 'visible', True)]
 
+        print("Showing pin drag targets")
         # If no visible in the top pin
         if len(visible_top_pin_controls) == 0:
             self.top_pin_drag_target.content.height = self.minimum_pin_height
@@ -145,6 +156,15 @@ class Workspace(ft.Container):
         ''' Removes our drag targets from the master stack, otherwise they sit overtop our widgets and get in the way '''
         self.pin_drag_targets.visible = False
         self.master_stack.update()
+
+    # Called when mouse enters the safety gesture detector.
+    def may_show_pin_drag_targets(self):
+        ''' Determines if we are dragging, and need to show the targets or not '''
+
+        if self.story.is_dragging_widget:
+            self.show_pin_drag_targets()
+        else:
+            return
 
     # Called when a draggable hovers over a drag target before dropping
     def on_hover_pin_drag_target(self, e):
@@ -181,6 +201,8 @@ class Workspace(ft.Container):
         widget = draggable.data
 
         old_pin_location = widget.data['pin_location']
+
+        self.story.is_dragging_widget = False   # We have finished dragging
 
         # If we were dragged from the main pin and we were the active tab, set the first tab to new active
         if old_pin_location == "main" and widget.data['is_active_tab'] == True:
@@ -647,7 +669,8 @@ class Workspace(ft.Container):
         ]
 
         # Set the master_stack as the content of this container
-        self.content = self.master_stack
+        #self.content = self.master_stack
+        self.content = self.safety_gd
         
         
         # Finally update the UI

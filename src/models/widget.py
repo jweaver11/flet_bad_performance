@@ -36,7 +36,7 @@ class Widget(ft.Container):
                 colors=[
                     ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
                     ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-                    #ft.Colors.CYAN_400, ft.Colors.PURPLE_500
+                    #ft.Colors.CYAN_400, ft.Colors.PURPLE_500   # Highlight colors
                 ],
             ),
             margin=ft.margin.all(0),
@@ -316,6 +316,7 @@ class Widget(ft.Container):
         ''' Shows our pin drag targets '''
         
         self.story.workspace.show_pin_drag_targets()
+        self.story.is_dragging_widget = True
         
     # Called when mouse hovers over the tab part of the widget
     def hover_tab(self, e):
