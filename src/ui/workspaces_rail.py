@@ -20,16 +20,6 @@ class Workspaces_Rail(ft.Container):
         # Style our rail (container)
         super().__init__(
             alignment=ft.alignment.center,  # Aligns content to the 
-            #bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),     # Original
-            #bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),
-            gradient=ft.LinearGradient(
-                begin=ft.alignment.top_center,
-                end=ft.alignment.bottom_center,
-                colors=[
-                    ft.Colors.with_opacity(.6, ft.Colors.ON_INVERSE_SURFACE),
-                    ft.Colors.with_opacity(.2, ft.Colors.ON_INVERSE_SURFACE),
-                ],
-            ),
             padding=ft.padding.only(bottom=10, right=2),
         )
 

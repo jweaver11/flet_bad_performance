@@ -28,16 +28,7 @@ class Active_Rail(ft.Container):
         super().__init__(
             alignment=ft.alignment.top_left,
             padding=ft.padding.only(top=10, bottom=10, left=8, right=8),
-            border_radius=ft.border_radius.only(top_right=8, bottom_right=8),
-            #bgcolor=ft.Colors.with_opacity(.4, ft.Colors.ON_INVERSE_SURFACE),
-            gradient=ft.LinearGradient(
-                begin=ft.alignment.top_center,
-                end=ft.alignment.bottom_center,
-                colors=[
-                    ft.Colors.with_opacity(.6, ft.Colors.ON_INVERSE_SURFACE),
-                    ft.Colors.with_opacity(.2, ft.Colors.ON_INVERSE_SURFACE),
-                ],
-            ),
+            border_radius=ft.border_radius.only(top_right=10, bottom_right=10),
             width=app.settings.data['active_rail_width'],  # Sets the width
         )
 

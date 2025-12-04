@@ -9,7 +9,7 @@ import flet as ft
 from models.app import app
 from models.story import Story
 import json
-
+from styles.colors import dark_gradient
 
 # Our workspace object that is stored in our story object
 class Workspace(ft.Container):
@@ -20,7 +20,10 @@ class Workspace(ft.Container):
         super().__init__(
             expand=True,
             alignment=ft.alignment.center,
-            bgcolor=ft.Colors.with_opacity(1, ft.Colors.SURFACE),
+            #bgcolor=ft.Colors.ON_INVERSE_SURFACE,
+            #bgcolor=ft.Colors.OUTLINE_VARIANT,
+            #bgcolor=ft.Colors.ON_SECONDARY,
+            #bgcolor="background",
             #padding=ft.padding.all(10),
             padding=ft.padding.only(top=10, bottom=10, left=0, right=10),
         )
@@ -106,15 +109,6 @@ class Workspace(ft.Container):
         # We use global stack like this so there is always a drag target, even if a pin is empty
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets, self.pin_drag_targets])
 
-        self.safety_gd = ft.GestureDetector(  # Safety gesture detector to prevent drag issues
-            expand=True,
-
-            content=self.master_stack,
-            hover_interval=20,
-            on_exit=lambda e: self.remove_drag_targets(),
-            #on_enter=lambda e: self.show_pin_drag_targets()
-            on_enter=lambda e: self.may_show_pin_drag_targets(),
-        )
 
 
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
@@ -566,14 +560,7 @@ class Workspace(ft.Container):
             
                 border_radius=ft.border_radius.all(8),
             
-                gradient=ft.LinearGradient(
-                    begin=ft.alignment.top_center,
-                    end=ft.alignment.bottom_center,
-                    colors=[
-                        ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
-                        ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-                    ],
-                ),
+                gradient=dark_gradient,
                 animate=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
                 margin=ft.margin.all(0),
                 #padding=ft.padding.all(8),
@@ -670,9 +657,8 @@ class Workspace(ft.Container):
 
         # Set the master_stack as the content of this container
         #self.content = self.master_stack
-        self.content = self.safety_gd
-        
-        
+        self.content = self.master_stack
+
         # Finally update the UI
         self.p.update()
 

@@ -1,4 +1,5 @@
 # Holds our custom hex colors that can be used in flet code
+import flet as ft
 
 colors_dict = {
     'light_blue': '#ADD8E6',
@@ -19,3 +20,18 @@ colors = [
     "brown",
     "grey",
 ]
+
+dark_gradient = ft.LinearGradient(
+    begin=ft.alignment.top_center,
+    end=ft.alignment.bottom_center,
+    colors=[
+
+        ft.Colors.with_opacity(0.6, ft.Colors.OUTLINE_VARIANT),
+        ft.Colors.with_opacity(0.2, ft.Colors.OUTLINE_VARIANT),
+
+
+        #ft.Colors.with_opacity(.8, ft.Colors.OUTLINE_VARIANT), ft.Colors.with_opacity(0.3, ft.Colors.OUTLINE_VARIANT),
+
+        #ft.Colors.CYAN_400, ft.Colors.PURPLE_500   # Highlight colors
+    ],
+)

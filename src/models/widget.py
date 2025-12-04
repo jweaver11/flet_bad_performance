@@ -11,6 +11,7 @@ import os
 import json
 from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
+from styles.colors import dark_gradient
 
 
 class Widget(ft.Container):
@@ -29,16 +30,8 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             data=data,                              # Sets our data. 
-            border_radius=ft.border_radius.all(8),
-            gradient=ft.LinearGradient(
-                begin=ft.alignment.top_center,
-                end=ft.alignment.bottom_center,
-                colors=[
-                    ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
-                    ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-                    #ft.Colors.CYAN_400, ft.Colors.PURPLE_500   # Highlight colors
-                ],
-            ),
+            border_radius=ft.border_radius.all(10),
+            gradient=dark_gradient,
             margin=ft.margin.all(0),
             padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
             #on_click=lambda e: print("Pressed widget")
@@ -559,7 +552,7 @@ class Widget(ft.Container):
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
         #self.body_container.padding = ft.padding.only(left=6, right=6, top=0, bottom=6)
-        self.body_container.border_radius = ft.border_radius.all(8)
+        self.body_container.border_radius = ft.border_radius.all(10)
 
 
         
@@ -582,7 +575,7 @@ class Widget(ft.Container):
 
         outer_container = ft.Container(
             expand=True,
-            border_radius=ft.border_radius.all(8),
+            border_radius=ft.border_radius.all(10),
             padding=ft.padding.only(top=0, bottom=6, left=6, right=6),
             gradient=ft.LinearGradient(
                 colors=[
