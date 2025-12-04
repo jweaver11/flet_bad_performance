@@ -26,8 +26,8 @@ dark_gradient = ft.LinearGradient(
     end=ft.alignment.bottom_center,
     colors=[
 
-        ft.Colors.with_opacity(0.6, ft.Colors.OUTLINE_VARIANT),
-        ft.Colors.with_opacity(0.2, ft.Colors.OUTLINE_VARIANT),
+        ft.Colors.with_opacity(0.4, ft.Colors.OUTLINE_VARIANT),
+        ft.Colors.with_opacity(0.1, ft.Colors.OUTLINE_VARIANT),
 
 
         #ft.Colors.with_opacity(.8, ft.Colors.OUTLINE_VARIANT), ft.Colors.with_opacity(0.3, ft.Colors.OUTLINE_VARIANT),
