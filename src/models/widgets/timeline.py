@@ -116,12 +116,6 @@ class Timeline(Widget):
 
         # Dropdown on the rail. We don't use it here, let the rail handle it
         self.timeline_dropdown = None      # 'Timeline_Dropdown'
-
-        # Set the active mini widget if we have one visible
-        for mini_widget in self.mini_widgets:
-            if mini_widget.visible:
-                self.set_active_mini_widget(mini_widget)
-                break
         
         # Builds/reloads our timeline UI
         self.reload_widget()
@@ -181,20 +175,22 @@ class Timeline(Widget):
         ''' Creates a new arc inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.timelines.arc import Arc
 
-        # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
-        self.arcs[title] = Arc(
+        new_arc = Arc(
             title=title, 
             owner=self, 
             father=self,
             page=self.p, 
             key="arcs", 
+            x_alignment=self.x_alignment,
             data=None
         )
-        self.mini_widgets.append(self.arcs[title])
+
+        # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
+        self.arcs[new_arc.title] = new_arc
+        self.mini_widgets.append(new_arc)
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
-        self.active_mini_widget = self.arcs[title]
         self.reload_widget()
         
     # Called when creating a new plotpoint
@@ -202,8 +198,7 @@ class Timeline(Widget):
         ''' Creates a new plotpoint inside of our timeline object, and updates the data to match '''
         from models.mini_widgets.timelines.plot_point import Plot_Point
 
-        # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
-        self.plot_points[title] = Plot_Point(
+        new_plot_point = Plot_Point(
             title=title, 
             owner=self, 
             father=self,
@@ -212,11 +207,12 @@ class Timeline(Widget):
             x_alignment=self.x_alignment,
             data=None
         )
-        self.mini_widgets.append(self.plot_points[title])
+        # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
+        self.plot_points[new_plot_point.title] = new_plot_point
+        self.mini_widgets.append(new_plot_point)
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
-        self.active_mini_widget = self.plot_points[title]
         self.reload_widget()
 
 

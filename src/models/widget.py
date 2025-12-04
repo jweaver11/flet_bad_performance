@@ -90,6 +90,8 @@ class Widget(ft.Container):
         
         self.body_container: ft.Container = ft.Container(expand=True)  # Stack to hold our body content, with mini widgets overlaid on top
 
+        self.master_stack: ft.Stack = ft.Stack(expand=True)
+
         # Called at end of constructor for all child widgets to build their view (not here tho since we're not on page yet)
         #self.reload_widget()
 
@@ -361,17 +363,6 @@ class Widget(ft.Container):
             self.story.workspace.reload_workspace()
 
 
-    # Called to set the active mini widget in this widget
-    def set_active_mini_widget(self, mini_widget):
-        print(f"Setting active mini widget to {mini_widget.title} in widget {self.title}")
-        if self.active_mini_widget is not None:
-            if self.active_mini_widget != mini_widget:
-                self.active_mini_widget.toggle_visibility(value=False, not_active=True)
-
-        self.active_mini_widget = mini_widget
-
-        #self.reload_widget()
-
 
     def focus(self):
         self.focused = True
@@ -558,43 +549,32 @@ class Widget(ft.Container):
         
 
         # Put our mini widgets on the right side
-        row = ft.Row(expand=True, spacing=0, controls=[self.body_container])
-        
+       # row = ft.Row(expand=True, spacing=0, controls=[self.body_container])
 
-        # Add our mini widget if we have one active
-        if self.active_mini_widget is not None:
-            #self.active_mini_widget.expand = 4
-            row.controls.append(self.active_mini_widget)
+        self.master_stack.controls = [self.body_container]
+
+        for mini_widget in self.mini_widgets:
+            spacing_container = ft.Container(
+                ignore_interactions=True,
+                expand=6,
+            )
+            row = ft.Row(
+                spacing=0,
+                expand=True,
+                tight=False,
+                controls=[
+                    spacing_container,
+                    mini_widget,
+                ]
+            )
+            self.master_stack.controls.append(row)        
             
         
         # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
-        self.tab.content = row  # We add this in combo with our 'tabs' later
+        self.tab.content = self.master_stack  # We add this in combo with our 'tabs' later
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]
-
-        outer_container = ft.Container(
-            expand=True,
-            border_radius=ft.border_radius.all(10),
-            padding=ft.padding.only(top=0, bottom=6, left=6, right=6),
-            gradient=ft.LinearGradient(
-                colors=[
-                    
-                    ft.Colors.ON_INVERSE_SURFACE,
-                    ft.Colors.SURFACE
-                ]
-            ),
-            content=self.tabs
-        )
-
-        # For adding focus outline
-        hover_gd = ft.GestureDetector(
-            mouse_cursor=ft.MouseCursor.CLICK,
-            
-            on_tap_down=lambda e: self.focus(),
-            #on_exit=self.stop_hover_tab,
-            content=outer_container
-        )
 
         self.content = self.tabs
 

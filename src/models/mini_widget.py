@@ -29,10 +29,14 @@ class Mini_Widget(ft.Container):
         # Parent constructor
         super().__init__(
             expand=4,
-            border_radius=ft.border_radius.all(6),
+            border_radius=ft.border_radius.all(10),
             border=ft.border.all(2, ft.Colors.SECONDARY_CONTAINER),
             padding=ft.padding.all(8),
-            data=data,      # Sets our data.
+            data=data,     
+            bgcolor=ft.Colors.with_opacity(.7, ft.Colors.SURFACE),
+            visible=False,
+            blur=5,
+            animate=ft.Animation(300, "ease_out")
         )
 
         
@@ -58,7 +62,8 @@ class Mini_Widget(ft.Container):
         )
 
         # Apply our visibility
-        self.visible = self.data['visible']
+        #self.visible = self.data['visible']
+        self.visible = False    # Start invisible until toggled
         self.is_selected = False    # Check if we are selected for ui purposes
 
         # Control for our title
@@ -104,27 +109,32 @@ class Mini_Widget(ft.Container):
         ''' Deletes our data from all live widget/mini widget objects that we nest in, and saves the owners file '''
 
         try:
+            print("Called mini widget delete dict")
+
+            # Applies the UI changes by removing ourselves from the mini widgets list
+            if self in self.owner.mini_widgets:
+                self.owner.mini_widgets.remove(self)
 
             # Remove our data
             self.data = None
 
             # Remove the data of our father (parent) widget/mini widget to match
             # By deleting the father data manually here, it will cascade up the chain when save_dict is called
-            self.father.data[self.key].pop(self.title, None)
+            self.owner.data[self.key].pop(self.title, None)
+            
             
             # Applies the changes up the chain
-            self.save_dict()
+            self.owner.save_dict()
 
-            # Applies the UI changes by removing ourselves from the mini widgets list
-            if self in self.owner.mini_widgets:
-                self.owner.mini_widgets.remove(self)
-            
             # Reload the widget if we have to
-            if self.visible:
-                self.owner.reload_widget()
+            self.owner.reload_widget()
 
             # Also reload the active rail to reflect changes
             self.owner.story.active_rail.content.reload_rail() 
+
+            self.data = None
+
+            print("Passed all checks")
 
         # Catch errors
         except Exception as e:
@@ -192,8 +202,10 @@ class Mini_Widget(ft.Container):
         
 
     # Called when clicking x to hide the mini widget
-    def toggle_visibility(self, e=None, value: bool=None, not_active: bool=False):
+    def toggle_visibility(self, e=None, value: bool=None, side: str="right"):
         ''' Shows or hides our mini widget, depending on current state '''
+
+        # Check if exclusive/ being shown alone or shared
 
         # If we passed in a value, use it
         if value is not None:
@@ -208,15 +220,27 @@ class Mini_Widget(ft.Container):
         # Save switch to file
         self.save_dict()
 
+        #self.update()
+        self.p.update()
+
         # Reload our mini w
-        self.reload_mini_widget()
+        #self.reload_mini_widget()
 
-        if not_active:
-            pass
-        else:
-            self.owner.set_active_mini_widget(self)
+        if self.visible:
+            print(f"Showing mini widget {self.title}")
 
-        print(f"Toggling visibility of mini widget {self.title}. We are visible: {self.visible}")
+            self.animate_out()
+            
+       
+
+        #print(f"Toggling visibility of mini widget {self.title}. We are visible: {self.visible}")
+
+    def animate_out(self, e=None):
+        ''' Animates our mini widget into view '''
+        self.width = 300
+        self.opacity = 1
+        self.p.update()  # Update self first
+        
 
     # Called whenever we hover over our mini widget on the right as a psuedo focus
     def on_hover(self, e: ft.HoverEvent):
