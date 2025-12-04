@@ -271,6 +271,12 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         ], 
     )
 
+    # Called when we click the minimize button
+    def _minimize_window(e=None):
+        ''' Minimizes the window '''
+        page.window.minimized = True
+        page.update()
+
 
         
     # Return our formatted menubar
@@ -297,7 +303,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: app.settings.toggle_visibility()),   # Settings button
-                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
+                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name         
             ]
         )
     )

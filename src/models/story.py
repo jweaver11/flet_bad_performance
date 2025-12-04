@@ -856,6 +856,8 @@ class Story(ft.View):
 
         page = self.p
 
+        page.title = f"{self.title}"
+
         # Clear our controls in our view before building it
         self.controls.clear()
 
@@ -936,12 +938,13 @@ class Story(ft.View):
             content=row,
             expand=True,
             on_hover=self.on_hover,
-            on_tap_up=lambda e: self.stop_dragging_widget(),  # NOT CALLED
             hover_interval=20,
         )
 
         # Views render like columns, so we add elements top-down
         self.controls = [self.menubar, gd]
+
+        page.update()
 
     # Called every time the mouse moves over the workspace
     def on_hover(self, e):
@@ -949,7 +952,3 @@ class Story(ft.View):
 
         self.mouse_x = e.local_x 
         self.mouse_y = e.local_y
-
-    def stop_dragging_widget(self):
-        self.is_dragging_widget = False
-        print("Stopped dragging widget")
