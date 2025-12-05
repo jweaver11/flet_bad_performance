@@ -19,6 +19,7 @@ class Arc(Mini_Widget):
         page: ft.Page, 
         key: str, 
         size: str = None,
+        x_alignment: float = None,          # Position of plot point on timeline if we pass one in (between -1 and 1)
         data: dict = None
     ):
         
@@ -100,6 +101,11 @@ class Arc(Mini_Widget):
         # Loads our mini widget
         self.reload_mini_widget()
 
+    def delete_dict(self, e=None):
+
+        self.owner.arcs.pop(self.data.get('title', None), None)
+        super().delete_dict()
+
 
     # Called when we hover over our arc on the timeline
     def on_start_hover(self, e: ft.HoverEvent):
@@ -107,7 +113,6 @@ class Arc(Mini_Widget):
 
         # Change its border opacity and update the page
         self.timeline_arc.border = ft.border.all(2, self.data.get('color', "secondary"))
-        #self.toggle_slider_visibility(value=True)
         self.p.update()
 
     # Called when we stop hovering over our arc on the timeline
@@ -118,44 +123,22 @@ class Arc(Mini_Widget):
         self.p.update()
 
 
-    def hide_slider(self):
-        ''' Hides our slider '''
+    def toggle_visibility(self, e=None, value: bool = None):
+        ''' Toggles the visibility of our timeline_point '''
 
-        self.slider.visible = False
-        self.p.update()
+        #print("Base toggle visibility for arc named: ", self.title)
 
-        
-    # Called when hovering over our arc to show the slider
-    def toggle_slider_visibility(self, e=None, value: bool = None):
-        ''' Shows our slider and hides our timeline_point. Makes sure all other sliders are hidden '''
-
-        # Check all other arcs
-        for arc in self.owner.arcs.values():
-
-            # If they are dragging, we don't wanna also start dragging ours, so return out
-            if arc.is_dragging and arc != self:
-                return
-            
-            # Also check if they have a slider visible. This matters for very close together arcs. Make sure only one is ready to drag at a time
-            elif arc.slider.visible and arc != self:
-                return
-            
-        # If we didn't return out, set our visibility based on value passed in
         if value is not None:
+            #print("Value passed in for base: ", value)
+
             self.slider.visible = value
-            self.save_dict()
-            self.p.update()
-        
+            super().toggle_visibility(value=value)
+
         else:
-            # If no value passed in, just toggle it
-            self.visible = not self.visible
-            self.data['visible'] = self.visible
-            self.slider.visible = self.visible
-            self.save_dict()
-            
-            # Apply it to the UI
-            self.p.update()
-            
+            print("Else called")
+            self.slider.visible = not self.slider.visible
+            super().toggle_visibility(self.slider.visible)
+
 
     # Called at the end of dragging our point on the slider to update it
     def change_x_positions(self, e: ft.DragUpdateEvent):
@@ -189,35 +172,19 @@ class Arc(Mini_Widget):
         self.x_alignment_start = ft.Alignment(self.data.get('x_alignment_start', -.2), 0)
         self.x_alignment_end = ft.Alignment(self.data.get('x_alignment_end', .2), 0)
 
+        # Determine which side of the timeline we're on for our mini widget
+        mid_value = e.control.start_value + ((e.control.end_value - e.control.start_value) / 2)
+        if mid_value <= 0:
+            self.data['side_location'] = "right"
+        else:
+            self.data['side_location'] = "left"
+            
         # Save our new positions to file
         self.save_dict()
 
         # Apply the UI changes
         self.reload_mini_widget()
         self.owner.reload_widget()
-
-    def toggle_visibility(self, e=None, value: bool=None, not_active: bool=False):
-        # If we passed in a value, use it
-        if value is not None:
-            self.data['visible'] = value
-            self.visible = value
-
-        # Otherwise, toggle our current state
-        else:
-            self.data['visible'] = not self.data['visible']
-            self.visible = self.data['visible']
-
-        # Save switch to file
-        self.save_dict()
-
-        self.slider.visible = self.visible
-
-        if not_active:
-            pass
-        else:
-            self.owner.set_active_mini_widget(self)
-
-        print(f"Toggling visibility of mini widget {self.title}. We are visible: {self.visible}")
 
 
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
@@ -288,10 +255,10 @@ class Arc(Mini_Widget):
         self.gd.content = ft.Column(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[ft.Text(self.title)])])
 
         self.timeline_arc = ft.Container(
-            bgcolor=ft.Colors.with_opacity(0.2, "yellow"),    # Testing
+            #bgcolor=ft.Colors.with_opacity(0.2, "yellow"),    # Testing
             offset=ft.Offset(0, -0.5) if self.data['branch_direction'] == "top" else ft.Offset(0, .5),          # Moves it up or down slightly to center on timeline
             expand=mid_ratio,
-            height=200,
+            height=mid_ratio,
             padding=ft.Padding(2,2,2,2),
 
             #height=None/proportions of width
@@ -335,15 +302,16 @@ class Arc(Mini_Widget):
                 self.slider,                                                # Our slider that appears when we hover over the plot point
             ]
         ) 
-
-
-
+        
 
     # Called to reload our mini widget content
     def reload_mini_widget(self):
 
         # Reload our timeline control and all associated components 
         self.reload_timeline_control()
+
+        # Reset our height depnding if we're collapsed or not
+        self.height = None
 
         self.title_control = ft.Row([
             ft.Text(self.data['title'], weight=ft.FontWeight.BOLD),
@@ -366,18 +334,76 @@ class Arc(Mini_Widget):
             expand=True,
         )
 
+        # Add collapse button for dragging
+        def _collapse_mode(e):
+           
+            # Limit our height when collapsed
+            self.height = 120
+                
+            # Row to add our collapse button so its on the correct side
+            footer_row = ft.Row([
+                ft.IconButton(
+                    tooltip="Expand", 
+                    icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_DOWN_OUTLINED,
+                    on_click=lambda e: self.reload_mini_widget() # Pass in whatever branch it is (just self for now)
+                )
+            ])
+
+            # Align the collapse button to the correct side
+            if self.data.get('side_location', "left") == "left":
+                footer_row.alignment = ft.MainAxisAlignment.END
+            else:
+                footer_row.alignment = ft.MainAxisAlignment.START
+
+            self.content = ft.Column(
+                scroll=ft.ScrollMode.AUTO,
+                expand=True,
+                controls=[
+                    self.title_control,
+                    ft.Container(expand=True, ignore_interactions=True),   # Pushes content to top
+                    footer_row
+                ],
+            )
+            self.p.update()
         
-        # Reload the mini widget content
-        self.content = ft.Column(
-            [
-                self.title_control,
-                self.content_control,
-                ft.TextButton(
-                    "Delete ME", 
-                    on_click=lambda e: self.delete_dict() # Pass in whatever branch it is (just self for now)
-                ),
-            ],
+        # Row to add our collapse button so its on the correct side
+        footer_row = ft.Row([
+            ft.IconButton(
+                tooltip="Collapse", 
+                icon=ft.Icons.KEYBOARD_DOUBLE_ARROW_UP_OUTLINED,
+                on_click=_collapse_mode # Pass in whatever branch it is (just self for now)
+            )
+        ])
+
+        # Align the collapse button to the correct side
+        if self.data.get('side_location', "left") == "left":
+            footer_row.alignment = ft.MainAxisAlignment.END
+        else:
+            footer_row.alignment = ft.MainAxisAlignment.START
+
+        self.content =ft.Column(      
             expand=True,
+            controls=[
+                ft.Column(
+                    scroll=ft.ScrollMode.AUTO,
+                    alignment=ft.MainAxisAlignment.START,
+                    expand=True,
+                    controls=[
+                        self.title_control,
+                        self.content_control,
+                        ft.Container(expand=True, ignore_interactions=True),   # Spacing
+                    
+                    ],
+                ),
+                ft.Container(expand=True, ignore_interactions=True),   # Makes sure collapse button is at the bottom
+                footer_row,
+            ]
         )
 
+        
+
+        
+
         self.p.update()
+
+    

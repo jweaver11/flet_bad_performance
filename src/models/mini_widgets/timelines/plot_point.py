@@ -19,6 +19,11 @@ class Plot_Point(Mini_Widget):
         x_alignment: float = None,          # Position of plot point on timeline if we pass one in (between -1 and 1)
         data: dict = None       
     ):
+        
+        if x_alignment is not None:
+            side_location = 'right' if x_alignment <= 0 else 'left'
+        else:
+            side_location = None
 
         # Parent constructor
         super().__init__(
@@ -27,6 +32,7 @@ class Plot_Point(Mini_Widget):
             father=father,      # In this case, father is always a timeline or another arc
             page=page,          
             key=key,  
+            side_location=side_location,
             data=data,    
         ) 
 
@@ -123,6 +129,11 @@ class Plot_Point(Mini_Widget):
 
         # Update our alignment based on our correct data. This is updated when dragging, so no need to set it here
         self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+
+        if self.data.get('x_alignment', 0) <= 0:
+            self.data['side_location'] = 'right'
+        else:
+            self.data['side_location'] = 'left'
 
         # Save new x_alignment to file
         self.save_dict()
@@ -254,6 +265,7 @@ class Plot_Point(Mini_Widget):
                 expand=True,
                 on_enter=self.show_slider,               # Show the slider when we hover over our plot point. This also hides timeline_point
                 on_secondary_tap=lambda e: print("Right click on plot point"),  # Pop open our menu options when right clicking
+                on_tap_down=self.show_slider,
             )
         )       
 
@@ -308,4 +320,4 @@ class Plot_Point(Mini_Widget):
         )
             
 
-        self._render_mini_widget()
+        self._render_mini_widget(no_update=True)

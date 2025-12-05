@@ -23,6 +23,7 @@ class Mini_Widget(ft.Container):
         father,                         # Immidiate parent widget or mini widget that holds us (Since some mini widget)
         page: ft.Page,                  # Grabs our original page for convenience and consistency
         key: str,                       # Key to identify this mini widget (by title) within its fathers data
+        side_location: str = None,      # Side of the widget the mini widget shows on
         data: dict = None               # Data passed in for this mini widget
     ):
 
@@ -34,9 +35,7 @@ class Mini_Widget(ft.Container):
             padding=ft.padding.all(8),
             data=data,     
             bgcolor=ft.Colors.with_opacity(.7, ft.Colors.SURFACE),
-            visible=False,
             blur=5,
-            animate=ft.Animation(300, "ease_out")
         )
 
         
@@ -56,14 +55,14 @@ class Mini_Widget(ft.Container):
                 'tag': "mini_widget",         # Default mini widget tag, but should be overwritten by child classes
                 'visible': True,              # If the widget is visible
                 'is_selected': bool,          # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
-                'side_location': 'right',     # Side of the widget the mini widget shows on
+                'side_location': side_location if side_location is not None else "right",     # Side of the widget the mini widget shows on
                 'custom_fields': dict,        # Dictionary for any custom fields the mini widget wants to store
             },
         )
 
         # Apply our visibility
-        #self.visible = self.data['visible']
-        self.visible = False    # Start invisible until toggled
+        self.visible = self.data['visible']
+        #self.visible = False    # TESTING
         self.is_selected = False    # Check if we are selected for ui purposes
 
         # Control for our title
@@ -202,13 +201,16 @@ class Mini_Widget(ft.Container):
         
 
     # Called when clicking x to hide the mini widget
-    def toggle_visibility(self, e=None, value: bool=None, side: str="right"):
+    def toggle_visibility(self, e=None, value: bool=None):
         ''' Shows or hides our mini widget, depending on current state '''
 
-        # Check if exclusive/ being shown alone or shared
+        #print("Super toggle visibility for mw named: ", self.title)
+        #print("Start of super visibility: ", self.visible)
+        #print("Value passed in: ", value)
 
         # If we passed in a value, use it
         if value is not None:
+
             self.data['visible'] = value
             self.visible = value
 
@@ -217,29 +219,23 @@ class Mini_Widget(ft.Container):
             self.data['visible'] = not self.data['visible']
             self.visible = self.data['visible']
 
+        print("Mid of super visibility: ", self.visible)
+
+        # If we are now visible, hide all other mini widgets
+        if self.visible:
+            
+            for mini_widget in self.owner.mini_widgets:
+                
+                if mini_widget.visible and mini_widget != self:
+                    mini_widget.toggle_visibility(value=False)
+                    break
+
+        print(f"Mini widget {self.title} visibility set to {self.visible}")
         # Save switch to file
         self.save_dict()
 
         #self.update()
         self.p.update()
-
-        # Reload our mini w
-        #self.reload_mini_widget()
-
-        if self.visible:
-            print(f"Showing mini widget {self.title}")
-
-            self.animate_out()
-            
-       
-
-        #print(f"Toggling visibility of mini widget {self.title}. We are visible: {self.visible}")
-
-    def animate_out(self, e=None):
-        ''' Animates our mini widget into view '''
-        self.width = 300
-        self.opacity = 1
-        self.p.update()  # Update self first
         
 
     # Called whenever we hover over our mini widget on the right as a psuedo focus
@@ -265,12 +261,17 @@ class Mini_Widget(ft.Container):
         # Call render function
         self._render_mini_widget()
 
-    def _render_mini_widget(self):
+    def _render_mini_widget(self, no_update: bool=False):
         ''' Renders our mini widget UI based on our data '''
 
         # Give Uniform mini titles and styling
 
-        self.p.update()
+        if no_update:
+            return
+        
+        else:
+
+            self.p.update()
         
 
         

@@ -509,7 +509,7 @@ class Widget(ft.Container):
         self._render_widget()
 
     # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets
-    def _render_widget(self):
+    def _render_widget(self, header: ft.Control = None):
         ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it '''
 
         # Set the mini widgets visibility to false so we can check later if we want to add it to the page
@@ -554,24 +554,41 @@ class Widget(ft.Container):
         self.master_stack.controls = [self.body_container]
 
         for mini_widget in self.mini_widgets:
+
+            # Spacing on either left or right of mini widget
             spacing_container = ft.Container(
                 ignore_interactions=True,
                 expand=6,
             )
+
+            # Row to put our mini widget into
             row = ft.Row(
                 spacing=0,
                 expand=True,
                 tight=False,
+                vertical_alignment=ft.CrossAxisAlignment.START,
                 controls=[
                     spacing_container,
-                    mini_widget,
+                    #mini_widget,
                 ]
             )
-            self.master_stack.controls.append(row)        
+
+            # Depending if we should be rendered on left or right side
+            if mini_widget.data.get('side_location', 'right') == 'right':
+                row.controls.append(mini_widget)
+            else:
+                row.controls.insert(0, mini_widget)
+
+            self.master_stack.controls.append(row)     
+
+        col = ft.Column([
+            header if header is not None else ft.Container(height=0),
+            self.master_stack
+        ])   
             
         
         # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
-        self.tab.content = self.master_stack  # We add this in combo with our 'tabs' later
+        self.tab.content = col  # We add this in combo with our 'tabs' later
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]

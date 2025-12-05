@@ -41,6 +41,14 @@ class Timeline(Widget):
                     'show_arcs': True,
                 },        
                 'information_display': {'visibility': True},
+                'interactive_viewer_settings': {
+                    #Need local_focal_point, which is an Offset(x, y)
+                    'pan_x': 0.0,
+                    'pan_y': 0.0,
+                    'scale': 1.0,
+                },
+        # Scale
+                    
                 'time_label': str,                          # Label for the time axis (any str they want)
                 'start_date': str,                          # Start and end date of the branch, for timeline view
                 'end_date': str,                            # Start and end date of the branch, for timeline view
@@ -114,9 +122,25 @@ class Timeline(Widget):
             on_tap=lambda e: self.information_display.toggle_visibility(value=True),
         )
 
+        self.interactive_viewer: ft.InteractiveViewer = ft.InteractiveViewer(
+            expand=5,
+            scale_factor=1000,
+            max_scale=2,
+            min_scale=0.5,
+            boundary_margin=ft.margin.all(20),
+            #on_interaction_start=lambda e: print(e),
+            #on_interaction_end=self.interactive_viewer_interaction_ended,
+            on_interaction_end=self.interactive_viewer_interaction_ended,
+            on_interaction_update=self.interactive_viewer_interaction_update,
+            content=self.timeline_control,
+        )
+
         # Dropdown on the rail. We don't use it here, let the rail handle it
         self.timeline_dropdown = None      # 'Timeline_Dropdown'
-        
+
+        self.is_initialized = False
+
+
         # Builds/reloads our timeline UI
         self.reload_widget()
 
@@ -430,6 +454,28 @@ class Timeline(Widget):
 
         self.p.open(dlg)
 
+
+    def interactive_viewer_interaction_ended(self, e):
+        ''' Called when our interactive viewer interaction ends '''
+        
+        self.save_dict()
+
+    def interactive_viewer_interaction_update(self, e):
+        ''' Called when our interactive viewer interaction updates '''
+        
+
+        if hasattr(e, 'scale'):
+            self.data['interactive_viewer_settings']['scale'] = e.scale
+            print("scale updated to", e.scale)
+
+        if hasattr(e, 'local_focal_point'):
+            self.data['interactive_viewer_settings']['pan_x'] = e.local_focal_point.x
+            self.data['interactive_viewer_settings']['pan_y'] = e.local_focal_point.y
+            print("local focal point updated to", e.local_focal_point)
+        # Need local_focal_point, which is an Offset(x, y)
+        # Scale
+        #pass
+
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):
 
@@ -459,7 +505,7 @@ class Timeline(Widget):
             #wrap=True,     # Want to wrap when lots of filters, but forces into column instead of row
             alignment=ft.MainAxisAlignment.CENTER,
             scroll="auto",
-            controls=[reset_zoom_button, filters],
+            controls=[reset_zoom_button, filters, ft.Container(expand=True)],
         )
 
         self.timeline_left_edge.content.color = ft.Colors.with_opacity(0.7, self.data.get('color', "primary"))
@@ -480,6 +526,8 @@ class Timeline(Widget):
 
         # Reset the content of our timeline control so we can rebuild it
         self.timeline_control.content = ft.Row(spacing=0, expand=True)
+
+        
 
         # Called right after this to give us our list of division positions
         def _set_division_list(total: int)-> list[int]:
@@ -540,17 +588,16 @@ class Timeline(Widget):
                 continue
             
 
-
         # Create a stack so we can sit our plotpoints and arcs on our timeline
         timeline_stack = ft.Stack(
             expand=True, 
             alignment=ft.Alignment(0, 0),
             controls=[
                 ft.Container(expand=True, ignore_interactions=True),    # Make sure we're expanded
-                timeline_row
+                timeline_row,
+                
             ]
         )
-        
 
         # Order arcs by from longest to shortest, so longer arcs are in back (temp)
         sorted_arcs = dict(sorted(self.arcs.items(), key=lambda item: item[1].data['x_alignment_end'] - item[1].data['x_alignment_start'], reverse=True))
@@ -572,7 +619,7 @@ class Timeline(Widget):
         # MAKE INVISIBLE IN FUTURE, ONLY EDGES ARE VERTICAL LINES
         # The timeline shown under our timeliness that that will display timeskips, etc. 
         timeline = ft.Container(
-            margin=ft.margin.all(10),
+            #margin=ft.margin.all(10),
             expand=True,
             content=ft.Column(
                 expand=True,
@@ -583,28 +630,20 @@ class Timeline(Widget):
             )
         )
 
-        # TODO: Make it so not have to rebuild interactive viewer every time??
-
-        # The body that is our interactive viewer, allowing zoom in and out and moving around
-        interactive_viewer = ft.InteractiveViewer(
-            min_scale=0.1,
-            max_scale=5,
-            expand=True,
-            boundary_margin=ft.margin.all(20),
-            #on_interaction_start=lambda e: print(e),
-            #on_interaction_end=lambda e: print(e),
-            #on_interaction_update=lambda e: print(e),
-            content=timeline,
-        )
 
         
+        
+    
+            
+        
         self.body_container.content = ft.Column([
-            header,
+            #header,
             timeline,
         ])
 
-        self._render_widget()
-    
+
+        self._render_widget(header=header)
+
 
 
 
