@@ -161,12 +161,21 @@ class Plot_Point(Mini_Widget):
             # Since no data changed, just update the page to apply changes
             self.p.update()
             
+    # Called when toggling whether this plot point is shown on the timeline in the timeline filters
+    def toggle_timeline_control(self, value: bool):
+        ''' Toggles whether this plot point is shown on the timeline '''
 
-    # Called when mouse clicks the thumb on the slider to start drag, or just clicks it
-    def start_dragging(self, e=None):
-        ''' Sets our state to dragging so may_hide_slider knows not to hide us. Also makes sure we're visible if clicking'''
-        #self.is_dragging = True
-        #self.toggle_visibility(value=True)
+        # Change the control visibility, data, and save it
+        self.timeline_control.visible = value
+        self.data['is_shown_on_widget'] = value
+        self.save_dict()
+        
+        # If we're hiding it, also hide our mini widget if it's open
+        if value == False:
+            self.toggle_visibility(value=value)
+        # Otherwise, just update the page
+        else:
+            self.p.update()
 
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
     def reload_slider(self):
@@ -202,7 +211,6 @@ class Plot_Point(Mini_Widget):
                             overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging      
                             on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
                             on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
-                            on_change_start=self.start_dragging,                # Make sure we're visible
                             on_blur=self.hide_slider                            # Hide the slider if we click away from it
                         ),
                     ),
@@ -272,6 +280,7 @@ class Plot_Point(Mini_Widget):
         # Rebuild our stack to hold our timeline point and slider
         self.timeline_control = ft.Stack(
             alignment=self.x_alignment,
+            visible=self.data.get('is_shown_on_widget', True),
             expand=True,            # Make sure it fills the whole timeline width
             controls=[
                 ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
@@ -279,7 +288,6 @@ class Plot_Point(Mini_Widget):
                 self.slider,                                                # Our slider that appears when we hover over the plot point
             ]
         ) 
-
 
 
     # Called when reloading changes to our plot point and in constructor

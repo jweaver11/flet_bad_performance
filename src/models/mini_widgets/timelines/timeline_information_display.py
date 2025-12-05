@@ -23,7 +23,7 @@ class Timeline_Information_Display(Mini_Widget):
         # Since we only reference out owners data and not our own, we don't need to verify it here
 
         # Set our visibility based on our owners data
-        #self.visible = self.owner.data['information_display']['visibility']
+        self.visible = self.owner.data.get('information_display_visibility', True)
         self.visible = False
 
         self.reload_mini_widget()

@@ -510,39 +510,15 @@ class Widget(ft.Container):
 
     # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets
     def _render_widget(self, header: ft.Control = None):
-        ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it '''
+        ''' 
+        Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it 
+        header parameter is any part of the body of the widget to be above mini widgets or info displays
+        '''
 
-        # Set the mini widgets visibility to false so we can check later if we want to add it to the page
-        #self.mini_widgets_container.visible = False
-        #self.content_row.controls.clear()   # Clear our content row so we can rebuild it
-
-
-        # Add the body container to our content row
-        #self.content_row.controls.append(self.body_container)
-
-
-        # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
-        #self.mini_widgets_column.controls = self.mini_widgets   
         
-        # Add our column that we build to our mini widgets container
-        #self.mini_widgets_container.content = self.mini_widgets_column
-
-        # Check if we are showing any mini widgets. If we are, add the container to our content row
-        #for mini_widget in self.mini_widgets_column.controls:
-            # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
-            #if mini_widget.visible:
-                #self.mini_widgets_container.visible = True
-                #self.content_row.controls.append(self.mini_widgets_container)
-                #break
-
-
-        # Overlay mini widget stuf on top of body container
-        # Using ratio starting with 10, render mini widgets on right or left side depending on setting
-        # Keep our mini widgets using the mini widgets list
 
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
-        #self.body_container.padding = ft.padding.only(left=6, right=6, top=0, bottom=6)
         self.body_container.border_radius = ft.border_radius.all(10)
 
 

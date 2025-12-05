@@ -126,11 +126,8 @@ class Arc(Mini_Widget):
     def toggle_visibility(self, e=None, value: bool = None):
         ''' Toggles the visibility of our timeline_point '''
 
-        #print("Base toggle visibility for arc named: ", self.title)
-
         if value is not None:
-            #print("Value passed in for base: ", value)
-
+            
             self.slider.visible = value
             super().toggle_visibility(value=value)
 
@@ -185,6 +182,22 @@ class Arc(Mini_Widget):
         # Apply the UI changes
         self.reload_mini_widget()
         self.owner.reload_widget()
+
+    # Called when toggling whether this plot point is shown on the timeline in the timeline filters
+    def toggle_timeline_control(self, value: bool):
+        ''' Toggles whether this plot point is shown on the timeline '''
+
+        # Change the control visibility, data, and save it
+        self.timeline_control.visible = value
+        self.data['is_shown_on_widget'] = value
+        self.save_dict()
+        
+        # If we're hiding it, also hide our mini widget if it's open
+        if value == False:
+            self.toggle_visibility(value=value)
+        # Otherwise, just update the page
+        else:
+            self.p.update()
 
 
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
@@ -262,7 +275,7 @@ class Arc(Mini_Widget):
             padding=ft.Padding(2,2,2,2),
 
             #height=None/proportions of width
-            border=ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "secondary"))),
+            border=ft.border.all(3, ft.Colors.with_opacity(.7, self.data.get('color', "secondary"))),
             
             #border=ft.border.only(
                 #top=ft.BorderSide(0, ft.Colors.TRANSPARENT),

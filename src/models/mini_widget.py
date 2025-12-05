@@ -54,7 +54,7 @@ class Mini_Widget(ft.Container):
                 'title': self.title,          # Title of the mini widget, should match the object title
                 'tag': "mini_widget",         # Default mini widget tag, but should be overwritten by child classes
                 'visible': True,              # If the widget is visible
-                'is_selected': bool,          # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+                'is_shown_on_widget': True,          # If the mini widget is shown on the parent widget. Some widgets can toggle this off
                 'side_location': side_location if side_location is not None else "right",     # Side of the widget the mini widget shows on
                 'custom_fields': dict,        # Dictionary for any custom fields the mini widget wants to store
             },
@@ -62,8 +62,7 @@ class Mini_Widget(ft.Container):
 
         # Apply our visibility
         self.visible = self.data['visible']
-        #self.visible = False    # TESTING
-        self.is_selected = False    # Check if we are selected for ui purposes
+        
 
         # Control for our title
         self.title_control = ft.TextField(
@@ -204,10 +203,6 @@ class Mini_Widget(ft.Container):
     def toggle_visibility(self, e=None, value: bool=None):
         ''' Shows or hides our mini widget, depending on current state '''
 
-        #print("Super toggle visibility for mw named: ", self.title)
-        #print("Start of super visibility: ", self.visible)
-        #print("Value passed in: ", value)
-
         # If we passed in a value, use it
         if value is not None:
 
@@ -219,7 +214,6 @@ class Mini_Widget(ft.Container):
             self.data['visible'] = not self.data['visible']
             self.visible = self.data['visible']
 
-        print("Mid of super visibility: ", self.visible)
 
         # If we are now visible, hide all other mini widgets
         if self.visible:
@@ -241,6 +235,7 @@ class Mini_Widget(ft.Container):
     # Called whenever we hover over our mini widget on the right as a psuedo focus
     def on_hover(self, e: ft.HoverEvent):
         print(e)
+        
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):
