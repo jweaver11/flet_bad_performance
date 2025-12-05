@@ -112,13 +112,17 @@ class Arc(Mini_Widget):
         ''' Focuses the arc control '''
 
         # Change its border opacity and update the page
-        self.timeline_arc.border = ft.border.all(2, self.data.get('color', "secondary"))
+        self.timeline_arc.border = ft.border.all(4, self.data.get('color', "secondary"))
         self.p.update()
 
     # Called when we stop hovering over our arc on the timeline
     def on_stop_hover(self, e: ft.HoverEvent):
         ''' Changes the arc control to unfocused '''
 
+        # Makes sure we stay highlighted if our information mini widget is open
+        if self.visible:
+            return
+        
         self.timeline_arc.border = ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "secondary")))
         self.p.update()
 
@@ -127,6 +131,12 @@ class Arc(Mini_Widget):
         ''' Toggles the visibility of our timeline_point '''
 
         if value is not None:
+
+            if value == True:
+                self.timeline_arc.border = ft.border.all(4, self.data.get('color', "secondary"))
+
+            else:
+                self.timeline_arc.border = ft.border.all(2, ft.Colors.with_opacity(.7, self.data.get('color', "secondary")))
             
             self.slider.visible = value
             super().toggle_visibility(value=value)

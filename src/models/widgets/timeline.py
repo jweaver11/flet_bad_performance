@@ -195,6 +195,7 @@ class Timeline(Widget):
         # Add our new Arc mini widget object to our arcs dict, and to our owners mini widgets
         self.arcs[new_arc.title] = new_arc
         self.mini_widgets.append(new_arc)
+        new_arc.toggle_visibility(value=True)
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
@@ -217,6 +218,7 @@ class Timeline(Widget):
         # Add our new Plot Point mini widget object to our plot_points dict, and to our owners mini widgets
         self.plot_points[new_plot_point.title] = new_plot_point
         self.mini_widgets.append(new_plot_point)
+        new_plot_point.toggle_visibility(value=True)
 
         # Apply our changes in the UI
         self.story.active_rail.content.reload_rail()
