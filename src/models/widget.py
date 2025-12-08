@@ -318,12 +318,6 @@ class Widget(ft.Container):
         ''' Changes the hide icon button color slightly for more interactivity '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.ON_SURFACE
-        #self.tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
-
-        # Handle when we're in main pin with multiple tabs
-        #if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
-            #self.story.workspace.main_pin_tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
-        
         self.p.update()
 
     # Called when mouse stops hovering over the tab part of the widget
@@ -331,12 +325,6 @@ class Widget(ft.Container):
         ''' Reverts the color change of the hide icon button '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.OUTLINE
-        #self.tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
-
-        # Handle when we're in main pin with multiple tabs
-        #if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
-            #self.story.workspace.main_pin_tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
-
         self.p.update()
 
 
@@ -362,22 +350,12 @@ class Widget(ft.Container):
         if self.story.workspace is not None:
             self.story.workspace.reload_workspace()
 
+    # Called when right clicking our tab
+    def get_menu_options(self) -> list[ft.Control]:
+        ''' Returns our list of menu options for this widget '''
 
-
-    def focus(self):
-        self.focused = True
-
-        for widget in self.story.widgets:
-            if widget != self:
-                if widget.focused:
-                    widget.padding = ft.padding.all(0)
-                    widget.focused = False
-                    break
-
-        self.padding = ft.padding.all(2)
-        self.p.update()
-        
-
+        return []
+    
     # Called at end of constructor
     def reload_tab(self):
         ''' Creates our tab for our widget that has the title and hide icon '''
@@ -476,6 +454,7 @@ class Widget(ft.Container):
                     # Event handlers for hovering and stop hovering over tab
                     on_hover=self.hover_tab,
                     on_exit=self.stop_hover_tab,
+                    on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
 
                     # Content of the gesture detector. This has our actual title and hide icon
                     content=ft.Row([

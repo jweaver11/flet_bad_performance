@@ -59,6 +59,24 @@ class Chapter(Widget):
         e.control.value = ""
         self.reload_widget()
 
+    def get_menu_options(self) -> list[ft.Control]:
+        ''' Returns our list of menu options for this widget '''
+
+        from styles.menu_option_style import Menu_Option_Style
+
+        return [
+            Menu_Option_Style(
+                #on_click=self.new_item_clicked,
+                    data="plot_point",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
+                        ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+        ]
+
+
+
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):

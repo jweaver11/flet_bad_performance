@@ -20,12 +20,7 @@ class Workspace(ft.Container):
         super().__init__(
             expand=True,
             alignment=ft.alignment.center,
-            #bgcolor=ft.Colors.ON_INVERSE_SURFACE,
-            #bgcolor=ft.Colors.OUTLINE_VARIANT,
-            #bgcolor=ft.Colors.ON_SECONDARY,
-            #bgcolor="background",
-            #padding=ft.padding.all(10),
-            padding=ft.padding.only(top=10, bottom=10, left=0, right=10),
+            padding=ft.padding.only(top=10, bottom=10, left=2, right=10),
         )
 
         self.p = page

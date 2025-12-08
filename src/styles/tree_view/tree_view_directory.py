@@ -14,6 +14,7 @@ class Tree_View_Directory(ft.GestureDetector):
         title: str,                                             # Title of this folder
         story: Story,                                           # Story reference for mouse positions and other logic
         page: ft.Page,                                          # Page reference for overlay menu
+        rail: ft.Control,
         is_expanded: bool = False,                              # Whether this directory is expanded or not
         color: str = "primary",                                 # Color of the folder icon
         father: 'Tree_View_Directory' = None,                   # Optional parent directory tile, if there is one
@@ -28,6 +29,7 @@ class Tree_View_Directory(ft.GestureDetector):
         self.father = father
         self.color = color
         self.is_expanded = is_expanded  
+        self.rail = rail
         self.additional_menu_options = additional_menu_options
 
         # State tracking variables
@@ -59,6 +61,10 @@ class Tree_View_Directory(ft.GestureDetector):
             mouse_cursor=ft.MouseCursor.CLICK,
             on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
         )
+
+        self.is_focused: bool = True
+
+        self.expansion_tile: ft.ExpansionTile = None
 
         # Reload our directory tile to set up initial UI
         self.reload()
@@ -144,6 +150,24 @@ class Tree_View_Directory(ft.GestureDetector):
             key='is_expanded',
             value=self.is_expanded
         )
+
+
+        #print("Active dropdown before:", self.rail.active_dropdown)
+        if self.rail.active_dropdown is not None:
+            if hasattr(self.rail.active_dropdown, "is_focused"):
+                
+                self.rail.active_dropdown.is_focused = False
+                self.rail.active_dropdown.refresh_expansion_tile()
+            
+            else:
+                self.rail.active_dropdown.timeline_dropdown.is_focused = False
+                self.rail.active_dropdown.timeline_dropdown.refresh_expansion_tile()
+
+        self.rail.active_dropdown = self
+        self.rail.refresh_buttons()
+
+        self.is_focused = True
+        self.refresh_expansion_tile()
 
     # Called when creating new category or when additional menu items are clicked
     def new_item_clicked(self, type: str = "category"):
@@ -642,12 +666,14 @@ class Tree_View_Directory(ft.GestureDetector):
 
         # Call the move file using the new directory path
         widget.move_file(new_directory=self.full_path)
+
+
         
     
 
     # Called when we need to reload this directory tile
     def reload(self):
-        expansion_tile = ft.ExpansionTile(
+        self.expansion_tile = ft.ExpansionTile(
             title=ft.Row([
                 ft.Icon(ft.Icons.FOLDER_OUTLINED, color=self.color),
                 ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left")
@@ -658,10 +684,8 @@ class Tree_View_Directory(ft.GestureDetector):
             tile_padding=ft.Padding(0, 0, 0, 0),
             controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented
             maintain_state=True,
-            #affinity=ft.TileAffinity.LEADING, 
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
             adaptive=True,
-            bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
             controls=[self.new_item_textfield], 
@@ -672,13 +696,13 @@ class Tree_View_Directory(ft.GestureDetector):
             if self.content.content.controls is not None:
                 for control in self.content.content.controls:
                     if control != self.new_item_textfield:      # Don't re-add our textfield, its already there
-                        expansion_tile.controls.append(control)
+                        self.expansion_tile.controls.append(control)
 
         # Wrap in all in a drag target so we can drag to move widgets into different folders
         drag_target = ft.DragTarget(
             group="widgets",
             on_accept=self.on_drag_accept,
-            content=expansion_tile,
+            content=self.expansion_tile,
         )
         
         # Set the content
