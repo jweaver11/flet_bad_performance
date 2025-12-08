@@ -60,7 +60,7 @@ class Timeline_Item(ft.GestureDetector):
             on_enter = self.on_hover,
             on_exit = self.on_stop_hover,
             on_secondary_tap = lambda e: self.mini_widget.owner.story.open_menu(self.get_menu_options()),
-            #on_tap = lambda e: self.widget.focus(),    # Open up timeline if not opened, focus our mini widget
+            on_tap = lambda e: self.mini_widget.toggle_visibility(value=True),    # Open up timeline if not opened, focus our mini widget
             mouse_cursor = ft.MouseCursor.CLICK,
         )
 

@@ -72,7 +72,7 @@ class Rail(ft.Container):
     # Called when a widget is dragged and dropped into this directory
     def on_drag_accept(self, e, new_directory: str):
         ''' Moves our widgets into this directory from wherever they were '''
-        print("Drag accepting")
+        #print("Drag accepting")
 
         # Load our data (draggables can't just pass in simple data for some reason)
         event_data = json.loads(e.data)

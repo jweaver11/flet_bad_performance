@@ -103,6 +103,7 @@ class Story(ft.View):
         # Variables to store our mouse position for opening menus
         self.mouse_x: int = 0
         self.mouse_y: int = 0
+        self.is_dragging_widget: bool = False
 
         # Allows changable directory path for rail elements to pass in (May not need)
         self.active_directory_path: str = None
@@ -855,6 +856,8 @@ class Story(ft.View):
 
         page = self.p
 
+        page.title = f"{self.title}"
+
         # Clear our controls in our view before building it
         self.controls.clear()
 
@@ -940,6 +943,8 @@ class Story(ft.View):
 
         # Views render like columns, so we add elements top-down
         self.controls = [self.menubar, gd]
+
+        page.update()
 
     # Called every time the mouse moves over the workspace
     def on_hover(self, e):

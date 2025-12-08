@@ -9,7 +9,7 @@ import flet as ft
 from models.app import app
 from models.story import Story
 import json
-
+from styles.colors import dark_gradient
 
 # Our workspace object that is stored in our story object
 class Workspace(ft.Container):
@@ -20,7 +20,10 @@ class Workspace(ft.Container):
         super().__init__(
             expand=True,
             alignment=ft.alignment.center,
-            bgcolor=ft.Colors.with_opacity(1, ft.Colors.SURFACE),
+            #bgcolor=ft.Colors.ON_INVERSE_SURFACE,
+            #bgcolor=ft.Colors.OUTLINE_VARIANT,
+            #bgcolor=ft.Colors.ON_SECONDARY,
+            #bgcolor="background",
             #padding=ft.padding.all(10),
             padding=ft.padding.only(top=10, bottom=10, left=0, right=10),
         )
@@ -107,6 +110,7 @@ class Workspace(ft.Container):
         self.master_stack = ft.Stack(expand=True, controls=[self.widgets, self.pin_drag_targets])
 
 
+
         # We call this in the story build_view, since it errors out here if the object is not fully built yet
         #self.reload_workspace() 
 
@@ -118,6 +122,7 @@ class Workspace(ft.Container):
 
         visible_top_pin_controls = [control for control in self.top_pin.controls if getattr(control, 'visible', True)]
 
+        print("Showing pin drag targets")
         # If no visible in the top pin
         if len(visible_top_pin_controls) == 0:
             self.top_pin_drag_target.content.height = self.minimum_pin_height
@@ -146,11 +151,20 @@ class Workspace(ft.Container):
         self.pin_drag_targets.visible = False
         self.master_stack.update()
 
+    # Called when mouse enters the safety gesture detector.
+    def may_show_pin_drag_targets(self):
+        ''' Determines if we are dragging, and need to show the targets or not '''
+
+        if self.story.is_dragging_widget:
+            self.show_pin_drag_targets()
+        else:
+            return
+
     # Called when a draggable hovers over a drag target before dropping
     def on_hover_pin_drag_target(self, e):
         ''' Makes the drag target visible for so visual feedback '''
 
-        e.control.content.opacity = .4
+        e.control.content.opacity = .3
         e.control.content.update()
        
     # Called when a draggable leaves a drag target
@@ -181,6 +195,8 @@ class Workspace(ft.Container):
         widget = draggable.data
 
         old_pin_location = widget.data['pin_location']
+
+        self.story.is_dragging_widget = False   # We have finished dragging
 
         # If we were dragged from the main pin and we were the active tab, set the first tab to new active
         if old_pin_location == "main" and widget.data['is_active_tab'] == True:
@@ -544,14 +560,7 @@ class Workspace(ft.Container):
             
                 border_radius=ft.border_radius.all(8),
             
-                gradient=ft.LinearGradient(
-                    begin=ft.alignment.top_center,
-                    end=ft.alignment.bottom_center,
-                    colors=[
-                        ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
-                        ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-                    ],
-                ),
+                gradient=dark_gradient,
                 animate=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
                 margin=ft.margin.all(0),
                 #padding=ft.padding.all(8),
@@ -647,9 +656,9 @@ class Workspace(ft.Container):
         ]
 
         # Set the master_stack as the content of this container
+        #self.content = self.master_stack
         self.content = self.master_stack
-        
-        
+
         # Finally update the UI
         self.p.update()
 
