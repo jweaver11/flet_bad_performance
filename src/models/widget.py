@@ -318,11 +318,11 @@ class Widget(ft.Container):
         ''' Changes the hide icon button color slightly for more interactivity '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.ON_SURFACE
-        self.tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
+        #self.tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
 
         # Handle when we're in main pin with multiple tabs
-        if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
-            self.story.workspace.main_pin_tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
+        #if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
+            #self.story.workspace.main_pin_tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
         
         self.p.update()
 
@@ -331,11 +331,11 @@ class Widget(ft.Container):
         ''' Reverts the color change of the hide icon button '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.OUTLINE
-        self.tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
+        #self.tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
 
         # Handle when we're in main pin with multiple tabs
-        if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
-            self.story.workspace.main_pin_tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
+        #if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
+            #self.story.workspace.main_pin_tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
 
         self.p.update()
 

@@ -371,9 +371,10 @@ class Workspace(ft.Container):
             if (e.delta_y > 0 and self.top_pin.height < self.p.height/2) or (e.delta_y < 0 and self.top_pin.height >= self.minimum_pin_height):
                 self.top_pin.height += e.delta_y
                 self.top_pin_drag_target.content.height = self.top_pin.height  # Update the drag target height to match the pin height
-            formatted_top_pin.update()
-            self.widgets.update() # Update the main pin, as it is affected by all pins resizing
-            self.master_stack.update()
+            #formatted_top_pin.update()
+            #self.widgets.update() # Update the main pin, as it is affected by all pins resizing
+            #self.master_stack.update()
+            self.p.update()
         def save_top_pin_height(e: ft.DragEndEvent):
             #print("save top pin height called")
             self.story.data['top_pin_height'] = self.top_pin.height
@@ -409,9 +410,10 @@ class Workspace(ft.Container):
             #print("move left pin divider called")
             if (e.delta_x > 0 and self.left_pin.width < self.p.width/2) or (e.delta_x < 0 and self.left_pin.width >= self.minimum_pin_width):
                 self.left_pin.width += e.delta_x
-            formatted_left_pin.update()
-            self.widgets.update()
-            self.master_stack.update()
+            #formatted_left_pin.update()
+            #self.widgets.update()
+            #self.master_stack.update()
+            self.p.update()
         def save_left_pin_width(e: ft.DragEndEvent):
             #print("save left pin width called")
             self.story.data['left_pin_width'] = self.left_pin.width
@@ -443,9 +445,10 @@ class Workspace(ft.Container):
             #print("move right pin divider called")
             if (e.delta_x < 0 and self.right_pin.width < self.p.width/2) or (e.delta_x > 0 and self.right_pin.width >= self.minimum_pin_width):
                 self.right_pin.width -= e.delta_x
-            formatted_right_pin.update()
-            self.widgets.update()
-            self.master_stack.update()
+            #formatted_right_pin.update()
+            #self.widgets.update()
+            #self.master_stack.update()
+            self.p.update()
         def save_right_pin_width(e: ft.DragEndEvent):
             print("save right pin width called")    
             self.story.data['right_pin_width'] = self.right_pin.width
@@ -475,9 +478,10 @@ class Workspace(ft.Container):
             #print("move bottom pin divider called")
             if (e.delta_y < 0 and self.bottom_pin.height < self.p.height/2) or (e.delta_y > 0 and self.bottom_pin.height >= self.minimum_pin_height):
                 self.bottom_pin.height -= e.delta_y
-            formatted_bottom_pin.update()
-            self.widgets.update()
-            self.master_stack.update()
+            #formatted_bottom_pin.update()
+            #self.widgets.update()
+            #self.master_stack.update()
+            self.p.update()
         def save_bottom_pin_height(e: ft.DragEndEvent):
             print("save bottom pin height called")
             self.story.data['bottom_pin_height'] = self.bottom_pin.height
@@ -539,7 +543,7 @@ class Workspace(ft.Container):
                 expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
                 #divider_color=ft.Colors.TRANSPARENT,
                 padding=ft.padding.all(0),
-                label_padding=ft.padding.all(0),
+                #label_padding=ft.padding.all(0),
                 mouse_cursor=ft.MouseCursor.BASIC,
                 
                 tabs=[]    # Gives our tab control here   
