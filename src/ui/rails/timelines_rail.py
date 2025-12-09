@@ -19,7 +19,7 @@ class Timelines_Rail(Rail):
         super().__init__(
             page=page,
             story=story,
-            directory_path=story.data['timelines_directory_path']
+            directory_path=story.data['timelines_directory_path'],
         )
 
         # Drop down we reference when adding new items to that dropdown
@@ -317,6 +317,8 @@ class Timelines_Rail(Rail):
 
         # Finally, add our new item textfield at the bottom
         content.controls.append(self.new_item_textfield)
+
+        
 
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(

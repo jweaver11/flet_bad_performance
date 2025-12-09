@@ -157,6 +157,7 @@ class Content_Rail(Rail):
             page=self.p,
             story=self.story,
             directory=self.directory_path,
+            rail=self,
             column=content,
             additional_directory_menu_options=self.get_directory_menu_options()
         )

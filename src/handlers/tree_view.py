@@ -16,6 +16,7 @@ def load_directory_data(
     page: ft.Page,                                        # Page reference for overlays if needed    
     story: Story,                                         # Story reference for any story related data
     directory: str,                                       # The directory to load data from
+    rail: ft.Control,                                     # The rail this tree view is in
     dir_dropdown: Tree_View_Directory = None,             # Optional parent expansion tile for when recursively called
     column: ft.Column = None,                             # Optional parent column to add elements too when not starting inside a tile
     additional_directory_menu_options: list[ft.Control] = None,      # Additional menu options passed in from parent rail to be used for directories
@@ -77,6 +78,7 @@ def load_directory_data(
                 story=story,
                 page=page,
                 color=color,
+                rail=rail,
                 is_expanded=is_expanded,
                 additional_menu_options=additional_directory_menu_options,
                 father=dir_dropdown if dir_dropdown is not None else None,
@@ -88,6 +90,7 @@ def load_directory_data(
                 story=story,                                              # Story reference
                 directory=full_path,                                      # Our new directory to load
                 dir_dropdown=new_expansion_tile,                          # Our new parent expansion tile
+                rail=rail,
                 additional_directory_menu_options=additional_directory_menu_options,           # Any additional menu options to pass down
                 additional_file_menu_options=additional_file_menu_options
             )
