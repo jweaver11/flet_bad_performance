@@ -473,7 +473,7 @@ class Widget(ft.Container):
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
             tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
                 group="widgets",    # Group for draggables (and receiving drag targets) to accept each other
-                data=self,  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
+                data=self.data['key'],  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
 
                 # Drag event handlers
                 on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging

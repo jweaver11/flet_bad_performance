@@ -191,14 +191,23 @@ class Workspace(ft.Container):
 
         # Load our event data
         event_data = json.loads(e.data)
-        # Save the src id from the data so we can find our draggable
-        src_id = event_data.get("src_id")
         
-        # Save our draggable so we can load its data
-        draggable = e.page.get_control(src_id)
+        # Grab our draggable from the event
+        draggable = e.page.get_control(event_data.get("src_id"))
             
-        # Set object variable to our object
-        widget = draggable.data
+        # Grab our key and set the widget
+        widget_key = draggable.data
+
+        widget = None
+
+        for w in self.story.widgets:
+            if w.data.get('key', "") == widget_key:
+                widget = w
+                break
+
+        if widget is None:
+            print("Error: Widget not found for drag accept")
+            return
 
         old_pin_location = widget.data['pin_location']
 

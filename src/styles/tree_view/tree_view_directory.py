@@ -631,14 +631,23 @@ class Tree_View_Directory(ft.GestureDetector):
 
         # Load our data (draggables can't just pass in simple data for some reason)
         event_data = json.loads(e.data)
-        # Grab the source id of the draggable
-        src_id = event_data.get("src_id")     
         
-        # Set the draggable
-        draggable = e.page.get_control(src_id)
+        # Grab our draggable from the event
+        draggable = e.page.get_control(event_data.get("src_id"))
             
-        # Now we can grab its data, in this case the widget
-        widget = draggable.data
+        # Grab our key and set the widget
+        widget_key = draggable.data
+
+        widget = None
+
+        for w in self.story.widgets:
+            if w.data.get('key', "") == widget_key:
+                widget = w
+                break
+
+        if widget is None:
+            print("Error: Widget not found for drag accept")
+            return
 
         # Call the move file using the new directory path
         widget.move_file(new_directory=self.full_path)
