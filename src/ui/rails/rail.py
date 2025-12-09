@@ -7,6 +7,7 @@ import os
 import json
 from models.story import Story
 from models.widgets.timeline import Timeline
+from styles.tree_view.tree_view_directory import Tree_View_Directory
 
 
 class Rail(ft.Container):
@@ -22,7 +23,6 @@ class Rail(ft.Container):
         
         # Initialize the parent Container class first
         super().__init__(
-            #padding=None,
             padding=ft.Padding(0, 0, 0, 0),        # Adds padding left to match divider on the right
         )
             
@@ -31,6 +31,8 @@ class Rail(ft.Container):
         self.story = story
         self.directory_path = directory_path
         self.timeline = timeline
+
+        self.active_dropdown: Tree_View_Directory = None
 
         # Text style for our textfields
         self.text_style = ft.TextStyle(
@@ -275,6 +277,13 @@ class Rail(ft.Container):
             # New Maps
             elif tag == "map":
                 self.story.create_map(title)
+
+    # Called when we select a new dropdown
+    def refresh_buttons(self):
+        ''' Refreshes the buttons at top of the rail '''
+        pass
+
+    
 
     # Called when changes occure that require rail to be reloaded. Should be overwritten by children
     def reload_rail(self) -> ft.Control:

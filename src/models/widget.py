@@ -11,6 +11,7 @@ import os
 import json
 from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
+from styles.colors import dark_gradient
 
 
 class Widget(ft.Container):
@@ -29,16 +30,8 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             data=data,                              # Sets our data. 
-            border_radius=ft.border_radius.all(8),
-            gradient=ft.LinearGradient(
-                begin=ft.alignment.top_center,
-                end=ft.alignment.bottom_center,
-                colors=[
-                    ft.Colors.with_opacity(0.6, ft.Colors.ON_INVERSE_SURFACE),
-                    ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
-                    #ft.Colors.CYAN_400, ft.Colors.PURPLE_500   # Highlight colors
-                ],
-            ),
+            border_radius=ft.border_radius.all(10),
+            gradient=dark_gradient,
             margin=ft.margin.all(0),
             padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
             #on_click=lambda e: print("Pressed widget")
@@ -96,6 +89,8 @@ class Widget(ft.Container):
         self.mini_widgets_row: ft.Row = ft.Column(spacing=4)  
         
         self.body_container: ft.Container = ft.Container(expand=True)  # Stack to hold our body content, with mini widgets overlaid on top
+
+        self.master_stack: ft.Stack = ft.Stack(expand=True)
 
         # Called at end of constructor for all child widgets to build their view (not here tho since we're not on page yet)
         #self.reload_widget()
@@ -323,12 +318,6 @@ class Widget(ft.Container):
         ''' Changes the hide icon button color slightly for more interactivity '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.ON_SURFACE
-        self.tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
-
-        # Handle when we're in main pin with multiple tabs
-        if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
-            self.story.workspace.main_pin_tabs.indicator_color = self.data.get('color', ft.Colors.PRIMARY)
-        
         self.p.update()
 
     # Called when mouse stops hovering over the tab part of the widget
@@ -336,12 +325,6 @@ class Widget(ft.Container):
         ''' Reverts the color change of the hide icon button '''
 
         self.hide_tab_icon_button.icon_color = ft.Colors.OUTLINE
-        self.tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
-
-        # Handle when we're in main pin with multiple tabs
-        if self.data['pin_location'] == "main" and len(self.story.workspace.main_pin.controls) > 1 and self.data['is_active_tab']:
-            self.story.workspace.main_pin_tabs.indicator_color = ft.Colors.with_opacity(0.8, self.data.get('color', ft.Colors.PRIMARY))
-
         self.p.update()
 
 
@@ -367,33 +350,12 @@ class Widget(ft.Container):
         if self.story.workspace is not None:
             self.story.workspace.reload_workspace()
 
+    # Called when right clicking our tab
+    def get_menu_options(self) -> list[ft.Control]:
+        ''' Returns our list of menu options for this widget '''
 
-    # Called to set the active mini widget in this widget
-    def set_active_mini_widget(self, mini_widget):
-        print(f"Setting active mini widget to {mini_widget.title} in widget {self.title}")
-        if self.active_mini_widget is not None:
-            if self.active_mini_widget != mini_widget:
-                self.active_mini_widget.toggle_visibility(value=False, not_active=True)
-
-        self.active_mini_widget = mini_widget
-
-        #self.reload_widget()
-
-
-    def focus(self):
-        self.focused = True
-
-        for widget in self.story.widgets:
-            if widget != self:
-                if widget.focused:
-                    widget.padding = ft.padding.all(0)
-                    widget.focused = False
-                    break
-
-        self.padding = ft.padding.all(2)
-        self.p.update()
-        
-
+        return []
+    
     # Called at end of constructor
     def reload_tab(self):
         ''' Creates our tab for our widget that has the title and hide icon '''
@@ -492,6 +454,7 @@ class Widget(ft.Container):
                     # Event handlers for hovering and stop hovering over tab
                     on_hover=self.hover_tab,
                     on_exit=self.stop_hover_tab,
+                    on_secondary_tap=lambda e: self.story.open_menu(self.get_menu_options()),
 
                     # Content of the gesture detector. This has our actual title and hide icon
                     content=ft.Row([
@@ -525,83 +488,65 @@ class Widget(ft.Container):
         self._render_widget()
 
     # Called when changes inside the widget require a reload to be reflected in the UI, like when adding mini widgets
-    def _render_widget(self):
-        ''' Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it '''
+    def _render_widget(self, header: ft.Control = None):
+        ''' 
+        Takes the 'reload_widget' content and builds the full UI with mini widgets and tab around it 
+        header parameter is any part of the body of the widget to be above mini widgets or info displays
+        '''
 
-        # Set the mini widgets visibility to false so we can check later if we want to add it to the page
-        #self.mini_widgets_container.visible = False
-        #self.content_row.controls.clear()   # Clear our content row so we can rebuild it
-
-
-        # Add the body container to our content row
-        #self.content_row.controls.append(self.body_container)
-
-
-        # BUILDING MINI WIDGETS - Column that holds our mini note controls on the side 1/3 of the widget
-        #self.mini_widgets_column.controls = self.mini_widgets   
         
-        # Add our column that we build to our mini widgets container
-        #self.mini_widgets_container.content = self.mini_widgets_column
-
-        # Check if we are showing any mini widgets. If we are, add the container to our content row
-        #for mini_widget in self.mini_widgets_column.controls:
-            # TODO: Add check for right or left side mini widgets. Either insert at controls[0] or append
-            #if mini_widget.visible:
-                #self.mini_widgets_container.visible = True
-                #self.content_row.controls.append(self.mini_widgets_container)
-                #break
-
-
-        # Overlay mini widget stuf on top of body container
-        # Using ratio starting with 10, render mini widgets on right or left side depending on setting
-        # Keep our mini widgets using the mini widgets list
 
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
-        #self.body_container.padding = ft.padding.only(left=6, right=6, top=0, bottom=6)
-        self.body_container.border_radius = ft.border_radius.all(8)
+        self.body_container.border_radius = ft.border_radius.all(10)
 
 
         
 
         # Put our mini widgets on the right side
-        row = ft.Row(expand=True, spacing=0, controls=[self.body_container])
-        
+       # row = ft.Row(expand=True, spacing=0, controls=[self.body_container])
 
-        # Add our mini widget if we have one active
-        if self.active_mini_widget is not None:
-            #self.active_mini_widget.expand = 4
-            row.controls.append(self.active_mini_widget)
+        self.master_stack.controls = [self.body_container]
+
+        for mini_widget in self.mini_widgets:
+
+            # Spacing on either left or right of mini widget
+            spacing_container = ft.Container(
+                ignore_interactions=True,
+                expand=6,
+            )
+
+            # Row to put our mini widget into
+            row = ft.Row(
+                spacing=0,
+                expand=True,
+                tight=False,
+                vertical_alignment=ft.CrossAxisAlignment.START,
+                controls=[
+                    spacing_container,
+                    #mini_widget,
+                ]
+            )
+
+            # Depending if we should be rendered on left or right side
+            if mini_widget.data.get('side_location', 'right') == 'right':
+                row.controls.append(mini_widget)
+            else:
+                row.controls.insert(0, mini_widget)
+
+            self.master_stack.controls.append(row)     
+
+        col = ft.Column([
+            header if header is not None else ft.Container(height=0),
+            self.master_stack
+        ])   
             
         
         # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
-        self.tab.content = row  # We add this in combo with our 'tabs' later
+        self.tab.content = col  # We add this in combo with our 'tabs' later
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
         self.tabs.tabs = [self.tab]
-
-        outer_container = ft.Container(
-            expand=True,
-            border_radius=ft.border_radius.all(8),
-            padding=ft.padding.only(top=0, bottom=6, left=6, right=6),
-            gradient=ft.LinearGradient(
-                colors=[
-                    
-                    ft.Colors.ON_INVERSE_SURFACE,
-                    ft.Colors.SURFACE
-                ]
-            ),
-            content=self.tabs
-        )
-
-        # For adding focus outline
-        hover_gd = ft.GestureDetector(
-            mouse_cursor=ft.MouseCursor.CLICK,
-            
-            on_tap_down=lambda e: self.focus(),
-            #on_exit=self.stop_hover_tab,
-            content=outer_container
-        )
 
         self.content = self.tabs
 

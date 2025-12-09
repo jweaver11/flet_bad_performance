@@ -33,12 +33,6 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
         new_story.startup()
         page.views.append(new_story)
 
-        # Set our new title to reflect this new loaded story
-        page_title = "StoryBoard -- " + new_story.title + " -- Saved status"
-        page.title = page_title
-
-        #print("Route change:", page.route)
-
     # Otherwise, give us a blank page
     else:
         menu_bar = create_menu_bar(page)

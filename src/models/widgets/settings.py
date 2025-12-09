@@ -66,30 +66,26 @@ class Settings(Widget):
             print(f"Error toggling rail reorderable: {e}")
 
     # Called when the page is resized
-    def page_resized(self, e):
-        #print("page resized")
-        self.data['page_width'] = self.p.width
-        self.data['page_height'] = self.p.height
-        #print("width:", self.p.width, "height:", self.p.height)
+    def page_resized(self, e=None):
 
-        # Check if we're maximized or not
+        # If we're minmized, save nothing and just return
+        if self.p.window.minimized:
+            return
+
+        # If we maximized the page, just save that, not the size
         if self.p.window.maximized:
             self.data['page_is_maximized'] = True
-            #print("maximized")
+            self.save_dict()
+            return
+        
+        # If page not maximized or minimized, save the size
         else:
             self.data['page_is_maximized'] = False
-            #print("not maximized")
-
-        self.save_dict()
-
-        # OUTDATED
-        # Make sure the story is done loading to avoid any errors refreshing things that arent on page yet
-        #if self.story is not None:
-            #if self.story.is_initialized:
-                #for timeline in self.story.timelines.values():
-                    #timeline.reload_widget()
-
-
+            self.data['page_width'] = self.p.width
+            self.data['page_height'] = self.p.height
+            self.save_dict()
+            return
+        
     
     # Called when someone expands the drop down holding the color scheme options
     def reload_widget(self):

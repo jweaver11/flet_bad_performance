@@ -492,6 +492,43 @@ class Story(ft.View):
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
 
+    def get_character_names(self) -> list:
+        '''Return a sorted list of character names.
+
+        Prefers in-memory loaded Character objects (self.characters), but will
+        fall back to reading the filenames in the characters directory so names
+        are available even if characters haven't been instantiated yet.
+        '''
+        names = []
+        try:
+            # Use loaded character objects first
+            if isinstance(self.characters, dict) and len(self.characters) > 0:
+                for c in self.characters.values():
+                    try:
+                        t = getattr(c, 'title', None)
+                        if t:
+                            names.append(t)
+                    except Exception:
+                        continue
+
+            # Fall back to files on disk for any names not already included
+            path = self.data.get('characters_directory_path')
+            if path and os.path.exists(path):
+                for fname in os.listdir(path):
+                    if fname.endswith('.json') and not fname.endswith('_display.json'):
+                        name = os.path.splitext(fname)[0]
+                        if name and name not in names:
+                            names.append(name)
+
+        except Exception as e:
+            print(f"Error getting character names: {e}")
+
+        # Return unique, sorted names
+        try:
+            return sorted(list(dict.fromkeys(names)))
+        except Exception:
+            return names
+
         
 
     # Called on story startup to create our plotline object.
@@ -816,7 +853,21 @@ class Story(ft.View):
     # Called when we right click our object on the tree view
     def open_menu(self, menu_options: list):
         ''' Pops open our menu options when right clicking an object on a rail '''
-        
+
+        page_width = self.p.width
+        page_height = self.p.height
+        print(f"Page width: {page_width}, height: {page_height}")
+        print(f"Mouse X: {self.mouse_x}, Mouse Y: {self.mouse_y}")
+
+        # If mouse x is within 120 pixels of width, move it left 120 pixels
+        # If mouse y is within 120 pixels move it up 120 pixels
+        if self.mouse_x + 120 > page_width:
+            self.mouse_x -= 120
+            print(f"Adjusted Mouse X: {self.mouse_x}")
+        if self.mouse_y + 90 > page_height:
+            self.mouse_y -= 50
+            print(f"Adjusted Mouse Y: {self.mouse_y}")
+
         # Our container that contains a column of our options. Need to use container for positioning
         menu = ft.Container(
             left=self.mouse_x,     # Positions the menu at the mouse location
@@ -855,6 +906,8 @@ class Story(ft.View):
         from models.app import app
 
         page = self.p
+
+        page.title = f"{self.title}"
 
         # Clear our controls in our view before building it
         self.controls.clear()
@@ -906,8 +959,8 @@ class Story(ft.View):
                     #],
                 #),
                 # Thin vertical divider, which is what the app will actually drag
-                #content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
-                padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
+                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
+                padding=ft.padding.only(right=8),  # Push the 2px divider ^ to the right side
             ),
             on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
             on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
@@ -936,12 +989,13 @@ class Story(ft.View):
             content=row,
             expand=True,
             on_hover=self.on_hover,
-            on_tap_up=lambda e: self.stop_dragging_widget(),  # NOT CALLED
             hover_interval=20,
         )
 
         # Views render like columns, so we add elements top-down
         self.controls = [self.menubar, gd]
+
+        page.update()
 
     # Called every time the mouse moves over the workspace
     def on_hover(self, e):
@@ -949,7 +1003,3 @@ class Story(ft.View):
 
         self.mouse_x = e.local_x 
         self.mouse_y = e.local_y
-
-    def stop_dragging_widget(self):
-        self.is_dragging_widget = False
-        print("Stopped dragging widget")

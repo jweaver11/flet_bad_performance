@@ -24,6 +24,8 @@ def main(page: ft.Page):
     init_settings(page)
     init_load_saved_stories(page)   # Changes route to active story if there is one
 
+    page.title = "StoryBoard"
+
     # Sets our theme modes and color schemes based on app settings (first start is dark and blue)
     page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))
     page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))
@@ -40,8 +42,7 @@ def main(page: ft.Page):
         page.window.height = app.settings.data.get('page_height')
 
     # Set our logic when page window is resized
-    page.on_resized = lambda e: app.settings.page_resized(e)
-
+    page.on_resized = app.settings.page_resized
 
     # Called to create the page view if no stories exist
     def create_page_if_no_stories_exist() -> ft.Control:
