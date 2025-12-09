@@ -230,7 +230,7 @@ class Character(Widget):
                                 ft.Dropdown(        # Dropdown selection of good, evil, neutral, and n/a
                                     label="alignment2",           # Label at top of dropdown 
                                     value=self.data['alignment2'],        # Value selected in the drop down
-                                    dense=True,
+                                    #dense=True,
                                     color=self.data['name_color'],      # Color of the dropdown text
                                     text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),         # Style of the text in the dropdown
                                     options=[           # Options for the dropdown
@@ -247,7 +247,6 @@ class Character(Widget):
                                 ft.Column(
                                     spacing=4,
                                     controls=[
-# Existing connections rendered as small removable items
                                         ft.Row(
                                             spacing=6,
                                             controls=[
@@ -272,6 +271,7 @@ class Character(Widget):
                                         # Dropdown to add another connection; options exclude self and already-chosen
                                         ft.Dropdown(
                                             label="Add Connection",
+                                            #this will change to the connections part of the data 
                                             value=None,
                                             hint_text="Select character to add",
                                             text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
