@@ -19,7 +19,7 @@ class Timelines_Rail(Rail):
         super().__init__(
             page=page,
             story=story,
-            directory_path=story.data['timelines_directory_path']
+            directory_path=story.data['timelines_directory_path'],
         )
 
         # Drop down we reference when adding new items to that dropdown
@@ -298,7 +298,7 @@ class Timelines_Rail(Rail):
 
 
             # Add some padding under it between timelines
-            timeline.timeline_dropdown.content.controls.append(ft.Container(height=10))
+            #timeline.timeline_dropdown.content.controls.append(ft.Container(height=10))
 
             # If theres only one timeline, no need to add the parent expansion to the page.
             if len(self.story.timelines) == 1:
@@ -313,10 +313,12 @@ class Timelines_Rail(Rail):
             else:
                 content.controls.append(timeline.timeline_dropdown)
     
-
+        content.controls.append(ft.Container(height=6))
 
         # Finally, add our new item textfield at the bottom
         content.controls.append(self.new_item_textfield)
+
+        
 
         # Gesture detector to put on top of stack on the rail to pop open menus on right click
         gd = ft.GestureDetector(

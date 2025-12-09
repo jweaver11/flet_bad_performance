@@ -2,14 +2,29 @@ import flet as ft
 from models.mini_widget import Mini_Widget
 from models.widget import Widget
 from handlers.verify_data import verify_data
-from models.widgets.timeline import Timeline
+import math
+from styles.text_styles import text_style
 
 
 # Plotpoint mini widget object that appear on timelines and arcs
 class Plot_Point(Mini_Widget):
 
     # Constructor. Requires title, owner widget, page reference, and optional data dictionary
-    def __init__(self, title: str, owner: Widget, father, page: ft.Page, key: str, data: dict=None):
+    def __init__(
+        self, 
+        title: str, 
+        owner: Widget, 
+        father, 
+        page: ft.Page, 
+        key: str,                           # Key is plot_points for timelines
+        x_alignment: float = None,          # Position of plot point on timeline if we pass one in (between -1 and 1)
+        data: dict = None       
+    ):
+        
+        if x_alignment is not None:
+            side_location = 'right' if x_alignment <= 0 else 'left'
+        else:
+            side_location = None
 
         # Parent constructor
         super().__init__(
@@ -18,9 +33,9 @@ class Plot_Point(Mini_Widget):
             father=father,      # In this case, father is always a timeline or another arc
             page=page,          
             key=key,  
+            side_location=side_location,
             data=data,    
         ) 
-        
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -29,7 +44,7 @@ class Plot_Point(Mini_Widget):
                 'tag': "plot_point",            # Tag to identify what type of object this is
                 'description': str,
                 'events': list,                 # Numbered list of events that occur at this plot point
-                'x_alignment': float,           # Float between -1 and 1 on x axis of timeline. 0 is center
+                'x_alignment': x_alignment if x_alignment is not None else float,           # Float between -1 and 1 on x axis of timeline. 0 is center
                 'is_major': bool,               # If this plot point is a major event
                 'date': str,                    # Date of the plot point
                 'time': str,                    # Time of the plot point
@@ -45,6 +60,7 @@ class Plot_Point(Mini_Widget):
 
         # UI elements
         self.timeline_point: ft.Container = None    # Circle container to show our plot point on the timeline
+        self.timeline_point_label: ft.Container = None  # Text label below our plot point on the timeline
         self.slider: ft.Column = None               # Slider to drag our plot point along the timeline
         self.timeline_control: ft.Stack = None      # Stack that holds our timeline point and slider
 
@@ -53,6 +69,11 @@ class Plot_Point(Mini_Widget):
 
         # Build our slider for moving our plot point
         self.reload_mini_widget()
+
+    def delete_dict(self, e=None):
+
+        self.owner.plot_points.pop(self.data.get('title', None), None)
+        super().delete_dict()
 
     # Called when actively dragging our slider thumb to change our x position
     def change_x_position(self, e):
@@ -66,6 +87,9 @@ class Plot_Point(Mini_Widget):
 
         # Save the new position to data, but don't needlessly write to file until we stop dragging
         self.data['x_alignment'] = np
+
+        # Update our dragging state. We do it here to see if we actually moved
+        self.is_dragging = True    
         
     # Called when hovering over our plot point to show the slider
     def show_slider(self, e=None):
@@ -90,18 +114,42 @@ class Plot_Point(Mini_Widget):
         # Apply it to the UI
         self.p.update()
 
+    # Called when we start dragging our slider thumb
+    def start_dragging(self):
+        ''' Hides the labels of all the other plot points when we are dragging ours '''
+
+        for plot_point in self.owner.plot_points.values():
+            if plot_point != self:
+                plot_point.timeline_point_label.visible = False
+
+        self.p.update()
+
 
     # Called when we stop dragging our slider thumb, or when we drag too high or low from slider
     def hide_slider(self, e=None):
         ''' Hides our slider and puts our dot back on the timeline. Saves our new position to the file '''
+
+        # If we clicked the slider thumb but didnt move, make our mini widget visible
+        if not self.is_dragging:
+            self.toggle_visibility(value=True)
+            return
     
         # Hide slider
         self.slider.visible = False
         self.timeline_point.visible = True      # Set our point to visible again
         self.is_dragging = False                # No longer dragging
 
+        # Show all other plot point labels again
+        for plot_point in self.owner.plot_points.values():
+            plot_point.timeline_point_label.visible = True
+
         # Update our alignment based on our correct data. This is updated when dragging, so no need to set it here
         self.x_alignment = ft.Alignment(self.data.get('x_alignment', 0), 0)
+
+        if self.data.get('x_alignment', 0) <= 0:
+            self.data['side_location'] = 'right'
+        else:
+            self.data['side_location'] = 'left'
 
         # Save new x_alignment to file
         self.save_dict()
@@ -129,12 +177,21 @@ class Plot_Point(Mini_Widget):
             # Since no data changed, just update the page to apply changes
             self.p.update()
             
+    # Called when toggling whether this plot point is shown on the timeline in the timeline filters
+    def toggle_timeline_control(self, value: bool):
+        ''' Toggles whether this plot point is shown on the timeline '''
 
-    # Called when mouse clicks the thumb on the slider to start drag, or just clicks it
-    def start_dragging(self, e=None):
-        ''' Sets our state to dragging so may_hide_slider knows not to hide us. Also makes sure we're visible if clicking'''
-        self.is_dragging = True
-        self.toggle_visibility(value=True)
+        # Change the control visibility, data, and save it
+        self.timeline_control.visible = value
+        self.data['is_shown_on_widget'] = value
+        self.save_dict()
+        
+        # If we're hiding it, also hide our mini widget if it's open
+        if value == False:
+            self.toggle_visibility(value=value)
+        # Otherwise, just update the page
+        else:
+            self.p.update()
 
     # Called whenever we need to rebuild our slider, such as on construction or when our x position changes
     def reload_slider(self):
@@ -151,12 +208,13 @@ class Plot_Point(Mini_Widget):
             spacing=0,
             visible=False,                                      # Start hidden until we hover over plot point
             controls=[
-                ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far up
+                #ft.GestureDetector(on_enter=self.hide_slider,  expand=True),    # Invisible container to hide slider when going too far up
+                ft.Container(ignore_interactions=True, expand=True),    # Invisible container to hide slider when going too far up
                 ft.Stack(
                     alignment=ft.Alignment(0,0),
                     controls=[
                     ft.GestureDetector(                                             # GD so we can detect right clicks on our slider
-                        on_secondary_tap=lambda e: print("Right click on slider"),
+                        on_secondary_tap=lambda e: print("Right clicked plotpoint"),
                         content=ft.Slider(
                             min=-100, max=100,                                  # Min and max values on each end of slider
                             adaptive=True,                                      # Make sure it looks good on all devices
@@ -168,8 +226,8 @@ class Plot_Point(Mini_Widget):
                             thumb_color=self.data.get('color', "secondary"),    # Color of our actual dot on the slider
                             overlay_color=ft.Colors.with_opacity(.5, self.data.get('color', "secondary")),    # Color of plot point when hovering over it or dragging      
                             on_change=lambda e: self.change_x_position(e),      # Update our data with new x position as we drag
-                            on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet                      
-                            on_change_start=self.start_dragging,                # Make sure we're visible
+                            on_change_end=self.hide_slider,                     # Save the new position, but don't write it yet
+                            on_change_start=lambda e: self.start_dragging(),      # Hide other plot point labels when we start dragging                      
                             on_blur=self.hide_slider                            # Hide the slider if we click away from it
                         ),
                     ),
@@ -188,8 +246,9 @@ class Plot_Point(Mini_Widget):
                                 width=50,
                                 spacing=0,
                                 controls=[
+                                    
                                     # Catch above and below the thumb
-                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
+                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, data="line213", hover_interval=100),
 
                                     # Reserve safe space for the thumb
                                     ft.Container(       # Safe area
@@ -197,18 +256,19 @@ class Plot_Point(Mini_Widget):
                                         shape=ft.BoxShape.CIRCLE,
                                         width=50, height=50, 
                                     ),
-                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, hover_interval=100),
+                                    ft.GestureDetector(expand=True, on_hover=self.may_hide_slider, data="line221", hover_interval=100),
                                 ]
                             ),
                             ft.GestureDetector(         # Catch our hovers to the right of the thumb
                                 on_hover=self.may_hide_slider,
+                                data="called from line 226 gd",
                                 expand=right_ratio,
                                 content=ft.Container(expand=True)
                             ),
                         ]
                     )
                 ]),
-                ft.GestureDetector(on_enter=self.hide_slider, expand=True),    # Invisible container to hide slider when going too far down
+                ft.Container(ignore_interactions=True, expand=True),    # Invisible container to hide slider when going too far down
         ])
 
     # Called from reload_mini_widget
@@ -230,20 +290,51 @@ class Plot_Point(Mini_Widget):
                 expand=True,
                 on_enter=self.show_slider,               # Show the slider when we hover over our plot point. This also hides timeline_point
                 on_secondary_tap=lambda e: print("Right click on plot point"),  # Pop open our menu options when right clicking
+                on_tap_down=self.show_slider,
             )
-        )       
+        )   
+
+        # Build our label each time
+        self.timeline_point_label = ft.Container(
+            width=20,
+            expand=True,
+            margin=ft.Margin(16,0,16,0), 
+            ignore_interactions=True,
+            content=ft.Column(
+                expand=False,
+                controls=[
+                    ft.Container(expand=8, ignore_interactions=True),   # Spacer to push text down
+                    ft.Container(expand=3, alignment=ft.Alignment(0,0), content=ft.VerticalDivider(thickness=2, color=self.data.get('color', "secondary"))),  # Line above text
+                    ft.Container(
+                        expand=1,
+                        alignment=ft.alignment.center,  # Center the text in its container
+                        content=ft.Text(
+                            value=self.title,
+                            expand=True,
+                            overflow=ft.TextOverflow.VISIBLE,
+                            no_wrap=True,
+                            #rotate=ft.Rotate(angle=0.5 * math.pi, alignment=ft.alignment.center),  # Add alignment to rotate
+                            style=text_style
+                        )
+                    ),    
+                    ft.Container(expand=3, ignore_interactions=True)   
+                ]
+            )
+        )
+                
 
         # Rebuild our stack to hold our timeline point and slider
         self.timeline_control = ft.Stack(
             alignment=self.x_alignment,
+            visible=self.data.get('is_shown_on_widget', True),
             expand=True,            # Make sure it fills the whole timeline width
             controls=[
                 ft.Container(expand=True, ignore_interactions=True),        # Make sure our stack is always expanded to full size
                 self.timeline_point,                                        # Our plot point on the timeline
+                self.timeline_point_label,
                 self.slider,                                                # Our slider that appears when we hover over the plot point
             ]
         ) 
-
 
 
     # Called when reloading changes to our plot point and in constructor
@@ -253,11 +344,20 @@ class Plot_Point(Mini_Widget):
         # Reload our timeline control
         self.reload_timeline_control()
 
+        self.title_control = ft.Row([
+            ft.Text(self.data['title'], weight=ft.FontWeight.BOLD),
+            ft.Container(expand=True),
+            ft.IconButton(
+                icon=ft.Icons.CLOSE,
+                tooltip="Close Mini Widget",
+                on_click=lambda e: self.toggle_visibility(value=False),
+            ),
+        ])
         
 
         # Rebuild our information display
         self.content_control = ft.TextField(
-            hint_text="Change x position",
+            hint_text="plot point",
             on_submit=self.change_x_position,
             expand=True,
         )
@@ -272,7 +372,7 @@ class Plot_Point(Mini_Widget):
                     on_click=lambda e: self.delete_dict()
                 ),
             ],
-            expand=True,
         )
+            
 
-        self.p.update()
+        self._render_mini_widget(no_update=True)

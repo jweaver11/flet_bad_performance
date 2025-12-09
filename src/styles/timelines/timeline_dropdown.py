@@ -7,6 +7,7 @@ from styles.menu_option_style import Menu_Option_Style
 from models.story import Story
 from models.widgets.timeline import Timeline
 import os
+from styles.colors import colors
 
 
 # TODO: When clicking and expanding, make sure to set the active_timeline to this timeline, 
@@ -63,7 +64,7 @@ class Timeline_Dropdown(ft.GestureDetector):
             dense=True,
         )
 
-        self.expansion_tile: ft.ExpansionTile = None
+        self.expansion_tile: ft.ExpansionTile = None    # Placeholder for our expansion tile
 
         
         # Parent constructor
@@ -86,6 +87,8 @@ class Timeline_Dropdown(ft.GestureDetector):
 
         # Run through our additional menu options if we have any, and set their on_click methods
         for option in self.additional_menu_options or []:
+
+            option.on_tap = self.new_item_clicked
 
             # Add to our menu options list
             menu_options.append(option)
@@ -409,20 +412,6 @@ class Timeline_Dropdown(ft.GestureDetector):
             self.timeline.reload_widget()
             #self.close_menu(None)      # Auto closing menu works, but has a grey screen bug
 
-        # List of available colors
-        colors = [
-            "primary",
-            "red",
-            "orange",
-            "yellow",
-            "green",
-            "blue",
-            "purple",
-            "pink",
-            "brown",
-            "grey",
-        ]
-
         # List for our colors when formatted
         color_controls = [] 
 
@@ -492,7 +481,7 @@ class Timeline_Dropdown(ft.GestureDetector):
             adaptive=True,
             bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
             collapsed_bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
-            shape=ft.RoundedRectangleBorder(),
+            #shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
         )
 

@@ -52,9 +52,9 @@ class Story(ft.View):
                 'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
                 'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
                 'top_pin_height': 200,
-                'left_pin_width': 200,
+                'left_pin_width': 230,
                 'main_pin_height': int,
-                'right_pin_width': 200,
+                'right_pin_width': 230,
                 'bottom_pin_height': 200,
                 'created_at': str,
                 'last_modified': str,
@@ -103,6 +103,7 @@ class Story(ft.View):
         # Variables to store our mouse position for opening menus
         self.mouse_x: int = 0
         self.mouse_y: int = 0
+        self.is_dragging_widget: bool = False
 
         # Allows changable directory path for rail elements to pass in (May not need)
         self.active_directory_path: str = None
@@ -815,7 +816,21 @@ class Story(ft.View):
     # Called when we right click our object on the tree view
     def open_menu(self, menu_options: list):
         ''' Pops open our menu options when right clicking an object on a rail '''
-        
+
+        page_width = self.p.width
+        page_height = self.p.height
+        print(f"Page width: {page_width}, height: {page_height}")
+        print(f"Mouse X: {self.mouse_x}, Mouse Y: {self.mouse_y}")
+
+        # If mouse x is within 120 pixels of width, move it left 120 pixels
+        # If mouse y is within 120 pixels move it up 120 pixels
+        if self.mouse_x + 120 > page_width:
+            self.mouse_x -= 120
+            print(f"Adjusted Mouse X: {self.mouse_x}")
+        if self.mouse_y + 90 > page_height:
+            self.mouse_y -= 50
+            print(f"Adjusted Mouse Y: {self.mouse_y}")
+
         # Our container that contains a column of our options. Need to use container for positioning
         menu = ft.Container(
             left=self.mouse_x,     # Positions the menu at the mouse location
@@ -843,6 +858,7 @@ class Story(ft.View):
         self.p.overlay.append(menu)
         self.p.update()
 
+
     # Called when new story object is created, either by program or by being loaded from storage
     def build_view(self) -> list[ft.Control]:
         ''' Builds our 'view' (page) that consists of our menubar, rails, and workspace '''
@@ -853,6 +869,8 @@ class Story(ft.View):
         from models.app import app
 
         page = self.p
+
+        page.title = f"{self.title}"
 
         # Clear our controls in our view before building it
         self.controls.clear()
@@ -894,10 +912,18 @@ class Story(ft.View):
         active_rail_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,   # Total width of the GD, so its easier to find with mouse
-                bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                #bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
+                #gradient=ft.LinearGradient(
+                    #begin=ft.alignment.top_center,
+                    #end=ft.alignment.bottom_center,
+                    #colors=[
+                        #ft.Colors.with_opacity(.6, ft.Colors.ON_INVERSE_SURFACE),
+                        #ft.Colors.with_opacity(.2, ft.Colors.ON_INVERSE_SURFACE),
+                    #],
+                #),
                 # Thin vertical divider, which is what the app will actually drag
-                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),
-                padding=ft.padding.only(left=8),  # Push the 2px divider ^ to the right side
+                content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
+                padding=ft.padding.only(right=8),  # Push the 2px divider ^ to the right side
             ),
             on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
             on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
@@ -931,6 +957,8 @@ class Story(ft.View):
 
         # Views render like columns, so we add elements top-down
         self.controls = [self.menubar, gd]
+
+        page.update()
 
     # Called every time the mouse moves over the workspace
     def on_hover(self, e):

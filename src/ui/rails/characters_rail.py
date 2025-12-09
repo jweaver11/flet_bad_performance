@@ -21,6 +21,21 @@ class Characters_Rail(Rail):
             directory_path=story.data['characters_directory_path']
         )
 
+        # UI elements
+        self.top_row_buttons = [
+            ft.IconButton(
+                tooltip="New Category",
+                icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
+                on_click=self.new_category_clicked
+            ),
+            
+            ft.IconButton(
+                tooltip="New Character",
+                icon=ft.Icons.PERSON_ADD_ALT_OUTLINED,
+                on_click=self.new_character_clicked
+            )
+        ]
+
         # Reload the rail on start
         self.reload_rail()
 
@@ -81,28 +96,11 @@ class Characters_Rail(Rail):
 
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            
-            controls=[
+            controls=[ft.Container(expand=True)]
+        )
 
-            # Add here, story name, and buttons to create new stuff.
-            # As well as right click options here that work like normal.
-
-            ft.Container(expand=True),
-
-            ft.IconButton(
-                tooltip="New Category",
-                icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
-                on_click=self.new_category_clicked
-            ),
-            
-            ft.IconButton(
-                tooltip="New Character",
-                icon=ft.Icons.PERSON_ADD_ALT_OUTLINED,
-                on_click=self.new_character_clicked
-            ),
-            
-            ft.Container(expand=True),
-        ])
+        header.controls.extend(self.top_row_buttons)
+        header.controls.append(ft.Container(expand=True))
                  
 
         # Build the content of our rail
@@ -117,10 +115,12 @@ class Characters_Rail(Rail):
             page=self.p,
             story=self.story,
             directory=self.directory_path,
+            rail=self,
             column=content,
             additional_directory_menu_options=self.get_directory_menu_options()
         ) 
  
+        content.controls.append(ft.Container(height=6))
         # Append our hidden textfield for creating new items
         content.controls.append(self.new_item_textfield)
 

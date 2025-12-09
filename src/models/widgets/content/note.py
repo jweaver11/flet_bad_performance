@@ -48,13 +48,10 @@ class Note(Widget):
         self.reload_tab()
         
         # Body of the tab, which is the content of flet container
-        body = ft.Container(
+        body = ft.TextField(
             expand=True,
-            padding=6,
-            #bgcolor=ft.Colors.with_opacity(0.3, ft.Colors.ON_SECONDARY),
-            content=ft.Column([
-                ft.Text("hi from " + self.title),
-            ])
+            multiline=True,
+            value=self.data.get('content', ''),
         )
 
         # Assign the body_container content as whatever view you have built in the widget

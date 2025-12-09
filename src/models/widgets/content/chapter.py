@@ -59,6 +59,24 @@ class Chapter(Widget):
         e.control.value = ""
         self.reload_widget()
 
+    def get_menu_options(self) -> list[ft.Control]:
+        ''' Returns our list of menu options for this widget '''
+
+        from styles.menu_option_style import Menu_Option_Style
+
+        return [
+            Menu_Option_Style(
+                #on_click=self.new_item_clicked,
+                    data="plot_point",
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
+                        ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                    ])
+                ),
+        ]
+
+
+
 
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_widget(self):
@@ -68,6 +86,7 @@ class Chapter(Widget):
         self.reload_tab()
         
         # BUILDING BODY - the inside the body container of our widget
+        
         self.body_container.content = ft.Column(
             expand=True,
             controls=[
@@ -77,9 +96,17 @@ class Chapter(Widget):
                     hint_text="Comment Title",
                     expand=True,
                     on_submit=self.submit_comment,
-                )
+                ),
+                ft.TextField(
+                    label="Chapter Summary",
+                    hint_text="A brief summary of what happens in this chapter.",
+                    expand=True,
+                    multiline=True,
+                    value=self.data['summary'],
+                ),
             ]
         )
+        
 
         self._render_widget()
 

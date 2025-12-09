@@ -7,6 +7,7 @@ import flet as ft
 from models.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
+from styles.colors import colors
 
 
 class Settings(Widget):
@@ -65,30 +66,26 @@ class Settings(Widget):
             print(f"Error toggling rail reorderable: {e}")
 
     # Called when the page is resized
-    def page_resized(self, e):
-        #print("page resized")
-        self.data['page_width'] = self.p.width
-        self.data['page_height'] = self.p.height
-        #print("width:", self.p.width, "height:", self.p.height)
+    def page_resized(self, e=None):
 
-        # Check if we're maximized or not
+        # If we're minmized, save nothing and just return
+        if self.p.window.minimized:
+            return
+
+        # If we maximized the page, just save that, not the size
         if self.p.window.maximized:
             self.data['page_is_maximized'] = True
-            #print("maximized")
+            self.save_dict()
+            return
+        
+        # If page not maximized or minimized, save the size
         else:
             self.data['page_is_maximized'] = False
-            #print("not maximized")
-
-        self.save_dict()
-
-        # OUTDATED
-        # Make sure the story is done loading to avoid any errors refreshing things that arent on page yet
-        #if self.story is not None:
-            #if self.story.is_initialized:
-                #for timeline in self.story.timelines.values():
-                    #timeline.reload_widget()
-
-
+            self.data['page_width'] = self.p.width
+            self.data['page_height'] = self.p.height
+            self.save_dict()
+            return
+        
     
     # Called when someone expands the drop down holding the color scheme options
     def reload_widget(self):
@@ -98,26 +95,17 @@ class Settings(Widget):
         def get_color_scheme_options():
             ''' Adds our choices to the color scheme dropdown control'''
 
-            # Our dropdown options for our color scheme dropdown control
-            color_scheme_options = [
-                ft.Colors.RED,
-                ft.Colors.BLUE,
-                ft.Colors.YELLOW,
-                ft.Colors.PURPLE,
-                ft.Colors.LIME,
-                ft.Colors.CYAN,
-            ]
 
             # Create a list to hold our dropdown options
             options = []
 
             # Runs through our colors above and adds them to the dropdown
-            for color in color_scheme_options:
+            for color in colors:
                 options.append(
                     ft.DropdownOption(
-                        key=color.value.capitalize(),
+                        key=color.capitalize(),
                         content=ft.Text(
-                            value=color.value.capitalize(),
+                            value=color.capitalize(),
                             color=color,
                         ),
                     )

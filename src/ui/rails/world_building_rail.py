@@ -152,9 +152,12 @@ class World_Building_Rail(Rail):
             story=self.story,
             directory=self.directory_path,
             column=content,
+            rail=self,
             additional_directory_menu_options=self.get_directory_menu_options(),
             additional_file_menu_options=self.get_file_menu_options()
         )
+
+        content.controls.append(ft.Container(height=6))
 
         # Append our hidden textfield for creating new items
         content.controls.append(self.new_item_textfield)

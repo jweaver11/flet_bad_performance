@@ -80,7 +80,7 @@ class Label_Dropdown(ft.GestureDetector):
         for option in self.additional_menu_options or []:
 
             # Set their on_click to call our on_click method, which can handle any type of widget
-            option.on_tap = lambda e: self.new_item_clicked(e)
+            option.on_tap = self.new_item_clicked
 
             # Add to our menu options list
             menu_options.append(option)

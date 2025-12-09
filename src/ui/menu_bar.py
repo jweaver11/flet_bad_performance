@@ -204,7 +204,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-                ft.TextButton("Open", on_click=open_selected_story),
+                ft.TextButton("Open", on_click=open_selected_story, style=ft.ButtonStyle(color=ft.Colors.INVERSE_SURFACE)),
             ]
         )
 
@@ -271,12 +271,13 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         ], 
     )
 
-
+    
         
     # Return our formatted menubar
     return ft.Container(
         border=ft.border.only(bottom=ft.BorderSide(width=1, color=ft.Colors.OUTLINE_VARIANT)),
-        bgcolor=ft.Colors.with_opacity(0.2, ft.Colors.ON_INVERSE_SURFACE),
+        #bgcolor=ft.Colors.with_opacity(.4, ft.Colors.ON_INVERSE_SURFACE),
+        
 
         content=ft.Row(
             spacing=None,
@@ -289,7 +290,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: app.settings.toggle_visibility()),   # Settings button
-                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name
+                ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name         
             ]
         )
     )

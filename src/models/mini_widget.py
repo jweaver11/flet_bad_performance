@@ -1,6 +1,7 @@
 '''
 Parent class for mini widgets, which are extended flet containers used as information displays on the side of the parent widget
 Makes showing detailed information easier without rending and entire widget where it doesn't make sense
+Mini widgets either are exclusive (only they are shown), or shared (additional mini widgets can be shown at same time)
 Mini widgets are stored in their OWNERS (Widget) json file, not their own file
 Some mini widgets can have their own files IN ADDITION to normal storage, such as maps or drawings storing images
 '''
@@ -22,40 +23,46 @@ class Mini_Widget(ft.Container):
         father,                         # Immidiate parent widget or mini widget that holds us (Since some mini widget)
         page: ft.Page,                  # Grabs our original page for convenience and consistency
         key: str,                       # Key to identify this mini widget (by title) within its fathers data
+        side_location: str = None,      # Side of the widget the mini widget shows on
         data: dict = None               # Data passed in for this mini widget
     ):
 
         # Parent constructor
         super().__init__(
-            expand=True,
-            border_radius=ft.border_radius.all(6),
-            bgcolor=ft.Colors.with_opacity(1, ft.Colors.ON_INVERSE_SURFACE),
-            data=data,      # Sets our data.
+            expand=4,
+            border_radius=ft.border_radius.all(10),
+            border=ft.border.all(2, ft.Colors.SECONDARY_CONTAINER),
+            padding=ft.padding.all(8),
+            data=data,     
+            bgcolor=ft.Colors.with_opacity(.7, ft.Colors.SURFACE),
+            blur=5,
         )
 
         
         # Set our parameters
-        self.title = title.capitalize()                        
-        self.owner = owner                          
+        self.title: str = title.capitalize()                        
+        self.owner: Widget = owner                          
         self.father = father                        
-        self.p = page                               
-        self.key = key     
+        self.p: ft.Page = page                               
+        self.key: str = key     
 
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our object so we can access its data and change it
             {   
-                'title': self.title,    # Title of the mini widget, should match the object title
-                'tag': "mini_widget",   # Default mini widget tag, but should be overwritten by child classes
-                'visible': True,        # If the widget is visible
-                'is_selected': bool,    # If the mini widget is selected in the owner's list of mini widgets, to change parts in UI
+                'title': self.title,          # Title of the mini widget, should match the object title
+                'tag': "mini_widget",         # Default mini widget tag, but should be overwritten by child classes
+                'visible': True,              # If the widget is visible
+                'is_shown_on_widget': True,          # If the mini widget is shown on the parent widget. Some widgets can toggle this off
+                'side_location': side_location if side_location is not None else "right",     # Side of the widget the mini widget shows on
+                'custom_fields': dict,        # Dictionary for any custom fields the mini widget wants to store
             },
         )
 
         # Apply our visibility
         self.visible = self.data['visible']
-        self.is_selected = False    # Check if we are selected for ui purposes
+        
 
         # Control for our title
         self.title_control = ft.TextField(
@@ -100,27 +107,32 @@ class Mini_Widget(ft.Container):
         ''' Deletes our data from all live widget/mini widget objects that we nest in, and saves the owners file '''
 
         try:
+            print("Called mini widget delete dict")
+
+            # Applies the UI changes by removing ourselves from the mini widgets list
+            if self in self.owner.mini_widgets:
+                self.owner.mini_widgets.remove(self)
 
             # Remove our data
             self.data = None
 
             # Remove the data of our father (parent) widget/mini widget to match
             # By deleting the father data manually here, it will cascade up the chain when save_dict is called
-            self.father.data[self.key].pop(self.title, None)
+            self.owner.data[self.key].pop(self.title, None)
+            
             
             # Applies the changes up the chain
-            self.save_dict()
+            self.owner.save_dict()
 
-            # Applies the UI changes by removing ourselves from the mini widgets list
-            if self in self.owner.mini_widgets:
-                self.owner.mini_widgets.remove(self)
-            
             # Reload the widget if we have to
-            if self.visible:
-                self.owner.reload_widget()
+            self.owner.reload_widget()
 
             # Also reload the active rail to reflect changes
             self.owner.story.active_rail.content.reload_rail() 
+
+            self.data = None
+
+            print("Passed all checks")
 
         # Catch errors
         except Exception as e:
@@ -141,6 +153,21 @@ class Mini_Widget(ft.Container):
         # Handle errors
         except Exception as e:
             print(f"Error changing data {key}:{value} in widget {self.title}: {e}")
+
+    def change_custom_field(self, **kwargs):
+        ''' Changes a key/value pair in our custom fields dictionary and saves the json file '''
+        # Called by:
+        # widget.change_custom_field(**{'key': value, 'key2': value2})
+
+        try:
+            for key, value in kwargs.items():
+                self.data['custom_fields'].update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing custom field {key}:{value} in widget {self.title}: {e}")
 
 
     def rename(self, new_name: str):
@@ -163,7 +190,6 @@ class Mini_Widget(ft.Container):
 
             # Reload the UI to reflect changes
             self.reload_mini_widget()
-            self.owner.reload_widget()
 
             # Also reload the active rail to reflect changes
             self.owner.story.active_rail.content.reload_rail() 
@@ -177,32 +203,46 @@ class Mini_Widget(ft.Container):
     def toggle_visibility(self, e=None, value: bool=None):
         ''' Shows or hides our mini widget, depending on current state '''
 
-        # If we want to specify we're visible or not, we can pass it in
+        # If we passed in a value, use it
         if value is not None:
+
             self.data['visible'] = value
             self.visible = value
 
+        # Otherwise, toggle our current state
         else:
-       
-            # Switch our visibility in data, then apply it
             self.data['visible'] = not self.data['visible']
             self.visible = self.data['visible']
-        
-        # Save the switch and reflect it in the UI
-        self.save_dict()
-        self.p.update()
 
+
+        # If we are now visible, hide all other mini widgets
+        if self.visible:
+            
+            for mini_widget in self.owner.mini_widgets:
+                
+                if mini_widget.visible and mini_widget != self:
+                    mini_widget.toggle_visibility(value=False)
+                    break
+
+        print(f"Mini widget {self.title} visibility set to {self.visible}")
+        # Save switch to file
+        self.save_dict()
+
+        #self.update()
+        self.p.update()
+        
 
     # Called whenever we hover over our mini widget on the right as a psuedo focus
     def on_hover(self, e: ft.HoverEvent):
         print(e)
-
         
+
     # Called after any changes happen to the data that need to be reflected in the UI
     def reload_mini_widget(self):
         ''' Reloads our mini widget UI based on our data '''
 
         # Add option to have the mini widget show on larger portion of screen, like an expand button at bottom left or right
+        # Add edit button next to title to be in edit mode
 
         # Create body content
         self.content = ft.Column(
@@ -216,11 +256,17 @@ class Mini_Widget(ft.Container):
         # Call render function
         self._render_mini_widget()
 
-    def _render_mini_widget(self):
+    def _render_mini_widget(self, no_update: bool=False):
         ''' Renders our mini widget UI based on our data '''
 
         # Give Uniform mini titles and styling
 
-        self.p.update()
+        if no_update:
+            return
+        
+        else:
+
+            self.p.update()
+        
 
         
