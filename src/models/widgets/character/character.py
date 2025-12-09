@@ -5,6 +5,7 @@ the app will change. Everything else is built upon program launch so we can disp
 '''
 
 import flet as ft
+import os
 from models.widget import Widget
 from models.story import Story
 from handlers.verify_data import verify_data
@@ -192,6 +193,9 @@ class Character(Widget):
         # Check if we're in edit mode or not. If yes, build the edit view like this
         if self.data.get('edit_mode', False):
 
+            # Ensure connections are normalized to a list for UI building
+            self._ensure_connections_list()
+
             #all of this needs to be the edit view
             body = ft.Container(
                 expand=True,                # Takes up maximum space allowed in its parent container
@@ -203,7 +207,7 @@ class Character(Widget):
                     regView_button,
                     #self.icon,                          # The icon above the name
                     ft.Text("hi from " + self.title),           # Text that shows the title
-                    #ft.Text(self.data['physical_description']), #test for me 
+                    #ft.Text((self.story.load_characters())),
                     ft.Row(                     # The row that will hold our dropdowns
                             wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                             controls=[          # All flet controls inside our Row
@@ -239,19 +243,46 @@ class Character(Widget):
                                     ],
                                     on_change=lambda e,name='alignment2': self._on_field_change(name,e.control.value),
                                 ),
-                                #TODO add a dropdown for connections (other characters)
-                                #should open another dropdown or text field to specify relationship
-                                # #WIP  
-                                ft.Dropdown(       # Dropdown selection of relatives (other characters)
-                                    label="Connections",
-                                #    #TODO value needs to be a list of connections
-                                #    color=self.data[connections_color],
-                                    text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
-                                    options=[
-                                #    #TODO populate options with other characters in story
-                                        ft.DropdownOption(text="(WIP) Select Character"),
-                                    ],
-                                    on_change=lambda e,name='connections': self._on_field_change(name,e.control.value),
+                                # Connections: show existing picks and allow adding more via dropdown
+                                ft.Column(
+                                    spacing=4,
+                                    controls=[
+# Existing connections rendered as small removable items
+                                        ft.Row(
+                                            spacing=6,
+                                            controls=[
+                                                ft.Container(content=ft.Text("Connections:", weight=ft.FontWeight.BOLD))
+                                            ] + [
+                                                ft.Container(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Text(cname),
+                                                            ft.IconButton(icon=ft.Icons.CLOSE, on_click=lambda e, n=cname: self._on_remove_connection(n), tooltip="Remove")
+                                                        ],
+                                                        spacing=4
+                                                    ),
+                                                    padding=ft.padding.all(6),
+                                                    bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+                                                    border_radius=ft.border_radius.all(6)
+                                                )
+                                                for cname in (self.data.get('connections') or [])
+                                            ]
+                                        ),
+
+                                        # Dropdown to add another connection; options exclude self and already-chosen
+                                        ft.Dropdown(
+                                            label="Add Connection",
+                                            value=None,
+                                            hint_text="Select character to add",
+                                            text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+                                            options=[
+                                                ft.DropdownOption(text=name)
+                                                for name in self.story.get_character_names()
+                                                if name and name != self.title and name not in (self.data.get('connections') or [])
+                                            ],
+                                            on_change=lambda e: self._on_add_connection(e.control.value),
+                                        ),
+                                    ]
                                 ),
                                 
                                 ft.TextField(   # Text field for sexuality input
@@ -348,6 +379,53 @@ class Character(Widget):
         self.data['physical_description']['Race'] = value
         self.save_dict()
 
+    def _ensure_connections_list(self):
+        '''Normalize connections into a list stored at self.data['connections'].'''
+        try:
+            conn = self.data.get('connections')
+            if isinstance(conn, list):
+                return
+            if isinstance(conn, dict):
+                # Try extract reasonable string entries from dict
+                extracted = []
+                for k, v in conn.items():
+                    if isinstance(v, str) and v:
+                        extracted.append(v)
+                    elif isinstance(k, str) and k:
+                        extracted.append(k)
+                self.data['connections'] = extracted
+                return
+            # Any other type, replace with empty list
+            self.data['connections'] = []
+        except Exception:
+            self.data['connections'] = []
+
+    def _on_add_connection(self, value: str):
+        '''Add a selected character name to connections (if not present) and persist.'''
+        try:
+            if not value:
+                return
+            self._ensure_connections_list()
+            if value in self.data['connections']:
+                return
+            self.data['connections'].append(value)
+            self.save_dict()
+            # Rebuild UI so the dropdown options exclude the added entry
+            self.reload_widget()
+        except Exception as e:
+            print(f"Error adding connection: {e}")
+
+    def _on_remove_connection(self, name: str):
+        '''Remove an existing connection and persist.'''
+        try:
+            self._ensure_connections_list()
+            if name in self.data['connections']:
+                self.data['connections'].remove(name)
+                self.save_dict()
+                self.reload_widget()
+        except Exception as e:
+            print(f"Error removing connection: {e}")
+
 
     # Called when not in edit mode FROM reload_widget
     def edit_mode_view(self, edit_button) -> ft.Container:
@@ -363,18 +441,30 @@ class Character(Widget):
                 edit_button,            # Just pass in the edit button for now so we don't build it twice
                 #self.icon,                          # The icon above the name
                 ft.Text("hi from " + self.title),           # Text that shows the title
-                #ft.Text(self.data['physical_description']), #test for me 
                 ft.Row(                     # The row that will hold our dropdowns
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
-                            ft.Text("Character details go here"),
-                            ft.Text("Alignment: " + self.data['alignment1'] + " " + self.data['alignment2']),
-                            ft.Text("Gender: " + self.data['gender']),
-                            ft.Text("Age: " + self.data['age']),  
-                            ft.Text("Race: " + self.data['physical_description'].get('Race', '')),
-                            ft.Text("Sexuality: " + self.data['sexuality']),
-                            ft.Text("Connections: " + str(self.data['connections'])),
-                            ft.Text("Custom Fields: " + str(self.data['custom_fields'])),
+                            ft.Text("Alignment: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['alignment1'] + " " + self.data['alignment2']),
+                            ft.Text("Gender: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['gender']),
+                            ft.Text("Age: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['age']),  
+                            ft.Text("Race: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['physical_description'].get('Race', '')),
+                            ft.Text("Sexuality: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['sexuality']),
+                            ft.Text("Connections: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(str(self.data['connections'])),
+                            ft.Text("Custom Fields: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(str(self.data['custom_fields'])),
                             
                         ]
                     ),
