@@ -492,6 +492,43 @@ class Story(ft.View):
                     except (json.JSONDecodeError, FileNotFoundError, KeyError) as e:
                         print(f"Error loading character from {filename}: {e}")
 
+    def get_character_names(self) -> list:
+        '''Return a sorted list of character names.
+
+        Prefers in-memory loaded Character objects (self.characters), but will
+        fall back to reading the filenames in the characters directory so names
+        are available even if characters haven't been instantiated yet.
+        '''
+        names = []
+        try:
+            # Use loaded character objects first
+            if isinstance(self.characters, dict) and len(self.characters) > 0:
+                for c in self.characters.values():
+                    try:
+                        t = getattr(c, 'title', None)
+                        if t:
+                            names.append(t)
+                    except Exception:
+                        continue
+
+            # Fall back to files on disk for any names not already included
+            path = self.data.get('characters_directory_path')
+            if path and os.path.exists(path):
+                for fname in os.listdir(path):
+                    if fname.endswith('.json') and not fname.endswith('_display.json'):
+                        name = os.path.splitext(fname)[0]
+                        if name and name not in names:
+                            names.append(name)
+
+        except Exception as e:
+            print(f"Error getting character names: {e}")
+
+        # Return unique, sorted names
+        try:
+            return sorted(list(dict.fromkeys(names)))
+        except Exception:
+            return names
+
         
 
     # Called on story startup to create our plotline object.
