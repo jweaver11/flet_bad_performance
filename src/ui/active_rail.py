@@ -27,7 +27,7 @@ class Active_Rail(ft.Container):
         # Consistent styling for all our rails
         super().__init__(
             alignment=ft.alignment.top_left,
-            padding=ft.padding.only(top=10, bottom=10, left=8, right=8),
+            padding=ft.padding.only(top=10, bottom=10, right=8),
             border_radius=ft.border_radius.only(top_right=10, bottom_right=10),
             width=app.settings.data['active_rail_width'],  # Sets the width
         )

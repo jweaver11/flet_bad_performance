@@ -629,7 +629,8 @@ class Timeline(Widget):
 
         plot_points_filters = ft.Container(
             padding=None,
-            expand=True,
+            #expand=True,
+            width=170,
             border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=ft.border_radius.all(6),
             content=ft.ExpansionTile(
@@ -650,7 +651,8 @@ class Timeline(Widget):
 
         arcs_filters = ft.Container(
             padding=None,
-            expand=True,
+            #expand=True,
+            width=170,
             border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=ft.border_radius.all(6),
             content=ft.ExpansionTile(
@@ -669,13 +671,14 @@ class Timeline(Widget):
             )
         )
         
-        
-        # Build our header last, since it will sit above the mini widgets
-        header = ft.Row(
+    
+
+        header =ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.START,
-            controls=[ft.Container(expand=3), plot_points_filters, arcs_filters, ft.Container(expand=3)],
+            controls=[plot_points_filters, arcs_filters],
         )
+        
 
         self._render_widget(header=header)
 

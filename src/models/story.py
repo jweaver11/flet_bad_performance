@@ -103,10 +103,6 @@ class Story(ft.View):
         # Variables to store our mouse position for opening menus
         self.mouse_x: int = 0
         self.mouse_y: int = 0
-        self.is_dragging_widget: bool = False
-
-        # Allows changable directory path for rail elements to pass in (May not need)
-        self.active_directory_path: str = None
 
         # State that we are not initialized yet, which will be changed at the end of startup method
         self.is_initialized = False
@@ -933,7 +929,7 @@ class Story(ft.View):
             ''' Responsible for altering the width of the active rail '''
 
             if (e.delta_x > 0 and self.active_rail.width < page.width/2) or (e.delta_x < 0 and self.active_rail.width > 100):
-                self.active_rail.width += e.delta_x    # Apply the change to our rail
+                self.active_rail.width += int(e.delta_x)    # Apply the change to our rail
                 
             page.update()   # Apply our changes to the rest of the page
 
@@ -968,6 +964,21 @@ class Story(ft.View):
             drag_interval=10,
         )
 
+        # Called when mouse exits workspace area
+        def exit_workspace():
+            ''' Makes sure our drag targets are removed when mouse leaves workspace '''
+            self.workspace.remove_drag_targets()
+           
+
+        # Add gd with on_enter
+        # is_dragging, drag_completed
+        workspace_gd = ft.GestureDetector(
+            content=self.workspace,
+            expand=True,
+            on_exit=lambda e: exit_workspace(), 
+        )
+
+
         # Save our 2 rails, divers, and our workspace container in a row
         row = ft.Row(
             spacing=0,  # No space between elements
@@ -975,12 +986,15 @@ class Story(ft.View):
 
             controls=[
                 self.workspaces_rail,  # Main rail of all available workspaces
-                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),   # Divider between workspaces rail and active_rail
-
+                ft.Container(
+                    width=10,   # Total width of the GD, so its easier to find with mouse
+                    content=ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
+                    padding=ft.padding.only(right=8),  # Push the 2px divider ^ to the right side
+                ),
                 self.active_rail,    # Rail for the selected workspace
                 active_rail_resizer,   # Divider between rail and work area
                 
-                self.workspace,    # Work area for pagelets
+                workspace_gd,    # Work area for pagelets
             ],
         )
 

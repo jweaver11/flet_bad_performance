@@ -5,8 +5,8 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
-    { name = "Josh Weaver", email = "nunyabusiness" }
-    { name = "Cory Malichar", email = "nunyabusiness" }
+    { name = "Josh Weaver", email = "nunyabusiness@gmail.com" },
+    { name = "Cory Malichar", email = "nunyabusiness@gmail.com" }
 ]
 dependencies = [
   "flet==0.28.3"

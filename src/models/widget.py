@@ -311,7 +311,6 @@ class Widget(ft.Container):
         ''' Shows our pin drag targets '''
         
         self.story.workspace.show_pin_drag_targets()
-        self.story.is_dragging_widget = True
         
     # Called when mouse hovers over the tab part of the widget
     def hover_tab(self, e):
@@ -499,6 +498,7 @@ class Widget(ft.Container):
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
         self.body_container.border_radius = ft.border_radius.all(10)
+        self.body_container.padding = ft.padding.all(6)
 
 
         
@@ -536,8 +536,9 @@ class Widget(ft.Container):
 
             self.master_stack.controls.append(row)     
 
+        header_container = ft.Container(padding=ft.padding.all(6), content=header) if header is not None else ft.Container(height=0)
         col = ft.Column([
-            header if header is not None else ft.Container(height=0),
+            header_container,
             self.master_stack
         ])   
             

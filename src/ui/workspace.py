@@ -26,8 +26,8 @@ class Workspace(ft.Container):
         self.p = page
         self.story = story
 
-        self.minimum_pin_height = 200
-        self.minimum_pin_width = 230
+        self.minimum_pin_height = int(self.p.height / 5)
+        self.minimum_pin_width = int(self.p.width / 10)
 
         # Creates our 5 pin locations for our widgets inside our workspace
         self.top_pin = ft.Row(spacing=10, height=story.data['top_pin_height'], controls=[])
@@ -45,23 +45,23 @@ class Workspace(ft.Container):
         # Pin drag targets
         self.top_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, height=self.story.data.get('top_pin_height', 200), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8, margin=ft.margin.only(left=8, right=8),), 
+            content=ft.Container(expand=True, height=self.story.data.get('top_pin_height', int(self.p.height/5)), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8, margin=ft.margin.only(left=8, right=8),), 
             on_accept=lambda e: self.pin_drag_accept(e, "top"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.left_pin_drag_target = ft.DragTarget(
             group="widgets",
-            content=ft.Container(expand=True, width=self.story.data.get('left_pin_width', 230), bgcolor=ft.Colors.ON_SURFACE, border_radius=8, opacity=0), 
+            content=ft.Container(expand=True, width=self.story.data.get('left_pin_width', int(self.p.width/10)), bgcolor=ft.Colors.ON_SURFACE, border_radius=8, opacity=0), 
             on_accept=lambda e: self.pin_drag_accept(e, "left"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
 
         self.right_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, width=self.story.data.get('right_pin_width', 230), bgcolor=ft.Colors.ON_SURFACE, border_radius=8, opacity=0), 
+            content=ft.Container(expand=True, width=self.story.data.get('right_pin_width', int(self.p.width/10)), bgcolor=ft.Colors.ON_SURFACE, border_radius=8, opacity=0), 
             on_accept=lambda e: self.pin_drag_accept(e, "right"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.bottom_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, height=self.story.data.get('bottom_pin_height', 200), margin=ft.margin.only(left=8, right=8), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8),
+            content=ft.Container(expand=True, height=self.story.data.get('bottom_pin_height', int(self.p.height/5)), margin=ft.margin.only(left=8, right=8), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8),
             on_accept=lambda e: self.pin_drag_accept(e, "bottom"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
 
@@ -117,7 +117,6 @@ class Workspace(ft.Container):
 
         visible_top_pin_controls = [control for control in self.top_pin.controls if getattr(control, 'visible', True)]
 
-        print("Showing pin drag targets")
         # If no visible in the top pin
         if len(visible_top_pin_controls) == 0:
             self.top_pin_drag_target.content.height = self.minimum_pin_height
@@ -146,14 +145,6 @@ class Workspace(ft.Container):
         self.pin_drag_targets.visible = False
         self.master_stack.update()
 
-    # Called when mouse enters the safety gesture detector.
-    def may_show_pin_drag_targets(self):
-        ''' Determines if we are dragging, and need to show the targets or not '''
-
-        if self.story.is_dragging_widget:
-            self.show_pin_drag_targets()
-        else:
-            return
 
     # Called when a draggable hovers over a drag target before dropping
     def on_hover_pin_drag_target(self, e):
@@ -199,8 +190,6 @@ class Workspace(ft.Container):
             return
 
         old_pin_location = widget.data['pin_location']
-
-        self.story.is_dragging_widget = False   # We have finished dragging
 
         # If we were dragged from the main pin and we were the active tab, set the first tab to new active
         if old_pin_location == "main" and widget.data['is_active_tab'] == True:
@@ -547,7 +536,7 @@ class Workspace(ft.Container):
                 expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
                 #divider_color=ft.Colors.TRANSPARENT,
                 padding=ft.padding.all(0),
-                #label_padding=ft.padding.all(0),
+                label_padding=ft.padding.only(left=6, right=6, top=0, bottom=0),
                 mouse_cursor=ft.MouseCursor.BASIC,
                 
                 tabs=[]    # Gives our tab control here   
@@ -664,7 +653,6 @@ class Workspace(ft.Container):
         ]
 
         # Set the master_stack as the content of this container
-        #self.content = self.master_stack
         self.content = self.master_stack
 
         # Finally update the UI
