@@ -869,9 +869,9 @@ class Story(ft.View):
             left=self.mouse_x,     # Positions the menu at the mouse location
             top=self.mouse_y,
             border_radius=ft.border_radius.all(4),
-            border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
-            bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+            bgcolor=ft.Colors.ON_INVERSE_SURFACE,
             width=120,
+            shadow=ft.BoxShadow(color=ft.Colors.BLACK, blur_radius=2, blur_style=ft.ShadowBlurStyle.NORMAL,),
             content=ft.Column(
                 spacing=4,
                 horizontal_alignment=ft.CrossAxisAlignment.STRETCH,

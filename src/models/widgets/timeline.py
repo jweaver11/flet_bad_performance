@@ -300,13 +300,6 @@ class Timeline(Widget):
                     items=self.get_color_options()
                 )
             ),
-            Menu_Option_Style(
-                on_click=lambda e: self.delete_clicked(e),
-                content=ft.Row([
-                    ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
-                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
-                ]),
-            ),
         ]
     
     # Called when mouse enters our timeline area
@@ -411,35 +404,6 @@ class Timeline(Widget):
             )
 
         return color_controls
-        
-
-    # Called when the delete button is clicked in the menu options
-    def delete_clicked(self, e):
-        ''' Deletes this file from the story '''
-
-        def _delete_confirmed(e):
-            ''' Deletes the widget after confirmation '''
-
-            self.p.close(dlg)
-            self.story.delete_widget(self)
-
-        self.story.close_menu()
-            
-
-        # Append an overlay to confirm the deletion
-        dlg = ft.AlertDialog(
-            title=ft.Text(f"Are you sure you want to delete {self.title} forever?", weight=ft.FontWeight.BOLD),
-            alignment=ft.alignment.center,
-            title_padding=ft.padding.all(25),
-            actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.p.close(dlg)),
-                ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-            ]
-        )
-
-        self.p.open(dlg)
-
-
     
 
     # Called when we need to rebuild out timeline UI
