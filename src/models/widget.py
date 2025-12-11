@@ -12,6 +12,8 @@ import json
 from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
 from styles.colors import dark_gradient
+from styles.colors import colors
+
 
 
 class Widget(ft.Container):
@@ -354,6 +356,35 @@ class Widget(ft.Container):
         ''' Returns our list of menu options for this widget '''
 
         return []
+    
+    # Called when color button is clicked
+    def get_color_options(self) -> list[ft.Control]:
+        ''' Returns a list of all available colors for icon changing '''
+
+        # Called when a color option is clicked on popup menu to change icon color
+        def _change_icon_color(color: str):
+            ''' Passes in our kwargs to the widget, and applies the updates '''
+
+            self.change_data({'color': color})
+            
+            # Change our icon to match, apply the update
+            self.story.active_rail.content.reload_rail()
+            self.reload_widget()
+            
+
+        # List for our colors when formatted
+        color_controls = [] 
+
+        # Create our controls for our color options
+        for color in colors:
+            color_controls.append(
+                ft.PopupMenuItem(
+                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
+                    on_click=lambda e, col=color: _change_icon_color(col)
+                )
+            )
+
+        return color_controls
     
     # Called at end of constructor
     def reload_tab(self):
