@@ -271,8 +271,9 @@ class Character(Widget):
                                         # Dropdown to add another connection; options exclude self and already-chosen
                                         ft.Dropdown(
                                             label="Add Connection",
-                                            #this will change to the connections part of the data 
+                                            #this will change the connections part of the data 
                                             value=None,
+                                            expand = 4,
                                             hint_text="Select character to add",
                                             text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
                                             options=[
