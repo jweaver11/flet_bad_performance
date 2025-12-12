@@ -12,6 +12,8 @@ import json
 from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
 from styles.colors import dark_gradient
+from styles.colors import colors
+
 
 
 class Widget(ft.Container):
@@ -311,7 +313,6 @@ class Widget(ft.Container):
         ''' Shows our pin drag targets '''
         
         self.story.workspace.show_pin_drag_targets()
-        self.story.is_dragging_widget = True
         
     # Called when mouse hovers over the tab part of the widget
     def hover_tab(self, e):
@@ -355,6 +356,35 @@ class Widget(ft.Container):
         ''' Returns our list of menu options for this widget '''
 
         return []
+    
+    # Called when color button is clicked
+    def get_color_options(self) -> list[ft.Control]:
+        ''' Returns a list of all available colors for icon changing '''
+
+        # Called when a color option is clicked on popup menu to change icon color
+        def _change_icon_color(color: str):
+            ''' Passes in our kwargs to the widget, and applies the updates '''
+
+            self.change_data({'color': color})
+            
+            # Change our icon to match, apply the update
+            self.story.active_rail.content.reload_rail()
+            self.reload_widget()
+            
+
+        # List for our colors when formatted
+        color_controls = [] 
+
+        # Create our controls for our color options
+        for color in colors:
+            color_controls.append(
+                ft.PopupMenuItem(
+                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
+                    on_click=lambda e, col=color: _change_icon_color(col)
+                )
+            )
+
+        return color_controls
     
     # Called at end of constructor
     def reload_tab(self):
@@ -435,7 +465,7 @@ class Widget(ft.Container):
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
             tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
                 group="widgets",    # Group for draggables (and receiving drag targets) to accept each other
-                data=self,  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
+                data=self.data['key'],  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
 
                 # Drag event handlers
                 on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging
@@ -499,6 +529,7 @@ class Widget(ft.Container):
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
         self.body_container.border_radius = ft.border_radius.all(10)
+        self.body_container.padding = ft.padding.all(6)
 
 
         
@@ -536,8 +567,9 @@ class Widget(ft.Container):
 
             self.master_stack.controls.append(row)     
 
+        header_container = ft.Container(padding=ft.padding.all(6), content=header) if header is not None else ft.Container(height=0)
         col = ft.Column([
-            header if header is not None else ft.Container(height=0),
+            header_container,
             self.master_stack
         ])   
             

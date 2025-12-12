@@ -2,6 +2,7 @@ import flet as ft
 from models.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
+from styles.menu_option_style import Menu_Option_Style
 
 
 # Class that holds our text chapter objects
@@ -59,20 +60,39 @@ class Chapter(Widget):
         e.control.value = ""
         self.reload_widget()
 
+    # Called when right clicking our controls for either timeline or an arc
     def get_menu_options(self) -> list[ft.Control]:
-        ''' Returns our list of menu options for this widget '''
 
-        from styles.menu_option_style import Menu_Option_Style
-
+        # Color, rename
         return [
             Menu_Option_Style(
-                #on_click=self.new_item_clicked,
-                    data="plot_point",
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
-                        ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                    ])
-                ),
+                #on_click=self.rename_clicked,
+                content=ft.Row([
+                    ft.Icon(ft.Icons.DRIVE_FILE_RENAME_OUTLINE_OUTLINED),
+                    ft.Text(
+                        "Rename", 
+                        weight=ft.FontWeight.BOLD, 
+                        color=ft.Colors.ON_SURFACE
+                    ), 
+                ]),
+            ),
+            # Color changing popup menu
+            Menu_Option_Style(
+                content=ft.PopupMenuButton(
+                    expand=True,
+                    tooltip="",
+                    padding=None,
+                    content=ft.Row(
+                        expand=True,
+                        controls=[
+                            ft.Icon(ft.Icons.COLOR_LENS_OUTLINED, color=ft.Colors.PRIMARY),
+                            ft.Text("Color", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True), 
+                            ft.Icon(ft.Icons.ARROW_DROP_DOWN_OUTLINED, color=ft.Colors.ON_SURFACE, size=16),
+                        ]
+                    ),
+                    items=self.get_color_options()
+                )
+            ),
         ]
 
 

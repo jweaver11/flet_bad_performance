@@ -12,7 +12,6 @@ from models.widget import Widget
 from models.mini_widgets.timelines.arc import Arc
 from handlers.verify_data import verify_data
 import flet.canvas as cv
-from styles.colors import colors
 
 
 class Timeline(Widget):
@@ -255,23 +254,6 @@ class Timeline(Widget):
         # Color, rename, delete
         return [
             # Delete button
-        
-            Menu_Option_Style(
-                on_click=self.new_item_clicked,
-                data="arc",
-                content=ft.Row([
-                    ft.Icon(ft.Icons.CIRCLE_OUTLINED),
-                    ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                ])
-            ),
-            Menu_Option_Style(
-                on_click=self.new_item_clicked,
-                data="plot_point",
-                content=ft.Row([
-                    ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
-                    ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
-                ])
-            ),
             Menu_Option_Style(
                 on_click=self.rename_clicked,
                 content=ft.Row([
@@ -301,11 +283,20 @@ class Timeline(Widget):
                 )
             ),
             Menu_Option_Style(
-                on_click=lambda e: self.delete_clicked(e),
+                on_click=self.new_item_clicked,
+                data="arc",
                 content=ft.Row([
-                    ft.Icon(ft.Icons.DELETE_OUTLINE_ROUNDED),
-                    ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True),
-                ]),
+                    ft.Icon(ft.Icons.CIRCLE_OUTLINED),
+                    ft.Text("Arc", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                on_click=self.new_item_clicked,
+                data="plot_point",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.ADD_LOCATION_OUTLINED),
+                    ft.Text("Plot Point", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
             ),
         ]
     
@@ -380,66 +371,6 @@ class Timeline(Widget):
 
         # Focus the title control for renaming
         self.information_display.title_control.focus()
-
-    # Called when color button is clicked
-    def get_color_options(self) -> list[ft.Control]:
-        ''' Returns a list of all available colors for icon changing '''
-
-        # Called when a color option is clicked on popup menu to change icon color
-        def _change_icon_color(color: str):
-            ''' Passes in our kwargs to the widget, and applies the updates '''
-
-            # Change the data
-            self.data['color'] = color
-            self.save_dict()
-            
-            # Change our icon to match, apply the update
-            self.story.active_rail.content.reload_rail()
-            self.reload_widget()
-            
-
-        # List for our colors when formatted
-        color_controls = [] 
-
-        # Create our controls for our color options
-        for color in colors:
-            color_controls.append(
-                ft.PopupMenuItem(
-                    content=ft.Text(color.capitalize(), weight=ft.FontWeight.BOLD, color=color),
-                    on_click=lambda e, col=color: _change_icon_color(col)
-                )
-            )
-
-        return color_controls
-        
-
-    # Called when the delete button is clicked in the menu options
-    def delete_clicked(self, e):
-        ''' Deletes this file from the story '''
-
-        def _delete_confirmed(e):
-            ''' Deletes the widget after confirmation '''
-
-            self.p.close(dlg)
-            self.story.delete_widget(self)
-
-        self.story.close_menu()
-            
-
-        # Append an overlay to confirm the deletion
-        dlg = ft.AlertDialog(
-            title=ft.Text(f"Are you sure you want to delete {self.title} forever?", weight=ft.FontWeight.BOLD),
-            alignment=ft.alignment.center,
-            title_padding=ft.padding.all(25),
-            actions=[
-                ft.TextButton("Cancel", on_click=lambda e: self.p.close(dlg)),
-                ft.TextButton("Delete", on_click=_delete_confirmed, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-            ]
-        )
-
-        self.p.open(dlg)
-
-
     
 
     # Called when we need to rebuild out timeline UI
@@ -449,7 +380,6 @@ class Timeline(Widget):
         self.reload_tab()
         
         # TODO:
-        # Don't let delete timeline if only one left
         # Clicking brings up a mini-menu in the timelines widget to show details and allow editing
         # Timeline object and all its children are gesture detectors
         # If event (pp, arc, etc.) is clicked on left side of screen bring mini widgets on right side, and vise versa
@@ -629,7 +559,8 @@ class Timeline(Widget):
 
         plot_points_filters = ft.Container(
             padding=None,
-            expand=True,
+            #expand=True,
+            width=170,
             border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=ft.border_radius.all(6),
             content=ft.ExpansionTile(
@@ -650,7 +581,8 @@ class Timeline(Widget):
 
         arcs_filters = ft.Container(
             padding=None,
-            expand=True,
+            #expand=True,
+            width=170,
             border=ft.border.all(1, ft.Colors.OUTLINE),
             border_radius=ft.border_radius.all(6),
             content=ft.ExpansionTile(
@@ -669,13 +601,14 @@ class Timeline(Widget):
             )
         )
         
-        
-        # Build our header last, since it will sit above the mini widgets
-        header = ft.Row(
+    
+
+        header =ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.START,
-            controls=[ft.Container(expand=3), plot_points_filters, arcs_filters, ft.Container(expand=3)],
+            controls=[plot_points_filters, arcs_filters],
         )
+        
 
         self._render_widget(header=header)
 

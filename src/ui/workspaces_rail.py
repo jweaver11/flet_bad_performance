@@ -20,7 +20,7 @@ class Workspaces_Rail(ft.Container):
         # Style our rail (container)
         super().__init__(
             alignment=ft.alignment.center,  # Aligns content to the 
-            padding=ft.padding.only(bottom=10, right=2),
+            padding=ft.padding.only(bottom=10, right=2, left=2),
         )
 
         # Build our rail on start
@@ -177,7 +177,8 @@ class Workspaces_Rail(ft.Container):
 
         # If not collapsed, make rail normal size and set the correct icon
         else:
-            self.width = 130
+            #self.width = self.p.width / 15
+            self.width = 120
             collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED
 
 
