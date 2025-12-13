@@ -5,6 +5,7 @@ from models.story import Story
 from ui.rails.rail import Rail
 from styles.menu_option_style import Menu_Option_Style
 from handlers.tree_view import load_directory_data
+from styles.tooltip import Tooltip
 
 
 class World_Building_Rail(Rail):
@@ -118,13 +119,13 @@ class World_Building_Rail(Rail):
             ft.Container(expand=True),
 
             ft.IconButton(
-                tooltip="New Category",
+                tooltip=Tooltip("New Category"),
                 icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
                 on_click=self.new_category_clicked
             ),
             
             ft.IconButton(
-                tooltip="New Map",
+                tooltip=Tooltip("New Map"),
                 icon=ft.Icons.MAP_OUTLINED,
                 on_click=self.new_map_clicked
             ),

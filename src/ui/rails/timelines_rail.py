@@ -7,6 +7,7 @@ from styles.timelines.timeline_dropdown import Timeline_Dropdown
 from styles.timelines.label_dropdown import Label_Dropdown
 from styles.timelines.timeline_item import Timeline_Item
 from styles.menu_option_style import Menu_Option_Style
+from styles.tooltip import Tooltip
 
 
 # Class is created in main on program startup
@@ -28,13 +29,13 @@ class Timelines_Rail(Rail):
         # UI elements
         self.top_row_buttons = [
             ft.IconButton(
-                tooltip="New Timeline",
+                tooltip=Tooltip("New Timeline"),
                 icon=ft.Icons.TIMELINE_OUTLINED,
                 on_click=self.new_item_clicked,
                 data="timeline"
             ),
             ft.IconButton(
-                tooltip="New Plot Point",
+                tooltip=Tooltip("New Plot Point"),
                 icon=ft.Icons.ADD_LOCATION_OUTLINED,
                 icon_color=ft.Colors.PRIMARY if len(self.story.timelines) == 1 else ft.Colors.ON_SURFACE_VARIANT,
                 disabled=len(self.story.timelines) != 1,    # Set to if no active timeline
@@ -42,7 +43,7 @@ class Timelines_Rail(Rail):
                 data="plot_point"
             ),
             ft.IconButton(
-                tooltip="New Arc",
+                tooltip=Tooltip("New Arc"),
                 icon=ft.Icons.ADD_CIRCLE_OUTLINE_OUTLINED,
                 icon_color=ft.Colors.PRIMARY if len(self.story.timelines) == 1 else ft.Colors.ON_SURFACE_VARIANT,
                 disabled=len(self.story.timelines) != 1,

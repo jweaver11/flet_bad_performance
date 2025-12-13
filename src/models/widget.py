@@ -13,6 +13,7 @@ from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
 from styles.colors import dark_gradient
 from styles.colors import colors
+from styles.tooltip import Tooltip
 
 
 
@@ -448,7 +449,7 @@ class Widget(ft.Container):
             on_click=lambda e: self.toggle_visibility(),
             icon=ft.Icons.CLOSE_ROUNDED,
             icon_color=ft.Colors.OUTLINE,
-            tooltip="Hide",
+            tooltip=Tooltip("Hide"),
         )
 
         self.tab_title_color = ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
