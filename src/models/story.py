@@ -852,8 +852,8 @@ class Story(ft.View):
 
         page_width = self.p.width
         page_height = self.p.height
-        print(f"Page width: {page_width}, height: {page_height}")
-        print(f"Mouse X: {self.mouse_x}, Mouse Y: {self.mouse_y}")
+        #print(f"Page width: {page_width}, height: {page_height}")
+        #print(f"Mouse X: {self.mouse_x}, Mouse Y: {self.mouse_y}")
 
         # If mouse x is within 120 pixels of width, move it left 120 pixels
         # If mouse y is within 120 pixels move it up 120 pixels
