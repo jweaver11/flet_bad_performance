@@ -3,6 +3,7 @@ from models.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
 from styles.menu_option_style import Menu_Option_Style
+from flet_quill import FletQuill
 
 
 # Class that holds our text chapter objects
@@ -110,20 +111,9 @@ class Chapter(Widget):
         self.body_container.content = ft.Column(
             expand=True,
             controls=[
-                ft.Text(f"hello from: {self.title}"),
-                ft.TextField(
-                    label="Add Comment",
-                    hint_text="Comment Title",
-                    expand=True,
-                    on_submit=self.submit_comment,
-                ),
-                ft.TextField(
-                    label="Chapter Summary",
-                    hint_text="A brief summary of what happens in this chapter.",
-                    expand=True,
-                    multiline=True,
-                    value=self.data['summary'],
-                ),
+                FletQuill(
+                    file_path=f"{self.directory_path}/{self.title}_text.json",
+                )
             ]
         )
         

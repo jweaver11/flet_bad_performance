@@ -6,7 +6,6 @@ from models.story import Story
 from ui.rails.rail import Rail
 from handlers.tree_view import load_directory_data
 from styles.menu_option_style import Menu_Option_Style
-from styles.tooltip import Tooltip
 
 
 # Class is created in main on program startup
@@ -127,18 +126,18 @@ class Content_Rail(Rail):
             ft.Container(expand=True),
 
             ft.IconButton(
-                tooltip=Tooltip("New Category"),
+                tooltip="New Category",
                 icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
                 on_click=self.new_category_clicked
             ),
             
             ft.IconButton(
-                tooltip=Tooltip("New Chapter"),
+                tooltip="New Chapter",
                 icon=ft.Icons.NOTE_ADD_OUTLINED,
                 on_click=self.new_chapter_clicked
             ),
             ft.IconButton(
-                tooltip=Tooltip("New Note"),
+                tooltip="New Note",
                 icon=ft.Icons.NOTE_ALT_OUTLINED,
                 on_click=self.new_note_clicked
             ),

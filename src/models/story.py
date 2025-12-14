@@ -410,6 +410,10 @@ class Story(ft.View):
         for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
             for filename in filenames:
 
+                # Skip text files, we don't need to read them here
+                if filename.endswith("_text.json"):
+                    continue
+
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
                     file_path = os.path.join(dirpath, filename)   

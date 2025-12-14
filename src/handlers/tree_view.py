@@ -28,12 +28,6 @@ def load_directory_data(
         return os.path.normcase(os.path.normpath(p))
     
 
-    file_options = [
-        ft.TextButton(content=ft.Text("Rename", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-        ft.TextButton(content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-        ft.TextButton(content=ft.Text("Option 3", weight=ft.FontWeight.BOLD, color=ft.Colors.GREY_300)),
-    ]
-
     try: 
 
         # Gives us a list of all files and folders in our current directory
@@ -109,6 +103,10 @@ def load_directory_data(
 
             # Skip any map display files
             if name.endswith("_display"):
+                continue
+
+            # Skip text files, we don't need to read them here
+            if name.endswith("_text"):
                 continue
           
             # Find our widget based on the filename

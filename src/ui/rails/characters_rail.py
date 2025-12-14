@@ -10,7 +10,6 @@ from styles.menu_option_style import Menu_Option_Style
 from ui.rails.rail import Rail
 from models.story import Story
 from handlers.tree_view import load_directory_data
-from styles.tooltip import Tooltip
 
 class Characters_Rail(Rail):
     def __init__(self, page: ft.Page, story: Story):
@@ -25,13 +24,13 @@ class Characters_Rail(Rail):
         # UI elements
         self.top_row_buttons = [
             ft.IconButton(
-                tooltip=Tooltip("New Category"),
+                tooltip="New Category",
                 icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
                 on_click=self.new_category_clicked
             ),
             
             ft.IconButton(
-                tooltip=Tooltip("New Character"),
+                tooltip="New Character",
                 icon=ft.Icons.PERSON_ADD_ALT_OUTLINED,
                 on_click=self.new_character_clicked
             )
