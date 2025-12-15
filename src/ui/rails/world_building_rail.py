@@ -112,9 +112,6 @@ class World_Building_Rail(Rail):
             
             controls=[
 
-            # Add here, story name, and buttons to create new stuff.
-            # As well as right click options here that work like normal.
-
             ft.Container(expand=True),
 
             ft.IconButton(

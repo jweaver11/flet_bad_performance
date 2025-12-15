@@ -410,6 +410,10 @@ class Story(ft.View):
         for dirpath, dirnames, filenames in os.walk(self.data['content_directory_path']):
             for filename in filenames:
 
+                # Skip text files, we don't need to read them here
+                if filename.endswith("_text.json"):
+                    continue
+
                 # All our objects are stored as JSON
                 if filename.endswith(".json"):
                     file_path = os.path.join(dirpath, filename)   
@@ -852,8 +856,8 @@ class Story(ft.View):
 
         page_width = self.p.width
         page_height = self.p.height
-        print(f"Page width: {page_width}, height: {page_height}")
-        print(f"Mouse X: {self.mouse_x}, Mouse Y: {self.mouse_y}")
+        #print(f"Page width: {page_width}, height: {page_height}")
+        #print(f"Mouse X: {self.mouse_x}, Mouse Y: {self.mouse_y}")
 
         # If mouse x is within 120 pixels of width, move it left 120 pixels
         # If mouse y is within 120 pixels move it up 120 pixels
