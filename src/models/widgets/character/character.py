@@ -43,6 +43,8 @@ class Character(Widget):
                 'gender': str, #text input
                 'age': str, #text input
                 'sexuality': str, #text input
+                'nationality': str, #text input
+                'title_prefix': str, #text input
                 'edit_mode': bool,  # Whether we are in edit mode or not
                 'physical_description': {
                     'Race': str, #having this in a dict sort of complicates the on_change handlers
@@ -242,8 +244,7 @@ class Character(Widget):
                     controls=[
                     regView_button,
                     #self.icon,                          # The icon above the name
-                    ft.Text("hi from " + self.title),           # Text that shows the title
-                    #ft.Text((self.story.load_characters())),
+                    #ft.Text("hi from " + self.title),           # Text that shows the title
                     ft.Row(                     # The row that will hold our dropdowns
                             wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                             controls=[          # All flet controls inside our Row
@@ -321,7 +322,20 @@ class Character(Widget):
                                         ),
                                     ]
                                 ),
-                                
+                                ft.TextField(   # Text field for title_prefix input
+                                    label ="Title",
+                                    value=self.data['title_prefix'],  # Load saved title data
+                                    width=200,
+                                    expand = False,
+                                    on_change=lambda e, name='title_prefix': self._on_field_change(name, e.control.value),  # Save on change
+                                ),
+                                ft.TextField(   # Text field for title_prefix input
+                                    label ="Nationality",
+                                    value=self.data['nationality'],  # Load saved nationality data
+                                    width=200,
+                                    expand = False,
+                                    on_change=lambda e, name='nationality': self._on_field_change(name, e.control.value),  # Save on change
+                                ),
                                 ft.TextField(   # Text field for sexuality input
                                     label ="Gender",
                                     value=self.data['gender'],  # Load saved sexuality data
@@ -477,10 +491,13 @@ class Character(Widget):
                 controls=[
                 edit_button,            # Just pass in the edit button for now so we don't build it twice
                 #self.icon,                          # The icon above the name
-                ft.Text("hi from " + self.title),           # Text that shows the title
+                #ft.Text("hi from " + self.title),           # Text that shows the title
                 ft.Row(                     # The row that will hold our dropdowns
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                         controls=[          # All flet controls inside our Row
+                            ft.Text("Full Title: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['title_prefix'] + " " + self.title),
                             ft.Text("Alignment: ",
                                     weight=ft.FontWeight.BOLD),
                             ft.Text(self.data['alignment1'] + " " + self.data['alignment2']),
@@ -496,6 +513,9 @@ class Character(Widget):
                             ft.Text("Sexuality: ",
                                     weight=ft.FontWeight.BOLD),
                             ft.Text(self.data['sexuality']),
+                            ft.Text("Nationality: ",
+                                    weight=ft.FontWeight.BOLD),
+                            ft.Text(self.data['nationality']),
                             ft.Text("Connections: ",
                                     weight=ft.FontWeight.BOLD),
                             ft.Text(str(self.data['connections'])),
