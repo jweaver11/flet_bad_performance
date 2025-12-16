@@ -54,9 +54,10 @@ class App:
             settings_data = None  # If there's an error, we will create default settings
 
         # Sets our app settings to our loaded settings. If none were loaded (I.E. first launch), Settings with create its own defaults
-        app.settings = Settings(page, data_paths.app_data_path, data=settings_data)
+        app.settings = Settings(page=page, directory_path=data_paths.app_data_path, data=settings_data)
 
-        ''' Page styling'''
+
+        ''' Page styling '''
 
         # Sets our app title
         page.title = "StoryBoard"

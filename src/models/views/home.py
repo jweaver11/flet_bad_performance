@@ -57,7 +57,7 @@ def create_home_view(page: ft.Page) -> ft.View:
                 story_title_field.focus()   # refocus the text field since the title was not unique
                 page.update()
 
-
+ 
         # Called everytime the user enters a new letter in the text box
         def check_story_title_unique(e):
             ''' Called when the text in the text box changes '''
@@ -70,7 +70,7 @@ def create_home_view(page: ft.Page) -> ft.View:
                 create_button.disabled = False
             else:
                 create_button.disabled = True
-                
+
             page.update()
             
 

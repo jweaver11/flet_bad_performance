@@ -718,8 +718,8 @@ class Story(ft.View):
                 self.widgets.append(note)
 
         # Add our settings to the widget list as well
-        if app.settings not in self.widgets:
-            self.widgets.append(app.settings)   # Add our app settings to the widgets list so its accessible everywhere
+        #if app.settings not in self.widgets:
+            #self.widgets.append(app.settings)   # Add our app settings to the widgets list so its accessible everywhere
         
 
 
@@ -949,15 +949,7 @@ class Story(ft.View):
         active_rail_resizer = ft.GestureDetector(
             content=ft.Container(
                 width=10,   # Total width of the GD, so its easier to find with mouse
-                #bgcolor=ft.Colors.with_opacity(0.4, ft.Colors.ON_INVERSE_SURFACE),  # Matches our bg color to the active_rail
-                #gradient=ft.LinearGradient(
-                    #begin=ft.alignment.top_center,
-                    #end=ft.alignment.bottom_center,
-                    #colors=[
-                        #ft.Colors.with_opacity(.6, ft.Colors.ON_INVERSE_SURFACE),
-                        #ft.Colors.with_opacity(.2, ft.Colors.ON_INVERSE_SURFACE),
-                    #],
-                #),
+                
                 # Thin vertical divider, which is what the app will actually drag
                 content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
                 padding=ft.padding.only(right=8),  # Push the 2px divider ^ to the right side
@@ -990,11 +982,8 @@ class Story(ft.View):
 
             controls=[
                 self.workspaces_rail,  # Main rail of all available workspaces
-                ft.Container(
-                    width=10,   # Total width of the GD, so its easier to find with mouse
-                    content=ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
-                    padding=ft.padding.only(right=8),  # Push the 2px divider ^ to the right side
-                ),
+                ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),     
+                
                 self.active_rail,    # Rail for the selected workspace
                 active_rail_resizer,   # Divider between rail and work area
                 

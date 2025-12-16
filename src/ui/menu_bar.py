@@ -171,7 +171,8 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
             if selected_story is not None:
                 print("Opening story: ", selected_story)
-                page.route = app.stories[selected_story].route
+                page.go(app.stories[selected_story].route)
+                app.settings.story = app.stories[selected_story]  # Gives our settings widget the story reference it needs
                 page.close(dlg)
                 page.update()
             else:
@@ -204,6 +205,18 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
         # Opens our dialog
         page.open(dlg)
+
+    def settings_clicked(e):
+        ''' Goes to the settings page '''
+        if page.route != "/settings":
+            page.go("/settings")
+        else:
+            # Get the active story title and find its route
+            active_story_title = app.settings.data.get('active_story', "/")
+            if active_story_title != "/" and active_story_title in app.stories:
+                page.go(app.stories[active_story_title].route)
+            else:
+                page.go("/")
 
 
     # Styling used by lots of menu bar items
@@ -292,7 +305,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 ft.IconButton(icon=ft.Icons.HOME_OUTLINED, on_click=lambda e: page.go("/"), tooltip="Home"),  # Temp for testing
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
-                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: app.settings.toggle_visibility()),   # Settings button
+                ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=settings_clicked),   # Settings button
                 ft.TextButton("Account Name", icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED),  # apps account name         
             ]
         )

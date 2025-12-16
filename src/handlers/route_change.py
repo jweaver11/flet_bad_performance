@@ -17,12 +17,16 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
 
     # If our route is the home page, we just need to load the home view and return
     if page.route == "/":
+
+        # Append the view manually since its just a function to return the view
         page.views.append(create_home_view(page))
         page.update()
         return
     
     # Else if its our settings page, we load that view and return
     elif page.route == "/settings":
+
+        app.settings.reload_settings()
         page.views.append(app.settings)
         page.update()
         return
@@ -45,13 +49,14 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
         # If we have a story route that matches our new route, load it to the page views
         if new_story is not None:
             
-            # Load our new stories data and builds its UI, then adds it to the page
+            
             new_story.startup()
+
+            app.settings.story = new_story  # Gives our settings widget the story reference it needs
             page.views.append(new_story)
 
         # Otherwise, give us a blank page
         else:
-            print("Error loading story for route: " + page.route)
             page.open(
                 Snack_Bar(
                     content=ft.Text(

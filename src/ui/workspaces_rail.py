@@ -3,7 +3,7 @@ This object is stored in app.all_workspaces_rail.
 Handles new workspace selections, re-ordering, collapsing, and expanding the rail. '''
 
 import flet as ft
-from models.app import app
+
 from models.views.story import Story
 
 # Class so we can store our all workspaces rail as an object inside of app
@@ -16,6 +16,7 @@ class Workspaces_Rail(ft.Container):
 
         # Selected workspace is story dependent, so read from the story instead
         self.selected_rail = story.data['selected_rail']
+        
 
         # Style our rail (container)
         super().__init__(
@@ -30,6 +31,7 @@ class Workspaces_Rail(ft.Container):
     # Called mostly when re-ordering or collapsing the rail. Also called on start
     def reload_rail(self, story) -> ft.Control:
         ''' Reloads our rail, and applies the correct styles and controls based on the state of the rail '''
+        from models.app import app    # Always grabs updated reference when reloading
 
         # Holds our list of controls that we will add in the rail later
         workspaces_rail = []
@@ -123,7 +125,7 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
-                    data="planning", label_content=ft.Text("Planningggg", no_wrap=True),
+                    data="planning", label_content=ft.Text("Planning", no_wrap=True),
                 ),
             ],
         )

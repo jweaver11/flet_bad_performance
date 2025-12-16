@@ -8,26 +8,43 @@ from models.views.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
 from styles.colors import colors
+import os
+import json
+from styles.colors import dark_gradient
+from ui.menu_bar import create_menu_bar
+from ui.workspaces_rail import Workspaces_Rail
 
+ 
+class Settings(ft.View):
 
-class Settings(Widget):
     # Constructor
-    def __init__(self, page: ft.Page, directory_path: str, story: Story=None, data: dict=None):
+    def __init__(
+        self, 
+        page: ft.Page, 
+        directory_path: str, 
+        story: Story = None, 
+        data: dict = None
+    ):
         
         # Constructor the parent widget class
         super().__init__(
-            title = "Settings",  # Name of character, but all objects have a 'title' for identification, so characters do too
-            page = page,   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
-            story = story,
-            directory_path = directory_path,
-            data = data,
+            route=f"/settings",                                      # Sets our route for our new story
+            padding=ft.padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
+            spacing=0,                                                      # No spacing between menubar and rest of page
         )
+
+        self.title = "settings"   # Title of our settings widget
+
+        self.p = page   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
+        self.story = story
+        self.directory_path = directory_path
+        self.data = data
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
             self,   # Pass in our own data so the function can see the actual data we loaded
             {
-                'tag': "settings",  # Tag for logic, should be overwritten by child classes
+                
                 'active_story': "/",    # this works as a route for the correct story
                 'tab_title_color': "primary",        # the tab color
                 'theme_mode': "system",       # the apps theme mode, dark or light
@@ -50,7 +67,28 @@ class Settings(Widget):
             },
         )
 
-        self.reload_widget()  # Loads our settings widget UI
+        #self.reload_settings()  # Loads our settings widget UI
+
+    # Called whenever there are changes in our data
+    def save_dict(self):
+        ''' Saves our current data to the json file '''
+
+        try:
+
+            # Set our file path
+            file_path = os.path.join(self.directory_path, f"{self.title}.json")
+
+            # Create the directory if it doesn't exist. Catches errors from users deleting folders
+            os.makedirs(self.directory_path, exist_ok=True)
+            
+            # Save the data to the file (creates file if doesnt exist)
+            with open(file_path, "w", encoding='utf-8') as f:   
+                json.dump(self.data, f, indent=4)
+        
+        # Handle errors
+        except Exception as e:
+            print(f"Error saving widget to {file_path}: {e}") 
+            print("Data that failed to save: ", self.data)
 
 
     # Called when the button to reorder the workspaces is clicked
@@ -87,9 +125,8 @@ class Settings(Widget):
         
     
     # Called when someone expands the drop down holding the color scheme options
-    def reload_widget(self):
-        # Rebuild out tab to reflect any changes
-        self.reload_tab()
+    def reload_settings(self):
+        
         
         def get_color_scheme_options():
             ''' Adds our choices to the color scheme dropdown control'''
@@ -172,7 +209,7 @@ class Settings(Widget):
         self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
         
         # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
-        self.content=ft.Column([
+        content=ft.Column([
             ft.TextButton(
                 "Reorder Workspaces", 
                 icon=ft.Icons.REORDER_ROUNDED,
@@ -183,21 +220,41 @@ class Settings(Widget):
             self.color_scheme_dropdown,
         ])
 
-        # Sets our content to our tab so it shows up
-        self.tab.content = self.content
+        cc = ft.Container(expand=True, content=content)
 
-        # Sets our header
-        tab = ft.Tabs(
-            selected_index=0,
-            animation_duration=0,
-            padding=ft.padding.all(0),
-            label_padding=ft.padding.all(0),
-            mouse_cursor=ft.MouseCursor.BASIC,
-            tabs=[self.tab]    # Gives our tab control here
-        )
+        self.controls.clear()
         
-        # Sets our object content to be our tab
-        self.content = tab
+
+        menubar = create_menu_bar(self.p)   
+        self.workspaces_rail = Workspaces_Rail(self.p, self.story)  # Create our all workspaces rail
+
+        self.controls = [
+            menubar,
+            
+            ft.Container(
+                expand=True,
+                content=ft.Row(
+                    spacing=0, 
+                    controls=[
+                        self.workspaces_rail,
+                        ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),
+                        
+                        ft.Container(
+                            expand=True, 
+                            alignment=ft.alignment.center, 
+                            gradient=dark_gradient, 
+                            content=cc,
+                            border_radius=20,
+                            margin=ft.margin.all(10),
+                        ),
+                    ]
+                ),
+            ),
+
+            
+        ]
+
+
 
         # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
         # Option to change where certain widgets default display to in pins
