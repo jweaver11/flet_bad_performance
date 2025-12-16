@@ -1,11 +1,11 @@
 '''
-Our app of the application. This model stores their info and certain UI elements,
-and their stories. It is a dead end file, that only imports the story model meaning...
-All other files can import this function without issues
+Our model for our app. Contains settings and stories, as well as methods to load them from files on startup (called in main)
 '''
 
-from models.story import Story
+from models.views.story import Story
 import flet as ft
+import os
+import json
 from models.widget import Widget
 
 
@@ -19,9 +19,128 @@ class App:
         
         # Dict of all our stories.
         self.stories = {}
-        
-        
 
+
+    # Called on app startup in main
+    def load_settings(self, page: ft.Page):
+        ''' Loads our settings from a JSON file into our rendered settings control. If none exist, creates default settings '''
+        from models.views.settings import Settings
+        from models.app import app
+        from constants import data_paths
+
+        # Should just look for our settings file to load our data from. Settings should do all other logic
+
+        # Path to our settings file
+        settings_file_path = os.path.join(data_paths.app_data_path, "settings.json")
+
+        # Create settings.json with empty dict if it doesn't exist
+        if not os.path.exists(settings_file_path):
+            with open(settings_file_path, "w", encoding='utf-8') as f:
+                json.dump({}, f)
+        
+        try:
+            # Read the JSON file
+            with open(settings_file_path, "r", encoding='utf-8') as f:
+                settings_data = json.load(f)
+
+        # If no file exists, create one with default settings
+        except(FileNotFoundError):
+            print("Settings file not found, creating default settings.")
+            settings_data = None  # If there's an error, we will create default settings
+                
+        # Other errors
+        except Exception as e:
+            print(f"Error loading settings {settings_file_path}: {e}")
+            settings_data = None  # If there's an error, we will create default settings
+
+        # Sets our app settings to our loaded settings. If none were loaded (I.E. first launch), Settings with create its own defaults
+        app.settings = Settings(page, data_paths.app_data_path, data=settings_data)
+
+        ''' Page styling'''
+
+        # Sets our app title
+        page.title = "StoryBoard"
+
+        # Sets our themes and which one we use. Default to dark mode with blue
+        page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))    
+        page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))   
+        page.theme_mode = app.settings.data.get('theme_mode', 'dark')      
+    
+        # Sets the title of our app, padding, and maximizes the window
+        page.padding = ft.padding.only(top=0, left=0, right=0, bottom=0)    
+
+        # Set the window size as maximized or not
+        if app.settings.data.get('page_is_maximized', True):
+            page.window.maximized = app.settings.data.get('page_is_maximized', True)
+        else:
+            page.window.width = app.settings.data.get('page_width')
+            page.window.height = app.settings.data.get('page_height')
+
+        # Set our logic when page window is resized
+        page.on_resized = app.settings.page_resized
+
+
+    # Called on app startup in main
+    def load_previous_story(self, page: ft.Page) -> bool:
+        ''' Loads our saved stories from the json files in story folders within the stories directory. If none exist, do nothing '''
+        
+        from constants import data_paths
+        from models.app import app
+        
+        # Create the stories directory if it doesnt exist already
+        os.makedirs(data_paths.stories_directory_path, exist_ok=True)
+            
+        # Iterate through all items in the stories directory
+        for story_folder in os.listdir(data_paths.stories_directory_path):
+
+            story_directory = os.path.join(data_paths.stories_directory_path, story_folder)
+                
+            # Look for JSON files within this story folder (ignore subdirectories)
+            try:
+                
+                # Check every item (folder and file) in this story folder
+                for item in os.listdir(story_directory):
+
+                    # Check for the story json data file. If it is, we'll load our story around this file data
+                    if item.endswith(".json"):
+
+                        # Set the file path to this json file so we can open it
+                        file_path = os.path.join(story_directory, item)
+
+                        # Read the JSON file
+                        with open(file_path, "r", encoding='utf-8') as f:
+                            # Set our data to be passed into our objects
+                            story_data = json.load(f)
+
+                        # Our story title is the same as the folder
+                        story_title = story_data.get("title", file_path.replace(".json", ""))
+                            
+                        app.stories[story_title] = Story(story_title, page, data=story_data)
+
+                        break
+                    # Else, continue through the next story folder
+                    else:
+                        continue
+                        
+            except Exception as e:
+                print(f"Error loading story {story_title}: {e}. May not be a directory")
+            
+
+        # Initialize and load all our stories data and UI elements
+        for story in app.stories.values():
+            # Sets our active story to the page route. The route change function will load the stories data and UI
+            if story.title == app.settings.data.get('active_story', None):
+                app.settings.story = story  # Gives our settings widget the story reference it needs
+                page.route = story.route    # This will call our route change function and set our story view
+
+                page.update()
+                return True
+            
+        page.update()
+        return False
+
+    
+    
     # Called when app creates a new story. Accepts our title, page reference, a template, and a type
     def create_new_story(self, title: str, page: ft.Page, template: str) -> Story:
         ''' Creates the new story object and has it run its 'startup' method. Changes route so our view displays the new story '''

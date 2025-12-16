@@ -4,7 +4,7 @@ A Settings object is created for every story
 '''
 
 import flet as ft
-from models.story import Story
+from models.views.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
 from styles.colors import colors
@@ -34,7 +34,6 @@ class Settings(Widget):
                 'active_rail_width': int(self.p.width / 10),  # Width of our active rail that we can resize
                 'theme_color_scheme': "blue",   # the color scheme of the app
                 'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
-                'workspaces_rail_order': list,      # Order of the workspace rail
                 'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
                 'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
                 'page_is_maximized': True,   # If the window is maximized or not

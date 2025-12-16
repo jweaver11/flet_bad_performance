@@ -3,7 +3,7 @@
 
 import flet as ft
 from styles.menu_option_style import Menu_Option_Style
-from models.story import Story
+from models.views.story import Story
 from models.widgets.timeline import Timeline
 
 # Expansion tiles used for timelines (when more than 1), plotpoints labels, and arcs labels

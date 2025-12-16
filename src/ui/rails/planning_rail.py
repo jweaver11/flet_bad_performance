@@ -1,7 +1,7 @@
 """ WIP """
 
 import flet as ft
-from models.story import Story
+from models.views.story import Story
 from ui.rails.rail import Rail
 
 

@@ -4,7 +4,7 @@ Handles new workspace selections, re-ordering, collapsing, and expanding the rai
 
 import flet as ft
 from models.app import app
-from models.story import Story
+from models.views.story import Story
 
 # Class so we can store our all workspaces rail as an object inside of app
 class Workspaces_Rail(ft.Container):

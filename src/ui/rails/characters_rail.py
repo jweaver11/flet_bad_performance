@@ -8,7 +8,7 @@ import flet as ft
 from models.widgets.character.character import Character
 from styles.menu_option_style import Menu_Option_Style
 from ui.rails.rail import Rail
-from models.story import Story
+from models.views.story import Story
 from handlers.tree_view import load_directory_data
 
 class Characters_Rail(Rail):

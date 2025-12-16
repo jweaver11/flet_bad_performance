@@ -7,7 +7,7 @@ import json
 import os
 import flet as ft
 from styles.menu_option_style import Menu_Option_Style
-from models.story import Story
+from models.views.story import Story
 from models.widget import Widget
 from models.mini_widgets.timelines.arc import Arc
 from handlers.verify_data import verify_data

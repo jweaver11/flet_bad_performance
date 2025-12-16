@@ -340,7 +340,7 @@ class Tree_View_File(ft.GestureDetector):
                         expand=True,
                         controls=[
                             ft.Icon(self.icon, color=self.icon_color), 
-                            ft.Text(value=self.widget.title, style=self.text_style),                   
+                            ft.Text(value=self.widget.title, style=self.text_style),   
                         ],
                     ),
                 )

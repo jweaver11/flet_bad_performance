@@ -5,7 +5,7 @@ Holds our settings icon, feedback, and account name as well
 
 import flet as ft
 from models.app import app
-from models.story import Story
+from models.views.story import Story
 
 
 
@@ -14,7 +14,17 @@ from models.story import Story
 
 
 # Called in main to create menu bar if no story exists, or by a story to create menu bar for that story
-def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
+def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
+
+    # Create our own menu bar with:
+    # New - Blank Story, From Template
+    # Open
+    # Import - story, chapter, map, drawing, character, note
+    # Export - story, chapter, map, drawing, character, note
+    # Delete Story
+
+
+    # Clicking new button auto selects blank story for now
     
     # Placeholder events for now
     def handle_menu_item_click(e):
@@ -32,6 +42,9 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
         pass
     def handle_submenu_hover(e):
         #print(f"{e.control.content.content.value}.on_hover")
+        pass
+
+    def handle_delete_click(e):
         pass
 
 
@@ -147,6 +160,9 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
 
             nonlocal selected_story
             selected_story = e.control.value
+            open_button.disabled = False
+            open_button.style=ft.ButtonStyle(color=ft.Colors.ON_SURFACE)
+            page.update()
 
         # Returns a list of all story titles available to open
         def get_stories_list() -> ft.Control:
@@ -189,6 +205,9 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             page.close(dlg)
             page.update()
 
+        open_button = ft.TextButton("Open", on_click=open_selected_story, disabled=True)
+
+
         # Our alert dialog that pops up when file -> open is clicked
         dlg = ft.AlertDialog(
             title=ft.Text(
@@ -204,7 +223,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-                ft.TextButton("Open", on_click=open_selected_story, style=ft.ButtonStyle(color=ft.Colors.INVERSE_SURFACE)),
+                open_button,
             ]
         )
 
@@ -215,6 +234,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
     # Styling used by lots of menu bar items
     menubar_style = ft.ButtonStyle(
         bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
+        shape=ft.RoundedRectangleBorder(radius=10),
         color=ft.Colors.PRIMARY
     )
 
@@ -236,7 +256,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                     content=ft.Text("File", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),     # Content of subment button
                     alignment=ft.alignment.center
                 ), 
-                style=menubar_style,    # styleing for the button
+                style=menubar_style,    # styling for the button
                 on_open=handle_submenu_open,    # Handle when a submenu is opened
                 on_close=handle_submenu_close,  # Handle when a submenu is closed
                 on_hover=handle_submenu_hover,  # Handle when a submenu is hovered
@@ -255,16 +275,21 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Import", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
-                        leading=ft.Icon(ft.Icons.IMPORT_EXPORT_OUTLINED),
+                        leading=ft.Icon(ft.Icons.FILE_UPLOAD_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
-                        # CAN ONLY EXPORT WIDGETS AND PSEUDO WIDGETS
                         content=ft.Text("Export", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
-                        leading=ft.Icon(ft.Icons.IMPORT_EXPORT_OUTLINED),
+                        leading=ft.Icon(ft.Icons.FILE_DOWNLOAD_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
+                    ),
+                    ft.MenuItemButton(
+                        content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        leading=ft.Icon(ft.Icons.DELETE_FOREVER_ROUNDED),
+                        style=menubar_style,
+                        on_click=handle_delete_click,
                     ),
                 ],
             ),
@@ -286,7 +311,7 @@ def create_menu_bar(page: ft.Page, story: Story=None) -> ft.Container:
                 ft.Container(expand=True),  # empty space in middle of menubar
                 # Fix broken widgets button
 
-
+                ft.IconButton(icon=ft.Icons.HOME_OUTLINED, on_click=lambda e: page.go("/"), tooltip="Home"),  # Temp for testing
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
                 ft.IconButton(icon=ft.Icons.SETTINGS_OUTLINED, on_click=lambda e: app.settings.toggle_visibility()),   # Settings button

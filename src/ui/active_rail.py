@@ -6,7 +6,7 @@ And gives us the correct rail on startup based on selected workspace
 
 import flet as ft
 from models.app import app
-from models.story import Story
+from models.views.story import Story
 from ui.rails.characters_rail import Characters_Rail  
 from ui.rails.content_rail import Content_Rail
 from ui.rails.timelines_rail import Timelines_Rail

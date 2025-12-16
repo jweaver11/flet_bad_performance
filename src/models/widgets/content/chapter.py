@@ -1,5 +1,5 @@
 import flet as ft
-from models.story import Story
+from models.views.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
 from styles.menu_option_style import Menu_Option_Style

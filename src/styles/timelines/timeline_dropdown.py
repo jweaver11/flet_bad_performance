@@ -4,7 +4,7 @@ Extended flet controls that implement the same styling for easy access
 
 import flet as ft
 from styles.menu_option_style import Menu_Option_Style
-from models.story import Story
+from models.views.story import Story
 from models.widgets.timeline import Timeline
 import os
 from styles.colors import colors

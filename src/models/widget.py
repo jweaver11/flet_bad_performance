@@ -6,7 +6,7 @@ Only Widgets create mini widgets
 '''
 
 import flet as ft
-from models.story import Story
+from models.views.story import Story
 import os
 import json
 from handlers.verify_data import verify_data

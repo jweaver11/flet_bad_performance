@@ -2,7 +2,7 @@
 
 import flet as ft
 import os
-from models.story import Story
+from models.views.story import Story
 from ui.rails.rail import Rail
 from handlers.tree_view import load_directory_data
 from styles.menu_option_style import Menu_Option_Style

@@ -1,6 +1,6 @@
 import flet as ft
 from models.widget import Widget
-from models.story import Story
+from models.views.story import Story
 from handlers.verify_data import verify_data
 
 

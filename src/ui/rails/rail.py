@@ -5,7 +5,7 @@ Parent rail class used by our six workspaces. Gives uniformity to our rails
 import flet as ft
 import os
 import json
-from models.story import Story
+from models.views.story import Story
 from models.widgets.timeline import Timeline
 from styles.tree_view.tree_view_directory import Tree_View_Directory
 

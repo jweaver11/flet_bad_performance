@@ -4,7 +4,7 @@ Class for showing all our characters laidd out in a family tree view.
 
 import flet as ft
 from models.widget import Widget
-from models.story import Story
+from models.views.story import Story
 from handlers.verify_data import verify_data
 
 

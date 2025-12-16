@@ -7,7 +7,7 @@ the app will change. Everything else is built upon program launch so we can disp
 import flet as ft
 import os
 from models.widget import Widget
-from models.story import Story
+from models.views.story import Story
 from handlers.verify_data import verify_data
 from styles.menu_option_style import Menu_Option_Style
 

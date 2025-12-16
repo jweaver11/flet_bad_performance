@@ -9,7 +9,7 @@ Nested in any particular way. WorldMaps CANNOT store each other or be nested.
 import os
 import flet as ft
 from models.widget import Widget
-from models.story import Story
+from models.views.story import Story
 from handlers.verify_data import verify_data
 
 
