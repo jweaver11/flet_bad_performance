@@ -36,8 +36,6 @@ class Widget(ft.Container):
             gradient=dark_gradient,
             margin=ft.margin.all(0),
             padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
-            #on_click=lambda e: print("Pressed widget")
-            #TODO: Make bgcolor gradiant, slightly brighter at top
         )
 
     
