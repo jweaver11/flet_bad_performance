@@ -6,33 +6,11 @@ Holds our settings icon, feedback, and account name as well
 import flet as ft
 from models.app import app
 from models.views.story import Story
-
-
-
-# CREATING NEW STORY ALLOWS USER OPTION TO CREATE BLANK,
-# OR SELECT FROM TEMPLATE OPTIONS, TYPES, REGRESSION, ETC
+from handlers.check_story_unique import story_is_unique
 
 
 # Called in main to create menu bar if no story exists, or by a story to create menu bar for that story
 def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
-
-    # Create our own menu bar with:
-    # New - Blank Story, From Template
-    # Open
-    # Import - story, chapter, map, drawing, character, note
-    # Export - story, chapter, map, drawing, character, note
-    # Delete Story
-
-
-    # Clicking new button auto selects blank story for now
-    
-    # Placeholder events for now
-    def handle_menu_item_click(e):
-        #print(f"{e.control.content.value}.on_click")
-        page.open(
-            ft.SnackBar(content=ft.Text(f"{e.control.content.value} was clicked!"))
-        )
-        page.update()
 
     def handle_submenu_open(e):
         #print(f"{e.control.content.content.value}.on_open")
@@ -51,7 +29,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
     # Called when file -> new is clicked
     def handle_create_new_story_clicked(e):
         ''' Opens a dialog to create a new story. Checks story is unique or not '''
-        #print("New Story Clicked")
+
 
         # Variable to track if the title is unique
         is_unique = True
@@ -95,21 +73,15 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
             nonlocal is_unique
 
-            # Checks if the title sitting in the text box is unique for submitting
-            title = e.control.value
-            for story in app.stories.values():
-                if story.title == title.title():
-                    e.control.error_text = "Title must be unique"
-                    is_unique = False
-                    page.update()
-                    return
-                else:
-                    e.control.error_text = None
-                    is_unique = True
-                    page.update()
+            is_unique = story_is_unique(e.control.value, e.control)
 
-            
-            #print(f"New story created with title: {title}")
+            if is_unique and e.control.value.strip() != "":
+                create_button.disabled = False
+            else:
+                create_button.disabled = True
+                
+            page.update()
+
 
         # Create a reference to the text field so we can access its value
         story_title_field = ft.TextField(
@@ -118,6 +90,9 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
             on_submit=submit_new_story,
             on_change=textbox_value_changed,
         )
+
+        create_button = ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field), disabled=True)
+
             
         # The dialog that will pop up whenever the new story button is clicked
         dlg = ft.AlertDialog(
@@ -135,7 +110,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
             # Our two action buttons at the bottom of the dialog
             actions=[
                 #ft.TextButton("Cancel", on_click=page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-                ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field)),
+                create_button,
             ],
         )
         
@@ -263,6 +238,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 controls=[      # The options shown inside of our button
                     ft.MenuItemButton(
                         content=ft.Text("New", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        # Options: Blank Story, From Template, but clicking also just creates blank
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_OUTLINE_ROUNDED, color=ft.Colors.ON_SURFACE,),
                         style=menubar_style,
                         on_click=handle_create_new_story_clicked,
@@ -275,12 +251,14 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Import", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        # Options: story, chapter, map, drawing, character, note
                         leading=ft.Icon(ft.Icons.FILE_UPLOAD_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
                         content=ft.Text("Export", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        # Options: story, chapter, map, drawing, character, note
                         leading=ft.Icon(ft.Icons.FILE_DOWNLOAD_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,

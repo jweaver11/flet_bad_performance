@@ -1,6 +1,7 @@
 import flet as ft
 from ui.menu_bar import create_menu_bar
 from styles.colors import dark_gradient
+from handlers.check_story_unique import story_is_unique
 
 
 # Called when creating our home view (No stories exist or none active)
@@ -63,29 +64,26 @@ def create_home_view(page: ft.Page) -> ft.View:
 
             nonlocal is_unique
 
-            # Checks if the title sitting in the text box is unique for submitting
-            title = e.control.value
-            for story in app.stories.values():
-                if story.title == title:
-                    e.control.error_text = "Title must be unique"
-                    is_unique = False
-                    page.update()
-                    return
-                else:
-                    e.control.error_text = None
-                    is_unique = True
-                    page.update()
+            is_unique = story_is_unique(e.control.value, e.control)
 
+            if is_unique and e.control.value.strip() != "":
+                create_button.disabled = False
+            else:
+                create_button.disabled = True
+                
+            page.update()
             
-            #print(f"New story created with title: {title}")
 
         # Create a reference to the text field so we can access its value
         story_title_field = ft.TextField(
             label="Story Title",
             autofocus=True,
+            capitalization=ft.TextCapitalization.WORDS,
             on_submit=submit_new_story,
             on_change=check_story_title_unique,
         )
+
+        create_button = ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field), disabled=True)
             
         # The dialog that will pop up whenever the new story button is clicked
         dlg = ft.AlertDialog(
@@ -99,7 +97,7 @@ def create_home_view(page: ft.Page) -> ft.View:
             # Our two action buttons at the bottom of the dialog
             actions=[
                 ft.TextButton("Cancel", on_click=close_dialog, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-                ft.TextButton("Create", on_click=lambda e: submit_new_story(story_title_field)),
+                create_button,
             ],
         )
 

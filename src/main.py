@@ -13,7 +13,7 @@ from models.views.home import create_home_view
 # Main function
 def main(page: ft.Page):
 
-    # Home view (No stories/main page), story view, settings view 
+    # Set loading view here if we want to use one
 
 
     # Set our route change function to be called on route changes
