@@ -265,6 +265,8 @@ class Rail(ft.Container):
             # New Characters
             elif tag == "character":
                 self.story.create_character(title)
+                for character in self.story.characters.values():
+                    character.reload_widget()
 
             # New Timelines
             elif tag == "timeline":
