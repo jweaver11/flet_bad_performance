@@ -1,12 +1,12 @@
 import flet as ft
 from models.views.story import Story
+from styles.snack_bar import Snack_Bar
 
 # Called whenever a new story is laoded
 def route_change(e: ft.RouteChangeEvent) -> Story:
     ''' Handles changing our page view based on the new route '''
     from models.app import app
     from models.views.home import create_home_view
-    from styles.snack_bar import Snack_Bar
 
     # Grabs our page from the event for easier reference
     page: ft.Page = e.page
@@ -58,13 +58,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
 
         # Otherwise, give us a blank page
         else:
-            page.open(
-                Snack_Bar(
-                    content=ft.Text(
-                        f"Error loading story for route: {page.route}",
-                        weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True
-                        )
-                    )
-                )
+            page.open(Snack_Bar(f"Error loading story for route: {page.route}"))
+                
         
         page.update()

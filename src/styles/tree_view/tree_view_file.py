@@ -248,7 +248,6 @@ class Tree_View_File(ft.GestureDetector):
         text_field = ft.TextField(
             value=self.widget.title,
             expand=True,
-            dense=True,
             autofocus=True,
             adaptive=True,
             text_size=14,

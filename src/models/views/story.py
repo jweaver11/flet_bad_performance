@@ -11,6 +11,7 @@ import shutil
 import json
 from constants import data_paths
 from handlers.verify_data import verify_data
+from styles.snack_bar import Snack_Bar
 
 
 class Story(ft.View):
@@ -163,7 +164,7 @@ class Story(ft.View):
         
         # Handle errors
         except Exception as e:
-            print(f"Error saving story to {file_path}: {e}")
+            self.p.open(Snack_Bar(f"Error saving story data: {e}"))
             
 
     # Called when a new story is created and not loaded with any data

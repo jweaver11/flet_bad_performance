@@ -5,13 +5,12 @@ import flet as ft
 class Snack_Bar(ft.SnackBar):
 
     # Constructor
-    def __init__(self, content: ft.Control):
+    def __init__(self, error_text: str):
 
         # Parent constructor
         super().__init__(
             bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
-            elevation=4,
-            content=content,
+            content=ft.Text(error_text, theme_style=ft.TextThemeStyle.BODY_LARGE, color=ft.Colors.ON_SURFACE, expand=True),
             padding=None,
             shape=ft.RoundedRectangleBorder(radius=8),
         )

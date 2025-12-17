@@ -295,13 +295,15 @@ class Settings(ft.View):
     def _load_story_settings(self):
         ''' Loads our story settings view '''
 
+        # Type - novel vs comic. Effects how new content is created
+
         # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
         content=ft.Column(
             spacing=20,
             controls=[
                 ft.Row([
-                    ft.Text(f"{self.story.title}\t Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
-                    ft.Container(expand=True),   # Spacer to push title to left
+                    ft.Text(f"{self.story.title} Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
+                    ft.Container(expand=True),   # Spacer to push close button to the right
                     ft.IconButton(
                         ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
                         scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT

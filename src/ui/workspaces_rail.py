@@ -10,14 +10,13 @@ from models.views.story import Story
 class Workspaces_Rail(ft.Container):
     
     # Constructor for our all_workspaces_rail object. Needs a page reference passed in
-    def __init__(self, page: ft.Page, story: Story):
+    def __init__(self, page: ft.Page, story: Story = None):
 
         self.p = page   # Page reference
 
-        # Selected workspace is story dependent, so read from the story instead
-        self.selected_rail = story.data['selected_rail']
-        
-
+        # Sets our selected rail based on the active story's saved data
+        self.selected_rail = story.data['selected_rail'] if story is not None else "content"    # Catch no story errors
+       
         # Style our rail (container)
         super().__init__(
             alignment=ft.alignment.center,  # Aligns content to the 

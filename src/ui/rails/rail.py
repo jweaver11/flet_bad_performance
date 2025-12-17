@@ -46,7 +46,7 @@ class Rail(ft.Container):
             hint_text="hint",                                   # Placeholder text before user starts typings
             data="data",                                        # Data for logic routing on submit
             autofocus=True,                                     # Auto-focus when made visible
-            capitalization=ft.TextCapitalization.SENTENCES,     # Capitalize sentences for names
+            capitalization=ft.TextCapitalization.WORDS,     # Capitalize sentences for names
             visible=False,                                      # Hidden by default
             text_style=self.text_style,                         # Text style for consistency
             on_blur=self.on_new_item_blur,                      # Called when clicking off the textfield and after submitting

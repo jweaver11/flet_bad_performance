@@ -582,6 +582,7 @@ class Tree_View_Directory(ft.GestureDetector):
             dense=True,
             autofocus=True,
             adaptive=True,
+            capitalization=ft.TextCapitalization.WORDS,
             text_size=14,
             text_style=self.text_style,
             on_submit=_submit_name,
