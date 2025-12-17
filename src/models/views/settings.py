@@ -21,7 +21,7 @@ class Settings(ft.View):
     def __init__(
         self, 
         page: ft.Page, 
-        directory_path: str, 
+        file_path: str, 
         story: Story = None, 
         data: dict = None
     ):
@@ -37,7 +37,7 @@ class Settings(ft.View):
 
         self.p = page   # Grabs our original page, as sometimes the reference gets lost. with all the UI changes that happen. p.update() always works
         self.story = story
-        self.directory_path = directory_path
+        self.file_path = file_path
         self.data = data
 
         # Verifies this object has the required data fields, and creates them if not
@@ -49,7 +49,7 @@ class Settings(ft.View):
                 'tab_title_color': "primary",        # the tab color
                 'theme_mode': "system",       # the apps theme mode, dark or light
                 'active_rail_width': int(self.p.width / 10),  # Width of our active rail that we can resize
-                'theme_color_scheme': "blue",   # the color scheme of the app
+                'theme_color': "blue",   # the color scheme of the app. Defaults to blue
                 'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
                 'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not
                 'workspaces_rail_is_reorderable': False,  # If the all workspaces rail is reorderable or not
@@ -66,8 +66,10 @@ class Settings(ft.View):
                 ],
             },
         )
+        
 
-        #self.reload_settings()  # Loads our settings widget UI
+        
+
 
     # Called whenever there are changes in our data
     def save_dict(self):
@@ -76,34 +78,23 @@ class Settings(ft.View):
         try:
 
             # Set our file path
-            file_path = os.path.join(self.directory_path, f"{self.title}.json")
+            
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            os.makedirs(self.directory_path, exist_ok=True)
+            #os.makedirs(self.file_path, exist_ok=True)
             
             # Save the data to the file (creates file if doesnt exist)
-            with open(file_path, "w", encoding='utf-8') as f:   
+            with open(self.file_path, "w", encoding='utf-8') as f:   
                 json.dump(self.data, f, indent=4)
         
         # Handle errors
         except Exception as e:
-            print(f"Error saving widget to {file_path}: {e}") 
+            print(f"Error saving widget to {self.file_path}: {e}") 
             print("Data that failed to save: ", self.data)
 
-
-    # Called when the button to reorder the workspaces is clicked
-    def toggle_rail_reorderable(self):
-        ''' Toggles if the all workspaces rail is reorderable or not '''
-
-        # Grabs our active story from the view on page, and toggles its reorder logic
-        try:
-            story = self.p.views[0]
-            story.all_workspaces_rail.toggle_reorder_rail(story)
-        except Exception as e:
-            print(f"Error toggling rail reorderable: {e}")
-
     # Called when the page is resized
-    def page_resized(self, e=None):
+    def _page_resized(self, e=None):
+        ''' This is set inside of app.load_settings() to be called whenever the page is resized. Saves the new page size to data/if its maximized'''
 
         # If we're minmized, save nothing and just return
         if self.p.window.minimized:
@@ -123,12 +114,30 @@ class Settings(ft.View):
             self.save_dict()
             return
         
-    
-    # Called when someone expands the drop down holding the color scheme options
-    def reload_settings(self):
+    # Called when we select a new category of settings in our settings view
+    def _settings_category_changed(self, e):
+        ''' Determines which category is now active and changes our body container to match '''
+
+        if e.control.selected_index == 0:   # Appearance settings
+            self.body_container.content = self._load_appearance_settings()
+        
+        elif e.control.selected_index == 1:   # App settings
+            self.body_container.content = self._load_app_settings()
+        
+        elif e.control.selected_index == 2:   # Account settings
+            self.body_container.content = self._load_account_settings()
+        
+        elif e.control.selected_index == 3:   # Story settings
+            self.body_container.content = self._load_story_settings()
+
+        self.p.update()
+        
+    # Called when appearance settings category is selected
+    def _load_appearance_settings(self) -> ft.Container:
+        ''' Contains toggle for theme mode, and color scheme dropdown '''
         
         
-        def get_color_scheme_options():
+        def _get_theme_color_options():
             ''' Adds our choices to the color scheme dropdown control'''
 
 
@@ -149,34 +158,37 @@ class Settings(ft.View):
             return options
         
         # Called when a dropdown option is selected. Saves our choice, and applies it to the page
-        def change_color_scheme_picked(e):
+        def _set_theme_color(e):
             ''' Saves our color scheme choice and applies it to the page '''
 
             # Save our color scheme choice to our objects data
-            self.data['theme_color_scheme'] = e.control.value
+            self.data['theme_color'] = e.control.value
+            e.control.color = e.control.value   # Changes the dropdown text color to match the selected color
 
             # Applies this theme to our page, for both dark and light themes
-            self.p.theme = ft.Theme(color_scheme_seed=self.data['theme_color_scheme'])
-            self.p.dark_theme = ft.Theme(color_scheme_seed=self.data['theme_color_scheme'])
-            
+            self.p.theme = ft.Theme(color_scheme_seed=self.data.get('theme_color', "blue"))
+            self.p.dark_theme = ft.Theme(color_scheme_seed=self.data.get('theme_color', "blue"))
+
             # Save the updated settings to the JSON file and update the page
             self.save_dict()
             self.p.update()
 
         # Dropdown so app can change their color scheme
-        self.color_scheme_dropdown = ft.Dropdown(
+        self.theme_color_dropdown = ft.Dropdown(
             label="Theme Color",
             capitalization= ft.TextCapitalization.SENTENCES,    # Capitalize our options
-            options=get_color_scheme_options(),
-            on_change=change_color_scheme_picked,
+            options=_get_theme_color_options(),
+            on_change=_set_theme_color,
+            value=self.data.get('theme_color', "blue"),
+            text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
+            color=self.data.get('theme_color', None),
+            dense=True,
         )
 
 
         # Called when theme switch is changed. Switches from dark to light theme, or reverse
         def toggle_theme(e):
             ''' Changes our settings theme data from dark to light or reverse '''
-
-            print("switch_theme called")
 
             # Change theme mode data, and the icon to match
             if self.data['theme_mode'] == "dark":   # Check which theme we're on
@@ -201,57 +213,201 @@ class Settings(ft.View):
             self.p.theme_mode = self.data['theme_mode']
             self.p.update()
             
+        
 
         # Icon of the theme button that changes depending on if we're dark or light mode
         self.theme_icon = ft.Icons.DARK_MODE if self.p.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
 
         # Button that changes the theme from dark or light when clicked
-        self.theme_button = ft.IconButton(icon=self.theme_icon, on_click=toggle_theme)
+        self.theme_button = ft.TextButton(text="Toggle theme mode", icon=self.theme_icon, on_click=toggle_theme)
         
         # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
-        content=ft.Column([
-            ft.TextButton(
-                "Reorder Workspaces", 
-                icon=ft.Icons.REORDER_ROUNDED,
-                #on_click=lambda e: story.all_workspaces_rail.toggle_rail_reorderable(),
-                on_click=lambda e: self.toggle_rail_reorderable()
-            ),
-            self.theme_button,
-            self.color_scheme_dropdown,
-        ])
+        content=ft.Column(
+            spacing=20,
+            controls=[
+                ft.Row([
+                    ft.Text("Appearance", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
+                    ft.Container(expand=True),   # Spacer to push title to left
+                    ft.IconButton(
+                        ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
+                        scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT
+                    )
+                ]),
+                ft.Divider(),
+                
+                self.theme_button,
+                self.theme_color_dropdown,
+                
+            ]
+        )
 
-        cc = ft.Container(expand=True, content=content)
+        return content
+    
+    def _load_app_settings(self):
+        ''' Loads our app settings view '''
 
+        # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
+        content=ft.Column(
+            spacing=20,
+            controls=[
+                ft.Row([
+                    ft.Text("Application Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
+                    ft.Container(expand=True),   # Spacer to push title to left
+                    ft.IconButton(
+                        ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
+                        scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT
+                    )
+                ]),
+                ft.Divider(),
+                
+                ft.TextButton(
+                    "Reorder Workspaces", 
+                    icon=ft.Icons.REORDER_ROUNDED,
+                    #on_click=lambda e: story.all_workspaces_rail.toggle_rail_reorderable(),
+                    on_click=lambda e: self.workspaces_rail.toggle_reorder_rail(story=self.story)
+                ),
+            ]
+        )
+
+        return content
+    
+    def _load_account_settings(self):
+        ''' Loads our account settings view '''
+
+        # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
+        content=ft.Column(
+            spacing=20,
+            controls=[
+                ft.Row([
+                    ft.Text("Account Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
+                    ft.Container(expand=True),   # Spacer to push title to left
+                    ft.IconButton(
+                        ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
+                        scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT
+                    )
+                ]),
+                ft.Divider(),
+            ]
+        )
+
+        return content
+    
+    def _load_story_settings(self):
+        ''' Loads our story settings view '''
+
+        # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
+        content=ft.Column(
+            spacing=20,
+            controls=[
+                ft.Row([
+                    ft.Text(f"{self.story.title}\t Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
+                    ft.Container(expand=True),   # Spacer to push title to left
+                    ft.IconButton(
+                        ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
+                        scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT
+                    )
+                ]),
+                ft.Divider(),
+            ]
+        )
+
+        return content
+
+        
+    
+    # Called when someone expands the drop down holding the color scheme options
+    def reload_settings(self):
+        ''' Reloads our settings view with updated data '''
+
+        # Clear any current controls we have
         self.controls.clear()
         
-
+        # Set our menubar
         menubar = create_menu_bar(self.p)   
-        self.workspaces_rail = Workspaces_Rail(self.p, self.story)  # Create our all workspaces rail
 
+        # Set our workspaces rail
+        self.workspaces_rail = Workspaces_Rail(self.p, self.story)  
+
+        # Set the rail we use for different settings categories
+        nav_rail = ft.NavigationRail(
+            selected_index=0,
+            bgcolor="transparent",
+            on_change=self._settings_category_changed,
+            label_type=ft.NavigationRailLabelType.ALL,
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icons.COLOR_LENS_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.COLOR_LENS_ROUNDED, color=ft.Colors.PRIMARY),
+                    label="Appearance",
+                    label_content=ft.Container(ft.Text("Appearance", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.Icons.SETTINGS_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.SETTINGS, color=ft.Colors.PRIMARY),
+                    label="App Settings",
+                    label_content=ft.Container(ft.Text("App Settings", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.ACCOUNT_CIRCLE_ROUNDED, color=ft.Colors.PRIMARY),
+                    label="Account",
+                    label_content=ft.Container(ft.Text("Account", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
+                ),
+                ft.NavigationRailDestination(
+                    icon=ft.Icons.BRUSH_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.BRUSH_ROUNDED, color=ft.Colors.PRIMARY),
+                    label="Story Settings",
+                    disabled=self.story is None,   # Disable if no story is loaded
+                    label_content=ft.Container(
+                        margin=ft.margin.only(bottom=20),
+                        content=ft.Text(
+                            "Story Settings", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE,
+                            color=ft.Colors.OUTLINE if self.story is None else None
+                        ),
+                    )
+                ),
+            ],
+        )
+
+        nav_rail_container = ft.Container(
+            bgcolor=ft.Colors.with_opacity(.5, ft.Colors.SURFACE),
+            border_radius=ft.border_radius.only(top_left=20, bottom_left=20),
+            padding=ft.padding.all(20),
+            content=nav_rail,
+        )
+
+        # Build the body of appearance view
+        self.body_container = ft.Container(
+            expand=True, 
+            padding=ft.padding.all(20),
+            content=self._load_appearance_settings()        # Default to appearance settings when settings are first opened
+        )
+
+        # View is like a column, so top down layout
         self.controls = [
             menubar,
-            
-            ft.Container(
+            ft.Row(
+                spacing=0, 
                 expand=True,
-                content=ft.Row(
-                    spacing=0, 
-                    controls=[
-                        self.workspaces_rail,
-                        ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),
-                        
-                        ft.Container(
-                            expand=True, 
-                            alignment=ft.alignment.center, 
-                            gradient=dark_gradient, 
-                            content=cc,
-                            border_radius=20,
-                            margin=ft.margin.all(10),
-                        ),
-                    ]
-                ),
-            ),
+                controls=[
+                    self.workspaces_rail,
+                    ft.VerticalDivider(thickness=2, width=2),
+                    ft.Container(
+                        expand=True,
+                        gradient=dark_gradient, border_radius=20,
+                        margin=ft.margin.all(10),
+                        content=ft.Row(
+                            controls=[
+                                nav_rail_container,
+                                ft.VerticalDivider(thickness=2, width=2),   
 
-            
+                                self.body_container
+                            ],
+                            spacing=0,
+                        )
+                    ),
+                ]
+            ),  
         ]
 
 
@@ -259,7 +415,6 @@ class Settings(ft.View):
         # OPTION TO NOT HAVE CHARACTERS SEX CHANGE COLORS?
         # Option to change where certain widgets default display to in pins
         # NOTE: Add is_first_launch check to run a tutorial
-        # Option for compact vs spread on view in the rails
 
 
 

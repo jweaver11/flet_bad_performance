@@ -54,7 +54,7 @@ class App:
             settings_data = None  # If there's an error, we will create default settings
 
         # Sets our app settings to our loaded settings. If none were loaded (I.E. first launch), Settings with create its own defaults
-        app.settings = Settings(page=page, directory_path=data_paths.app_data_path, data=settings_data)
+        app.settings = Settings(page=page, file_path=settings_file_path, data=settings_data)
 
 
         ''' Page styling '''
@@ -63,8 +63,8 @@ class App:
         page.title = "StoryBoard"
 
         # Sets our themes and which one we use. Default to dark mode with blue
-        page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))    
-        page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color_scheme', "blue"))   
+        page.theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color', "blue"))    
+        page.dark_theme = ft.Theme(color_scheme_seed=app.settings.data.get('theme_color', "blue"))   
         page.theme_mode = app.settings.data.get('theme_mode', 'dark')      
     
         # Sets the title of our app, padding, and maximizes the window
@@ -78,7 +78,7 @@ class App:
             page.window.height = app.settings.data.get('page_height')
 
         # Set our logic when page window is resized
-        page.on_resized = app.settings.page_resized
+        page.on_resized = app.settings._page_resized
 
 
     # Called on app startup in main

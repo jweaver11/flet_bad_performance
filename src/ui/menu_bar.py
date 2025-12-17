@@ -276,6 +276,13 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                         style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
+                    
+                    ft.MenuItemButton(
+                        content=ft.Text("Settings", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        leading=ft.Icon(ft.Icons.SETTINGS_OUTLINED),
+                        style=menubar_style,
+                        on_click=settings_clicked,
+                    ),
                     ft.MenuItemButton(
                         content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
                         leading=ft.Icon(ft.Icons.DELETE_FOREVER_ROUNDED),

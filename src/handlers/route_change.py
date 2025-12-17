@@ -42,6 +42,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
             if story.route == page.route:
                 new_story = story
                 app.settings.data['active_story'] = story.title
+                app.settings.story = story
                 app.settings.save_dict()
                 break
             

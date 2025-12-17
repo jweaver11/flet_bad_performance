@@ -8,7 +8,6 @@ colors_dict = {
 
 
 colors = [
-    "primary",
     "red",
     "orange",
     "yellow",
@@ -18,7 +17,6 @@ colors = [
     "purple",
     "pink",
     "brown",
-    "grey",
 ]
 
 dark_gradient = ft.LinearGradient(

@@ -50,7 +50,7 @@ class Workspaces_Rail(ft.Container):
                     selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), # Selected icon on the rail
                     padding=ft.padding.only(top=10, bottom=10), # Padding for spacing
                     # Label underneath the icon and the data we will use to identify the rail
-                    data="content", label_content=ft.Text("Content", no_wrap=True),
+                    data="content", label_content=ft.Text("Content", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -65,7 +65,7 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED), 
                     selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
-                    data="characters", label_content=ft.Text("Characters", no_wrap=True),
+                    data="characters", label_content=ft.Text("Characters", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -80,7 +80,7 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, scale=1.2), 
                     selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
                     padding=ft.padding.only(top=10, bottom=10),
-                    data="timelines", label_content=ft.Text("Timelines", no_wrap=True),
+                    data="timelines", label_content=ft.Text("Timelines", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -95,7 +95,7 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
-                    data="world_building", label_content=ft.Text("World Building", no_wrap=True),
+                    data="world_building", label_content=ft.Text("World Building", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -110,7 +110,7 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.DRAW_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.DRAW, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
-                    data="drawing_board", label_content=ft.Text("Drawing Board", no_wrap=True),
+                    data="drawing_board", label_content=ft.Text("Drawing Board", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -125,7 +125,7 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
-                    data="planning", label_content=ft.Text("Planning", no_wrap=True),
+                    data="planning", label_content=ft.Text("Planning", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -180,7 +180,6 @@ class Workspaces_Rail(ft.Container):
 
         # If not collapsed, make rail normal size and set the correct icon
         else:
-            #self.width = self.p.width / 15
             self.width = 120
             collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED
 
@@ -194,19 +193,30 @@ class Workspaces_Rail(ft.Container):
         # Sets our content as a column. This will fill our width and hold...
         # Either our list of workspaces, or a reorderable list of our workspaces
         self.content=ft.Column(
-            alignment=ft.alignment.center,
-            spacing=0,
+            alignment=ft.MainAxisAlignment.CENTER,
+            spacing=4,
         )
 
         # If we're reorderable, make our reorderable rail using a reorderable list
         if app.settings.data['workspaces_rail_is_reorderable']:
-            reorderable_list = ft.ReorderableListView(
-                on_reorder=lambda e: self.handle_rail_reorder(e, story),
-            )
 
-            # Add our workspaces (rails) to the list. Add the list to our column
-            reorderable_list.controls.extend(workspaces_rail)  
-            self.content.controls.append(reorderable_list)
+            # Can only reorder if on settings page, so check for that
+            if self.p.route == "/settings":
+                reorderable_list = ft.ReorderableListView(
+                    padding=4,
+                    on_reorder=lambda e: self.handle_rail_reorder(e, story),
+                )
+
+                # Add our workspaces (rails) to the list. Add the list to our column
+                reorderable_list.controls.extend(workspaces_rail)  
+                self.content.controls.append(reorderable_list)
+            else:
+
+                # If we're not on settings page, set it so we are not reorderable and build our normal rail
+                app.settings.data['workspaces_rail_is_reorderable'] = False
+                app.settings.save_dict()
+
+                self.content.controls.extend(workspaces_rail) 
 
         # If we're not reorderable, add the selector workspaces (rails) to the column
         else:
@@ -269,7 +279,7 @@ class Workspaces_Rail(ft.Container):
 
 
     # Called by clicking re-order rail button in the settings.
-    def toggle_reorder_rail(self, story: Story):
+    def toggle_reorder_rail(self, story: Story, value: bool = None):
         ''' Toggles the reorderable state of the rail, and saves the state in settings '''
         from models.app import app    # Always grabs updated reference when re-ordering
 
@@ -279,7 +289,10 @@ class Workspaces_Rail(ft.Container):
             app.settings.save_dict()
 
         # Toggle our reorderable state, and save it in settings
-        app.settings.data['workspaces_rail_is_reorderable'] = not app.settings.data['workspaces_rail_is_reorderable']
+        if value is not None:
+            app.settings.data['workspaces_rail_is_reorderable'] = value
+        else:
+            app.settings.data['workspaces_rail_is_reorderable'] = not app.settings.data['workspaces_rail_is_reorderable']
         app.settings.save_dict()
 
         self.reload_rail(story)  # Reload the rail to apply changes

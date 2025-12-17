@@ -21,12 +21,12 @@ def main(page: ft.Page):
 
     # Load settings and previous story (if one exists)
     app.load_settings(page)             
-    app.load_previous_story(page)       # If a previous story was loaded, it will load here
+    app.load_previous_story(page)       # If a previous story was loaded, we load its route/view here
 
-    # If route is default (No story was loaded), create a view for that
+    # If route is default/home (No story was loaded), create a view for that
     if page.route == "/":
         
-        page.views.append(create_home_view(page))
+        page.views.append(create_home_view(page))   # Simple view so we just use a function, not a class
         page.update()
     
 
