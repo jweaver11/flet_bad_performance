@@ -40,7 +40,7 @@ class Widget(ft.Container):
 
     
         # Set our parameters
-        self.title: str = title.capitalize()                          
+        self.title: str = title                     
         self.p: ft.Page = page                               
         self.directory_path: str = directory_path        
         self.story: Story = story                
