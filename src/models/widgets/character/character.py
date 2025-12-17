@@ -35,6 +35,7 @@ class Character(Widget):
                 'tag': "character",
                 'pin_location': "left" if data is None else data.get('pin_location', "left"),     # Start our characters on the left pin
 
+                'narrator': bool, # Whether this character is a narrator -- check box in edit view
                 'tab_color': "primary",
                 'name_color': "primary",
                 'sex_color': "primary",
@@ -248,6 +249,10 @@ class Character(Widget):
                     ft.Row(                     # The row that will hold our dropdowns
                             wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
                             controls=[          # All flet controls inside our Row
+                                ft.Checkbox(label="Narrator",    # Checkbox for narrator status
+                                    value=self.data['narrator'],
+                                    on_change=lambda e, name='narrator': self._on_field_change(name, e.control.value)
+                                    ),
                                 ft.Dropdown(        # Dropdown selection of lawful, chaotic, neutral, and n/a
                                     label="alignment1",           # Label at top of dropdown 
                                     value=self.data['alignment1'],        # Value selected in the drop down
@@ -494,7 +499,12 @@ class Character(Widget):
                 #ft.Text("hi from " + self.title),           # Text that shows the title
                 ft.Row(                     # The row that will hold our dropdowns
                         wrap=True,          # Allows moving into columns/multiple lines if dropdowns don't fit
-                        controls=[          # All flet controls inside our Row
+                        controls= (          # All flet controls inside our Row
+                            [
+                                ft.Icon(ft.Icons.MIC, size=20),
+                                #ft.Text("Narrator", weight=ft.FontWeight.BOLD),
+                            ] if self.data['narrator'] else []
+                        ) + [
                             ft.Text("Full Title: ",
                                     weight=ft.FontWeight.BOLD),
                             ft.Text(self.data['title_prefix'] + " " + self.title),
@@ -522,7 +532,6 @@ class Character(Widget):
                             ft.Text("Custom Fields: ",
                                     weight=ft.FontWeight.BOLD),
                             ft.Text(str(self.data['custom_fields'])),
-                            
                         ]
                     ),
                 ]
