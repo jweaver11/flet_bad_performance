@@ -15,6 +15,7 @@ from styles.snack_bar import Snack_Bar
 
 
 class Story(ft.View):
+    
     # Constructor.
     def __init__(
         self, 

@@ -45,7 +45,7 @@ class Timeline_Information_Display(Mini_Widget):
                 self.title_control,
                 self.content_control,
 
-                ft.TextButton("Hide me", on_click=self.toggle_visibility),
+                ft.TextButton(f"Close {self.title}", on_click=self.toggle_visibility),
             ],
             expand=True,
         )

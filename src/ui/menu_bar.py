@@ -15,15 +15,11 @@ from styles.snack_bar import Snack_Bar
 def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
     def handle_submenu_open(e):
-        #print(f"{e.control.content.content.value}.on_open")
         pass
     def handle_submenu_close(e):
-        #print(f"{e.control.content.content.value}.on_close")
         pass
     def handle_submenu_hover(e):
-        #print(f"{e.control.content.content.value}.on_hover")
         pass
-
     def handle_delete_click(e):
         pass
 

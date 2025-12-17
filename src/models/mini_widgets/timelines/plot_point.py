@@ -349,7 +349,7 @@ class Plot_Point(Mini_Widget):
             ft.Container(expand=True),
             ft.IconButton(
                 icon=ft.Icons.CLOSE,
-                tooltip="Close Mini Widget",
+                tooltip=f"Close {self.title}",
                 on_click=lambda e: self.toggle_visibility(value=False),
             ),
         ])
@@ -362,11 +362,15 @@ class Plot_Point(Mini_Widget):
             expand=True,
         )
 
+        cont = ft.Container(margin=ft.Margin(0,10,0,10), content=self.content_control, expand=True)
+
         # Format our mini widget content
         self.content = ft.Column(
-            [
+            spacing=0,
+            controls=[
                 self.title_control,
-                self.content_control,
+                ft.Divider(height=2, thickness=2),
+                cont,
                 ft.TextButton(
                     "Delete ME", 
                     on_click=lambda e: self.delete_dict()

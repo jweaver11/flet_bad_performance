@@ -356,8 +356,8 @@ class Settings(ft.View):
                     label_content=ft.Container(ft.Text("Account", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.Icons.BRUSH_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.BRUSH_ROUNDED, color=ft.Colors.PRIMARY),
+                    icon=ft.Icons.MENU_BOOK_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.PRIMARY),
                     label="Story Settings",
                     disabled=self.story is None,   # Disable if no story is loaded
                     label_content=ft.Container(

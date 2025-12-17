@@ -341,7 +341,7 @@ class Arc(Mini_Widget):
             ft.Container(expand=True),
             ft.IconButton(
                 icon=ft.Icons.CLOSE,
-                tooltip="Close Mini Widget",
+                tooltip=f"Close {self.title}",
                 on_click=lambda e: self.toggle_visibility(value=False),
             ),
         ])
