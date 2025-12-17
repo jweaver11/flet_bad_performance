@@ -101,8 +101,8 @@ def load_directory_data(
             # Get rid of the extension and capitalize the name
             name = os.path.splitext(file_name)[0] 
 
-            # Skip any map display files
-            if name.endswith("_display"):
+            # Skip any map canvas files
+            if name.endswith("_canvas"):
                 continue
 
             # Skip text files, we don't need to read them here

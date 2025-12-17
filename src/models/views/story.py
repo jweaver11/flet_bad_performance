@@ -129,7 +129,7 @@ class Story(ft.View):
         self.load_world_building()
 
         # Loads our maps from file storage
-        self.load_maps()
+        #self.load_maps()
 
         # Everything we loaded above is a widget, but this just adds them all to self.widgets
         self.load_widgets()

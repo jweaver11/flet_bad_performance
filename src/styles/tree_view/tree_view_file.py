@@ -48,6 +48,7 @@ class Tree_View_File(ft.GestureDetector):
             size=14,
             color=ft.Colors.ON_SURFACE,
             weight=ft.FontWeight.BOLD,
+            overflow=ft.TextOverflow.ELLIPSIS,
         )
 
         # Get icon color from widget data if it exists
@@ -331,7 +332,7 @@ class Tree_View_File(ft.GestureDetector):
             content=ft.Draggable(
                 group="widgets",
                 data=self.widget.data['key'],
-                content_feedback=ft.TextButton(content=ft.Row([ft.Icon(self.icon), ft.Text(self.widget.title, style=self.text_style, expand=True)])),
+                content_feedback=ft.TextButton(content=ft.Row([ft.Icon(self.icon, expand=True), ft.Text(self.widget.title, style=self.text_style, expand=True)], expand=True)),
                 on_drag_start=lambda e: self.widget.story.workspace.show_pin_drag_targets(),
                 content=ft.GestureDetector(
                     mouse_cursor=ft.MouseCursor.CLICK,

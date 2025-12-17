@@ -109,11 +109,9 @@ class World_Building_Rail(Rail):
 
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=ft.MainAxisAlignment.CENTER,
             
             controls=[
-
-            ft.Container(expand=True),
-
             ft.IconButton(
                 tooltip="New Category",
                 icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
@@ -125,8 +123,6 @@ class World_Building_Rail(Rail):
                 icon=ft.Icons.MAP_OUTLINED,
                 on_click=self.new_map_clicked
             ),
-            
-            ft.Container(expand=True),
         ])
                  
         # Build the content of our rail

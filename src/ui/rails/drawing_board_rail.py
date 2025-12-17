@@ -30,8 +30,7 @@ class Drawing_Board_Rail(Rail):
         # Open
         # Upload
         # TODO: RAIL Has brushes, tools, colors, etc.
-        # Structure of content_directory, showing images in the rail
-        # - click one to open it in a drawing board
+        # Rail shows our brush/drawing design options, not a view of all drawings
 
 
         # Build the content of our rail

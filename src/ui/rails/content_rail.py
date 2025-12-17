@@ -115,34 +115,57 @@ class Content_Rail(Rail):
         # Creating a chapter for comics creates a folder to store images and drawings
         # Creating a chapter for novels creates a text document for writing, and allows
         # Right clicking allows to upload
+
+        # TODO: Should be 2 buttons: New and upload. Each has all those options
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            
+            alignment=ft.MainAxisAlignment.CENTER,
             controls=[
-
-            # Add here, story name, and buttons to create new stuff.
-            # As well as right click options here that work like normal.
-
-            ft.Container(expand=True),
-
-            ft.IconButton(
-                tooltip="New Category",
-                icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
-                on_click=self.new_category_clicked
-            ),
-            
-            ft.IconButton(
-                tooltip="New Chapter",
-                icon=ft.Icons.NOTE_ADD_OUTLINED,
-                on_click=self.new_chapter_clicked
-            ),
-            ft.IconButton(
-                tooltip="New Note",
-                icon=ft.Icons.NOTE_ALT_OUTLINED,
-                on_click=self.new_note_clicked
-            ),
-            ft.Container(expand=True),
-        ])
+                ft.PopupMenuButton(
+                    icon=ft.Icons.ADD_CIRCLE_OUTLINE_OUTLINED,
+                    tooltip="New Content",
+                    menu_padding=0,
+                    items=[
+                        ft.PopupMenuItem(
+                            text="Category", icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
+                            on_click=self.new_category_clicked
+                        ),
+                        ft.PopupMenuItem(
+                            text="Chapter", icon=ft.Icons.NOTE_ADD_OUTLINED,
+                            on_click=self.new_chapter_clicked
+                        ),
+                        ft.PopupMenuItem(
+                            text="Drawing", icon=ft.Icons.BRUSH_OUTLINED,
+                        ),
+                        ft.PopupMenuItem(
+                            text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
+                            on_click=self.new_note_clicked
+                        ),
+                    ]
+                ),
+                ft.PopupMenuButton(
+                    icon=ft.Icons.FILE_UPLOAD_OUTLINED,
+                    tooltip="Upload Content",
+                    menu_padding=0,
+                    items=[
+                        ft.PopupMenuItem(
+                            text="Chapter", icon=ft.Icons.NOTE_ADD_OUTLINED,
+                            on_click=self.new_chapter_clicked
+                        ),
+                        ft.PopupMenuItem(
+                            text="Drawing", icon=ft.Icons.BRUSH_OUTLINED,
+                        ),
+                        ft.PopupMenuItem(
+                            text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
+                            on_click=self.new_note_clicked
+                        ),
+                        ft.PopupMenuItem(
+                            text="Image", icon=ft.Icons.IMAGE_OUTLINED,
+                        )
+                    ]
+                ),
+            ]
+        )
                  
 
         # Build the content of our rail

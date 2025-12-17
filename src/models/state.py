@@ -1,11 +1,17 @@
 '''
-Simple state management class for drawings
+State management model for our drawings
 '''
 
+import flet as ft
 
 class State:
-    x = 0
 
-    y = 0
+    def __init__(self):
 
-    shapes = []
+        self.x: float = float()
+
+        self.y: float = float()
+
+        self.paint_brush = ft.Paint(stroke_width=3)
+
+        self.shapes = []

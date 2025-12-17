@@ -21,6 +21,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
     def handle_submenu_hover(e):
         pass
     def handle_delete_click(e):
+        # Should pop open dialog to confirm deletion, warning that it cannot be undone
         pass
 
 
@@ -248,20 +249,20 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 on_hover=handle_submenu_hover,  # Handle when a submenu is hovered
                 controls=[      # The options shown inside of our button
                     ft.MenuItemButton(
-                        content=ft.Text("New", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        content=ft.Text("New Story", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
                         # Options: Blank Story, From Template, but clicking also just creates blank
                         leading=ft.Icon(ft.Icons.ADD_CIRCLE_OUTLINE_ROUNDED, color=ft.Colors.ON_SURFACE,),
                         style=menubar_style,
                         on_click=handle_create_new_story_clicked,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Open", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        content=ft.Text("Open Story", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
                         leading=ft.Icon(ft.Icons.MENU_BOOK_OUTLINED),
                         style=menubar_style,
                         on_click=handle_file_open_click,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Import", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        content=ft.Text("Upload", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
                         # Options: story, chapter, map, drawing, character, note
                         leading=ft.Icon(ft.Icons.FILE_UPLOAD_OUTLINED),
                         style=menubar_style,
@@ -282,7 +283,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                         on_click=settings_clicked,
                     ),
                     ft.MenuItemButton(
-                        content=ft.Text("Delete", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
+                        content=ft.Text("Delete Story", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),
                         leading=ft.Icon(ft.Icons.DELETE_FOREVER_ROUNDED),
                         style=menubar_style,
                         on_click=handle_delete_click,

@@ -185,12 +185,7 @@ class Widget(ft.Container):
                 
                 # Otherwise, open our app bar dialog to show the error
                 self.p.open(
-                    Snack_Bar(          
-                        content=ft.Text(
-                            f"Cannot move {self.title}. A file with that name already exists in the target directory.",
-                            weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE, expand=True
-                        ),
-                    )
+                    Snack_Bar(f"Cannot move {self.title}. A file with that name already exists in the target directory.")
                 )
 
                 # Remove our drag targets since we arent moving anything

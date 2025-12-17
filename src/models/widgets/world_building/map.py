@@ -83,33 +83,41 @@ class Map(Widget):
             },
         )
 
-        # State used for drawing
+        # UI Elements
+        self.interactive_viewer: ft.InteractiveViewer = None    # Our interactive viewer for zooming and panning
+        self.stack: ft.Stack = None                             # Our main stack for layering the map elements
+        self.background_image: ft.Image = None                  # Background image (if we have one) that goes
+        self.canvas: cv.Canvas = None                           # Our drawing canvas overtop the background image
+        self.top_layer: ft.Container = None                     # Top layer to show our locations, markers, etc. on top of the canvas
+
+
+        # Drawing elements
         self.state = State()
+        self.paint_brush = ft.Paint(stroke_width=3)
 
-        # Have edit mode where all locations, places, etc. disappear and user can draw and edit underlying map
-        self.drawing_mode = False  # Whether we are in drawing mode or not
-
-
-        self.dragging_mode = False  # Whether we are in dragging mode or not. Used to drag around on top of parent map
+        # State handlers
+        self.drawing_mode = False  
+        self.dragging_mode = False  
 
         # Dict of our sub maps
         self.maps: list = []
-
-
         self.details = {}
 
         # The Visual Canvas map for drawing
         self.map = cv.Canvas(
             content=ft.GestureDetector(
-                on_pan_start=self.pan_start,
-                on_pan_update=self.pan_update,
-                drag_interval=10,
+                on_pan_start=self.start_drawing,
+                on_pan_update=self.is_drawing,
+                on_pan_end=lambda e: self.save_canvas(),
+                #drag_interval=10,
             ),
             expand=True
         )
 
+        self.brush = ft.Paint(stroke_width=3)
+
         # The display container for our map
-        self.display: ft.InteractiveViewer = None
+        self.canvas: ft.InteractiveViewer = None
 
         self.information_display = Map_Information_Display(
             title=self.title,
@@ -121,18 +129,15 @@ class Map(Widget):
         )
 
         self.mini_widgets.append(self.information_display)
-
-        # Load our maps that are held within this amp
-        #self.load_sub_maps()
         
         # Load the rest of our map details and data thats not sub maps
         self.load_details()
 
         # Load our drawing/display
-        self.load_display()
+        self.load_canvas()
         
 
-        # Reloads the information display of the map
+        # Reloads the information canvas of the map
         self.reload_widget()
 
 
@@ -140,34 +145,8 @@ class Map(Widget):
     # Their map dict is now list, and contains the title of their sub maps, not the data
 
 
-
-    # Called in constructor
-    def load_sub_maps(self):
-        ''' Loads all sub maps stored in our data into our sub_maps dict'''
-
-        try: 
-            # Run through our maps saved in the maps dict
-            for map_title, map_data in self.data['maps'].items():
-
-                # Create a new map object
-                self.maps[map_title] = Map(
-                    title=map_title,
-                    owner=self,       # Our world building widget
-                    father=self,
-                    page=self.p,
-                    key="maps",
-                    data=map_data,
-                )
-                
-                # Add it to our mini widgets list
-                self.mini_widgets.append(self.maps[map_title])
-
-        # Catch errors
-        except Exception as e:
-            print(f"Error loading maps for the : {e}")
-
     # Called when loading our drawing data from its file
-    def load_display(self):
+    def load_canvas(self):
         ''' Loads our drawing from our saved map drawing file '''
 
         # Clear existing shapes we might have
@@ -176,7 +155,7 @@ class Map(Widget):
         try:
 
             # Set our file path
-            filename = os.path.join(self.directory_path, f"{self.title}_display.json")
+            filename = os.path.join(self.directory_path, f"{self.title}_canvas.json")
 
             # Check if file exists, if not create it with empty data
             if not os.path.exists(filename):
@@ -194,16 +173,16 @@ class Map(Widget):
 
         # Handle errors
         except Exception as e:
-            print(f"Error loading display from {filename}: {e}")
+            print(f"Error loading canvas from {filename}: {e}")
 
     # Called to save our drawing data to its file
-    def save_display(self):
+    def save_canvas(self):
         ''' Saves our map drawing data to its own json file. Maps are special and get their 'drawing' saved seperately '''
 
         try:
 
             # Set our file path
-            file_path = os.path.join(self.directory_path, f"{self.title}_display.json")
+            file_path = os.path.join(self.directory_path, f"{self.title}_canvas.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.directory_path, exist_ok=True)
@@ -218,7 +197,7 @@ class Map(Widget):
             print("Data that failed to save: ", self.state.shapes)
 
 
-    # Use our parent delete file method, and delete our display as well
+    # Use our parent delete file method, and delete our canvas as well
     def delete_file(self, old_file_path) -> bool:
 
         # Call our parent delete first
@@ -226,8 +205,8 @@ class Map(Widget):
 
             try:
 
-                # Set our display file path
-                file_path = os.path.join(self.directory_path, f"{self.title}_display.json")
+                # Set our canvas file path
+                file_path = os.path.join(self.directory_path, f"{self.title}_canvas.json")
 
                 # Delete the file if it exists
                 if os.path.exists(file_path):
@@ -238,7 +217,7 @@ class Map(Widget):
                 return True
 
             except Exception as e:
-                print(f"Error deleting map display file: {e}")
+                print(f"Error deleting map canvas file: {e}")
                 return False
 
         else:
@@ -247,7 +226,7 @@ class Map(Widget):
 
     # Called when renaming our map
     def rename(self, title: str):
-        ''' Calls our parent to rename our json file, and then renames our display file as well '''
+        ''' Calls our parent to rename our json file, and then renames our canvas file as well '''
 
         # Save our old title
         old_title = self.title
@@ -255,28 +234,28 @@ class Map(Widget):
         # Call parent to rename our main widget file
         super().rename(title)
 
-        # Save our old file path for renaming our display
-        old_file_path = os.path.join(self.directory_path, f"{old_title}_display.json")     
+        # Save our old file path for renaming our canvas
+        old_file_path = os.path.join(self.directory_path, f"{old_title}_canvas.json")     
                                                
-        # Rename our display file 
-        os.rename(old_file_path, self.data['key'] + "_display" + ".json") 
+        # Rename our canvas file 
+        os.rename(old_file_path, self.data['key'] + "_canvas" + ".json") 
 
-        # Save our display
-        self.save_display()
+        # Save our canvas
+        self.save_canvas()
 
     # Called when moving file
     def move_file(self, new_directory):
-        ''' Calls parent move, and then save display to give us our new display file '''
+        ''' Calls parent move, and then save canvas to give us our new canvas file '''
 
-        # Copy display file here first
+        # Copy canvas file here first
 
-        # Call our parent move file. Since we defined our own delete file, it will delete the display file as well
+        # Call our parent move file. Since we defined our own delete file, it will delete the canvas file as well
         super().move_file(new_directory)
 
-        # TODO: Paste new display file with correct title
+        # TODO: Paste new canvas file with correct title
 
-        # Now save our new display file
-        self.save_display()
+        # Now save our new canvas file
+        self.save_canvas()
             
 
     def load_details(self):
@@ -297,13 +276,15 @@ class Map(Widget):
         # Grab local mouse to figure out x and map it to our timeline
 
 
-    async def pan_start(self, e: ft.DragStartEvent):
+    async def start_drawing(self, e: ft.DragStartEvent):
         self.state.x, self.state.y = e.local_x, e.local_y
 
-    async def pan_update(self, e: ft.DragUpdateEvent):
+    async def is_drawing(self, e: ft.DragUpdateEvent):
         def draw_line():
-            line = cv.Line(self.state.x, self.state.y, e.local_x, e.local_y,
-                           paint=ft.Paint(stroke_width=3))
+            line = cv.Line(
+                self.state.x, self.state.y, e.local_x, e.local_y,
+                paint=self.paint_brush
+            )
             self.map.shapes.append(line)
             self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
             #self.map.update()
@@ -318,20 +299,25 @@ class Map(Widget):
         # Rebuild out tab to reflect any changes
         self.reload_tab()
 
+        #
+
         # Make it so that maps 'mini widget' shows inside of the map...
         # Multiple mini widgets able to be shown at same time
         # We render our map and all the markers, then go through our 'sub maps', find their data, and render them on top as well
         # - Sub maps only have the title still, we don't save their data
         # -- Recursively go through rendering sub maps on top of parent map
 
-        # Display of our map (Gesture detector)
-        display = ft.Column([
+        # Adds like 1000 gd's on top of the map for right clicking and placing marks/content. The mini widget that is placed is then the...
+        # Content of one of those 1000 gd's. 
+
+        # canvas of our map (Gesture detector)
+        canvas = ft.Column([
             self.map,
             ft.Row(
                 expand=True,
                 controls=[
-                    ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_display()),
-                    ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_display())
+                    ft.ElevatedButton("Save Drawing", on_click=lambda e: self.save_canvas()),
+                    ft.ElevatedButton("Load Drawing", on_click=lambda e: self.load_canvas())
                 ]
             )
         ])
@@ -344,18 +330,18 @@ class Map(Widget):
                     fit=ft.ImageFit.COVER,
                     expand=True
                 ),
-                display,
+                canvas,
             ]
         )
 
-        display_container = ft.Container(
+        canvas_container = ft.Container(
             content=stack,
             expand=True,
         )
 
-        self.display = display_container
+        self.canvas = canvas_container
 
-        self.body_container.content = self.display
+        self.body_container.content = self.canvas
 
         self._render_widget()
     

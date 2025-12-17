@@ -96,11 +96,11 @@ class Characters_Rail(Rail):
 
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[ft.Container(expand=True)]
+            alignment=ft.MainAxisAlignment.CENTER,
         )
 
         header.controls.extend(self.top_row_buttons)
-        header.controls.append(ft.Container(expand=True))
+        
                  
 
         # Build the content of our rail
