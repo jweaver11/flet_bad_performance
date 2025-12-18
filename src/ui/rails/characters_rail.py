@@ -97,9 +97,8 @@ class Characters_Rail(Rail):
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             alignment=ft.MainAxisAlignment.CENTER,
+            controls=self.top_row_buttons
         )
-
-        header.controls.extend(self.top_row_buttons)
         
                  
 

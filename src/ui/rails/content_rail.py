@@ -160,7 +160,7 @@ class Content_Rail(Rail):
                             on_click=self.new_note_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Image", icon=ft.Icons.IMAGE_OUTLINED,
+                            text="Image", icon=ft.Icons.ADD_PHOTO_ALTERNATE_OUTLINED,
                         )
                     ]
                 ),

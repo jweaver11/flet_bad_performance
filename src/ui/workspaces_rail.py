@@ -106,9 +106,9 @@ class Workspaces_Rail(ft.Container):
             on_change=lambda e: self.on_workspace_change(e, story),  
             destinations=[
                 ft.NavigationRailDestination(
-                    #icon=ft.Icon(ft.Icons.DRAW_OUTLINED), -- OLD
-                    icon=ft.Icons.BRUSH_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.BRUSH, color=ft.Colors.PRIMARY),
+                    icon=ft.Icon(ft.Icons.DRAW_OUTLINED), 
+                    #icon=ft.Icons.BRUSH_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.DRAW_ROUNDED, color=ft.Colors.PRIMARY),
                     padding=ft.padding.only(top=10, bottom=10),
                     data="drawing_board", label_content=ft.Text("Drawing Board", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
