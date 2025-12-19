@@ -67,13 +67,13 @@ class Canvas(Widget):
                 #on_pan_end=lambda e: self.save_canvas(),
             ),
             expand=True,
-            on_resize=self.on_canvas_resize,
+            on_resize=self.on_canvas_resize, resize_interval=20,
         )
 
         self.canvas_container: ft.Container = ft.Container(
             content=self.canvas,
-            expand=True,
-            border=ft.border.all(1, ft.Colors.BLUE),
+            expand=True, clip_behavior=ft.ClipBehavior.HARD_EDGE,
+            border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT),
         )
 
         #self.information_display: Drawing_Information_Display = Drawing_Information_Display()
@@ -153,7 +153,7 @@ class Canvas(Widget):
         self.canvas.shapes.clear()
         for x1, y1, x2, y2 in self.state.shapes:
             self.canvas.shapes.append(
-                cv.Line(x1, y1, x2, y2, paint=self.brush)
+                cv.Line(x1, y1, x2, y2, paint=self.paint)
             )
         try:
             self.canvas.update()
