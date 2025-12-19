@@ -61,8 +61,13 @@ class Story(ft.View):
                 'created_at': str,
                 'last_modified': str,
                 'canvas_data': {
+                    'stroke_shape': "line",    # freehand, line, rectangle, circle, etc
                     'color': "#FFFFFF",
-                    'opacity': 100
+                    'opacity': 100,
+                    'stroke_width': 3,
+                    'anti_alias': True,
+                    'blend_mode': "normal",
+                    'gradient': None,
                 },
 
                 'settings': {
@@ -186,6 +191,21 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             print(f"Error changing data {key}:{value} for story {self.title}: {e}")
+
+    def update_canvas_data(self, **kwargs):
+        ''' Changes a key/value pair in our canvas_data dict and saves the json file '''
+        # Called by:
+        # story.update_canvas_data(**{'key': value, 'key2': value2})
+
+        try:
+            for key, value in kwargs.items():
+                self.data['canvas_data'].update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing canvas_data {key}:{value} for story {self.title}: {e}")
             
 
     # Called when a new story is created and not loaded with any data

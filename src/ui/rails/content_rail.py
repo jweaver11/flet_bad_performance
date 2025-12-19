@@ -81,7 +81,7 @@ class Content_Rail(Rail):
                 ])
             ),
             Menu_Option_Style(
-                #on_click=self.new_chapter_clicked,
+                on_click=self.new_canvas_clicked,
                 data="canvas",
                 content=ft.Row([
                     ft.Icon(ft.Icons.BRUSH_OUTLINED),
@@ -111,7 +111,7 @@ class Content_Rail(Rail):
                 ])
             ),
             Menu_Option_Style(
-                #on_click=self.new_chapter_clicked,
+                on_click=self.new_canvas_clicked,
                 data="canvas",
                 content=ft.Row([
                     ft.Icon(ft.Icons.BRUSH_OUTLINED),

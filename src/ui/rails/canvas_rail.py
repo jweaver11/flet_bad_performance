@@ -113,7 +113,7 @@ class Canvas_Rail(Rail):
             min=0, max=100, expand=True,
             divisions=100, value=self.story.data.get('canvas_data', {}).get('opacity', 100),
             label="Opacity: {value}%",
-            on_change_end=lambda e: self.story.change_data(**{'canvas_data': {'opacity': int(e.control.value)}})
+            on_change_end=lambda e: self.story.update_canvas_data(**{'opacity': float(e.control.value)})
         )
         
         

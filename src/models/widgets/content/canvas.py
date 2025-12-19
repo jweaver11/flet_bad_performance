@@ -52,8 +52,10 @@ class Canvas(Widget):
 
         # State tracking for canvas drawing info
         self.state: State = State()         # Used for our coordinates and how to apply things
-        self.paint_type: cv.Line = None     # Type of insertion (line, rect, circle, etc)
-        self.brush: ft.Paint = ft.Paint(stroke_width=3)       # Brush styling (color, width, etc)
+        self.stroke_shape: cv.Line = None     # Type of insertion (line, rect, circle, etc)
+
+
+        self.paint: ft.Paint = ft.Paint(stroke_width=3)       # Brush styling (color, width, etc)
 
         # Track last known canvas size to rescale drawings on resize
         self._last_canvas_size: tuple[float, float] | None = None
@@ -62,7 +64,7 @@ class Canvas(Widget):
             content=ft.GestureDetector(
                 on_pan_start=self.start_drawing,
                 on_pan_update=self.is_drawing,
-                on_pan_end=lambda e: self.save_canvas(),
+                #on_pan_end=lambda e: self.save_canvas(),
             ),
             expand=True,
             on_resize=self.on_canvas_resize,
@@ -79,8 +81,72 @@ class Canvas(Widget):
         
        
         # Load our drawing/display
-        self.load_canvas()
+        #self.load_canvas()
         self.reload_widget()
+
+    # Called on launch to load our drawing from data into our canvas
+    def load_canvas(self):
+        """Loads our drawing from our saved map drawing file."""
+        coords = self.data.get("canvas", [])
+
+        self.canvas.shapes.clear()
+        self.state.shapes.clear()
+
+        # Restore baseline size (used for future scaling). If absent, first resize sets it.
+        meta = self.data.get("canvas_meta") or {}
+        w = meta.get("w")
+        h = meta.get("h")
+        if isinstance(w, (int, float)) and isinstance(h, (int, float)) and w > 0 and h > 0:
+            self._last_canvas_size = (float(w), float(h))
+
+        for x1, y1, x2, y2 in coords:
+            self.state.shapes.append((x1, y1, x2, y2))
+
+        self._rebuild_canvas_from_state()
+
+    # Called when we stop a stroke to save our drawing data
+    def save_canvas(self):
+        """Saves our drawing to our saved map drawing file."""
+        self.data["canvas"] = self.state.shapes
+
+        # Persist the last known canvas size alongside the coords
+        if self._last_canvas_size is not None:
+            w, h = self._last_canvas_size
+            self.data["canvas_meta"] = {"w": float(w), "h": float(h)}
+
+        self.save_dict()
+        
+    # Called when we start drawing on the canvas
+    async def start_drawing(self, e: ft.DragStartEvent):
+        ''' Determines what shape we're using to draw, and applies the brush settings '''
+        # Shape options
+        # Brush settings - color, width, anti alias, blen modes, blur image?, gradient
+
+        # Set the brush as well and grab the data we need
+        self.paint.color = ft.Colors.with_opacity(
+            opacity=self.story.data.get('canvas_data', {}).get('opacity', 1) / 100, 
+            color=self.story.data.get('canvas_data', {}).get('color', ft.Colors.ON_SURFACE)
+        )
+        print("Brush color set to: ", self.paint.color)
+        self.paint.stroke_width = self.story.data.get('canvas_data', {}).get('stroke_width', 3)
+        #self.paint.anti_alias = True
+
+        
+        self.state.x, self.state.y = e.local_x, e.local_y
+
+    async def is_drawing(self, e: ft.DragUpdateEvent):
+        def draw_line():
+            line = cv.Line(
+                self.state.x, self.state.y, e.local_x, e.local_y,
+                paint=self.paint
+            )
+            self.canvas.shapes.append(line)
+            self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
+            
+            self.p.update()
+            self.state.x, self.state.y = e.local_x, e.local_y
+        Thread(target=draw_line, daemon=True).start()
+
 
     def _rebuild_canvas_from_state(self) -> None:
         """Rebuild visible canvas shapes from self.state.shapes."""
@@ -137,61 +203,6 @@ class Canvas(Widget):
         # Update meta so future resizes and saves remain consistent
         self._last_canvas_size = (float(new_w), float(new_h))
         self.data["canvas_meta"] = {"w": float(new_w), "h": float(new_h)}
-
-    # Called on launch to load our drawing from data into our canvas
-    def load_canvas(self):
-        """Loads our drawing from our saved map drawing file."""
-        coords = self.data.get("canvas", [])
-
-        self.canvas.shapes.clear()
-        self.state.shapes.clear()
-
-        # Restore baseline size (used for future scaling). If absent, first resize sets it.
-        meta = self.data.get("canvas_meta") or {}
-        w = meta.get("w")
-        h = meta.get("h")
-        if isinstance(w, (int, float)) and isinstance(h, (int, float)) and w > 0 and h > 0:
-            self._last_canvas_size = (float(w), float(h))
-
-        for x1, y1, x2, y2 in coords:
-            self.state.shapes.append((x1, y1, x2, y2))
-
-        self._rebuild_canvas_from_state()
-
-    # Called when we stop a stroke to save our drawing data
-    def save_canvas(self):
-        """Saves our drawing to our saved map drawing file."""
-        self.data["canvas"] = self.state.shapes
-
-        # Persist the last known canvas size alongside the coords
-        if self._last_canvas_size is not None:
-            w, h = self._last_canvas_size
-            self.data["canvas_meta"] = {"w": float(w), "h": float(h)}
-
-        self.save_dict()
-        
-    # Called when we start drawing on the canvas
-    async def start_drawing(self, e: ft.DragStartEvent):
-
-        # Set the brush as well and grab the data we need
-        self.brush.color = self.story.data.get('canvas_data', {}).get('color', ft.Colors.ON_SURFACE)
-
-        print("Color was set to ", self.brush.color)
-        
-        self.state.x, self.state.y = e.local_x, e.local_y
-
-    async def is_drawing(self, e: ft.DragUpdateEvent):
-        def draw_line():
-            line = cv.Line(
-                self.state.x, self.state.y, e.local_x, e.local_y,
-                paint=self.brush
-            )
-            self.canvas.shapes.append(line)
-            self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
-            
-            self.p.update()
-            self.state.x, self.state.y = e.local_x, e.local_y
-        Thread(target=draw_line, daemon=True).start()
 
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):       
