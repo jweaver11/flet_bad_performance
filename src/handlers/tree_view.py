@@ -98,22 +98,21 @@ def load_directory_data(
         # Now go through our files
         for file_name in files:
 
-            # Get rid of the extension and capitalize the name
-            name = os.path.splitext(file_name)[0] 
+            try:
+                # Load the file data to see if it's valid
+                with open(os.path.join(directory, file_name), 'r', encoding='utf-8') as f:
+                    file_data = json.load(f)
 
-            # Skip any map canvas files
-            if name.endswith("_canvas"):
-                continue
+                key = file_data.get('key', None)
 
-            # Skip text files, we don't need to read them here
-            if name.endswith("_text"):
+                for widget in story.widgets:
+                    if widget.data.get('key', None) == key:
+                        widget = widget
+                        break
+
+            except Exception as e:
+                print(f"Error loading file {file_name} in directory {directory}: {e}")
                 continue
-          
-            # Find our widget based on the filename
-            for widget in story.widgets:
-                if widget.title == name and widget.directory_path == os.path.join(directory):  
-                    widget = widget
-                    break
             
 
             # Create the file item

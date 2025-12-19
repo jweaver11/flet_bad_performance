@@ -386,29 +386,17 @@ class Widget(ft.Container):
         # Grabs our tag to determine the icon we'll use
         tag = self.data.get('tag', None)
 
-        if tag is None:
-            self.icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
-
-        elif tag == "chapter":
-            self.icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
-
-        elif tag == "note":
-            self.icon = ft.Icon(ft.Icons.COMMENT_OUTLINED)
-
-        elif tag == "character":
-            self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE)
-
-        elif tag == "settings":
-            self.icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
-        
-        elif tag == "timeline":
-            self.icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED)
-
-        elif tag == "map":
-            self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)
-
-        else:
-            self.icon = ft.Icon(ft.Icons.FOLDER_OUTLINED)
+        # Set our icon based on what type of widget we are using tag
+        if tag is None: self.icon = ft.Icon(ft.Icons.ERROR_OUTLINE)      # Catch errors
+        elif tag == "chapter": self.icon = ft.Icon(ft.Icons.DESCRIPTION_OUTLINED)
+        elif tag == "note": self.icon = ft.Icon(ft.Icons.COMMENT_OUTLINED)
+        elif tag == "canvas": self.icon = ft.Icon(ft.Icons.BRUSH_OUTLINED)
+        elif tag == "character": self.icon = ft.Icon(ft.Icons.PERSON_OUTLINE)
+        elif tag == "settings": self.icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
+        elif tag == "timeline": self.icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED)
+        elif tag == "map": self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)
+        elif tag == "world_building": self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)
+        else: self.icon = ft.Icon(ft.Icons.ERROR_OUTLINE)     # Catch errors
         
         # Set the color and size
         self.icon.color = self.data.get('color', ft.Colors.PRIMARY)

@@ -12,6 +12,4 @@ class State:
 
         self.y: float = float()
 
-        self.paint_brush = ft.Paint(stroke_width=3)
-
         self.shapes = []

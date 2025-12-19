@@ -43,6 +43,14 @@ class Content_Rail(Rail):
         self.new_item_textfield.value = None
         self.new_item_textfield.visible = True
         self.story.close_menu()
+
+    # New canvases
+    def new_canvas_clicked(self, e):
+        self.new_item_textfield.hint_text = "Canvas Title"
+        self.new_item_textfield.data = "canvas"
+        self.new_item_textfield.value = None
+        self.new_item_textfield.visible = True
+        self.story.close_menu()
         
     # New notes
     def new_note_clicked(self, e):
@@ -73,6 +81,14 @@ class Content_Rail(Rail):
                 ])
             ),
             Menu_Option_Style(
+                on_click=self.new_canvas_clicked,
+                data="canvas",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.BRUSH_OUTLINED),
+                    ft.Text("Canvas", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
                 on_click=self.new_note_clicked,
                 content=ft.Row(expand=True, controls=[
                     ft.Icon(ft.Icons.NOTE_ALT_OUTLINED),
@@ -92,6 +108,14 @@ class Content_Rail(Rail):
                 content=ft.Row([
                     ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
                     ft.Text("Chapter", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                on_click=self.new_canvas_clicked,
+                data="canvas",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.BRUSH_OUTLINED),
+                    ft.Text("Canvas", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
             Menu_Option_Style(
@@ -135,7 +159,8 @@ class Content_Rail(Rail):
                             on_click=self.new_chapter_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Drawing", icon=ft.Icons.BRUSH_OUTLINED,
+                            text="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
+                            on_click=self.new_canvas_clicked
                         ),
                         ft.PopupMenuItem(
                             text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
@@ -153,7 +178,7 @@ class Content_Rail(Rail):
                             on_click=self.new_chapter_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Drawing", icon=ft.Icons.BRUSH_OUTLINED,
+                            text="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
                         ),
                         ft.PopupMenuItem(
                             text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,

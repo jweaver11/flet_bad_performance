@@ -27,214 +27,7 @@ class Workspaces_Rail(ft.Container):
         # Build our rail on start
         self.reload_rail(story)
 
-    # Called mostly when re-ordering or collapsing the rail. Also called on start
-    def reload_rail(self, story) -> ft.Control:
-        ''' Reloads our rail, and applies the correct styles and controls based on the state of the rail '''
-        from models.app import app    # Always grabs updated reference when reloading
-
-        # Holds our list of controls that we will add in the rail later
-        workspaces_rail = []
-
-        # Creates our rails for each workspace selection, that get added to the workspaces_rail list
-        content_rail = ft.NavigationRail(
-            height=70,  # Set height of each rail
-            bgcolor=ft.Colors.TRANSPARENT,  # Make rail background transparent
-            selected_index=None,    # All rails start unselected, we set the right one later
-            on_change=lambda e: self.on_workspace_change(e, story),    # When the rail is clicked
-
-            destinations=[  # Each rail only has one destination
-                # We do it this way so we can change the order when re-ordering the rail
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED), # Icon on the rail
-                    selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), # Selected icon on the rail
-                    padding=ft.padding.only(top=10, bottom=10), # Padding for spacing
-                    # Label underneath the icon and the data we will use to identify the rail
-                    data="content", label_content=ft.Text("Content", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                ),
-            ],
-        )
-        # Characters workspace rail
-        characters_rail = ft.NavigationRail(
-            height=70,
-            bgcolor=ft.Colors.TRANSPARENT,
-            selected_index=None,
-            on_change=lambda e: self.on_workspace_change(e, story),  
-            destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED), 
-                    selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="characters", label_content=ft.Text("Characters", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                ),
-            ],
-        )
-        # Plot and timeline workspace rail
-        timelines_rail = ft.NavigationRail(
-            height=70,  
-            bgcolor=ft.Colors.TRANSPARENT,
-            selected_index=None,
-            on_change=lambda e: self.on_workspace_change(e, story),   
-            destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, scale=1.2), 
-                    selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="timelines", label_content=ft.Text("Timelines", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                ),
-            ],
-        )
-        # World building workspace rail
-        world_building_rail = ft.NavigationRail(
-            height=70,  
-            bgcolor=ft.Colors.TRANSPARENT,
-            selected_index=None,
-            on_change=lambda e: self.on_workspace_change(e, story),    
-            destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED), 
-                    selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="world_building", label_content=ft.Text("World Building", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                ),
-            ],
-        )
-        # Drawing board workspace rail
-        drawing_board_rail = ft.NavigationRail(
-            height=70,  
-            bgcolor=ft.Colors.TRANSPARENT,
-            selected_index=None,
-            on_change=lambda e: self.on_workspace_change(e, story),  
-            destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.DRAW_OUTLINED), 
-                    #icon=ft.Icons.BRUSH_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.DRAW_ROUNDED, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="drawing_board", label_content=ft.Text("Drawing Board", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                ),
-            ],
-        )
-        # Planning workspace rail
-        planning_rail = ft.NavigationRail(
-            height=70,  
-            bgcolor=ft.Colors.TRANSPARENT,
-            selected_index=None,
-            on_change=lambda e: self.on_workspace_change(e, story),  
-            destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED),
-                    selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="planning", label_content=ft.Text("Planning", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                ),
-            ],
-        )
-
-        # Reads our selected workspace from ourself, and toggles the correct workspace selection icon
-        if self.selected_rail == "content":
-            content_rail.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
-        elif self.selected_rail == "characters":
-            characters_rail.selected_index = 0
-        elif self.selected_rail == "timelines":
-            timelines_rail.selected_index = 0
-        elif self.selected_rail == "world_building":
-            world_building_rail.selected_index = 0
-        elif self.selected_rail == "drawing_board":
-            drawing_board_rail.selected_index = 0
-        elif self.selected_rail == "planning":
-            planning_rail.selected_index = 0
-
-
-        # Goes through our workspace order, and adds the correct control to our list for the rail
-        # We do it this way so when the app re-orders the rail, it will save their changes
-        for workspace in app.settings.data['workspaces_rail_order']:     # Just a list of strings
-            if workspace == "content":
-                workspaces_rail.append(content_rail)   # Add our corresponding workspace selector rail to the list
-            elif workspace == "characters":
-                workspaces_rail.append(characters_rail)    
-            elif workspace == "timelines":
-                workspaces_rail.append(timelines_rail)
-            elif workspace == "world_building":
-                workspaces_rail.append(world_building_rail)
-            elif workspace == "drawing_board":
-                workspaces_rail.append(drawing_board_rail)
-            elif workspace == "planning":
-                workspaces_rail.append(planning_rail)
-
-
-        # If we're collapsed...
-        if app.settings.data['workspaces_rail_is_collapsed']:
-
-            self.width = 50     # Make the rail less wide
-            
-            # Remove our labels below the icons
-            content_rail.destinations[0].label_content = None
-            characters_rail.destinations[0].label_content = None
-            timelines_rail.destinations[0].label_content = None
-            world_building_rail.destinations[0].label_content = None
-            drawing_board_rail.destinations[0].label_content = None
-            planning_rail.destinations[0].label_content = None
-
-            # Set our collapsed icon buttons icon depending on collapsed state
-            collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED
-
-        # If not collapsed, make rail normal size and set the correct icon
-        else:
-            self.width = 120
-            collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED
-
-
-        # Set our collapsed icon button using our defined icon above
-        collapse_icon_button = ft.IconButton(
-            icon=collapse_icon,
-            on_click=lambda e: self.toggle_collapse_rail(e, story),
-        )
-
-        # Sets our content as a column. This will fill our width and hold...
-        # Either our list of workspaces, or a reorderable list of our workspaces
-        self.content=ft.Column(
-            alignment=ft.MainAxisAlignment.CENTER,
-            spacing=4,
-        )
-
-        # If we're reorderable, make our reorderable rail using a reorderable list
-        if app.settings.data['workspaces_rail_is_reorderable']:
-
-            # Can only reorder if on settings page, so check for that
-            if self.p.route == "/settings":
-                reorderable_list = ft.ReorderableListView(
-                    padding=4,
-                    on_reorder=lambda e: self.handle_rail_reorder(e, story),
-                )
-
-                # Add our workspaces (rails) to the list. Add the list to our column
-                reorderable_list.controls.extend(workspaces_rail)  
-                self.content.controls.append(reorderable_list)
-            else:
-
-                # If we're not on settings page, set it so we are not reorderable and build our normal rail
-                app.settings.data['workspaces_rail_is_reorderable'] = False
-                app.settings.save_dict()
-
-                self.content.controls.extend(workspaces_rail) 
-
-        # If we're not reorderable, add the selector workspaces (rails) to the column
-        else:
-            self.content.controls.extend(workspaces_rail) 
-
-        # Fill in empty space under the rail, before the collapse icon button at the bottom
-        self.content.controls.append(ft.Container(expand=True))
-
-        # Add our collapse icon button to the right side of the rail
-        self.content.controls.append(ft.Row(
-            spacing=0, 
-            controls=[
-                ft.Container(expand=True),  # Fills left side of row
-                collapse_icon_button,
-            ]), 
-        )
-
-        self.p.update() # Update the page to show our changes
+    
 
     # Called whenever we select a new workspace selector rail
     def on_workspace_change(self, e, story: Story):
@@ -313,5 +106,214 @@ class Workspaces_Rail(ft.Container):
         app.settings.save_dict()
 
         self.reload_rail(story)  # Reload the rail to apply changes
+
+    # Called mostly when re-ordering or collapsing the rail. Also called on start
+    def reload_rail(self, story) -> ft.Control:
+        ''' Reloads our rail, and applies the correct styles and controls based on the state of the rail '''
+        from models.app import app    # Always grabs updated reference when reloading
+
+        # Holds our list of controls that we will add in the rail later
+        workspaces_rail = []
+
+        # Creates our rails for each workspace selection, that get added to the workspaces_rail list
+        content_rail = ft.NavigationRail(
+            height=70,  # Set height of each rail
+            bgcolor=ft.Colors.TRANSPARENT,  # Make rail background transparent
+            selected_index=None,    # All rails start unselected, we set the right one later
+            on_change=lambda e: self.on_workspace_change(e, story),    # When the rail is clicked
+
+            destinations=[  # Each rail only has one destination
+                # We do it this way so we can change the order when re-ordering the rail
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED), # Icon on the rail
+                    selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), # Selected icon on the rail
+                    padding=ft.padding.only(top=10, bottom=10), # Padding for spacing
+                    # Label underneath the icon and the data we will use to identify the rail
+                    data="content", label_content=ft.Text("Content", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                ),
+            ],
+        )
+        # Characters workspace rail
+        characters_rail = ft.NavigationRail(
+            height=70,
+            bgcolor=ft.Colors.TRANSPARENT,
+            selected_index=None,
+            on_change=lambda e: self.on_workspace_change(e, story),  
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED), 
+                    selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
+                    padding=ft.padding.only(top=10, bottom=10),
+                    data="characters", label_content=ft.Text("Characters", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                ),
+            ],
+        )
+        # Plot and timeline workspace rail
+        timelines_rail = ft.NavigationRail(
+            height=70,  
+            bgcolor=ft.Colors.TRANSPARENT,
+            selected_index=None,
+            on_change=lambda e: self.on_workspace_change(e, story),   
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, scale=1.2), 
+                    selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
+                    padding=ft.padding.only(top=10, bottom=10),
+                    data="timelines", label_content=ft.Text("Timelines", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                ),
+            ],
+        )
+        # World building workspace rail
+        world_building_rail = ft.NavigationRail(
+            height=70,  
+            bgcolor=ft.Colors.TRANSPARENT,
+            selected_index=None,
+            on_change=lambda e: self.on_workspace_change(e, story),    
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED), 
+                    selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
+                    padding=ft.padding.only(top=10, bottom=10),
+                    data="world_building", label_content=ft.Text("World Building", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                ),
+            ],
+        )
+        # Canvas workspace rail
+        canvas_rail = ft.NavigationRail(
+            height=70,  
+            bgcolor=ft.Colors.TRANSPARENT,
+            selected_index=None,
+            on_change=lambda e: self.on_workspace_change(e, story),  
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.DRAW_OUTLINED), 
+                    #icon=ft.Icons.BRUSH_OUTLINED,
+                    selected_icon=ft.Icon(ft.Icons.DRAW_ROUNDED, color=ft.Colors.PRIMARY),
+                    padding=ft.padding.only(top=10, bottom=10),
+                    data="canvas", label_content=ft.Text("Canvas", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                ),
+            ],
+        )
+        # Planning workspace rail
+        planning_rail = ft.NavigationRail(
+            height=70,  
+            bgcolor=ft.Colors.TRANSPARENT,
+            selected_index=None,
+            on_change=lambda e: self.on_workspace_change(e, story),  
+            destinations=[
+                ft.NavigationRailDestination(
+                    icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED),
+                    selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
+                    padding=ft.padding.only(top=10, bottom=10),
+                    data="planning", label_content=ft.Text("Planning", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                ),
+            ],
+        )
+
+        # Reads our selected workspace from ourself, and toggles the correct workspace selection icon
+        if self.selected_rail == "content":
+            content_rail.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
+        elif self.selected_rail == "characters":
+            characters_rail.selected_index = 0
+        elif self.selected_rail == "timelines":
+            timelines_rail.selected_index = 0
+        elif self.selected_rail == "world_building":
+            world_building_rail.selected_index = 0
+        elif self.selected_rail == "canvas":
+            canvas_rail.selected_index = 0
+        elif self.selected_rail == "planning":
+            planning_rail.selected_index = 0
+
+
+        # Goes through our workspace order, and adds the correct control to our list for the rail
+        # We do it this way so when the app re-orders the rail, it will save their changes
+        for workspace in app.settings.data['workspaces_rail_order']:     # Just a list of strings
+            if workspace == "content":
+                workspaces_rail.append(content_rail)   # Add our corresponding workspace selector rail to the list
+            elif workspace == "characters":
+                workspaces_rail.append(characters_rail)    
+            elif workspace == "timelines":
+                workspaces_rail.append(timelines_rail)
+            elif workspace == "world_building":
+                workspaces_rail.append(world_building_rail)
+            elif workspace == "canvas":
+                workspaces_rail.append(canvas_rail)
+            elif workspace == "planning":
+                workspaces_rail.append(planning_rail)
+
+
+        # If we're collapsed...
+        if app.settings.data['workspaces_rail_is_collapsed']:
+
+            self.width = 50     # Make the rail less wide
+            
+            # Remove our labels below the icons
+            content_rail.destinations[0].label_content = None
+            characters_rail.destinations[0].label_content = None
+            timelines_rail.destinations[0].label_content = None
+            world_building_rail.destinations[0].label_content = None
+            canvas_rail.destinations[0].label_content = None
+            planning_rail.destinations[0].label_content = None
+
+            # Set our collapsed icon buttons icon depending on collapsed state
+            collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED
+
+        # If not collapsed, make rail normal size and set the correct icon
+        else:
+            self.width = 120
+            collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT_ROUNDED
+
+
+        # Set our collapsed icon button using our defined icon above
+        collapse_icon_button = ft.IconButton(
+            icon=collapse_icon,
+            on_click=lambda e: self.toggle_collapse_rail(e, story),
+        )
+
+        # Sets our content as a column. This will fill our width and hold...
+        # Either our list of workspaces, or a reorderable list of our workspaces
+        self.content=ft.Column(
+            alignment=ft.MainAxisAlignment.CENTER,
+            spacing=4,
+        )
+
+        # If we're reorderable, make our reorderable rail using a reorderable list
+        if app.settings.data['workspaces_rail_is_reorderable']:
+
+            # Can only reorder if on settings page, so check for that
+            if self.p.route == "/settings":
+                reorderable_list = ft.ReorderableListView(
+                    padding=4,
+                    on_reorder=lambda e: self.handle_rail_reorder(e, story),
+                )
+
+                # Add our workspaces (rails) to the list. Add the list to our column
+                reorderable_list.controls.extend(workspaces_rail)  
+                self.content.controls.append(reorderable_list)
+            else:
+
+                # If we're not on settings page, set it so we are not reorderable and build our normal rail
+                app.settings.data['workspaces_rail_is_reorderable'] = False
+                app.settings.save_dict()
+
+                self.content.controls.extend(workspaces_rail) 
+
+        # If we're not reorderable, add the selector workspaces (rails) to the column
+        else:
+            self.content.controls.extend(workspaces_rail) 
+
+        # Fill in empty space under the rail, before the collapse icon button at the bottom
+        self.content.controls.append(ft.Container(expand=True))
+
+        # Add our collapse icon button to the right side of the rail
+        self.content.controls.append(ft.Row(
+            spacing=0, 
+            controls=[
+                ft.Container(expand=True),  # Fills left side of row
+                collapse_icon_button,
+            ]), 
+        )
+
+        self.p.update() # Update the page to show our changes
         
         
