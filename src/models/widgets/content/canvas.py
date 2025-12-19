@@ -53,7 +53,7 @@ class Canvas(Widget):
         # State tracking for canvas drawing info
         self.state: State = State()         # Used for our coordinates and how to apply things
         self.paint_type: cv.Line = None     # Type of insertion (line, rect, circle, etc)
-        self.paint_brush: ft.Paint = ft.Paint(stroke_width=3)       # Brush styling (color, width, etc)
+        self.brush: ft.Paint = ft.Paint(stroke_width=3)       # Brush styling (color, width, etc)
 
         # Track last known canvas size to rescale drawings on resize
         self._last_canvas_size: tuple[float, float] | None = None
@@ -87,7 +87,7 @@ class Canvas(Widget):
         self.canvas.shapes.clear()
         for x1, y1, x2, y2 in self.state.shapes:
             self.canvas.shapes.append(
-                cv.Line(x1, y1, x2, y2, paint=self.paint_brush)
+                cv.Line(x1, y1, x2, y2, paint=self.brush)
             )
         try:
             self.canvas.update()
@@ -138,6 +138,7 @@ class Canvas(Widget):
         self._last_canvas_size = (float(new_w), float(new_h))
         self.data["canvas_meta"] = {"w": float(new_w), "h": float(new_h)}
 
+    # Called on launch to load our drawing from data into our canvas
     def load_canvas(self):
         """Loads our drawing from our saved map drawing file."""
         coords = self.data.get("canvas", [])
@@ -157,6 +158,7 @@ class Canvas(Widget):
 
         self._rebuild_canvas_from_state()
 
+    # Called when we stop a stroke to save our drawing data
     def save_canvas(self):
         """Saves our drawing to our saved map drawing file."""
         self.data["canvas"] = self.state.shapes
@@ -168,10 +170,13 @@ class Canvas(Widget):
 
         self.save_dict()
         
-
+    # Called when we start drawing on the canvas
     async def start_drawing(self, e: ft.DragStartEvent):
 
         # Set the brush as well and grab the data we need
+        self.brush.color = self.story.data.get('canvas_data', {}).get('color', ft.Colors.ON_SURFACE)
+
+        print("Color was set to ", self.brush.color)
         
         self.state.x, self.state.y = e.local_x, e.local_y
 
@@ -179,7 +184,7 @@ class Canvas(Widget):
         def draw_line():
             line = cv.Line(
                 self.state.x, self.state.y, e.local_x, e.local_y,
-                paint=self.paint_brush
+                paint=self.brush
             )
             self.canvas.shapes.append(line)
             self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))

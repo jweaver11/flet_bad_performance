@@ -61,6 +61,7 @@ class Story(ft.View):
                 'created_at': str,
                 'last_modified': str,
                 'canvas_data': {
+                    'color': "#FFFFFF",
                     'opacity': 100
                 },
 
@@ -988,6 +989,7 @@ class Story(ft.View):
 
             app.settings.data['active_rail_width'] = self.active_rail.width
             app.settings.save_dict()
+
             print("Active rail width: " + str(self.active_rail.width))
 
         # The actual resizer for the active rail (gesture detector)

@@ -5,6 +5,8 @@ from models.views.story import Story
 from ui.rails.rail import Rail
 from styles.menu_option_style import Menu_Option_Style
 import math
+from flet_contrib.color_picker import ColorPicker
+from models.app import app
 
 
 # Class for our Canvas Board rail
@@ -38,8 +40,18 @@ class Canvas_Rail(Rail):
             ft.IconButton(
                 icon=ft.Icons.FILE_UPLOAD_OUTLINED,
                 tooltip="Upload Canvas",
+                on_click=lambda e: print("Upload Canvas clicked")
             )
         ]
+
+        self.color_picker = ColorPicker(color=self.story.data.get('canvas_data', {}).get('color', "#000000"))
+
+        self.color_picker_button = ft.IconButton(
+            icon=ft.Icons.COLOR_LENS_OUTLINED,
+            icon_color=self.story.data.get('canvas_data', {}).get('color', ft.Colors.PRIMARY),
+            tooltip="Color Picker", on_click=self.color_picker_clicked
+        )
+       
 
         # Reload the rail on start
         self.reload_rail()
@@ -59,6 +71,33 @@ class Canvas_Rail(Rail):
         # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()   
 
+   
+
+    def color_picker_clicked(self, e):
+
+        def _apply_color_change(e):
+
+            selected_color = self.color_picker.color
+           
+            print("Selected color: ", selected_color)
+            self.story.change_data(**{'canvas_data': {'color': selected_color}})
+
+            self.color_picker_button.icon_color = selected_color
+            self.p.close(alert_dialog)
+            self.p.update()
+
+        alert_dialog = ft.AlertDialog(
+            title=ft.Text("Select Brush Color", weight=ft.FontWeight.BOLD),
+            content=self.color_picker,
+            actions=[
+                ft.TextButton("CANCEL", on_click=lambda e: self.p.close(alert_dialog), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("APPLY", on_click=_apply_color_change),
+            ],
+        )
+
+        self.p.open(alert_dialog)
+
+
     
 
     # Called on startup and when we have changes to the rail that have to be reloaded 
@@ -71,12 +110,15 @@ class Canvas_Rail(Rail):
         )
 
         opacity = ft.Slider(
-            min=0, max=100,
-            divisions=10, value=self.story.data.get('canvas_data', {}).get('opacity', 100),
+            min=0, max=100, expand=True,
+            divisions=100, value=self.story.data.get('canvas_data', {}).get('opacity', 100),
             label="Opacity: {value}%",
             on_change_end=lambda e: self.story.change_data(**{'canvas_data': {'opacity': int(e.control.value)}})
         )
         
+        
+        # Type of brush?
+        # Brush settings - color, width, anti alias, blen modes, blur image?, gradient
                  
 
         # Build the content of our rail
@@ -84,19 +126,10 @@ class Canvas_Rail(Rail):
             scroll=ft.ScrollMode.AUTO,
             spacing=0,
             controls=[
-                opacity
+                self.color_picker_button,
+                ft.Row([ft.Text("Opacity:", theme_style=ft.TextThemeStyle.LABEL_LARGE), opacity])
             ]
         )
-
-        # Build rail here
-        # Open/Upload Upload
-        # TODO: RAIL Has brushes, tools, colors, etc.
-        # Rail shows our brush/drawing design options, not a view of all drawings
-
-        
-
-        # Type of brush?
-        # Brush settings - color, width, anti alias, blen modes, blur image?, gradient
 
 
         content.controls.append(self.new_item_textfield)
