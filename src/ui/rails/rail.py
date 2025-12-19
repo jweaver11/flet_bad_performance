@@ -270,6 +270,10 @@ class Rail(ft.Container):
 
             elif tag == "canvas":
                 self.story.create_canvas(title)
+                self.story.change_data(**{'selected_rail': 'canvas'})
+                self.story.workspaces_rail.selected_rail = "canvas"
+                self.story.workspaces_rail.reload_rail(self.story)
+                self.story.active_rail.display_active_rail(self.story)
 
             # New Characters
             elif tag == "character":
