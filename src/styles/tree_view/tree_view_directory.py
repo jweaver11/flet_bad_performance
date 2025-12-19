@@ -151,7 +151,6 @@ class Tree_View_Directory(ft.GestureDetector):
             value=self.is_expanded
         )
 
-
         #print("Active dropdown before:", self.rail.active_dropdown)
         if self.rail.active_dropdown is not None:
             if hasattr(self.rail.active_dropdown, "is_focused"):
@@ -168,6 +167,16 @@ class Tree_View_Directory(ft.GestureDetector):
 
         self.is_focused = True
         self.refresh_expansion_tile()
+
+    def refresh_expansion_tile(self):
+        if self.is_focused:
+            self.expansion_tile.bgcolor = ft.Colors.with_opacity(.1, "primary")
+            self.expansion_tile.collapsed_bgcolor = ft.Colors.with_opacity(.1, "primary")
+        else:
+            self.expansion_tile.bgcolor = ft.Colors.TRANSPARENT
+            self.expansion_tile.collapsed_bgcolor = ft.Colors.TRANSPARENT
+
+        self.p.update()
 
     # Called when creating new category or when additional menu items are clicked
     def new_item_clicked(self, type: str = "category"):

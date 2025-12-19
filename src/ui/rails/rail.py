@@ -156,6 +156,12 @@ class Rail(ft.Container):
                 if os.path.normcase(os.path.normpath(key)) == new_key:
                     self.item_is_unique = False
 
+        # Check our drawings
+        elif tag == "drawing":
+            for key in self.story.drawings.keys():
+                if os.path.normcase(os.path.normpath(key)) == new_key:
+                    self.item_is_unique = False
+
         # Check our characters
         elif tag == "character":
             for key in self.story.characters.keys():
@@ -261,6 +267,9 @@ class Rail(ft.Container):
             # New Notes
             elif tag == "note":
                 self.story.create_note(title)
+
+            elif tag == "drawing":
+                self.story.create_drawing(title)
 
             # New Characters
             elif tag == "character":

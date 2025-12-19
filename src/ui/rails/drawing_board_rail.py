@@ -25,7 +25,7 @@ class Drawing_Board_Rail(Rail):
                 tooltip="New Vertical Drawing",
                 icon=ft.Icons.COMPARE_ARROWS_OUTLINED,
                 rotate=ft.Rotate(math.pi/2),  # 90 degrees counter-clockwise
-                #on_click=self.new_category_clicked
+                on_click=self.new_drawing_clicked
             ),
             
             ft.IconButton(
@@ -33,7 +33,7 @@ class Drawing_Board_Rail(Rail):
                 #icon=ft.Icons.BRUSH_OUTLINED,
                 icon=ft.Icons.COMPARE_ARROWS_OUTLINED,
                 #rotate=ft.Rotate(0.70),  # 90 degrees clockwise
-                #on_click=self.new_character_clicked
+                on_click=self.new_drawing_clicked
             )
         ]
 
@@ -41,7 +41,7 @@ class Drawing_Board_Rail(Rail):
         self.reload_rail()
 
     # Called when new character button or menu option is clicked
-    def new_character_clicked(self, e):
+    def new_drawing_clicked(self, e):
         ''' Handles setting our textfield for new character creation '''
         
         # Makes sure the right textfield is visible and the others are hidden
@@ -49,8 +49,8 @@ class Drawing_Board_Rail(Rail):
 
         # Set our textfield value to none, and the hint and data
         self.new_item_textfield.value = None
-        self.new_item_textfield.hint_text = "Character Name"
-        self.new_item_textfield.data = "character"
+        self.new_item_textfield.hint_text = "Drawing Title"
+        self.new_item_textfield.data = "drawing"
 
         # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()   
@@ -75,11 +75,13 @@ class Drawing_Board_Rail(Rail):
             controls=[]
         )
 
-        # New
-        # Open
-        # Upload
+        # Build rail here
+        # Open/Upload Upload
         # TODO: RAIL Has brushes, tools, colors, etc.
         # Rail shows our brush/drawing design options, not a view of all drawings
+
+
+        content.controls.append(self.new_item_textfield)
 
 
         # Build the content of our rail
