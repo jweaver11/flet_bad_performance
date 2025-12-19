@@ -60,6 +60,9 @@ class Story(ft.View):
                 'bottom_pin_height': 200,
                 'created_at': str,
                 'last_modified': str,
+                'canvas_data': {
+                    'opacity': 100
+                },
 
                 'settings': {
                     'type': self.type,             # Novel or comic. Affects templates and default data for new content
@@ -93,7 +96,7 @@ class Story(ft.View):
         self.chapters: dict = {}        # Text based chapeters only
         self.notes: dict = {}           # Notes stored in our story
         self.images: dict = {}          # Images imported in to be used in the story, or just as reference
-        self.drawings: dict = {}        # Drawings by the user for comic chapters
+        self.canvases: dict = {}        # canvases by the user for comic chapters
         self.characters: dict = {}      # Characters in the story
         self.timelines: dict = {}       # Timelines for our story
         self.world_building: None       # World building widget that contains our maps, lore, governments, history, etc
@@ -116,7 +119,7 @@ class Story(ft.View):
     def startup(self):
 
         # Loads our content objects from storage into our story object. Includes chapters and images
-        # This also loads our drawing board images here, since they can be opened in either workspace
+        # This also loads our canvas board images here, since they can be opened in either workspace
         self.load_content()
 
         # Loads our characters from file storage into our characters list
@@ -166,6 +169,22 @@ class Story(ft.View):
         # Handle errors
         except Exception as e:
             self.p.open(Snack_Bar(f"Error saving story data: {e}"))
+
+    # Called for little data changes
+    def change_data(self, **kwargs):
+        ''' Changes a key/value pair in our data and saves the json file '''
+        # Called by:
+        # story.change_data(**{'key': value, 'key2': value2})
+
+        try:
+            for key, value in kwargs.items():
+                self.data.update({key: value})
+
+            self.save_dict()
+
+        # Handle errors
+        except Exception as e:
+            print(f"Error changing data {key}:{value} for story {self.title}: {e}")
             
 
     # Called when a new story is created and not loaded with any data
@@ -174,7 +193,7 @@ class Story(ft.View):
 
 
         # TODO: Try statements only when writing to files
-        # On story first creation, add default folders inside content: chapters, notes, drawings, images
+        # On story first creation, add default folders inside content: chapters, notes, canvases, images
         # Inside characters: main, side, background
 
         try:
@@ -190,7 +209,6 @@ class Story(ft.View):
                 "characters",
                 "timelines",
                 "world_building",
-                "drawing_board",
                 "planning",
             ]
 
@@ -213,7 +231,7 @@ class Story(ft.View):
                 if template is not None:
                     pass
 
-                # Create our folder to store our maps data files and their drawings
+                # Create our folder to store our maps data files and their canvases
                 maps_folders = [
                     "maps",
                     #"displays",
@@ -406,7 +424,7 @@ class Story(ft.View):
         ''' Loads our content from our content folder inside of our story folder '''
         from models.widgets.content.note import Note
         from models.widgets.content.chapter import Chapter
-        from models.widgets.content.drawing import Drawing
+        from models.widgets.content.canvas import Canvas
 
         # Check if the characters folder exists. Creates it if it doesn't. Exists in case people delete this folder
         if not os.path.exists(self.data['content_directory_path']):
@@ -445,8 +463,8 @@ class Story(ft.View):
                         elif content_data.get("tag", "") == "image":
                             print("image tag found, skipping for now")
 
-                        elif content_data.get("tag", "") == "drawing":
-                            self.drawings[content_key] = Drawing(content_title, self.p, dirpath, self, content_data)
+                        elif content_data.get("tag", "") == "canvas":
+                            self.canvases[content_key] = Canvas(content_title, self.p, dirpath, self, content_data)
 
                         elif content_data.get("tag", "") == "note":
                             self.notes[content_key] = Note(content_title, self.p, dirpath, self, content_data)
@@ -699,9 +717,9 @@ class Story(ft.View):
             if chapter not in self.widgets:
                 self.widgets.append(chapter)
 
-        for drawing in self.drawings.values():
-            if drawing not in self.widgets:
-                self.widgets.append(drawing)
+        for canvas in self.canvases.values():
+            if canvas not in self.widgets:
+                self.widgets.append(canvas)
 
         # Add all our images to the widgets list
         for image in self.images.values():
@@ -770,10 +788,10 @@ class Story(ft.View):
         self.active_rail.content.reload_rail()
         self.workspace.reload_workspace()
 
-    # Called to create a drawing object
-    def create_drawing(self, title: str, directory_path: str=None):
+    # Called to create a canvas object
+    def create_canvas(self, title: str, directory_path: str=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
-        from models.widgets.content.drawing import Drawing
+        from models.widgets.content.canvas import Canvas
 
         # If no path is passed in, construct the full file path for the note JSON file
         if directory_path is None:   # There SHOULD always be a path passed in, but this will catch errors
@@ -783,8 +801,8 @@ class Story(ft.View):
         key = directory_path + "\\" + title
 
         # Save our new note and add it to the widget list
-        self.drawings[key] = Drawing(title, self.p, directory_path, self)
-        self.widgets.append(self.drawings[key]) 
+        self.canvases[key] = Canvas(title, self.p, directory_path, self)
+        self.widgets.append(self.canvases[key]) 
 
         # Apply the UI changes
         self.active_rail.content_rail.reload_rail()

@@ -25,7 +25,7 @@ from threading import Thread
 
 
 
-class Drawing(Widget):
+class Canvas(Widget):
     def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
         # Supported categories: World map, continent, region, ocean, country, city, dungeon, room, none.
         
@@ -44,14 +44,16 @@ class Drawing(Widget):
         verify_data(
             self,
             {
-                "tag": "drawing",
+                "tag": "canvas",
                 "canvas": list,          # list[(x1,y1,x2,y2), ...] in pixel coords
                 "canvas_meta": dict,     # stores width/height used for the coords
             },
         )
 
-        self.state: State = State()
-        self.paint_brush: ft.Paint = ft.Paint(stroke_width=3)
+        # State tracking for canvas drawing info
+        self.state: State = State()         # Used for our coordinates and how to apply things
+        self.paint_type: cv.Line = None     # Type of insertion (line, rect, circle, etc)
+        self.paint_brush: ft.Paint = ft.Paint(stroke_width=3)       # Brush styling (color, width, etc)
 
         # Track last known canvas size to rescale drawings on resize
         self._last_canvas_size: tuple[float, float] | None = None
@@ -70,7 +72,6 @@ class Drawing(Widget):
             content=self.canvas,
             expand=True,
             border=ft.border.all(1, ft.Colors.BLUE),
-               # <-- rescale when the control is resized
         )
 
         #self.information_display: Drawing_Information_Display = Drawing_Information_Display()
@@ -93,6 +94,7 @@ class Drawing(Widget):
         except Exception:
             pass
 
+    # Called when the canvas control is resized
     async def on_canvas_resize(self, e: ft.ControlEvent):
         """Rescales stored drawing coordinates to match the new canvas size."""
         new_w = getattr(e, "width", None)
@@ -168,6 +170,9 @@ class Drawing(Widget):
         
 
     async def start_drawing(self, e: ft.DragStartEvent):
+
+        # Set the brush as well and grab the data we need
+        
         self.state.x, self.state.y = e.local_x, e.local_y
 
     async def is_drawing(self, e: ft.DragUpdateEvent):

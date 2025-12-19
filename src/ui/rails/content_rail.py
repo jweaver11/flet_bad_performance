@@ -73,6 +73,14 @@ class Content_Rail(Rail):
                 ])
             ),
             Menu_Option_Style(
+                #on_click=self.new_chapter_clicked,
+                data="canvas",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.BRUSH_OUTLINED),
+                    ft.Text("Canvas", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
                 on_click=self.new_note_clicked,
                 content=ft.Row(expand=True, controls=[
                     ft.Icon(ft.Icons.NOTE_ALT_OUTLINED),
@@ -92,6 +100,14 @@ class Content_Rail(Rail):
                 content=ft.Row([
                     ft.Icon(ft.Icons.NOTE_ADD_OUTLINED),
                     ft.Text("Chapter", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
+                ])
+            ),
+            Menu_Option_Style(
+                #on_click=self.new_chapter_clicked,
+                data="canvas",
+                content=ft.Row([
+                    ft.Icon(ft.Icons.BRUSH_OUTLINED),
+                    ft.Text("Canvas", color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.BOLD),
                 ])
             ),
             Menu_Option_Style(
@@ -153,7 +169,7 @@ class Content_Rail(Rail):
                             on_click=self.new_chapter_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Drawing", icon=ft.Icons.BRUSH_OUTLINED,
+                            text="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
                         ),
                         ft.PopupMenuItem(
                             text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,

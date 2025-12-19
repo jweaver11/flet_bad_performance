@@ -61,7 +61,7 @@ class Settings(ft.View):
                     "characters",
                     "timelines",
                     "world_building",
-                    "drawing_board",
+                    "canvas",
                     "planning",
                 ],
             },
