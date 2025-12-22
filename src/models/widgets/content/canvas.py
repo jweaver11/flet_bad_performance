@@ -64,7 +64,9 @@ class Canvas(Widget):
             content=ft.GestureDetector(
                 on_pan_start=self.start_drawing,
                 on_pan_update=self.is_drawing,
-                #on_pan_end=lambda e: self.save_canvas(),
+                on_pan_end=lambda e: self.save_canvas(),
+                drag_interval=10,
+                
             ),
             expand=True,
             on_resize=self.on_canvas_resize, resize_interval=20,
@@ -104,17 +106,7 @@ class Canvas(Widget):
 
         self._rebuild_canvas_from_state()
 
-    # Called when we stop a stroke to save our drawing data
-    def save_canvas(self):
-        """Saves our drawing to our saved map drawing file."""
-        self.data["canvas"] = self.state.shapes
-
-        # Persist the last known canvas size alongside the coords
-        if self._last_canvas_size is not None:
-            w, h = self._last_canvas_size
-            self.data["canvas_meta"] = {"w": float(w), "h": float(h)}
-
-        self.save_dict()
+    
         
     # Called when we start drawing on the canvas
     async def start_drawing(self, e: ft.DragStartEvent):
@@ -135,17 +127,36 @@ class Canvas(Widget):
         self.state.x, self.state.y = e.local_x, e.local_y
 
     async def is_drawing(self, e: ft.DragUpdateEvent):
-        def draw_line():
-            line = cv.Line(
-                self.state.x, self.state.y, e.local_x, e.local_y,
-                paint=self.paint
-            )
-            self.canvas.shapes.append(line)
-            self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y))
-            
-            self.p.update()
-            self.state.x, self.state.y = e.local_x, e.local_y
-        Thread(target=draw_line, daemon=True).start()
+        
+        line = cv.Line(
+            self.state.x, self.state.y, e.local_x, e.local_y,
+            paint=self.paint,
+            data=self.paint     # brush data
+        )
+        #print(line.data)
+        self.canvas.shapes.append(line)
+        self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y, self.paint.__dict__))
+        
+        self.p.update()
+        self.state.x, self.state.y = e.local_x, e.local_y
+        
+
+    # Called when we stop a stroke to save our drawing data
+    def save_canvas(self):
+        """Saves our drawing to our saved map drawing file."""
+        #self.data["canvas"] = self.state.shapes
+        self.data['canvas'].extend(self.state.shapes)
+
+        # Persist the last known canvas size alongside the coords
+        #if self._last_canvas_size is not None:
+            #w, h = self._last_canvas_size
+            #self.data["canvas_meta"] = {"w": float(w), "h": float(h)}
+
+        self.save_dict()
+
+        self.state.shapes.clear()
+
+
 
 
     def _rebuild_canvas_from_state(self) -> None:
