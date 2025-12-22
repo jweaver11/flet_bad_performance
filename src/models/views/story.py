@@ -68,6 +68,8 @@ class Story(ft.View):
                     
                     'stroke_cap': "butt",
                     'stroke_join': "miter",
+                    'stroke_miter_limit': 10,
+                    'stroke_dash_pattern': list,
 
                     #'blend_mode': "normal",
                     #'gradient': None,

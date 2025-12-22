@@ -52,8 +52,7 @@ class Canvas_Rail(Rail):
             icon=ft.Icons.COLOR_LENS_OUTLINED, tooltip="The color of your brush strokes.",
             icon_color=self.story.data.get('paint_settings', {}).get('color', ft.Colors.PRIMARY),
             on_click=self._color_picker_clicked
-        )
-       
+        )       
 
         # Reload the rail on start
         self.reload_rail()
@@ -136,10 +135,18 @@ class Canvas_Rail(Rail):
         # Called when changing paint style
         def _paint_style_changed(e):
             new_style = e.control.text.lower()      # New style
+            self.story.data['paint_settings']['stroke_dash_pattern'] = None   # Clear any dash pattern when changing style
             if new_style == "stroke":       # Change the icon
                 e.control.parent.content = ft.Icon(ft.Icons.BRUSH_OUTLINED)
-            else:
+            elif new_style == "fill":
                 e.control.parent.content = ft.Icon(ft.Icons.FORMAT_COLOR_FILL_OUTLINED)
+            else:
+                # Dashed line is not a style, so we just add stroke_dash pattern data and return
+                e.control.parent.content = ft.Icon(ft.Icons.LINE_STYLE_OUTLINED)
+                self.story.data['paint_settings']['stroke_dash_pattern'] = [self.story.data['paint_settings']['stroke_width'], self.story.data['paint_settings']['stroke_width']]   # Default dash pattern
+                self.story.save_dict()
+                self.p.update()
+                return
             self.story.data['paint_settings']['style'] = new_style      # Update the data
             self.story.save_dict()
             self.p.update()     # Update the page
@@ -206,6 +213,7 @@ class Canvas_Rail(Rail):
             menu_padding=ft.padding.all(0),
             items=[
                 ft.PopupMenuItem(text="Stroke", icon=ft.Icons.BRUSH_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Dashed Stroke", icon=ft.Icons.LINE_STYLE_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Fill", icon=ft.Icons.FORMAT_COLOR_FILL_OUTLINED, on_click=_paint_style_changed),
             ]
         )
@@ -253,20 +261,20 @@ class Canvas_Rail(Rail):
         )
 
 
+
+
         # Build the content of our rail
         content = ft.Column(
             scroll=ft.ScrollMode.AUTO,
             controls=[
                 ft.Row([ft.Text("Brush Settings: ", theme_style=ft.TextThemeStyle.TITLE_MEDIUM, weight=ft.FontWeight.BOLD)], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Row([self.color_picker_button, paint_style], alignment=ft.MainAxisAlignment.SPACE_EVENLY),
-                ft.Row([ft.Text("Size:", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
-                ft.Row([ft.Text("Opacity:", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_opacity]),
-                ft.Row([ft.Text("Stroke Cap Shape:", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_cap]),
-                ft.Row([ft.Text("Stroke Join Shape:", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_join]),
+                ft.Row([ft.Text("Size", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
+                ft.Row([ft.Text("Opacity", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_opacity]),
+                ft.Row([ft.Text("Stroke Cap Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_cap]),
+                ft.Row([ft.Text("Stroke Join Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_join]),
 
                 # gradient
-                # stroke join
-                # stroke miter
                 # stroke dash pattern
                 
                 ft.Divider(),
