@@ -60,10 +60,8 @@ class Story(ft.View):
                 'bottom_pin_height': 200,
                 'created_at': str,
                 'last_modified': str,
-                'canvas_data': {
-                    'stroke_shape': "line",    # freehand, line, rectangle, circle, etc
-                    'color': "#FFFFFF",
-                    'opacity': 100,
+                'paint_settings': {
+                    'color': "#FFFFFF,1.0",     # Hex color folowed by opacity
                     'stroke_width': 3,
                     'anti_alias': True,
                     'blend_mode': "normal",
