@@ -61,18 +61,21 @@ class Story(ft.View):
                 'created_at': str,
                 'last_modified': str,
                 'paint_settings': {
+                    # Stroke styles
                     'color': "#FFFFFF,1.0",     # Hex color folowed by opacity
                     'stroke_width': 3,
                     'style': "stroke",
-                    'anti_alias': True,
-                    
                     'stroke_cap': "butt",
                     'stroke_join': "miter",
                     'stroke_miter_limit': 10,
                     'stroke_dash_pattern': list,
-
-                    #'blend_mode': "normal",
                     #'gradient': None,
+
+                    # Effects
+                    'anti_alias': True,
+                    'blur_image': 10,
+                    'blend_mode': "src_over",
+                    
                 },
 
                 'settings': {
