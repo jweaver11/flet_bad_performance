@@ -12,4 +12,5 @@ class State:
 
         self.y: float = float()
 
-        self.shapes = []
+        self.lines = []
+        self.points = []

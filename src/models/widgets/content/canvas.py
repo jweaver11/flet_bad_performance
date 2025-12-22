@@ -48,11 +48,16 @@ class Canvas(Widget):
                 
                 "canvas_meta": dict,     # stores width/height used for the coords for resizing
                 "canvas": list,          # Stores the lines data to storage so we can load it later
+                "canvas": {
+                    'lines': list,
+                    'points': list,
+                },
             },
         )
 
         # State tracking for canvas drawing info
         self.state: State = State()         # Used for our coordinates and how to apply things
+        self.min_segment_dist: float = 3.0
 
         # Track last known canvas size to rescale drawings on resize
         self._last_canvas_size: tuple[float, float] | None = None
@@ -62,6 +67,7 @@ class Canvas(Widget):
                 on_pan_start=self.start_drawing,
                 on_pan_update=self.is_drawing,
                 on_pan_end=lambda e: self.save_canvas(),
+                #on_tap_up=lambda e: print("Long press ended"),      # Handles so we can add points
                 drag_interval=30,
                 
             ),
@@ -77,6 +83,8 @@ class Canvas(Widget):
 
         #self.information_display: Drawing_Information_Display = Drawing_Information_Display()
         #self.mini_widgets.append(self.information_display)
+
+        # Add notes to drawings??
         
        
         # Load our drawing/display
@@ -87,8 +95,8 @@ class Canvas(Widget):
     def load_canvas(self):
         """Loads our drawing from our saved map drawing file."""
 
-        lines = self.data.get('canvas', [])
-        for line in lines:
+        shapes = self.data.get('canvas', {})
+        for line in shapes.get('lines', []):
             x1, y1, x2, y2, paint_settings = line
             self.canvas.shapes.append(
                 cv.Line(
@@ -102,11 +110,32 @@ class Canvas(Widget):
     # Called when we start drawing on the canvas
     async def start_drawing(self, e: ft.DragStartEvent):
         ''' Set our initial starting x and y coordinates for the line we're drawing '''
+
         self.state.x, self.state.y = e.local_x, e.local_y
+
+        point = cv.Points(
+            points=[(e.local_x, e.local_y)],
+            paint=ft.Paint(**self.story.data.get('paint_settings', {})),
+        )
+        self.canvas.shapes.append(point)
+
+        self.state.points.append((e.local_x, e.local_y, point.paint.__dict__))
+
+        # After dragging canvas widget, it loses page reference and can't update
+        try:
+            self.canvas.update()
+        except Exception as ex:
+            self.p.update()
 
     # Called when actively drawing on the canvas
     async def is_drawing(self, e: ft.DragUpdateEvent):
         ''' Creates our line to add to the canvas as we draw, and saves that lines data to self.state '''
+
+        # Sampling to improve perforamance. If the line length is too small, we skip it
+        dx = e.local_x - self.state.x
+        dy = e.local_y - self.state.y
+        if dx * dx + dy * dy < self.min_segment_dist * self.min_segment_dist:
+            return
         
         # Create our line using our previous x and y, the current x and y, and our brush settings.
         line = cv.Line(
@@ -125,7 +154,7 @@ class Canvas(Widget):
         
 
         # Store the shape so we can save it to data
-        self.state.shapes.append((self.state.x, self.state.y, e.local_x, e.local_y, line.paint.__dict__))
+        self.state.lines.append((self.state.x, self.state.y, e.local_x, e.local_y, line.paint.__dict__))
 
         # Update our state x and y for the next segment
         self.state.x, self.state.y = e.local_x, e.local_y
@@ -137,68 +166,23 @@ class Canvas(Widget):
         """ Saves our lines to our canvas data for storage """
         
         # Add on to what we already have
-        self.data['canvas'].extend(self.state.shapes)
+        if self.state.lines:
+            self.data['canvas']['lines'].extend(self.state.lines)
+        if self.state.points:
+            self.data['canvas']['points'].extend(self.state.points)
 
         self.save_dict()
 
         # Clear the current state, otherwise it constantly grows and lags the program
-        self.state.shapes.clear()
+        self.state.lines.clear()
 
 
-    def _rebuild_canvas_from_state(self) -> None:
-        """Rebuild visible canvas shapes from self.state.shapes."""
-        self.canvas.shapes.clear()
-        for x1, y1, x2, y2 in self.state.shapes:
-            self.canvas.shapes.append(
-                cv.Line(x1, y1, x2, y2, paint=self.paint)
-            )
-
-        #self.p.update()
-        self.canvas.update()
+    
 
     # Called when the canvas control is resized
     async def on_canvas_resize(self, e: ft.ControlEvent):
         """Rescales stored drawing coordinates to match the new canvas size."""
-        new_w = getattr(e, "width", None)
-        new_h = getattr(e, "height", None)
-
-        # Fallback if event doesn't expose width/height
-        if not new_w or not new_h:
-            new_w = getattr(self.canvas_container, "width", None)
-            new_h = getattr(self.canvas_container, "height", None)
-
-        if not new_w or not new_h:
-            return
-
-        # First size we learn: treat as baseline (no rescale yet)
-        if self._last_canvas_size is None:
-            self._last_canvas_size = (float(new_w), float(new_h))
-            self.data["canvas_meta"] = {"w": float(new_w), "h": float(new_h)}
-            return
-
-        old_w, old_h = self._last_canvas_size
-        if old_w <= 0 or old_h <= 0:
-            self._last_canvas_size = (float(new_w), float(new_h))
-            self.data["canvas_meta"] = {"w": float(new_w), "h": float(new_h)}
-            return
-
-        sx = float(new_w) / float(old_w)
-        sy = float(new_h) / float(old_h)
-
-        if sx == 1.0 and sy == 1.0:
-            return
-
-        # Scale all stored coords
-        self.state.shapes = [
-            (x1 * sx, y1 * sy, x2 * sx, y2 * sy)
-            for (x1, y1, x2, y2) in self.state.shapes
-        ]
-
-        self._rebuild_canvas_from_state()
-
-        # Update meta so future resizes and saves remain consistent
-        self._last_canvas_size = (float(new_w), float(new_h))
-        self.data["canvas_meta"] = {"w": float(new_w), "h": float(new_h)}
+        pass
 
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):       
@@ -211,12 +195,3 @@ class Canvas(Widget):
 
         self._render_widget()
     
-
-
-# Add notes to drawings, duhhh
-
-
-# What a drawing should do on load:
-# Load its normal widget data
-# Load its drawing data (shapes, lines, etc) from its _canvas file
-# resize_interval = 10

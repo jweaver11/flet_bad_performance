@@ -51,7 +51,7 @@ class Canvas_Rail(Rail):
         self.color_picker_button = ft.IconButton(
             icon=ft.Icons.COLOR_LENS_OUTLINED,
             icon_color=self.story.data.get('paint_settings', {}).get('color', ft.Colors.PRIMARY),
-            tooltip="Color Picker", on_click=self.color_picker_clicked
+            tooltip="Color Picker", on_click=self._color_picker_clicked
         )
        
 
@@ -75,7 +75,7 @@ class Canvas_Rail(Rail):
 
    
     # Called when color picker button is clicked to change color
-    def color_picker_clicked(self, e):
+    def _color_picker_clicked(self, e):
         ''' Opens a dialog to pick new hex brush color.'''
 
         # Called when the apply button is selected. Applies to color change to data and UI
@@ -85,10 +85,11 @@ class Canvas_Rail(Rail):
             selected_color = self.color_picker.color
            
             # Our story data needs the opacity, but color picker can't have it
-            opacity = self.story.data.get('canvas_data', {}).get('color', "1.0").split(",", 1)[1].strip()
+            opacity = self.story.data.get('paint_settings', {}).get('color', "1.0").split(",", 1)[1].strip()
             color_with_opacity = f"{selected_color},{opacity}"
             
-            self.story.change_data(**{'paint_settings': {'color': color_with_opacity}})
+            self.story.data['paint_settings']['color'] = color_with_opacity
+            self.story.save_dict()
 
             self.color_picker_button.icon_color = selected_color
             self.p.close(alert_dialog)
@@ -107,26 +108,28 @@ class Canvas_Rail(Rail):
         # Open the dialog
         self.p.open(alert_dialog)
 
-    # Called when we change the opacity on our slider
-    def opacity_changed(self, e):
-        ''' Handles when the opacity slider is changed. Updates our story data. '''
 
-        new_opacity = float(e.control.value)/100
-
-        print("New Opacity:", new_opacity)
-
-        # Get our current color without opacity
-        current_color = self.story.data.get('paint_settings', {}).get('color', "#000000").split(",", 1)[0].strip()
-        color_with_opacity = f"{current_color},{new_opacity}"
-
-        print("Color with Opacity:", color_with_opacity)
-
-        self.story.change_data(**{'paint_settings': {'color': color_with_opacity}})
-
-    
 
     # Called on startup and when we have changes to the rail that have to be reloaded 
     def reload_rail(self):
+
+        def _paint_width_changed(e):
+            new_width = int(e.control.value)
+
+            # Change the data directly
+            self.story.data['paint_settings']['stroke_width'] = new_width
+            self.story.save_dict()
+
+        def _paint_opacity_changed(e):
+            new_opacity = float(e.control.value)/100
+
+            # Get our current color without opacity
+            current_color = self.story.data.get('paint_settings', {}).get('color', "#000000").split(",", 1)[0].strip()
+            color_with_opacity = f"{current_color},{new_opacity}"
+
+            # Change the data directly
+            self.story.data['paint_settings']['color'] = color_with_opacity
+            self.story.save_dict()
 
         header = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -140,12 +143,19 @@ class Canvas_Rail(Rail):
             min=0, max=100, expand=True,
             divisions=100, value=opacity_value,
             label="Opacity: {value}%",
-            on_change_end=self.opacity_changed
+            on_change_end=_paint_opacity_changed
+        )
+
+        paint_width = ft.Slider(
+            min=1, max=50, expand=True,
+            divisions=49, value=self.story.data.get('paint_settings', {}).get('stroke_width', 5),
+            label="Brush Size: {value}px",
+            on_change_end=_paint_width_changed
         )
         
         
-        # Type of brush?
-        # Brush settings - color, width, anti alias, blend modes, blur image?, gradient
+        # Type of brush
+        # Brush settings  anti alias, blend modes, blur image?, gradient
                  
 
         # Build the content of our rail
@@ -154,6 +164,7 @@ class Canvas_Rail(Rail):
             spacing=0,
             controls=[
                 self.color_picker_button,
+                ft.Row([ft.Text("Size:", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
                 ft.Row([ft.Text("Opacity:", theme_style=ft.TextThemeStyle.LABEL_LARGE), opacity])
             ]
         )

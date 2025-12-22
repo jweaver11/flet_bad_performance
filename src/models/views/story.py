@@ -66,6 +66,7 @@ class Story(ft.View):
                     'anti_alias': True,
                     'blend_mode': "normal",
                     'gradient': None,
+                    'stroke_cap': "round",
                 },
 
                 'settings': {
