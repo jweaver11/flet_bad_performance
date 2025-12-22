@@ -64,12 +64,12 @@ class Canvas(Widget):
 
         self.canvas: cv.Canvas = cv.Canvas(
             content=ft.GestureDetector(
+                mouse_cursor=ft.MouseCursor.PRECISE,
                 on_pan_start=self.start_drawing,
                 on_pan_update=self.is_drawing,
                 on_pan_end=lambda e: self.save_canvas(),
-                #on_tap_up=lambda e: print("Long press ended"),      # Handles so we can add points
-                drag_interval=30,
-                
+                on_tap_up=self.add_point,      # Handles so we can add points
+                drag_interval=20,
             ),
             expand=True,
             on_resize=self.on_canvas_resize, resize_interval=20,
@@ -85,11 +85,14 @@ class Canvas(Widget):
         #self.mini_widgets.append(self.information_display)
 
         # Add notes to drawings??
-        
+        self.interactive_viewer: ft.InteractiveViewer = ft.InteractiveViewer(
+            content=self.canvas_container,
+        )
        
         # Load our drawing/display
         self.load_canvas()
         self.reload_widget()
+
 
     # Called on launch to load our drawing from data into our canvas
     def load_canvas(self):
@@ -104,6 +107,14 @@ class Canvas(Widget):
                     ft.Paint(**paint_settings),
                 )
             )
+        for point in shapes.get('points', []):
+            px, py, paint_settings = point
+            self.canvas.shapes.append(
+                cv.Points(
+                    points=[(px, py)],
+                    paint=ft.Paint(**paint_settings),
+                )
+            )
 
     
         
@@ -112,6 +123,13 @@ class Canvas(Widget):
         ''' Set our initial starting x and y coordinates for the line we're drawing '''
 
         self.state.x, self.state.y = e.local_x, e.local_y
+
+        print("Paint style: ", ft.Paint(**self.story.data.get('paint_settings', {})))
+
+
+    # Called when we click the canvas and don't initiate a drag
+    async def add_point(self, e: ft.TapEvent):
+        ''' Adds a point to the canvas if we just clicked and didn't initiate a drag '''
 
         point = cv.Points(
             points=[(e.local_x, e.local_y)],
@@ -126,6 +144,9 @@ class Canvas(Widget):
             self.canvas.update()
         except Exception as ex:
             self.p.update()
+
+        self.save_canvas()
+        
 
     # Called when actively drawing on the canvas
     async def is_drawing(self, e: ft.DragUpdateEvent):
@@ -175,6 +196,7 @@ class Canvas(Widget):
 
         # Clear the current state, otherwise it constantly grows and lags the program
         self.state.lines.clear()
+        self.state.points.clear()
 
 
     
@@ -191,7 +213,7 @@ class Canvas(Widget):
         # Rebuild out tab to reflect any changes
         self.reload_tab()
 
-        self.body_container.content = self.canvas_container
+        self.body_container.content = self.interactive_viewer
 
         self._render_widget()
     

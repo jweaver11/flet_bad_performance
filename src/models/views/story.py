@@ -63,10 +63,14 @@ class Story(ft.View):
                 'paint_settings': {
                     'color': "#FFFFFF,1.0",     # Hex color folowed by opacity
                     'stroke_width': 3,
+                    'style': "stroke",
                     'anti_alias': True,
-                    'blend_mode': "normal",
-                    'gradient': None,
-                    'stroke_cap': "round",
+                    
+                    'stroke_cap': "butt",
+                    'stroke_join': "miter",
+
+                    #'blend_mode': "normal",
+                    #'gradient': None,
                 },
 
                 'settings': {
