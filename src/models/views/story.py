@@ -826,7 +826,7 @@ class Story(ft.View):
         self.workspace.reload_workspace()
 
     # Called to create a canvas object
-    def create_canvas(self, title: str, directory_path: str=None):
+    def create_canvas(self, title: str, directory_path: str=None, data: dict=None):
         ''' Creates a new note object, saves it to our live story object, and saves it to storage'''
         from models.widgets.content.canvas import Canvas
 
@@ -837,8 +837,14 @@ class Story(ft.View):
         # Set the key
         key = directory_path + "\\" + title
 
+        # Format our data if we have any
+        if data is not None:
+            new_data = {'canvas_meta': data}
+
+            print("Data to pass in: ", new_data)
+
         # Save our new note and add it to the widget list
-        self.canvases[key] = Canvas(title, self.p, directory_path, self)
+        self.canvases[key] = Canvas(title, self.p, directory_path, self, new_data)
         self.widgets.append(self.canvases[key]) 
 
         # Apply the UI changes
@@ -924,13 +930,11 @@ class Story(ft.View):
     # Called clicking outside the menu to close it
     def close_menu(self, e=None):
         ''' Closes our right click menu when clicking outside of it '''
-        try:
-            # Removes the controls from our overlay and applies to UI
-            self.p.overlay.clear()
-            self.p.update()
+        
+        self.p.overlay.clear()
+        self.p.update()
 
-        except Exception as e:
-            print(f"Error closing menu: {e}")
+        
 
     # Called when we right click our object on the tree view
     def open_menu(self, menu_options: list):

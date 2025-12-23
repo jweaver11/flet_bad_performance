@@ -4,12 +4,8 @@ Maps are widgets that have their own drawing canvas, and info display. they can 
 '''
 
 #TODO: 
-# BLANK NO TEMPLATE MAPS EXIST AS WELL
 # ADD DUPLICATE OPTION AS WELL
-# Users can choose to create their image or use some default ones, or upload their own
-# When hovering over a map, display it on the rail as well so we can see where new sub maps would
-
-# THERES A MAP DISPLAY DUMMY, HB U CHECK THAT OUT!!!!!
+# Option for transparent background/no brackground
 
 
 import os
@@ -22,12 +18,20 @@ from styles.snack_bar import Snack_Bar
 from models.state import State
 import flet.canvas as cv
 from threading import Thread
+#from PIL import Image, ImageDraw
 
 
 
 class Canvas(Widget):
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None):
-        # Supported categories: World map, continent, region, ocean, country, city, dungeon, room, none.
+    def __init__(
+            self, 
+            title: str, 
+            page: ft.Page, 
+            directory_path: str, 
+            story: Story, 
+            data: dict = None,
+            canvas_data: dict = None,
+        ):
         
         
         # Parent constructor
@@ -39,6 +43,8 @@ class Canvas(Widget):
             data=data,  
         ) 
 
+        
+
 
         # Verifies this object has the required data fields, and creates them if not
         verify_data(
@@ -46,8 +52,15 @@ class Canvas(Widget):
             {
                 "tag": "canvas",
                 
-                "canvas_meta": dict,     # stores width/height used for the coords for resizing
-                "canvas": list,          # Stores our drawing data
+                "canvas_meta": {        # Set canvas data here
+                    "width": int,
+                    "height": int,
+                    "aspect_ratio": float,
+                    "bgcolor": str,
+                    "bgimage": str,
+                },     
+
+                #"canvas": list,          # Stores our drawing data
                 "canvas": {
                     'paths': list,
                     'points': list,
@@ -62,7 +75,7 @@ class Canvas(Widget):
         # Track last known canvas size to rescale drawings on resize
         self._last_canvas_size: tuple[float, float] | None = None
 
-        self.canvas: cv.Canvas = cv.Canvas(
+        self.canvas = cv.Canvas(
             content=ft.GestureDetector(
                 mouse_cursor=ft.MouseCursor.PRECISE,
                 on_pan_start=self.start_drawing,
@@ -75,24 +88,34 @@ class Canvas(Widget):
             on_resize=self.on_canvas_resize, resize_interval=100,
         )
 
-        self.canvas_container: ft.Container = ft.Container(
-            content=self.canvas,
+
+        
+
+        self.canvas_container = ft.Container(
+            content=self.canvas, width=2000, height=1000,
             expand=True, clip_behavior=ft.ClipBehavior.HARD_EDGE,
-            border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT),
+            margin=ft.margin.all(20), bgcolor=ft.Colors.SURFACE,
+            border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
+            #aspect_ratio=1/2,
+            # Sets bgcolor or image based on canvas settings, and aspect ratio
         )
+
+
+        
 
         #self.information_display: Drawing_Information_Display = Drawing_Information_Display()
         #self.mini_widgets.append(self.information_display)
 
         # Add notes to drawings??
-        self.interactive_viewer: ft.InteractiveViewer = ft.InteractiveViewer(
-            content=self.canvas_container,
-        )
 
-        self.current_path: cv.Path = cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
+
+        self.interactive_viewer = ft.InteractiveViewer(content=self.canvas_container)
+
+        self.current_path = cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
        
         # Load our drawing/display
         self.load_canvas()
+
         self.reload_widget()
 
     
@@ -104,18 +127,6 @@ class Canvas(Widget):
 
         shapes = self.data.get('canvas', {})
 
-        '''
-        #OLD - Used Lines but was much more performance heavy
-        
-        for line in shapes.get('paths', []):
-            x1, y1, x2, y2, paint_settings = line
-            self.canvas.shapes.append(
-                cv.Line(
-                    x1, y1, x2, y2,
-                    ft.Paint(**paint_settings),
-                )
-            )
-        '''
 
         # Loading points
         for point in shapes.get('points', []):
@@ -128,12 +139,11 @@ class Canvas(Widget):
                 )
             )
 
-        
-
+        # Loading paths
         for path in shapes.get('paths', []):
             
-            elements = path.get('elements', []) # List of the elements in this path
-            paint_settings = path.get('paint', {})  # Paint settings for this path
+            elements = path.get('elements', [])         # List of the elements in this path
+            paint_settings = path.get('paint', {})      # Paint settings for this path
 
             new_path = cv.Path(elements=[], paint=ft.Paint(**paint_settings))   # Set a new path for this path with our paint settings
 
@@ -162,7 +172,6 @@ class Canvas(Widget):
             point_mode=self.story.data.get('canvas_settings', {}).get('point_mode', 'points'),
             paint=ft.Paint(**self.story.data.get('paint_settings', {})),
         )
-
         # Add point to the canvas and our state data
         self.canvas.shapes.append(point)
         self.state.points.append((e.local_x, e.local_y, point.point_mode, point.paint.__dict__))
@@ -187,11 +196,7 @@ class Canvas(Widget):
         self.current_path = cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
         self.state.paths.clear()
         self.state.paths.append({'elements': list(), 'paint': self.story.data.get('paint_settings')})
-        #self.state.paths['paint'] = self.story.data.get('paint_settings')
-
-
-        # Add check for what kind of path (if one at at all) here
-        
+        #self.state.paths['paint'] = self.story.data.get('paint_settings')        
 
         # Set move to element at our starting position that the mouse is at for the path to start from
         move_to_element = cv.Path.MoveTo(e.local_x, e.local_y)
@@ -217,22 +222,9 @@ class Canvas(Widget):
         if dx * dx + dy * dy < self.min_segment_dist * self.min_segment_dist:
             return
         
-        '''
-        OLD - Used Lines but was much more performance heavy
-        # Create our line using our previous x and y, the current x and y, and our brush settings.
-        line = cv.Line(
-            self.state.x, self.state.y, e.local_x, e.local_y,
-            paint=ft.Paint(**self.story.data.get('paint_settings', {})),
-        )
 
-        # Store the shape so we can save it to data
-        #self.state.lines.append((self.state.x, self.state.y, e.local_x, e.local_y, line.paint.__dict__))
-
-        # Add the line to our canvas so we can see it
-        self.canvas.shapes.append(line)
-        '''
-
-        # Check for what type of path we're adding here
+        # Add check for what kind of path (if one at at all) here
+        
 
         # Set the path element based on what kind of path we're adding, add it to our current path and our state paths
         path_element = cv.Path.LineTo(e.local_x, e.local_y)
@@ -256,7 +248,6 @@ class Canvas(Widget):
     # Called when we release the mouse to stop drawing a line
     def save_canvas(self):
         """ Saves our paths to our canvas data for storage """
-
         
         # Add on to what we already have
         if self.state.paths:
@@ -278,6 +269,84 @@ class Canvas(Widget):
         """Rescales stored drawing coordinates to match the new canvas size."""
         pass
 
+
+    # NOT TESTED ----------------------------------
+    def export_canvas(self, filename: str = "canvas_export.png", desired_width: int = 1920, desired_height: int = 1080):
+        """Exports the canvas as an image at desired size, computing bounds if no meta exists."""
+        shapes = self.data.get('canvas', {})
+        
+        # Compute bounding box from all coordinates
+        min_x, min_y, max_x, max_y = float('inf'), float('inf'), float('-inf'), float('-inf')
+        
+        # Check points
+        for point in shapes.get('points', []):
+            px, py = point[0], point[1]
+            min_x = min(min_x, px)
+            min_y = min(min_y, py)
+            max_x = max(max_x, px)
+            max_y = max(max_y, py)
+        
+        # Check paths
+        for path in shapes.get('paths', []):
+            for element in path.get('elements', []):
+                if 'x' in element and 'y' in element:
+                    min_x = min(min_x, element['x'])
+                    min_y = min(min_y, element['y'])
+                    max_x = max(max_x, element['x'])
+                    max_y = max(max_y, element['y'])
+        
+        # If no shapes, use defaults
+        if min_x == float('inf'):
+            min_x, min_y, max_x, max_y = 0, 0, desired_width, desired_height
+        
+        # Calculate original bounds
+        orig_width = max_x - min_x
+        orig_height = max_y - min_y
+        
+        # Avoid division by zero
+        if orig_width == 0:
+            orig_width = 1
+        if orig_height == 0:
+            orig_height = 1
+        
+        # Scale factor to fit desired size (maintain aspect ratio or stretch as needed)
+        scale_x = desired_width / orig_width
+        scale_y = desired_height / orig_height
+        scale = min(scale_x, scale_y)  # To fit without cropping; use max for stretching
+        
+        # Create image at desired size
+        #img = Image.new("RGBA", (desired_width, desired_height), (255, 255, 255, 0))
+        #draw = ImageDraw.Draw(img)
+        
+        # Render shapes, scaled and translated
+        offset_x = (desired_width - orig_width * scale) / 2  # Center horizontally
+        offset_y = (desired_height - orig_height * scale) / 2  # Center vertically
+        
+        # Render points
+        for point in shapes.get('points', []):
+            px, py, point_mode, paint_settings = point
+            scaled_x = (px - min_x) * scale + offset_x
+            scaled_y = (py - min_y) * scale + offset_y
+            # Draw as circle (adapt for point_mode)
+            #draw.ellipse((scaled_x-2, scaled_y-2, scaled_x+2, scaled_y+2), fill=paint_settings.get('color', 'black'))
+        
+        # Render paths (simplified; full path rendering needs more logic for curves)
+        for path in shapes.get('paths', []):
+            paint_settings = path.get('paint', {})
+            points = []
+            for element in path.get('elements', []):
+                if element['type'] in ['moveto', 'lineto']:
+                    scaled_x = (element['x'] - min_x) * scale + offset_x
+                    scaled_y = (element['y'] - min_y) * scale + offset_y
+                    points.append((scaled_x, scaled_y))
+            #if points:
+                #draw.line(points, fill=paint_settings.get('color', 'black'), width=2)
+        
+        #img.save(os.path.join(self.directory_path, filename))
+        self.page.snack_bar = Snack_Bar(f"Canvas exported to {filename} at {desired_width}x{desired_height}")
+        self.page.snack_bar.open = True
+        self.page.update()
+
     # Called when we need to rebuild out timeline UI
     def reload_widget(self):       
         ''' Rebuilds/reloads our map UI '''
@@ -285,7 +354,10 @@ class Canvas(Widget):
         # Rebuild out tab to reflect any changes
         self.reload_tab()
 
+        self.body_container.alignment = ft.alignment.center
+
         self.body_container.content = self.interactive_viewer
 
         self._render_widget()
+
 

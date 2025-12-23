@@ -7,6 +7,7 @@ from styles.menu_option_style import Menu_Option_Style
 import math
 from flet_contrib.color_picker import ColorPicker
 from models.app import app
+from handlers.new_canvas_alert_dlg import new_canvas_alert_dlg
 
 
 # Class for our Canvas Board rail
@@ -25,15 +26,8 @@ class Canvas_Rail(Rail):
         # Buttons at the top of the rail
         self.top_row_buttons = [
             ft.IconButton(
-                tooltip="New Vertical Canvas",
-                icon=ft.Icons.COMPARE_ARROWS_OUTLINED,
-                rotate=ft.Rotate(math.pi/2),  # 90 degrees counter-clockwise
-                on_click=self.new_canvas_clicked
-            ),
-            
-            ft.IconButton(
-                tooltip="New Horizontal canvas",
-                icon=ft.Icons.COMPARE_ARROWS_OUTLINED,
+                tooltip="New Canvas",
+                icon=ft.Icons.ADD_CIRCLE_OUTLINE_OUTLINED,
                 on_click=self.new_canvas_clicked
             ),
             ft.IconButton(
@@ -63,17 +57,12 @@ class Canvas_Rail(Rail):
     # Called when new character button or menu option is clicked
     def new_canvas_clicked(self, e):
         ''' Handles setting our textfield for new character creation '''
-        
-        # Makes sure the right textfield is visible and the others are hidden
-        self.new_item_textfield.visible = True
-
-        # Set our textfield value to none, and the hint and data
-        self.new_item_textfield.value = None
-        self.new_item_textfield.hint_text = "Canvas Title"
-        self.new_item_textfield.data = "canvas"
 
         # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()   
+
+        self.p.open(new_canvas_alert_dlg(self.p, self.story))
+        self.p.update()
 
    
     # Called when color picker button is clicked to change color
@@ -117,8 +106,6 @@ class Canvas_Rail(Rail):
         mode = str(self.story.data.get('paint_settings', {}).get('blend_mode', 'src_over'))
         match mode:
             case "src_over":
-                return "Source Over"
-            case "none":
                 return "None"
             case "clear":
                 return "Clear"
@@ -207,12 +194,13 @@ class Canvas_Rail(Rail):
 
         # Called when changing paint style
         def _paint_style_changed(e):
-            new_style = e.control.text.lower()      # New style
+            new_style = e.control.data     # New style
             self.story.data['paint_settings']['stroke_dash_pattern'] = None   # Clear any dash pattern when changing style
-            if new_style == "stroke":       # Change the icon
-                e.control.parent.icon = ft.Icons.BRUSH_OUTLINED
-            elif new_style == "fill":
-                e.control.parent.icon = ft.Icons.FORMAT_COLOR_FILL_OUTLINED
+            if new_style is not None:
+                if new_style == "stroke":       # Change the icon
+                    e.control.parent.icon = ft.Icons.BRUSH_OUTLINED
+                elif new_style == "fill":
+                    e.control.parent.icon = ft.Icons.GESTURE_OUTLINED
             else:
                 # Dashed line is not a style, so we just add stroke_dash pattern data and return
                 e.control.parent.icon = ft.Icons.LINE_STYLE_OUTLINED
@@ -264,7 +252,7 @@ class Canvas_Rail(Rail):
         def _paint_blend_mode_changed(e):
             mode = e.control.data
 
-            if mode == "src_over" or mode == "none":
+            if mode == "src_over":
                 self.paint_blend_mode.icon = ft.Icons.BLUR_OFF_OUTLINED
                 self.story.data['paint_settings']['blend_mode'] = "src_over"
             else:
@@ -303,17 +291,17 @@ class Canvas_Rail(Rail):
         if self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'stroke':
             paint_style_icon = ft.Icons.BRUSH_OUTLINED
         elif self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'fill':
-            paint_style_icon = ft.Icons.FORMAT_COLOR_FILL_OUTLINED
-        else:
+            paint_style_icon = ft.Icons.GESTURE_OUTLINED
+        if self.story.data.get('paint_settings', {}).get('stroke_dash_pattern', None):
             paint_style_icon = ft.Icons.LINE_STYLE_OUTLINED
         paint_style = ft.PopupMenuButton(
             icon=paint_style_icon,
             tooltip="The style of paint for your brush strokes.",
             menu_padding=ft.padding.all(0),
             items=[
-                ft.PopupMenuItem(text="Stroke", icon=ft.Icons.BRUSH_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Stroke", data="stroke", icon=ft.Icons.BRUSH_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Dashed Stroke", icon=ft.Icons.LINE_STYLE_OUTLINED, on_click=_paint_style_changed),
-                ft.PopupMenuItem(text="Fill", icon=ft.Icons.FORMAT_COLOR_FILL_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Lasso Fill", data="fill", icon=ft.Icons.GESTURE_OUTLINED, on_click=_paint_style_changed),
             ]
         )
 
@@ -374,7 +362,7 @@ class Canvas_Rail(Rail):
             icon=paint_blend_mode_icon,
             tooltip="The blend mode of your brush strokes.", menu_padding=ft.padding.all(0),
             items=[
-                ft.PopupMenuItem(text="None", icon=ft.Icons.BLUR_OFF_OUTLINED, on_click=_paint_blend_mode_changed, data="none", tooltip="No blend mode"),
+                ft.PopupMenuItem(text="None", icon=ft.Icons.BLUR_OFF_OUTLINED, on_click=_paint_blend_mode_changed, data="src_over", tooltip="No blend mode"),
                 ft.PopupMenuItem(text="Clear", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="clear", tooltip="Drop both the source and destination images, leaving nothing"),
                 ft.PopupMenuItem(text="Color", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="color", tooltip="Take the hue and saturation of the source image, and the luminosity of the destination image"),
                 ft.PopupMenuItem(text="Color Burn", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="color_burn", tooltip="Divide the inverse of the destination by the source, and inverse the result"),
@@ -416,7 +404,8 @@ class Canvas_Rail(Rail):
                 ft.Row([ft.Text("Brush Settings: ", theme_style=ft.TextThemeStyle.TITLE_MEDIUM, weight=ft.FontWeight.BOLD)], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Row([self.color_picker_button, paint_style], alignment=ft.MainAxisAlignment.SPACE_EVENLY),
 
-                # CHeckbox erase mode - set color to transparent and blendmode.clear?
+                # Checkbox erase mode - set color to transparent and blendmode.clear?
+                # Add shapes button. Path will use paint.style.paintingstyle fill or stroke.
                 # Point mode selector. Point, lines, polygon
                 # Some sort of cv.Path.Close() option
 

@@ -6,6 +6,7 @@ from models.views.story import Story
 from ui.rails.rail import Rail
 from handlers.tree_view import load_directory_data
 from styles.menu_option_style import Menu_Option_Style
+from handlers.new_canvas_alert_dlg import new_canvas_alert_dlg
 
 
 # Class is created in main on program startup
@@ -46,11 +47,11 @@ class Content_Rail(Rail):
 
     # New canvases
     def new_canvas_clicked(self, e):
-        self.new_item_textfield.hint_text = "Canvas Title"
-        self.new_item_textfield.data = "canvas"
-        self.new_item_textfield.value = None
-        self.new_item_textfield.visible = True
-        self.story.close_menu()
+        # Close the menu (if ones is open), which will update the page as well
+        self.story.close_menu()   
+
+        self.p.open(new_canvas_alert_dlg(self.p, self.story))
+        self.p.update()
         
     # New notes
     def new_note_clicked(self, e):
