@@ -14,8 +14,12 @@ class State:
         self.y: float = float()
 
         # Shapes that we are currently drawing so we know what to save to data
-        self.lines = []     # Lines
+        self.paths = [{'elements': list(), 'paint': dict()}]    # Paths
+
         self.points = []    # Points
 
         # our list of recent changes so we can undo them
         undo_list = []
+
+        # List of recent changes from undo in case user wants to redo them
+        redo_list = []

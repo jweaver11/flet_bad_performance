@@ -417,6 +417,8 @@ class Canvas_Rail(Rail):
                 ft.Row([self.color_picker_button, paint_style], alignment=ft.MainAxisAlignment.SPACE_EVENLY),
 
                 # CHeckbox erase mode - set color to transparent and blendmode.clear?
+                # Point mode selector. Point, lines, polygon
+                # Some sort of cv.Path.Close() option
 
                 ft.Row([ft.Text("Size", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
                 ft.Row([ft.Text("Opacity", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_opacity]),

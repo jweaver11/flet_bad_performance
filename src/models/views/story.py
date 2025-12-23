@@ -60,6 +60,25 @@ class Story(ft.View):
                 'bottom_pin_height': 200,
                 'created_at': str,
                 'last_modified': str,
+                
+
+                'settings': {
+                    'type': self.type,             # Novel or comic. Affects templates and default data for new content
+                    'multi_planetary': bool,       # Whether the story will take place on multiple planets
+                    'multi_timelines': bool,       # Whether the story will have multiple timelines (regression, multiverse, etc.)
+                },
+                
+                # Dict of all our categories INSIDE of basic story structure (content, characters, timelines)
+                'folders': {
+                    'path': {                   # Path to the category folder (used as the key, since all will be unique)
+                        'name': str,            # Name of category just in case
+                        'color': str,           # Color of that folder
+                        'is_expanded': True     # Whether this folder is expanded in the tree view
+                    }
+                },            
+                'is_new_story': True,      # Whether this story is newly created or loaded from storage
+
+                # Paint settings for our canvas drawings to use as default that they will then change
                 'paint_settings': {
                     # Stroke styles
                     'color': "#FFFFFF,1.0",     # Hex color folowed by opacity
@@ -78,21 +97,10 @@ class Story(ft.View):
                     
                 },
 
-                'settings': {
-                    'type': self.type,             # Novel or comic. Affects templates and default data for new content
-                    'multi_planetary': bool,       # Whether the story will take place on multiple planets
-                    'multi_timelines': bool,       # Whether the story will have multiple timelines (regression, multiverse, etc.)
-                },
-                
-                # Dict of all our categories INSIDE of basic story structure (content, characters, timelines)
-                'folders': {
-                    'path': {                   # Path to the category folder (used as the key, since all will be unique)
-                        'name': str,            # Name of category just in case
-                        'color': str,           # Color of that folder
-                        'is_expanded': True     # Whether this folder is expanded in the tree view
-                    }
-                },            
-                'is_new_story': True,      # Whether this story is newly created or loaded from storage
+                # Other canvas related settings that are not technically paint
+                'canvas_settings':{
+                    'point_mode': "points",    # points, lines, or polygon
+                }
             },
         )
 
