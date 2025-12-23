@@ -23,16 +23,7 @@ from threading import Thread
 
 
 class Canvas(Widget):
-    def __init__(
-            self, 
-            title: str, 
-            page: ft.Page, 
-            directory_path: str, 
-            story: Story, 
-            data: dict = None,
-            canvas_data: dict = None,
-        ):
-        
+    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None,):
         
         # Parent constructor
         super().__init__(
@@ -42,8 +33,6 @@ class Canvas(Widget):
             story=story,
             data=data,  
         ) 
-
-        
 
 
         # Verifies this object has the required data fields, and creates them if not

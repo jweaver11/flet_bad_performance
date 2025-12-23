@@ -11,33 +11,46 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         ''' Handles when the text field is changed '''
         # Set our nonlocal variables
         nonlocal canvas_data, create_button
-
+        
         # Grab out data (key) and pass in the value to our data dict
-        data = e.control.data
-        canvas_data[data] = e.control.value
+        key = e.control.data
 
-        # Reset error text
+        # Reset error text and create_button status
         e.control.error_text = None
+        create_button.disabled = False
 
+        # If there is no value (user deleted it all), set to None
         if e.control.value == "":
-            value = int()
-            
+            value = None
+        # Otherwise, set the value
         else:
             value = int(e.control.value)
 
-        if value == 0:
-            e.control.error_text = f"{data.capitalize()} cannot be 0"
-            create_button.disabled = True
+
+       
+
+        # Check if value is 0. If it is, set error text and disable create button
+        if value is not None:
+            if value == 0:
+                e.control.error_text = f"{key.capitalize()} cannot be 0"
+                create_button.disabled = True
+                page.update()
+                return
+    
+        # Set our data
+        canvas_data[key] = value
+
+        print("Canvas data updated: ", canvas_data)
+
+        if canvas_data.get('width') is None and canvas_data.get('height') is None:
+            create_button.disabled = False
             page.update()
             return
+        elif canvas_data.get('width') is None or canvas_data.get('height') is None:
+            create_button.disabled = True
+            page.update()
 
-            
-
-        # Enable the button if both height and width have been set
-        if canvas_data.get('width') is not None and canvas_data.get('height') is not None:
-            if int(canvas_data.get('width')) > 0 and int(canvas_data.get('height')) > 0:    # Make sure no 0 values
-                create_button.disabled = False
-                page.update()
+        # Update page if we passed all checks so our create button will work
         page.update()
             
             
@@ -64,7 +77,12 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         nonlocal canvas_data
         data = e.control.data
 
-        canvas_data.update(data)
+        #canvas_data.update(data)
+        e.control.border = ft.border.all(2, ft.Colors.PRIMARY)
+
+        for control in alert_dialog.content.controls:
+            if control != e.control and isinstance(control, ft.Container):
+                control.border = ft.border.all(1, ft.Colors.OUTLINE_VARIANT)
 
         create_button.disabled = False
         page.update()
@@ -86,9 +104,11 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         page.update()
 
     canvas_data = {'width': None, 'height': None, 'aspect_ratio': None}       # Data we will pass set to pass in whenever a different option is selected
+
     create_button = ft.TextButton(text="CREATE", on_click=_create_button_clicked, disabled=True)  # Button to create the canvas
+
     width_textfield = ft.TextField(
-        label="Width", data="width", width=140, dense=True,  input_filter=ft.NumbersOnlyInputFilter(), 
+        label="Width", data="width", width=140, dense=True, input_filter=ft.NumbersOnlyInputFilter(), 
         max_length=4, on_change=_text_field_changed
     )
     height_textfield = ft.TextField(
@@ -102,16 +122,14 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
 
     alert_dialog = ft.AlertDialog(
         title=ft.Text("Build Your Canvas", weight=ft.FontWeight.BOLD),
-        
         actions=[
             ft.TextButton("CANCEL", on_click=lambda e: page.close(alert_dialog), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
             create_button
         ],
         content=ft.Row(
-            #alignment=ft.MainAxisAlignment.CENTER,
-            wrap=True,
-            spacing=20,
+            wrap=True,  run_alignment=ft.MainAxisAlignment.CENTER,
             controls=[
+
                 title_textfield,
                 ft.Divider(),
                 ft.Container(
@@ -119,11 +137,14 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
                     border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
                     height=120, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=120
                 ),
+                ft.Text("Custom Size:", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
                 width_textfield,
                 height_textfield,
                 ft.Divider(color=ft.Colors.TRANSPARENT),
+                ft.Divider(),
                 
-                ft.Text("Horizontal", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
+                ft.Text("Templates", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.TITLE_MEDIUM, text_align=ft.TextAlign.RIGHT, width=88),
+                ft.Divider(color=ft.Colors.TRANSPARENT),
                 
                 ft.Container(
                     content=ft.Text("4k (3840x2160)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
@@ -140,40 +161,70 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
                     border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
                     height=90, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=160
                 ),
-                ft.Container(
-                    content=ft.Text("Banner (1500x500)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
-                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
-                    height=53, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=160
-                ),
-                ft.Divider(color=ft.Colors.TRANSPARENT),
-               
-            
-                ft.Text("Vertical", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
                 
                 ft.Container(
-                    content=ft.Text("4k (2160x3840)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
+                    content=ft.Text("4k (2160x3840)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
                     border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected, 
                     height=160, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90,
                 ),
                 ft.Container(
-                    content=ft.Text("2k (1440x2560)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
+                    content=ft.Text("2k (1440x2560)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
                     border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
                     height=160, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90
                 ),
                 ft.Container(
-                    content=ft.Text("HD (1080x1920)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
+                    content=ft.Text("HD (1080x1920)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
                     border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected, 
                     height=160, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90
                 ),
                 ft.Container(
-                    content=ft.Text("Banner (500x1500)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
+                    content=ft.Text("Banner (500x1500)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
                     border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
-                    height=160, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90
+                    height=270, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90
                 ),
-                ft.Divider(color=ft.Colors.TRANSPARENT),
+                ft.Container(
+                    content=ft.Text("Banner (1500x500)", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    height=90, alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=270
+                ),
+                ft.Divider(color=ft.Colors.TRANSPARENT),    
+                #ft.Text("Aspect Ratio", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
+                ft.Container(
+                    content=ft.Text("16:9", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, height=90, width=160
+                ),
+                ft.Container(
+                    content=ft.Text("4:3", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, height=120, width=160
+                ),
+                ft.Container(
+                    content=ft.Text("2:1", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, height=90, width=160
+                ),
 
-
-                ft.Text("Aspect Ratio", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
+                ft.Container(
+                    content=ft.Text("9:16", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, height=160, width=90
+                ),
+                ft.Container(
+                    content=ft.Text("3:4", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90, height=120
+                ),
+                ft.Container(
+                    content=ft.Text("1:2", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90, height=160
+                ),
+                ft.Container(
+                    content=ft.Text("1:1", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(4), border_radius=4,
+                    border=ft.border.all(1, ft.Colors.OUTLINE_VARIANT), on_click=_new_option_selected,
+                    alignment=ft.alignment.top_center, bgcolor=ft.Colors.SURFACE, width=90, height=90
+                ),
             ], 
             
         )
