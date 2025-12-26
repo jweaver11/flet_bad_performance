@@ -117,8 +117,7 @@ class Story(ft.View):
         # Our widgets objects. Keys are stored as directory paths + titles for uniqueness (example: c:\path\to\character\character_name)
         self.chapters: dict = {}        # Text based chapeters only
         self.notes: dict = {}           # Notes stored in our story
-        self.images: dict = {}          # Images imported in to be used in the story, or just as reference
-        self.canvases: dict = {}        # canvases by the user for comic chapters
+        self.canvases: dict = {}        # canvases by the user for comic chapters, or to store images (as backgrounds)
         self.characters: dict = {}      # Characters in the story
         self.timelines: dict = {}       # Timelines for our story
         self.world_building: None       # World building widget that contains our maps, lore, governments, history, etc
@@ -411,10 +410,6 @@ class Story(ft.View):
             elif tag == "note":
                 if widget.data['key'] in self.notes.keys():
                     del self.notes[widget.data['key']]
-
-            elif tag == "image":
-                if widget.data['key'] in self.images.keys():
-                    del self.images[widget.data['key']]
 
             elif tag == "character":
                 if widget.data['key'] in self.characters.keys():
@@ -758,11 +753,6 @@ class Story(ft.View):
             if canvas not in self.widgets:
                 self.widgets.append(canvas)
 
-        # Add all our images to the widgets list
-        for image in self.images.values():
-            if image not in self.widgets:
-                self.widgets.append(image)
-
         # Add our plotline to the widgets list
         for timeline in self.timelines.values():
             if timeline not in self.widgets:
@@ -840,8 +830,6 @@ class Story(ft.View):
         # Format our data if we have any
         if data is not None:
             new_data = {'canvas_meta': data}
-
-            print("Data to pass in: ", new_data)
 
         # Save our new note and add it to the widget list
         self.canvases[key] = Canvas(title, self.p, directory_path, self, new_data)
