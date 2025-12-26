@@ -137,7 +137,7 @@ class Canvas(Widget):
             self.canvas.shapes.append(
                 cv.Points(
                     points=[(px, py)],
-                    point_mode=point_mode,
+                    #point_mode=point_mode,
                     paint=ft.Paint(**paint_settings),
                 )
             )
@@ -164,50 +164,20 @@ class Canvas(Widget):
             self.canvas.shapes.append(new_path)
 
 
-    def _set_paint_gradient(self) -> ft.Control:
-        """Applies gradient settings to a Paint object based on the specified type and settings."""
-
-        gradient_type = self.story.data.get('canvas_settings', {}).get('gradient_settings', {}).get('mode', 'linear')
-        settings = self.story.data.get('canvas_settings', {}).get('gradient_settings', {})
-
-        if self.story.data.get('canvas_settings', {}).get('is_using_gradient', False) == False:
-            return None
-        
-        if gradient_type == 'linear':
-            return ft.PaintLinearGradient(
-                begin=(settings["begin"]["x"], settings["begin"]["y"]),  # Convert dict → tuple
-                end=(settings["end"]["x"], settings["end"]["y"]),  
-                colors=settings.get('colors', []),
-                #color_stops=settings.get('stops', None),
-                tile_mode=settings.get('tile_mode', 'clamp'),
-                #type="linear",
-            )
-        elif gradient_type == 'radial':
-            return ft.PaintRadialGradient(**settings)
-        elif gradient_type == 'sweep':
-            return ft.PaintSweepGradient(**settings)
-        
-      
-    
-        
+         
 
     # Called when we click the canvas and don't initiate a drag
     async def add_point(self, e: ft.TapEvent):
         ''' Adds a point to the canvas if we just clicked and didn't initiate a drag '''
 
-        # Set the paint
-        paint = ft.Paint(**self.story.data.get('paint_settings', {}))
-
-        # Create the point using our paint settings and point mode
+         # Create the point using our paint settings and point mode
         point = cv.Points(
             points=[(e.local_x, e.local_y)],
-            point_mode=self.story.data.get('canvas_settings', {}).get('point_mode', 'points'),
-            paint=paint,
+            paint=ft.Paint(**self.story.data.get('paint_settings', {})),
         )
-        
         # Add point to the canvas and our state data
         self.canvas.shapes.append(point)
-        self.state.points.append((e.local_x, e.local_y, point.point_mode, paint.__dict__))
+        self.state.points.append((e.local_x, e.local_y, point.point_mode, point.paint.__dict__))
 
         # After dragging canvas widget, it loses page reference and can't update
         try:

@@ -98,27 +98,7 @@ class Story(ft.View):
 
                 # Other canvas related settings that are not technically paint
                 'canvas_settings':{
-                    'point_mode': "points",                     # points, lines, or polygon
-                    'is_using_gradient': bool,                  # if we'll use the gradient settings below
-                    
-                    'gradient_settings': {
-                        'mode': "linear",                       # linear, radial, or sweep
-                        'colors': [
-                            "#cd4c1f",
-                            "#1fadcd"
-                        ],                                      # List of colors in the gradient
-                        'stops': list,                          # List of stops for the gradient
-                        'begin': {'x': -1, 'y': -1},      # x and y between 0 and 1
-                        'end': {'x': 1, 'y': 1},
-                        'center': {'x': float, 'y': float},
-                        'focal': {'x': float, 'y': float},
-                        'focal_radius': float,
-                        'radius': float,
-                        'tile_mode': "clamp",                   # clamp, repeated, decal, or mirror
-                        'end_angle': float,
-                        'rotation': float,  
-                        'start_angle': float,
-                    },   
+                     
                 }
             },
         )

@@ -39,15 +39,24 @@ class Canvas_Rail(Rail):
 
         # Color picker for changing brush color
         color_only = self.story.data.get('paint_settings', {}).get('color', "#000000").split(",", 1)[0]     # Set color without opacity for the color picker
-        self.color_picker = ColorPicker(color=color_only)   # Set our color pickers color
-        self.color_picker.visible = not self.story.data.get('canvas_settings', {}).get('is_using_gradient', False)   # Hide if using gradient
+        self.color_picker = ColorPicker(color=color_only)   # Set our color pickers color 
 
-        # Button to open the diolog to pick brush color
-        self.color_picker_button = ft.IconButton(
+        self.color_picker_button = ft.PopupMenuButton(
             icon=ft.Icons.COLOR_LENS_OUTLINED, tooltip="The color of your brush strokes.",
             icon_color=self.story.data.get('paint_settings', {}).get('color', ft.Colors.PRIMARY),
-            on_click=self._color_picker_clicked,
-        )       
+            menu_padding=ft.padding.all(0), size_constraints=ft.BoxConstraints(min_width=310),
+            on_cancel=self._set_color,
+            items=[
+                ft.PopupMenuItem(
+                    disabled=True,
+                    content=ft.Container(
+                        padding=ft.Padding(left=10, right=10, top=10, bottom=20),
+                        content=self.color_picker,     
+                    ),
+                    
+                )
+            ]
+        )
 
         self.paint_blend_mode: ft.PopupMenuButton = None    # Will be initialized in reload_rail
         self.paint_blend_mode_label: ft.Text = ft.Text(f"Blend Mode: {self._set_blend_mode_label()}", theme_style=ft.TextThemeStyle.LABEL_LARGE, expand=True)
@@ -65,137 +74,22 @@ class Canvas_Rail(Rail):
         self.p.open(new_canvas_alert_dlg(self.p, self.story))
         self.p.update()
 
-   
-    # Called when color picker button is clicked to change color
-    def _color_picker_clicked(self, e):
-        ''' Opens a dialog to pick new hex brush color.'''
 
-        # Called when the apply button is selected. Applies to color change to data and UI
-        def _apply_color_change(e):
+    def _set_color(self, e):
 
-            selected_color = self.color_picker.color    # Our new selected color
+        selected_color = self.color_picker.color    # Our new selected color
            
-            # Our story data needs the opacity, but color picker can't have it
-            opacity = self.story.data.get('paint_settings', {}).get('color', "1.0").split(",", 1)[1].strip()
-            color_with_opacity = f"{selected_color},{opacity}"
-            
-            self.story.data['paint_settings']['color'] = color_with_opacity
-            self.story.save_dict()
+        # Our story data needs the opacity, but color picker can't have it
+        opacity = self.story.data.get('paint_settings', {}).get('color', "1.0").split(",", 1)[1].strip()
+        color_with_opacity = f"{selected_color},{opacity}"
+        
 
-            self.color_picker_button.icon_color = selected_color
-            self.p.close(alert_dialog)
-            self.p.update()
+        self.story.data['paint_settings']['color'] = color_with_opacity
+        self.story.save_dict()
 
-        # Called when the checkbox to use gradient is changed
-        def _use_gradient_changed(e):
-            is_using_gradient = e.control.value
-            self.story.data['canvas_settings']['is_using_gradient'] = is_using_gradient
-
-            self.color_picker.visible = not is_using_gradient
-            gradient_dropdown.visible = is_using_gradient
-            color_list.visible = is_using_gradient
-            add_color_button.visible = is_using_gradient
-            self.p.update()
-
-        # Called when gradient mode is changed
-        def _gradient_mode_changed(e):
-            new_mode = e.control.value.lower()
-            self.story.data['canvas_settings']['gradient_settings']['mode'] = new_mode
-
-        def _add_color_to_gradient(e):
-            new_color = e.control.parent.controls[0].color
-            self.story.data['canvas_settings']['gradient_settings'].setdefault('colors', []).append(new_color)
-            color_list.controls = _get_gradient_colors()
-            self.p.update()
-            
-            
-        def _get_gradient_colors() -> list[ft.Control]:
-            controls = []
-            for color in self.story.data.get('canvas_settings', {}).get('gradient_settings', {}).get('colors', []):
-                list_tile = ft.ListTile(
-                    title=ft.Text(f"{color}"), 
-                    leading=ft.PopupMenuButton(
-                        icon=ft.Icons.COLOR_LENS_OUTLINED, menu_padding=ft.padding.all(0),
-                        tooltip="Edit Color", expand=True, width=50, icon_color=color,
-                        size_constraints=ft.BoxConstraints(min_width=220, max_width=440),
-                        items=[
-                            ft.PopupMenuItem(
-                                padding=ft.padding.all(10), height=320, 
-                                content=ft.Row([
-                                ColorPicker(), ft.TextButton("SAVE", expand=True, disabled=True)])
-                            )
-                        ]
-                    ),
-                    trailing=ft.Container(ft.IconButton(ft.Icons.DELETE_OUTLINE_OUTLINED, icon_color=ft.Colors.ERROR), margin=ft.margin.only(right=10)),
-                )
-                controls.append(list_tile)
-
-            
-            return controls
-
-        gradient_dropdown = ft.Dropdown(
-            label="Gradient Mode", expand=True,
-            on_change=_gradient_mode_changed,
-            visible=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
-            value=self.story.data.get('canvas_settings', {}).get('gradient_settings', 'linear').get('mode', 'linear').capitalize(),
-            options=[
-                ft.dropdown.Option("Linear"),
-                ft.dropdown.Option("Radial"),
-                ft.dropdown.Option("Sweep"),
-            ],
-        )
-
-        color_list = ft.ReorderableListView(
-            controls=_get_gradient_colors(),
-            visible=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
-        )
-
-        add_color_button = ft.PopupMenuButton(
-            icon=ft.Icons.ADD_OUTLINED, menu_padding=ft.padding.all(0),
-            tooltip="Add Color to Gradient", expand=True, width=50,
-            size_constraints=ft.BoxConstraints(min_width=220, max_width=440),
-            visible=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
-            items=[
-                ft.PopupMenuItem(
-                    padding=ft.padding.all(10), height=320, #disabled=True,
-                    content=ft.Row([ColorPicker(), ft.TextButton("ADD", on_click=_add_color_to_gradient)])
-                )
-            ]
-            #on_click=lambda e: print("Add color clicked")
-        )
-
-        # Alert dialog for picking color
-        alert_dialog = ft.AlertDialog(
-            title=ft.Column([ft.Text("Select Brush Color", weight=ft.FontWeight.BOLD), ft.Divider()], spacing=0),
-            content=ft.Column([
-                self.color_picker,
-                ft.Checkbox(label="Use Gradient", value=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
-                    on_change=_use_gradient_changed, label_style=ft.TextStyle(weight=ft.FontWeight.BOLD)
-                ),
-                ft.Container(height=8), 
-                gradient_dropdown,
-                ft.Container(height=8),
-                ft.Row([
-                    ft.Container(height=10, expand=True),
-                    ft.Text("Colors", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE),
-                    add_color_button,
-                    ft.Container(height=10, expand=True),
-                ]),
-                ft.Divider(),
-                
-
-                color_list,
-                
-            ], scroll=ft.ScrollMode.AUTO, spacing=0),
-            actions=[
-                ft.TextButton("CANCEL", on_click=lambda e: self.p.close(alert_dialog), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
-                ft.TextButton("APPLY", on_click=_apply_color_change),
-            ],
-            
-        )
-
-        # Open the dialog
-        self.p.open(alert_dialog)
+        self.color_picker_button.icon_color = selected_color
+        self.color_picker_button.icon_color = selected_color
+        self.p.update()
 
    
     def _set_blend_mode_label(self) -> str:
@@ -446,8 +340,8 @@ class Canvas_Rail(Rail):
 
 
         paint_stroke_blur = ft.Slider(
-            min=0, max=20,  tooltip="The blur effect of your brush strokes.", expand=True,
-            divisions=20, value=self.story.data.get('paint_settings', {}).get('blur_image', 0),
+            min=0, max=50,  tooltip="The blur effect of your brush strokes.", expand=True,
+            divisions=50, value=self.story.data.get('paint_settings', {}).get('blur_image', 0),
             label="Stroke Blur: {value}",  
             on_change_end=_paint_stroke_blur_changed  
         )
@@ -494,6 +388,7 @@ class Canvas_Rail(Rail):
         )
 
 
+
         # Build the content of our rail
         content = ft.Column(
             scroll=ft.ScrollMode.AUTO,
@@ -504,8 +399,6 @@ class Canvas_Rail(Rail):
 
                 # Checkbox erase mode - set color to transparent and blendmode.clear?
                 # Add shapes button. Path will use paint.style.paintingstyle fill or stroke.
-                # Point mode selector. Point, lines, polygon
-                # Some sort of cv.Path.Close() option
 
                 ft.Row([ft.Text("Size", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
                 ft.Row([ft.Text("Opacity", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_opacity]),
@@ -513,8 +406,6 @@ class Canvas_Rail(Rail):
                 ft.Container(height=10),   # Spacer
                 ft.Row([ft.Text("Stroke Join Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_join]),
                 ft.Container(height=10),   # Spacer
-
-                # gradient
                
                 
                 ft.Divider(),
