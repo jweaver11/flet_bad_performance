@@ -74,7 +74,7 @@ class Canvas_Rail(Rail):
         self.p.open(new_canvas_alert_dlg(self.p, self.story))
         self.p.update()
 
-
+    # Called when color picker is closed
     def _set_color(self, e):
 
         selected_color = self.color_picker.color    # Our new selected color
