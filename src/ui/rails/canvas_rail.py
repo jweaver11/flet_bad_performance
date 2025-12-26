@@ -40,6 +40,7 @@ class Canvas_Rail(Rail):
         # Color picker for changing brush color
         color_only = self.story.data.get('paint_settings', {}).get('color', "#000000").split(",", 1)[0]     # Set color without opacity for the color picker
         self.color_picker = ColorPicker(color=color_only)   # Set our color pickers color
+        self.color_picker.visible = not self.story.data.get('canvas_settings', {}).get('is_using_gradient', False)   # Hide if using gradient
 
         # Button to open the diolog to pick brush color
         self.color_picker_button = ft.IconButton(
@@ -72,8 +73,7 @@ class Canvas_Rail(Rail):
         # Called when the apply button is selected. Applies to color change to data and UI
         def _apply_color_change(e):
 
-            # Our new selected color
-            selected_color = self.color_picker.color
+            selected_color = self.color_picker.color    # Our new selected color
            
             # Our story data needs the opacity, but color picker can't have it
             opacity = self.story.data.get('paint_settings', {}).get('color', "1.0").split(",", 1)[1].strip()
@@ -86,14 +86,112 @@ class Canvas_Rail(Rail):
             self.p.close(alert_dialog)
             self.p.update()
 
+        # Called when the checkbox to use gradient is changed
+        def _use_gradient_changed(e):
+            is_using_gradient = e.control.value
+            self.story.data['canvas_settings']['is_using_gradient'] = is_using_gradient
+
+            self.color_picker.visible = not is_using_gradient
+            gradient_dropdown.visible = is_using_gradient
+            color_list.visible = is_using_gradient
+            add_color_button.visible = is_using_gradient
+            self.p.update()
+
+        # Called when gradient mode is changed
+        def _gradient_mode_changed(e):
+            new_mode = e.control.value.lower()
+            self.story.data['canvas_settings']['gradient_settings']['mode'] = new_mode
+
+        def _add_color_to_gradient(e):
+            new_color = e.control.parent.controls[0].color
+            self.story.data['canvas_settings']['gradient_settings'].setdefault('colors', []).append(new_color)
+            color_list.controls = _get_gradient_colors()
+            self.p.update()
+            
+            
+        def _get_gradient_colors() -> list[ft.Control]:
+            controls = []
+            for color in self.story.data.get('canvas_settings', {}).get('gradient_settings', {}).get('colors', []):
+                list_tile = ft.ListTile(
+                    title=ft.Text(f"{color}"), 
+                    leading=ft.PopupMenuButton(
+                        icon=ft.Icons.COLOR_LENS_OUTLINED, menu_padding=ft.padding.all(0),
+                        tooltip="Edit Color", expand=True, width=50, icon_color=color,
+                        size_constraints=ft.BoxConstraints(min_width=220, max_width=440),
+                        items=[
+                            ft.PopupMenuItem(
+                                padding=ft.padding.all(10), height=320, 
+                                content=ft.Row([
+                                ColorPicker(), ft.TextButton("SAVE", expand=True, disabled=True)])
+                            )
+                        ]
+                    ),
+                    trailing=ft.Container(ft.IconButton(ft.Icons.DELETE_OUTLINE_OUTLINED, icon_color=ft.Colors.ERROR), margin=ft.margin.only(right=10)),
+                )
+                controls.append(list_tile)
+
+            
+            return controls
+
+        gradient_dropdown = ft.Dropdown(
+            label="Gradient Mode", expand=True,
+            on_change=_gradient_mode_changed,
+            visible=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
+            value=self.story.data.get('canvas_settings', {}).get('gradient_settings', 'linear').get('mode', 'linear').capitalize(),
+            options=[
+                ft.dropdown.Option("Linear"),
+                ft.dropdown.Option("Radial"),
+                ft.dropdown.Option("Sweep"),
+            ],
+        )
+
+        color_list = ft.ReorderableListView(
+            controls=_get_gradient_colors(),
+            visible=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
+        )
+
+        add_color_button = ft.PopupMenuButton(
+            icon=ft.Icons.ADD_OUTLINED, menu_padding=ft.padding.all(0),
+            tooltip="Add Color to Gradient", expand=True, width=50,
+            size_constraints=ft.BoxConstraints(min_width=220, max_width=440),
+            visible=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
+            items=[
+                ft.PopupMenuItem(
+                    padding=ft.padding.all(10), height=320, #disabled=True,
+                    content=ft.Row([ColorPicker(), ft.TextButton("ADD", on_click=_add_color_to_gradient)])
+                )
+            ]
+            #on_click=lambda e: print("Add color clicked")
+        )
+
         # Alert dialog for picking color
         alert_dialog = ft.AlertDialog(
-            title=ft.Text("Select Brush Color", weight=ft.FontWeight.BOLD),
-            content=self.color_picker,
+            title=ft.Column([ft.Text("Select Brush Color", weight=ft.FontWeight.BOLD), ft.Divider()], spacing=0),
+            content=ft.Column([
+                self.color_picker,
+                ft.Checkbox(label="Use Gradient", value=self.story.data.get('canvas_settings', {}).get('is_using_gradient', False),
+                    on_change=_use_gradient_changed, label_style=ft.TextStyle(weight=ft.FontWeight.BOLD)
+                ),
+                ft.Container(height=8), 
+                gradient_dropdown,
+                ft.Container(height=8),
+                ft.Row([
+                    ft.Container(height=10, expand=True),
+                    ft.Text("Colors", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    add_color_button,
+                    ft.Container(height=10, expand=True),
+                ]),
+                ft.Divider(),
+                
+
+                color_list,
+                
+            ], scroll=ft.ScrollMode.AUTO, spacing=0),
             actions=[
                 ft.TextButton("CANCEL", on_click=lambda e: self.p.close(alert_dialog), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
                 ft.TextButton("APPLY", on_click=_apply_color_change),
             ],
+            
         )
 
         # Open the dialog

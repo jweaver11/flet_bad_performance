@@ -88,7 +88,6 @@ class Story(ft.View):
                     'stroke_join': "miter",
                     'stroke_miter_limit': 10,
                     'stroke_dash_pattern': list,
-                    #'gradient': None,
 
                     # Effects
                     'anti_alias': True,
@@ -99,10 +98,32 @@ class Story(ft.View):
 
                 # Other canvas related settings that are not technically paint
                 'canvas_settings':{
-                    'point_mode': "points",    # points, lines, or polygon
+                    'point_mode': "points",                     # points, lines, or polygon
+                    'is_using_gradient': bool,                  # if we'll use the gradient settings below
+                    
+                    'gradient_settings': {
+                        'mode': "linear",                       # linear, radial, or sweep
+                        'colors': [
+                            "#cd4c1f",
+                            "#1fadcd"
+                        ],                                      # List of colors in the gradient
+                        'stops': list,                          # List of stops for the gradient
+                        'begin': {'x': -1, 'y': -1},      # x and y between 0 and 1
+                        'end': {'x': 1, 'y': 1},
+                        'center': {'x': float, 'y': float},
+                        'focal': {'x': float, 'y': float},
+                        'focal_radius': float,
+                        'radius': float,
+                        'tile_mode': "clamp",                   # clamp, repeated, decal, or mirror
+                        'end_angle': float,
+                        'rotation': float,  
+                        'start_angle': float,
+                    },   
                 }
             },
         )
+        ft.Paint()
+        
 
         # Stories have required structures as well, so we verify they exist or we will error out
         # We also use this function to create most detailed structures from templates if newly created story

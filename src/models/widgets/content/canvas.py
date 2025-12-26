@@ -6,6 +6,11 @@ Maps are widgets that have their own drawing canvas, and info display. they can 
 #TODO: 
 # ADD DUPLICATE OPTION AS WELL
 # Option for transparent background/no brackground
+# Option to upload image as background
+# Option to export canvas as image file (png, jpg, etc). Option to change how image fits on canvas (stretch, fit, fill, tile, center, etc)
+# Add ft.DecorationImage options to the canvas container for background images
+# Add color_filter for both decoration image and container ?
+# Fill tool??
 
 
 import os
@@ -23,7 +28,16 @@ from threading import Thread
 
 
 class Canvas(Widget):
-    def __init__(self, title: str, page: ft.Page, directory_path: str, story: Story, data: dict = None,):
+    def __init__(
+        self, 
+        title: str, 
+        page: ft.Page, 
+        directory_path: str, 
+        story: Story, 
+        data: dict = None,
+        bgcolor: str = None,
+        bgimage_path: str = None,
+    ):
         
         # Parent constructor
         super().__init__(
@@ -45,8 +59,8 @@ class Canvas(Widget):
                     "width": int,
                     "height": int,
                     "aspect_ratio": float,
-                    "bgcolor": str,
-                    "bgimage": str,
+                    "bgcolor": bgcolor,
+                    "bgimage_path": bgimage_path,
                 },     
 
                 #"canvas": list,          # Stores our drawing data
@@ -83,7 +97,7 @@ class Canvas(Widget):
         self.canvas_container = ft.Container(
             content=self.canvas, width=2000, height=1000,
             expand=True, clip_behavior=ft.ClipBehavior.HARD_EDGE,
-            margin=ft.margin.all(20), bgcolor=ft.Colors.SURFACE,
+            margin=ft.margin.all(20), bgcolor=ft.Colors.SURFACE if bgcolor is None else bgcolor,
             border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
             #aspect_ratio=1/2,
             # Sets bgcolor or image based on canvas settings, and aspect ratio
@@ -148,6 +162,32 @@ class Canvas(Widget):
                     print("Unknown path element type while loading: ", element)
 
             self.canvas.shapes.append(new_path)
+
+
+    def _set_paint_gradient(self) -> ft.Control:
+        """Applies gradient settings to a Paint object based on the specified type and settings."""
+
+        gradient_type = self.story.data.get('canvas_settings', {}).get('gradient_settings', {}).get('mode', 'linear')
+        settings = self.story.data.get('canvas_settings', {}).get('gradient_settings', {})
+
+        if self.story.data.get('canvas_settings', {}).get('is_using_gradient', False) == False:
+            return None
+        
+        if gradient_type == 'linear':
+            return ft.PaintLinearGradient(
+                begin=(settings["begin"]["x"], settings["begin"]["y"]),  # Convert dict → tuple
+                end=(settings["end"]["x"], settings["end"]["y"]),  
+                colors=settings.get('colors', []),
+                #color_stops=settings.get('stops', None),
+                tile_mode=settings.get('tile_mode', 'clamp'),
+                #type="linear",
+            )
+        elif gradient_type == 'radial':
+            return ft.PaintRadialGradient(**settings)
+        elif gradient_type == 'sweep':
+            return ft.PaintSweepGradient(**settings)
+        
+      
     
         
 
@@ -155,15 +195,19 @@ class Canvas(Widget):
     async def add_point(self, e: ft.TapEvent):
         ''' Adds a point to the canvas if we just clicked and didn't initiate a drag '''
 
+        # Set the paint
+        paint = ft.Paint(**self.story.data.get('paint_settings', {}))
+
         # Create the point using our paint settings and point mode
         point = cv.Points(
             points=[(e.local_x, e.local_y)],
             point_mode=self.story.data.get('canvas_settings', {}).get('point_mode', 'points'),
-            paint=ft.Paint(**self.story.data.get('paint_settings', {})),
+            paint=paint,
         )
+        
         # Add point to the canvas and our state data
         self.canvas.shapes.append(point)
-        self.state.points.append((e.local_x, e.local_y, point.point_mode, point.paint.__dict__))
+        self.state.points.append((e.local_x, e.local_y, point.point_mode, paint.__dict__))
 
         # After dragging canvas widget, it loses page reference and can't update
         try:
@@ -185,7 +229,6 @@ class Canvas(Widget):
         self.current_path = cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
         self.state.paths.clear()
         self.state.paths.append({'elements': list(), 'paint': self.story.data.get('paint_settings')})
-        #self.state.paths['paint'] = self.story.data.get('paint_settings')        
 
         # Set move to element at our starting position that the mouse is at for the path to start from
         move_to_element = cv.Path.MoveTo(e.local_x, e.local_y)
@@ -197,7 +240,6 @@ class Canvas(Widget):
         # Add the path to the canvas so we can see it
         self.canvas.shapes.append(self.current_path)
 
-        #print("Paint style: ", ft.Paint(**self.story.data.get('paint_settings', {})))
 
         
 
@@ -212,7 +254,7 @@ class Canvas(Widget):
             return
         
 
-        # Add check for what kind of path (if one at at all) here
+        # Add check for what kind of path/brush tool (if one at at all) here
         
 
         # Set the path element based on what kind of path we're adding, add it to our current path and our state paths
@@ -343,7 +385,11 @@ class Canvas(Widget):
         # Rebuild out tab to reflect any changes
         self.reload_tab()
 
+        self.canvas_container.image = ft.DecorationImage(self.data.get('canvas_meta', {}).get('bgimage_path', ""), fit=ft.ImageFit.COVER) if self.data['canvas_meta'].get('bgimage_path', "") != "" else None
+
         self.body_container.alignment = ft.alignment.center
+
+
 
         self.body_container.content = self.interactive_viewer
 

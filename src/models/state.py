@@ -2,7 +2,6 @@
 State management model for our drawings
 '''
 
-import flet as ft
 
 class State:
 
@@ -18,7 +17,7 @@ class State:
 
         self.points = []    # Points
 
-        # our list of recent changes so we can undo them
+        # Our list of recent changes so we can undo them
         undo_list = []
 
         # List of recent changes from undo in case user wants to redo them

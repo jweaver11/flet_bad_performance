@@ -126,6 +126,11 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         ''' Handles creating a new canvas when create is clicked '''
         nonlocal canvas_data
 
+        if not _check_title():
+            title_textfield.focus()
+            page.update()
+            return
+
         title = title_textfield.value if title_textfield.value != "" else f"Canvas {len(story.canvases) + 1}"
 
         story.create_canvas(
@@ -151,7 +156,7 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         max_length=4, on_change=_size_text_field_changed
     )  
     title_textfield = ft.TextField(
-        label="Title", data="title", width=300, autofocus=True, 
+        label="Title", data="title", width=300, autofocus=True, on_submit=_create_button_clicked,
         on_change=_title_text_field_changed, capitalization=ft.TextCapitalization.WORDS # Add check for other widgets with same names
     )
 
