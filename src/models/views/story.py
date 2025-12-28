@@ -84,8 +84,8 @@ class Story(ft.View):
                     'color': "#FFFFFF,1.0",     # Hex color folowed by opacity
                     'stroke_width': 3,
                     'style': "stroke",
-                    'stroke_cap': "butt",
-                    'stroke_join': "miter",
+                    'stroke_cap': "round",
+                    'stroke_join': "round",
                     'stroke_miter_limit': 10, 
                     'stroke_dash_pattern': None,
 
@@ -98,7 +98,7 @@ class Story(ft.View):
 
                 # Other canvas related settings that are not technically paint
                 'canvas_settings':{
-                     
+                    'stroke_dash_pattern': None,
                 }
             },
         )

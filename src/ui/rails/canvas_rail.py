@@ -61,6 +61,13 @@ class Canvas_Rail(Rail):
         self.paint_blend_mode: ft.PopupMenuButton = None    # Will be initialized in reload_rail
         self.paint_blend_mode_label: ft.Text = ft.Text(f"Blend Mode: {self._set_blend_mode_label()}", theme_style=ft.TextThemeStyle.LABEL_LARGE, expand=True)
 
+        self.paint_adjust_dashed_lines_button = ft.IconButton(
+            icon=ft.Icons.TUNE_OUTLINED,
+            tooltip="Adjust the dash pattern for dashed lines.",
+            visible=self.story.data.get('paint_settings', {}).get('stroke_dash_pattern', None) is not None,
+            # on_click= Open pattern adjustment dialog/button to adjust length and gap, and add more segments
+        )
+
         # Reload the rail on start
         self.reload_rail()
 
@@ -190,27 +197,31 @@ class Canvas_Rail(Rail):
         # Called when changing paint style
         def _paint_style_changed(e):
             new_style = e.control.data     # New style
-            self.story.data['paint_settings']['stroke_dash_pattern'] = None   # Clear any dash pattern when changing style
-            if new_style is not None:
-                if new_style == "stroke":       # Change the icon
-                    e.control.parent.icon = ft.Icons.BRUSH_OUTLINED
-                elif new_style == "lineto":
-                    e.control.parent.icon = ft.Icons.HORIZONTAL_RULE
-                elif new_style == "fill":
-                    e.control.parent.icon = ft.Icons.GESTURE_OUTLINED
-                elif new_style == "arcto":
-                    e.control.parent.icon = ft.Icons.AUTORENEW_OUTLINED
             
-            else:
-                # Dashed line is not a style, so we just add stroke_dash pattern data and return
-                e.control.parent.icon = ft.Icons.LINE_STYLE_OUTLINED
-                self.story.data['paint_settings']['stroke_dash_pattern'] = [self.story.data['paint_settings']['stroke_width'], self.story.data['paint_settings']['stroke_width']]   # Default dash pattern
-                self.story.save_dict()
-                self.p.update()
-                return
+            if new_style == "stroke":       # Change the icon
+                e.control.parent.icon = ft.Icons.BRUSH_OUTLINED
+            elif new_style == "lineto":
+                e.control.parent.icon = ft.Icons.HORIZONTAL_RULE
+            elif new_style == "fill":
+                e.control.parent.icon = ft.Icons.GESTURE_OUTLINED
+            elif new_style == "arcto":
+                e.control.parent.icon = ft.Icons.AUTORENEW_OUTLINED
+            
             self.story.data['paint_settings']['style'] = new_style      # Update the data
             self.story.save_dict()
             self.p.update()     # Update the page
+
+        # Called when changing paint dash pattern usage
+        def _paint_dash_pattern_changed(e):
+            if e.control.value:   # If checked, set a default dash pattern
+                self.story.data['paint_settings']['stroke_dash_pattern'] = self.story.data['canvas_settings']['stroke_dash_pattern']  
+                self.paint_adjust_dashed_lines_button.visible = True
+            else:
+                self.story.data['paint_settings']['stroke_dash_pattern'] = None
+                self.paint_adjust_dashed_lines_button.visible = False
+            self.story.save_dict()
+            self.p.update()
+            
 
         # Called when changing paint anti-aliasing
         def _paint_anti_alias_changed(e):
@@ -298,7 +309,6 @@ class Canvas_Rail(Rail):
             paint_style_icon = ft.Icons.AUTORENEW_OUTLINED
         
         
-
         else:
             paint_style_icon = ft.Icons.BRUSH_OUTLINED
 
@@ -312,7 +322,6 @@ class Canvas_Rail(Rail):
             items=[
                 ft.PopupMenuItem(text="Stroke", data="stroke", icon=ft.Icons.BRUSH_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Line", data="lineto", icon=ft.Icons.HORIZONTAL_RULE, on_click=_paint_style_changed),
-                ft.PopupMenuItem(text="Dashed Stroke", icon=ft.Icons.LINE_STYLE_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Lasso Fill", data="fill", icon=ft.Icons.GESTURE_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Arc", data="arcto", icon=ft.Icons.AUTORENEW_OUTLINED, on_click=_paint_style_changed),
             ]
@@ -408,6 +417,13 @@ class Canvas_Rail(Rail):
             ]
         )
 
+        paint_use_dashed_lines = ft.Checkbox(
+            label="Dashed Pattern", on_change=_paint_dash_pattern_changed,
+            label_position=ft.LabelPosition.LEFT,
+            value=self.story.data.get('paint_settings', {}).get('stroke_dash_pattern', None) is not None,
+        )
+
+        
 
 
         # Build the content of our rail
@@ -426,6 +442,10 @@ class Canvas_Rail(Rail):
                 ft.Row([ft.Text("Stroke Cap Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_cap]),
                 ft.Container(height=10),   # Spacer
                 ft.Row([ft.Text("Stroke Join Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_join]),
+                ft.Container(height=10),   # Spacer
+                ft.Row([paint_use_dashed_lines, self.paint_adjust_dashed_lines_button]),
+                ft.Container(height=10),   # Spacer
+                ft.Row([]),
                 ft.Container(height=10),   # Spacer
                
                 

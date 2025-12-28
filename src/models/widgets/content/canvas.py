@@ -155,7 +155,7 @@ class Canvas(Widget):
             safe_paint_settings = path.get('paint', {}).copy()
 
             # Set stroke or fill based on custom styles
-            safe_stroke = 'fill' if style == 'fill' or style.endswith('_fill') else 'stroke'
+            safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
             safe_paint_settings['style'] = safe_stroke
 
             new_path = cv.Path(elements=[], paint=ft.Paint(**safe_paint_settings))   # Set a new path for this path with our paint settings
@@ -228,9 +228,10 @@ class Canvas(Widget):
         safe_paint_settings = self.story.data.get('paint_settings', {}).copy()
 
         # Set either stroke or fill based on custom styles
-        safe_stroke = 'fill' if style == 'fill' or style.endswith('_fill') else 'stroke'
+        safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
         safe_paint_settings['style'] = safe_stroke
 
+        print(safe_paint_settings)
 
         # Update state x and y coordinates
         self.state.x, self.state.y = e.local_x, e.local_y
