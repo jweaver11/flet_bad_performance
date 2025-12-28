@@ -65,7 +65,7 @@ class Canvas_Rail(Rail):
             icon=ft.Icons.TUNE_OUTLINED,
             tooltip="Adjust the dash pattern for dashed lines.",
             visible=self.story.data.get('paint_settings', {}).get('stroke_dash_pattern', None) is not None,
-            # on_click= Open pattern adjustment dialog/button to adjust length and gap, and add more segments
+            # on_click= Open pattern adjustment dialog/button to adjust length and gap, and add more segments. Make reorderable and deletable
         )
 
         # Reload the rail on start
@@ -443,7 +443,7 @@ class Canvas_Rail(Rail):
                 ft.Container(height=10),   # Spacer
                 ft.Row([ft.Text("Stroke Join Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_join]),
                 ft.Container(height=10),   # Spacer
-                ft.Row([paint_use_dashed_lines, self.paint_adjust_dashed_lines_button]),
+                ft.Row([paint_use_dashed_lines, self.paint_adjust_dashed_lines_button], spacing=0),
                 ft.Container(height=10),   # Spacer
                 ft.Row([]),
                 ft.Container(height=10),   # Spacer

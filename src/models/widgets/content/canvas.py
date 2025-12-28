@@ -248,7 +248,7 @@ class Canvas(Widget):
         self.current_path.elements.append(move_to_element)
         self.state.paths[0]['elements'].append((move_to_element.__dict__))
 
-        print(f"Starting drawing with style {style}")
+        #print(f"Starting drawing with style {style}")
 
         # If we're using lineto (straight lines), add that element to the current path and state right away
         if style == "lineto":

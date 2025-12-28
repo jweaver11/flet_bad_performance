@@ -98,7 +98,7 @@ class Story(ft.View):
 
                 # Other canvas related settings that are not technically paint
                 'canvas_settings':{
-                    'stroke_dash_pattern': None,
+                    'stroke_dash_pattern': [10, 15],
                 }
             },
         )
