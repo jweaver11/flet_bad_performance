@@ -194,8 +194,13 @@ class Canvas_Rail(Rail):
             if new_style is not None:
                 if new_style == "stroke":       # Change the icon
                     e.control.parent.icon = ft.Icons.BRUSH_OUTLINED
+                elif new_style == "lineto":
+                    e.control.parent.icon = ft.Icons.HORIZONTAL_RULE
                 elif new_style == "fill":
                     e.control.parent.icon = ft.Icons.GESTURE_OUTLINED
+                elif new_style == "arcto":
+                    e.control.parent.icon = ft.Icons.AUTORENEW_OUTLINED
+            
             else:
                 # Dashed line is not a style, so we just add stroke_dash pattern data and return
                 e.control.parent.icon = ft.Icons.LINE_STYLE_OUTLINED
@@ -285,8 +290,19 @@ class Canvas_Rail(Rail):
         # Paint style (Stroke, dash, fill, etc.)
         if self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'stroke':
             paint_style_icon = ft.Icons.BRUSH_OUTLINED
+        elif self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'lineto':
+            paint_style_icon = ft.Icons.HORIZONTAL_RULE
         elif self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'fill':
             paint_style_icon = ft.Icons.GESTURE_OUTLINED
+        elif self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'arcto':
+            paint_style_icon = ft.Icons.AUTORENEW_OUTLINED
+        
+        
+
+        else:
+            paint_style_icon = ft.Icons.BRUSH_OUTLINED
+
+        # If stroke dash pattern is set, we're using dashed stroke
         if self.story.data.get('paint_settings', {}).get('stroke_dash_pattern', None):
             paint_style_icon = ft.Icons.LINE_STYLE_OUTLINED
         paint_style = ft.PopupMenuButton(
@@ -295,8 +311,10 @@ class Canvas_Rail(Rail):
             menu_padding=ft.padding.all(0),
             items=[
                 ft.PopupMenuItem(text="Stroke", data="stroke", icon=ft.Icons.BRUSH_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Line", data="lineto", icon=ft.Icons.HORIZONTAL_RULE, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Dashed Stroke", icon=ft.Icons.LINE_STYLE_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Lasso Fill", data="fill", icon=ft.Icons.GESTURE_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Arc", data="arcto", icon=ft.Icons.AUTORENEW_OUTLINED, on_click=_paint_style_changed),
             ]
         )
 

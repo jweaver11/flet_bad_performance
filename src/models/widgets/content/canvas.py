@@ -148,18 +148,45 @@ class Canvas(Widget):
             elements = path.get('elements', [])         # List of the elements in this path
             paint_settings = path.get('paint', {})      # Paint settings for this path
 
-            new_path = cv.Path(elements=[], paint=ft.Paint(**paint_settings))   # Set a new path for this path with our paint settings
+            # Grab our style for simple logic
+            style = path.get('paint', {}).get('style', 'stroke')
+
+            # Make a copy of our paint settings to modify for drawing
+            safe_paint_settings = path.get('paint', {}).copy()
+
+            # Set stroke or fill based on custom styles
+            safe_stroke = 'fill' if style == 'fill' or style.endswith('_fill') else 'stroke'
+            safe_paint_settings['style'] = safe_stroke
+
+            new_path = cv.Path(elements=[], paint=ft.Paint(**safe_paint_settings))   # Set a new path for this path with our paint settings
 
             # Iterate through each element for its type, and create a new path element based on that
             for element in elements:
+
                 # MoveTo just has x and y
                 if element['type'] == 'moveto':
                     new_path.elements.append(cv.Path.MoveTo(element['x'], element['y']))
+
                 # Lineto jjust has x and y
                 elif element['type'] == 'lineto':
                     new_path.elements.append(cv.Path.LineTo(element['x'], element['y']))
+
+                # QuadraticTo has cp1x, cp1y, x, y, w
+                elif element['type'] == 'arcto':
+                    new_path.elements.append(
+                        cv.Path.ArcTo(
+                            radius=element['radius'],
+                            rotation=element['rotation'],
+                            large_arc=element['large_arc'],
+                            x=element['x'],
+                            y=element['y'],
+                        )
+                    )
+
+                
                 else:
                     print("Unknown path element type while loading: ", element)
+                    self.p.open(Snack_Bar(f"Error loading {self.title}"))
 
             self.canvas.shapes.append(new_path)
  
@@ -194,13 +221,22 @@ class Canvas(Widget):
     async def start_drawing(self, e: ft.DragStartEvent):
         ''' Set our initial starting x and y coordinates for the line we're drawing '''
 
-        
+        # Grab our style so we can compare it
+        style = str(self.story.data.get('paint_settings', {}).get('style', 'stroke'))
+
+        # Make a copy of our paint settings to modify it, since some of the styles are not built in
+        safe_paint_settings = self.story.data.get('paint_settings', {}).copy()
+
+        # Set either stroke or fill based on custom styles
+        safe_stroke = 'fill' if style == 'fill' or style.endswith('_fill') else 'stroke'
+        safe_paint_settings['style'] = safe_stroke
+
 
         # Update state x and y coordinates
         self.state.x, self.state.y = e.local_x, e.local_y
 
         # Clear and set our current path and state to match it
-        self.current_path = cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
+        self.current_path = cv.Path(elements=[], paint=ft.Paint(**safe_paint_settings))
         self.state.paths.clear()
         self.state.paths.append({'elements': list(), 'paint': self.story.data.get('paint_settings')})
 
@@ -210,13 +246,32 @@ class Canvas(Widget):
         # Add that element to current paths elements and our state paths
         self.current_path.elements.append(move_to_element)
         self.state.paths[0]['elements'].append((move_to_element.__dict__))
-    
+
+        print(f"Starting drawing with style {style}")
+
+        # If we're using lineto (straight lines), add that element to the current path and state right away
+        if style == "lineto":
+            line_element = cv.Path.LineTo(e.local_x, e.local_y)
+            self.current_path.elements.append(line_element)
+            self.state.paths[0]['elements'].append((line_element.__dict__))
+
+        # Else if we're using arcto, add that element to the current path and state right away
+        elif style == 'arcto' or style == 'arctofill':
+            arc_element = cv.Path.ArcTo(
+                radius=12,
+                rotation=0,
+                large_arc=False,
+                x=e.local_x,
+                y=e.local_y,
+            )
+            self.current_path.elements.append(arc_element)
+            self.state.paths[0]['elements'].append((arc_element.__dict__))
+
         # Add the path to the canvas so we can see it
         self.canvas.shapes.append(self.current_path)
 
 
         
-
     # Called when actively drawing on the canvas
     async def is_drawing(self, e: ft.DragUpdateEvent):
         ''' Creates our line to add to the canvas as we draw, and saves that paths data to self.state '''
@@ -227,28 +282,72 @@ class Canvas(Widget):
         if dx * dx + dy * dy < self.min_segment_dist * self.min_segment_dist:
             return
         
+        # Grab our style so we can compare it
+        style = str(self.story.data.get('paint_settings', {}).get('style', 'stroke'))
 
-        # Add check for what kind of path/brush tool (if one at at all) here
+
+        # Handle lineto (Straight lines). Grab the element we created on start drawing, update its data
+        if style == "lineto":
+            
+            # Set the element and its data
+            line_element = self.current_path.elements[-1]
+            line_dict = line_element.__dict__
+
+            # Update the elements position
+            line_element.x = e.local_x
+            line_element.y = e.local_y
+
+            # Update the dict to match
+            line_dict['x'] = line_element.x
+            line_dict['y'] = line_element.y
+
+            # Update the page and return early
+            try:
+                self.canvas.update()
+            except Exception as ex:
+                self.p.update()
+            return
+        
+        # Handle arcs
+        if style == 'arcto' or style == 'arctofill':
+            
+            arc_element = self.current_path.elements[-1]
+            arc_dict = arc_element.__dict__
+
+            arc_element.x = e.local_x
+            arc_element.y = e.local_y
+        
+
+            arc_dict['x'] = arc_element.x
+            arc_dict['y'] = arc_element.y
+
+            # Update the page and return early
+            try:
+                self.canvas.update()
+            except Exception as ex:
+                self.p.update()
+            return
         
         
+        # If its not one of our custom styles, use free-draw stroke, which is constantly adding line_to segements
+        else:
 
-        # Set the path element based on what kind of path we're adding, add it to our current path and our state paths
-        path_element = cv.Path.LineTo(e.local_x, e.local_y)
+            # Set the path element based on what kind of path we're adding, add it to our current path and our state paths
+            path_element = cv.Path.LineTo(e.local_x, e.local_y)
 
-        # Add the declared element to our current path and state paths
-        self.current_path.elements.append(path_element)
-        self.state.paths[0]['elements'].append((path_element.__dict__))  
+            # Add the declared element to our current path and state paths
+            self.current_path.elements.append(path_element)
+            self.state.paths[0]['elements'].append((path_element.__dict__))  
 
-        # After dragging canvas widget, it loses page reference and can't update
-        try:
-            self.canvas.update()
-        except Exception as ex:
-            self.p.update()
-            #print("Canvas update failed during drawing. Updating page instead")
-        
+            # After dragging canvas widget, it loses page reference and can't update
+            try:
+                self.canvas.update()
+            except Exception as ex:
+                self.p.update()
+            
 
-        # Update our state x and y for the next segment
-        self.state.x, self.state.y = e.local_x, e.local_y
+            # Update our state x and y for the next segment
+            self.state.x, self.state.y = e.local_x, e.local_y
         
 
     # Called when we release the mouse to stop drawing a line
@@ -268,9 +367,6 @@ class Canvas(Widget):
         self.state.paths.clear()
         self.state.points.clear()
 
-    
-
-    
 
     # Called when the canvas control is resized
     async def on_canvas_resize(self, e: ft.ControlEvent):
