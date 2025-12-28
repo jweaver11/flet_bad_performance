@@ -81,10 +81,13 @@ class Canvas_Rail(Rail):
            
         # Our story data needs the opacity, but color picker can't have it
         opacity = self.story.data.get('paint_settings', {}).get('color', "1.0").split(",", 1)[1].strip()
+        
+        
         color_with_opacity = f"{selected_color},{opacity}"
         
 
         self.story.data['paint_settings']['color'] = color_with_opacity
+        
         self.story.save_dict()
 
         self.color_picker_button.icon_color = selected_color

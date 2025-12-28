@@ -58,7 +58,7 @@ class Widget(ft.Container):
                 'visible': True,                                # Whether this widget is visible in the workspace or not
                 'is_active_tab': True,                          # Whether this widget's tab is the active tab in the main pin
                 'color': "primary",                             # Color of the icon on the rail and next to title on rail
-                'mini_widgets_location': "right",               # Side of the widget the mini widgets show up on (left or right)
+                #'mini_widgets_location': "right",    OUTDATED           # Side of the widget the mini widgets show up on (left or right)
                 'custom_fields': dict,                          # Dictionary for any custom fields the widget wants to store
             },
         )

@@ -48,7 +48,7 @@ class Settings(ft.View):
                 'active_story': "/",    # this works as a route for the correct story
                 'tab_title_color': "primary",        # the tab color
                 'theme_mode': "system",       # the apps theme mode, dark or light
-                'active_rail_width': int(self.p.width / 10),  # Width of our active rail that we can resize
+                'active_rail_width': 200,  # Width of our active rail that we can resize
                 'theme_color': "blue",   # the color scheme of the app. Defaults to blue
                 'change_name_colors_based_on_morality': True,   # If characters names change colors in char based on morality
                 'workspaces_rail_is_collapsed': False,  # If the all workspaces rail is collapsed or not

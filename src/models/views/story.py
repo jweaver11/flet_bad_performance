@@ -86,12 +86,12 @@ class Story(ft.View):
                     'style': "stroke",
                     'stroke_cap': "butt",
                     'stroke_join': "miter",
-                    'stroke_miter_limit': 10,
-                    'stroke_dash_pattern': list,
+                    'stroke_miter_limit': 10, 
+                    'stroke_dash_pattern': None,
 
                     # Effects
                     'anti_alias': True,
-                    'blur_image': 10,
+                    'blur_image': int,
                     'blend_mode': "src_over",
                     
                 },
@@ -102,7 +102,6 @@ class Story(ft.View):
                 }
             },
         )
-        ft.Paint()
         
 
         # Stories have required structures as well, so we verify they exist or we will error out

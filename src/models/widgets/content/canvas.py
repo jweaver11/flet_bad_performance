@@ -137,7 +137,7 @@ class Canvas(Widget):
             self.canvas.shapes.append(
                 cv.Points(
                     points=[(px, py)],
-                    #point_mode=point_mode,
+                    point_mode=point_mode,
                     paint=ft.Paint(**paint_settings),
                 )
             )
@@ -162,7 +162,7 @@ class Canvas(Widget):
                     print("Unknown path element type while loading: ", element)
 
             self.canvas.shapes.append(new_path)
-
+ 
 
          
 
@@ -175,6 +175,7 @@ class Canvas(Widget):
             points=[(e.local_x, e.local_y)],
             paint=ft.Paint(**self.story.data.get('paint_settings', {})),
         )
+        
         # Add point to the canvas and our state data
         self.canvas.shapes.append(point)
         self.state.points.append((e.local_x, e.local_y, point.point_mode, point.paint.__dict__))
@@ -185,12 +186,15 @@ class Canvas(Widget):
         except Exception as ex:
             self.p.update()
             
+            
         # Save our canvas data
         self.save_canvas()
         
     # Called when we start drawing on the canvas
     async def start_drawing(self, e: ft.DragStartEvent):
         ''' Set our initial starting x and y coordinates for the line we're drawing '''
+
+        
 
         # Update state x and y coordinates
         self.state.x, self.state.y = e.local_x, e.local_y
@@ -226,6 +230,7 @@ class Canvas(Widget):
 
         # Add check for what kind of path/brush tool (if one at at all) here
         
+        
 
         # Set the path element based on what kind of path we're adding, add it to our current path and our state paths
         path_element = cv.Path.LineTo(e.local_x, e.local_y)
@@ -250,6 +255,7 @@ class Canvas(Widget):
     def save_canvas(self):
         """ Saves our paths to our canvas data for storage """
         
+        
         # Add on to what we already have
         if self.state.paths:
             self.data['canvas']['paths'].extend(self.state.paths)
@@ -262,6 +268,7 @@ class Canvas(Widget):
         self.state.paths.clear()
         self.state.points.clear()
 
+    
 
     
 
@@ -344,8 +351,7 @@ class Canvas(Widget):
                 #draw.line(points, fill=paint_settings.get('color', 'black'), width=2)
         
         #img.save(os.path.join(self.directory_path, filename))
-        self.page.snack_bar = Snack_Bar(f"Canvas exported to {filename} at {desired_width}x{desired_height}")
-        self.page.snack_bar.open = True
+        self.page.open(Snack_Bar(f"Canvas exported to {filename} at {desired_width}x{desired_height}"))
         self.page.update()
 
     # Called when we need to rebuild out timeline UI
@@ -355,10 +361,11 @@ class Canvas(Widget):
         # Rebuild out tab to reflect any changes
         self.reload_tab()
 
+        self.canvas_container.content = self.canvas
+
         self.canvas_container.image = ft.DecorationImage(self.data.get('canvas_meta', {}).get('bgimage_path', ""), fit=ft.ImageFit.COVER) if self.data['canvas_meta'].get('bgimage_path', "") != "" else None
 
         self.body_container.alignment = ft.alignment.center
-
 
 
         self.body_container.content = self.interactive_viewer

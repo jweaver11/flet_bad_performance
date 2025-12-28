@@ -160,6 +160,8 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         on_change=_title_text_field_changed, capitalization=ft.TextCapitalization.WORDS # Add check for other widgets with same names
     )
 
+    title_textfield_container = ft.Container(title_textfield, margin=ft.margin.only(top=6))
+
     template_controls = [
         ft.Container(
             content=ft.Text("Blank", text_align=ft.TextAlign.CENTER), padding=ft.padding.all(5), border_radius=4,
@@ -272,54 +274,55 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
         content=ft.Column(
             scroll=ft.ScrollMode.AUTO,
             controls=[
-            
-            title_textfield,
-            ft.Divider(),
-            ft.Row([
-                template_controls[0],
-                ft.Column(
-                    alignment=ft.MainAxisAlignment.CENTER, 
-                    controls=[
-                        ft.Text("Custom Size:", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
-                        width_textfield,
-                        height_textfield,
-                ])
-            ]),
-            ft.Divider(),
-            ft.Text("Templates", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.TITLE_MEDIUM, text_align=ft.TextAlign.RIGHT, width=88),
-            
-            ft.Row([
-                ft.Column(
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[
-                    ft.Row([
-                        template_controls[1],
-                        template_controls[2],
-                        template_controls[3],
-                    ]),
-                    template_controls[4],
-                
-                ]),
-                template_controls[5],
-                template_controls[6],
-                template_controls[7],
-                template_controls[8],
-            ]),  
-            ft.Row([
-                ft.Column([
-                    template_controls[9],
-                    template_controls[10],
-                ]),
-                template_controls[11],
-                template_controls[12],
-                template_controls[13],
-                template_controls[14],
-                template_controls[15],
-                
 
+                #title_textfield,
+                title_textfield_container,
+                ft.Divider(),
+                ft.Row([
+                    template_controls[0],
+                    ft.Column(
+                        alignment=ft.MainAxisAlignment.CENTER, 
+                        controls=[
+                            ft.Text("Custom Size:", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.LABEL_LARGE, text_align=ft.TextAlign.RIGHT, width=88),
+                            width_textfield,
+                            height_textfield,
+                    ])
+                ]),
+                ft.Divider(),
+                ft.Text("Templates", weight=ft.FontWeight.BOLD, theme_style=ft.TextThemeStyle.TITLE_MEDIUM, text_align=ft.TextAlign.RIGHT, width=88),
                 
+                ft.Row([
+                    ft.Column(
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[
+                        ft.Row([
+                            template_controls[1],
+                            template_controls[2],
+                            template_controls[3],
+                        ]),
+                        template_controls[4],
+                    
+                    ]),
+                    template_controls[5],
+                    template_controls[6],
+                    template_controls[7],
+                    template_controls[8],
+                ]),  
+                ft.Row([
+                    ft.Column([
+                        template_controls[9],
+                        template_controls[10],
+                    ]),
+                    template_controls[11],
+                    template_controls[12],
+                    template_controls[13],
+                    template_controls[14],
+                    template_controls[15],
+                    
+
+                    
+                ])
             ])
-        ])
         
     )
 
