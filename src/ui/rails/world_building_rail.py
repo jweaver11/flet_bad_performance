@@ -140,15 +140,15 @@ class World_Building_Rail(Rail):
         
 
         # Load our content directory data into the rail
-        load_directory_data(
-            page=self.p,
-            story=self.story,
-            directory=self.directory_path,
-            column=content,
-            rail=self,
-            additional_directory_menu_options=self.get_directory_menu_options(),
-            additional_file_menu_options=self.get_file_menu_options()
-        )
+        #load_directory_data(
+            #page=self.p,
+            #story=self.story,
+            #directory=self.directory_path,
+            #column=content,
+            #rail=self,
+            #additional_directory_menu_options=self.get_directory_menu_options(),
+            #additional_file_menu_options=self.get_file_menu_options()
+        #)
 
         content.controls.append(ft.Container(height=6))
 

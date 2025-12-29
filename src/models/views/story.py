@@ -28,7 +28,7 @@ class Story(ft.View):
         
         # Parent constructor
         super().__init__(
-            route=os.path.normpath(os.path.normcase(f"\{title.lower().replace(' ', "_")}")), # Not working
+            route=os.path.normpath(os.path.normcase(f"\{title}".lower().replace(' ', "_"))), # Not working
             padding=ft.Padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
             spacing=0,                                                      # No spacing between menubar and rest of page
         )  
@@ -121,7 +121,7 @@ class Story(ft.View):
         self.canvases: dict = {}        # canvases by the user for comic chapters, or to store images (as backgrounds)
         self.characters: dict = {}      # Characters in the story
         self.timelines: dict = {}       # Timelines for our story
-        self.world_building: None       # World building widget that contains our maps, lore, governments, history, etc
+        self.world_building: None = None       # World building widget that contains our maps, lore, governments, history, etc
         self.maps: dict = {}            # Maps created inside of world building
 
         # Store all our widgets above in a master list for easier rendering in the UI
@@ -154,7 +154,7 @@ class Story(ft.View):
         self.load_world_building()
 
         # Loads our maps from file storage
-        #self.load_maps()
+        self.load_maps()
 
         # Everything we loaded above is a widget, but this just adds them all to self.widgets
         self.load_widgets()
@@ -1076,7 +1076,7 @@ class Story(ft.View):
         )
 
         # Views render like columns, so we add elements top-down
-        self.controls = [self.menubar, gd]
+        self.controls = [self.menubar, row]
 
         page.update()
 

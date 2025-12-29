@@ -134,14 +134,15 @@ class App:
             
             # Sets our active story to the page route. The route change function will load the stories data and UI
             if story.route == app.settings.data.get('active_story', None):
-                print("Loading previous story: ", story.title)
+                #print("Loading previous story: ", story.title)
                 app.settings.story = story  # Gives our settings widget the story reference it needs
                 await page.push_route(story.route)
+                return
                 
             
         # Give us home view if no stories were active
-        print("Page route is: ", page.route)
-        await page.push_route("/")
+        #print("Page route is: ", page.route)
+        await page.push_route("/home")
         
 
     
@@ -162,8 +163,6 @@ class App:
         self.settings.data['active_story'] = story.route
         self.settings.story = story
         self.settings.save_dict()
-
-        print("Page Route after create new story: ", page.route)
 
         
     

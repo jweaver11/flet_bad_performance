@@ -632,7 +632,7 @@ class Workspace(ft.Container):
                 controls=[
                     formatted_top_pin,    # formatted top pin
                     #formatted_main_pin,   # formatted main pin
-                    self.main_pin_tabs,   # main pin as tab control
+                    #self.main_pin_tabs,   # main pin as tab control
                     formatted_bottom_pin,     # formatted bottom pin
 
             ]),
