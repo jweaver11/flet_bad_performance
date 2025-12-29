@@ -57,7 +57,10 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
 
         # Otherwise, give us a blank page
         else:
-            page.open(Snack_Bar(f"Error loading story for route: {page.route}"))
+            page.views.append(create_home_view(page))
+            page.update()
+            page.show_dialog(Snack_Bar(f"Error loading story for route: {page.route}"))
+            
                 
         
         page.update()

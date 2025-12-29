@@ -71,13 +71,18 @@ class Widget(ft.Container):
         self.focused = False
 
         # UI ELEMENTS - Tab
-        self.tabs: ft.Tabs = None # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
-        self.tab: ft.Tab = None  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
+        self.tabs: ft.Tabs = None 
+        self.tab_bar: ft.TabBar = None 
+        self.tab: ft.Tab = None 
+        
         self.icon: ft.Icon = None
         self.tab_text: ft.Text = None
         self.hide_tab_icon_button: ft.IconButton = None    # 'X' icon button to hide widget from workspace'
 
+        
+
         # UI ELEMENTS - Body
+        self.tab_bar_view: ft.TabBarView = None   # Tab bar view to hold our body content
 
         # Declare our mini widgets list                      
         self.mini_widgets: list = []   
@@ -395,12 +400,14 @@ class Widget(ft.Container):
         elif tag == "settings": self.icon = ft.Icon(ft.Icons.SETTINGS_OUTLINED)
         elif tag == "timeline": self.icon = ft.Icon(ft.Icons.TIMELINE_ROUNDED)
         elif tag == "map": self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)
-        elif tag == "world_building": self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)
+        elif tag == "world_building": self.icon = ft.Icon(ft.Icons.MAP_OUTLINED)    #TODO: Change to world/globe
         else: self.icon = ft.Icon(ft.Icons.ERROR_OUTLINE)     # Catch errors
         
         # Set the color and size
         self.icon.color = self.data.get('color', ft.Colors.PRIMARY)
         #self.icon.scale = 0.8
+
+
 
         self.tab_text = ft.Text(
             weight=ft.FontWeight.BOLD, # Make the text bold
@@ -421,17 +428,10 @@ class Widget(ft.Container):
             tooltip="Hide",
         )
 
-        self.tab_title_color = ft.Colors.PRIMARY  # The color of the title in our tab and the divider under it
+        
 
-        # Tab that holds our widget title and 'body'.
-        # Since this is a ft.Tab, it needs to be nested in a ft.Tabs control or it wont render.
-        # We do this so we can use tabs in the main pin area, but still show as a container in other pin areas
+        # Tab that holds our title and hide icon button
         self.tab = ft.Tab(
-
-            # Initialize the content. This will be our content of the body of the widget
-            #content=ft.Stack(), 
-            
-
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
             label=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
                 group="widgets",    # Group for draggables (and receiving drag targets) to accept each other
@@ -439,8 +439,7 @@ class Widget(ft.Container):
 
                 # Drag event handlers
                 on_drag_start=self.start_drag,    # Shows our pin targets when we start dragging
-                #on_drag_complete = Do nothing. The accepted drag targets handle logic and removing pin drag targets
-                #on_drag_cancel=lambda e: story.workspace.remove_drag_targets,
+                #on_drag_end=lambda e: story.workspace.remove_drag_targets, # Removes pin targets when stop dragging
 
                 # Content when we are dragging the follows the mouse
                 content_feedback=ft.TextButton(self.title), # Normal text won't restrict its own size, so we use a button
@@ -470,6 +469,9 @@ class Widget(ft.Container):
                 )
             )                    
         )
+
+        # Set our tab bar which will hold our tab
+        self.tab_bar = ft.TabBar(tabs=[self.tab])
 
 
     # Called by child classes at the end of their constructor, or when they need UI update to reflect changes
@@ -543,26 +545,22 @@ class Widget(ft.Container):
             self.master_stack
         ])   
 
-        ft.Tab()
+        
+        
+        self.tab_bar_view = ft.TabBarView(expand=True, controls=[self.body_container])   # Tab bar view to hold our body content
+
+        
 
         # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
         self.tabs = ft.Tabs(
             selected_index=0,
-            animation_duration=0,
+            animation_duration=100,
             length=1,
-            content=self.tab
-            #divider_color=ft.Colors.TRANSPARENT,
-            #indicator_color = "transparent",
-            #indicator_color = ft.Colors.with_opacity(0.7, self.data.get('color', ft.Colors.PRIMARY)),
-            #divider_color=ft.Colors.TRANSPARENT,
+            content=ft.Column([
+                self.tab_bar,
+                self.tab_bar_view,
+            ])
         )
-            
-        
-        # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
-        #self.tab.content = col  # We add this in combo with our 'tabs' later
-        
-        # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
-        #self.tabs.tabs = [self.tab]
 
         self.content = self.tabs
 

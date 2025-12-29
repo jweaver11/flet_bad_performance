@@ -6,7 +6,6 @@ Initializes the app, settings, page data, and renders our UI onto the page
 import flet as ft
 from models.app import app
 from handlers.route_change import route_change
-from models.views.home import create_home_view
 import asyncio
 
 
@@ -14,23 +13,18 @@ import asyncio
 # Main function
 def main(page: ft.Page):
 
-    # Set loading view here if we want to use one
-
+    
+    page.views.append(ft.View([ft.Text("Loading view here", expand=True)], "/loading"))
+    page.update()
 
     # Set our route change function to be called on route changes
     page.on_route_change = route_change 
+    
 
     # Load settings and previous story (if one exists)
     app.load_settings(page)             
     asyncio.create_task(app.load_previous_story(page))       # If a previous story was loaded, we load its route/view here
 
-    print(page.route)
-
-    # If route is default/home (No story was loaded), create a view for that
-    if page.route == "/":
-        
-        page.views.append(create_home_view(page))   # Simple view so we just use a function, not a class
-        page.update()
 
     
 

@@ -84,7 +84,7 @@ class App:
 
 
     # Called on app startup in main
-    async def load_previous_story(self, page: ft.Page) -> bool:
+    async def load_previous_story(self, page: ft.Page):
         ''' Loads our saved stories from the json files in story folders within the stories directory. If none exist, do nothing '''
         
         from constants import data_paths
@@ -136,17 +136,12 @@ class App:
             if story.route == app.settings.data.get('active_story', None):
                 print("Loading previous story: ", story.title)
                 app.settings.story = story  # Gives our settings widget the story reference it needs
-                #page.route = story.route    # This will call our route change function and set our story view
-
                 await page.push_route(story.route)
-
-                page.update()
-                return True
+                
             
+        # Give us home view if no stories were active
+        await page.push_route("/")
         
-            
-        page.update()
-        return False
 
     
     
