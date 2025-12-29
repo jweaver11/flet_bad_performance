@@ -63,7 +63,7 @@ class Canvas(Widget):
                     "bgimage_path": bgimage_path,
                 },     
 
-                #"canvas": list,          # Stores our drawing data
+                # Store our drawing data to load/save
                 "canvas": {
                     'paths': list,
                     'points': list,

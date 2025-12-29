@@ -65,7 +65,7 @@ class Canvas_Rail(Rail):
             icon=ft.Icons.TUNE_OUTLINED,
             tooltip="Adjust the dash pattern for dashed lines.",
             visible=self.story.data.get('paint_settings', {}).get('stroke_dash_pattern', None) is not None,
-            # on_click= Open pattern adjustment dialog/button to adjust length and gap, and add more segments. Make reorderable and deletable
+            #on_click= Open pattern adjustment dialog/button to adjust length and gap, and add more segments. Make reorderable and deletable
         )
 
         # Reload the rail on start
