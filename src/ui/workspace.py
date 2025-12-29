@@ -19,8 +19,8 @@ class Workspace(ft.Container):
         # Set our container properties for the workspace
         super().__init__(
             expand=True,
-            alignment=ft.alignment.center,
-            padding=ft.padding.only(top=10, bottom=10, left=2, right=10),
+            alignment=ft.Alignment.CENTER,
+            padding=ft.Padding.only(top=10, bottom=10, left=2, right=10),
         )
 
         self.p = page
@@ -45,7 +45,7 @@ class Workspace(ft.Container):
         # Pin drag targets
         self.top_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, height=self.story.data.get('top_pin_height', int(self.p.height/5)), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8, margin=ft.margin.only(left=8, right=8),), 
+            content=ft.Container(expand=True, height=self.story.data.get('top_pin_height', int(self.p.height/5)), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8, margin=ft.Margin.only(left=8, right=8),), 
             on_accept=lambda e: self.pin_drag_accept(e, "top"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
         self.left_pin_drag_target = ft.DragTarget(
@@ -61,14 +61,14 @@ class Workspace(ft.Container):
         )
         self.bottom_pin_drag_target = ft.DragTarget(
             group="widgets", 
-            content=ft.Container(expand=True, height=self.story.data.get('bottom_pin_height', int(self.p.height/5)), margin=ft.margin.only(left=8, right=8), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8),
+            content=ft.Container(expand=True, height=self.story.data.get('bottom_pin_height', int(self.p.height/5)), margin=ft.Margin.only(left=8, right=8), bgcolor=ft.Colors.ON_SURFACE, opacity=0, border_radius=8),
             on_accept=lambda e: self.pin_drag_accept(e, "bottom"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
         )
 
         # Weird flet rendering logic, this one needs a container around the drag target to work properly
         self.main_pin_drag_target = ft.Container(
             expand=True,
-            padding=ft.padding.all(8),
+            padding=ft.Padding.all(8),
             content=ft.DragTarget(
             group="widgets", 
             on_accept=lambda e: self.pin_drag_accept(e, "main"), on_will_accept=self.on_hover_pin_drag_target, on_leave=self.on_stop_hover_drag_target,
@@ -389,7 +389,7 @@ class Workspace(ft.Container):
             content=ft.Container(
                 height=10,
                 bgcolor=ft.Colors.TRANSPARENT,
-                padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
+                padding=ft.Padding.only(top=8),  # Push the 2px divider to the right side
                 #content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
             ),
             on_pan_update=move_top_pin_divider,
@@ -422,7 +422,7 @@ class Workspace(ft.Container):
             content=ft.Container(
                 width=10,
                 bgcolor=ft.Colors.TRANSPARENT,
-                padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+                padding=ft.Padding.only(left=8),  # Push the 2px divider to the right side
                 #content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
             ),
             on_pan_update=move_left_pin_divider,
@@ -457,7 +457,7 @@ class Workspace(ft.Container):
             content=ft.Container(
                 width=10,
                 bgcolor=ft.Colors.TRANSPARENT,
-                padding=ft.padding.only(left=8),  # Push the 2px divider to the right side
+                padding=ft.Padding.only(left=8),  # Push the 2px divider to the right side
                 #content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.PRIMARY, opacity=.5)
             ),
             on_pan_update=move_right_pin_divider,
@@ -490,7 +490,7 @@ class Workspace(ft.Container):
             content=ft.Container(
                 height=10,
                 bgcolor=ft.Colors.TRANSPARENT,
-                padding=ft.padding.only(top=8),  # Push the 2px divider to the right side
+                padding=ft.Padding.only(top=8),  # Push the 2px divider to the right side
                 #content=ft.Divider(thickness=2, height=2, color=ft.Colors.PRIMARY, opacity=.5)
             ),
             on_pan_update=move_bottom_pin_divider,
@@ -535,19 +535,19 @@ class Workspace(ft.Container):
                 on_change=main_pin_tab_change,
                 expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
                 #divider_color=ft.Colors.TRANSPARENT,
-                padding=ft.padding.all(0),
-                label_padding=ft.padding.only(left=6, right=6, top=0, bottom=0),
-                mouse_cursor=ft.MouseCursor.BASIC,
-                
-                tabs=[]    # Gives our tab control here   
+                #padding=ft.padding.all(0),
+                #label_padding=ft.padding.only(left=6, right=6, top=0, bottom=0),
+                #mouse_cursor=ft.MouseCursor.BASIC,
+                length=1,
+                content=ft.Text("Workspace")    # Gives our tab control here   
             )
             for widget in visible_main_controls:
-                self.main_pin_tabs.tabs.append(widget.tab)
+                self.main_pin_tabs.content = widget.tab
                 #print("Added tab for widget:", widget.data.get('title', 'Untitled'))
                 # Sets the selected tab to the active one in the main pin
-                if widget.data['is_active_tab']:
-                    self.main_pin_tabs.selected_index = self.main_pin_tabs.tabs.index(widget.tab)
-                    self.main_pin_tabs.indicator_color =  ft.Colors.with_opacity(0.8, widget.data.get('color', ft.Colors.PRIMARY))
+                #if widget.data['is_active_tab']:
+                    #self.main_pin_tabs.selected_index = self.main_pin_tabs.tabs.index(widget.tab)
+                    #self.main_pin_tabs.indicator_color =  ft.Colors.with_opacity(0.8, widget.data.get('color', ft.Colors.PRIMARY))
                     
 
             # Stick it in a container for styling
@@ -555,14 +555,14 @@ class Workspace(ft.Container):
                 
                 expand=True, 
             
-                border_radius=ft.border_radius.all(8),
+                border_radius=ft.BorderRadius.all(8),
             
                 gradient=dark_gradient,
                 animate=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
-                margin=ft.margin.all(0),
+                margin=ft.Margin.all(0),
                 #padding=ft.padding.all(8),
-                padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
-                    content=self.main_pin_tabs
+                padding=ft.Padding.only(top=0, bottom=8, left=8, right=8),
+                content=self.main_pin_tabs
                 )
 
             #print(len(tabs.tabs), " tabs added to main pin")

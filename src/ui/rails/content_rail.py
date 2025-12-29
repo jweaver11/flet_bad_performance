@@ -152,19 +152,19 @@ class Content_Rail(Rail):
                     menu_padding=0,
                     items=[
                         ft.PopupMenuItem(
-                            text="Category", icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
+                            content="Category", icon=ft.Icons.CREATE_NEW_FOLDER_OUTLINED,
                             on_click=self.new_category_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Chapter", icon=ft.Icons.NOTE_ADD_OUTLINED,
+                            content="Chapter", icon=ft.Icons.NOTE_ADD_OUTLINED,
                             on_click=self.new_chapter_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
+                            content="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
                             on_click=self.new_canvas_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
+                            content="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
                             on_click=self.new_note_clicked
                         ),
                     ]
@@ -175,18 +175,18 @@ class Content_Rail(Rail):
                     menu_padding=0,
                     items=[
                         ft.PopupMenuItem(
-                            text="Chapter", icon=ft.Icons.NOTE_ADD_OUTLINED,
+                            content="Chapter", icon=ft.Icons.NOTE_ADD_OUTLINED,
                             on_click=self.new_chapter_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
+                            content="Canvas", icon=ft.Icons.BRUSH_OUTLINED,
                         ),
                         ft.PopupMenuItem(
-                            text="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
+                            content="Note", icon=ft.Icons.NOTE_ALT_OUTLINED,
                             on_click=self.new_note_clicked
                         ),
                         ft.PopupMenuItem(
-                            text="Image", icon=ft.Icons.ADD_PHOTO_ALTERNATE_OUTLINED,
+                            content="Image", icon=ft.Icons.ADD_PHOTO_ALTERNATE_OUTLINED,
                         )
                     ]
                 ),

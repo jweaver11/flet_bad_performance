@@ -279,6 +279,7 @@ class Label_Dropdown(ft.GestureDetector):
             bgcolor=ft.Colors.TRANSPARENT,
             shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
+            controls=[]
         )
 
         # Re-adds our content controls in the correct order

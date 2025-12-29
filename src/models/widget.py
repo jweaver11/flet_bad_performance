@@ -498,8 +498,8 @@ class Widget(ft.Container):
 
         # Set ratio for our body container and mini widgets
         self.body_container.expand = 6
-        self.body_container.border_radius = ft.border_radius.all(10)
-        self.body_container.padding = ft.padding.all(6)
+        self.body_container.border_radius = ft.BorderRadius.all(10)
+        self.body_container.padding = ft.Padding.all(6)
 
 
         
@@ -537,7 +537,7 @@ class Widget(ft.Container):
 
             self.master_stack.controls.append(row)     
 
-        header_container = ft.Container(padding=ft.padding.all(6), content=header) if header is not None else ft.Container(height=0)
+        header_container = ft.Container(padding=ft.Padding.all(6), content=header) if header is not None else ft.Container(height=0)
         col = ft.Column([
             header_container,
             self.master_stack

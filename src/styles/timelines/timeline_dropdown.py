@@ -483,6 +483,7 @@ class Timeline_Dropdown(ft.GestureDetector):
             collapsed_bgcolor=ft.Colors.TRANSPARENT if not self.is_focused else ft.Colors.with_opacity(.2, "primary"),
             #shape=ft.RoundedRectangleBorder(),
             on_change=lambda e: self.toggle_expand(),
+            controls=[]
         )
 
         # Our controls should always be 3. Plot point dropdown, arcs dropdown, and a spacing container

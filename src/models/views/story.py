@@ -947,10 +947,10 @@ class Story(ft.View):
         menu = ft.Container(
             left=self.mouse_x,     # Positions the menu at the mouse location
             top=self.mouse_y,
-            border_radius=ft.border_radius.all(4),
+            border_radius=ft.BorderRadius.all(4),
             bgcolor=ft.Colors.ON_INVERSE_SURFACE,
             width=120,
-            shadow=ft.BoxShadow(color=ft.Colors.BLACK, blur_radius=2, blur_style=ft.ShadowBlurStyle.NORMAL,),
+            shadow=ft.BoxShadow(color=ft.Colors.BLACK, blur_radius=2, blur_style=ft.BlurStyle.NORMAL,),
             content=ft.Column(
                 spacing=4,
                 horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
@@ -1007,8 +1007,8 @@ class Story(ft.View):
         def move_active_rail_divider(e: ft.DragUpdateEvent):
             ''' Responsible for altering the width of the active rail '''
 
-            if (e.delta_x > 0 and self.active_rail.width < page.width/2) or (e.delta_x < 0 and self.active_rail.width > 100):
-                self.active_rail.width += int(e.delta_x)    # Apply the change to our rail
+            if (e.local_delta.x > 0 and self.active_rail.width < page.width/2) or (e.local_delta.x < 0 and self.active_rail.width > 100):
+                self.active_rail.width = self.active_rail.width + int(e.local_delta.x)    # Apply the change to our rail
                 
             page.update()   # Apply our changes to the rest of the page
 
@@ -1084,5 +1084,5 @@ class Story(ft.View):
     def on_hover(self, e):
         ''' Stores our mouse positioning so we know where to open menus '''
 
-        self.mouse_x = e.local_x 
-        self.mouse_y = e.local_y
+        self.mouse_x = e.local_position.x 
+        self.mouse_y = e.local_position.y
