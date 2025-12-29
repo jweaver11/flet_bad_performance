@@ -7,6 +7,7 @@ import flet as ft
 from models.app import app
 from handlers.route_change import route_change
 from models.views.home import create_home_view
+from models.views.loading import create_loading_view
 
 
 
@@ -14,7 +15,9 @@ from models.views.home import create_home_view
 def main(page: ft.Page):
 
     # Set loading view here if we want to use one
-
+    # Our loading view while we setup the app
+    page.views.append(create_loading_view(page))
+    page.update()
 
     # Set our route change function to be called on route changes
     page.on_route_change = route_change 
