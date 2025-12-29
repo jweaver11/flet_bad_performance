@@ -15,12 +15,12 @@ class Workspaces_Rail(ft.Container):
         self.p = page   # Page reference
 
         # Sets our selected rail based on the active story's saved data
-        self.selected_rail = story.data['selected_rail'] if story is not None else "content"    # Catch no story errors
+        self.selected_rail = story.data.get('selected_rail', 'content') if story is not None else "content"    # Catch no story errors
        
         # Style our rail (container)
         super().__init__(
-            alignment=ft.alignment.center,  # Aligns content to the 
-            padding=ft.padding.only(bottom=10, right=2, left=2),
+            alignment=ft.Alignment.CENTER,  # Aligns content to the 
+            padding=ft.Padding.only(bottom=10, right=2, left=2),
             animate=ft.Animation(500, ft.AnimationCurve.FAST_LINEAR_TO_SLOW_EASE_IN),
         )
 
@@ -49,7 +49,10 @@ class Workspaces_Rail(ft.Container):
 
         # Handle when there is no active story (shouldn't happen)
         else:
-            print("No active story, cannot change active rail")
+            
+            self.selected_rail = e.control.destinations[0].data
+            self.reload_rail(story)
+            
             #story.active_rail.content = ft.Text("No active rail")
 
         self.p.update()
@@ -127,9 +130,9 @@ class Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_OUTLINED), # Icon on the rail
                     selected_icon=ft.Icon(ft.Icons.LIBRARY_BOOKS_ROUNDED, color=ft.Colors.PRIMARY), # Selected icon on the rail
-                    padding=ft.padding.only(top=10, bottom=10), # Padding for spacing
+                    padding=ft.Padding.only(top=10, bottom=10), # Padding for spacing
                     # Label underneath the icon and the data we will use to identify the rail
-                    data="content", label_content=ft.Text("Content", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    data="content", label=ft.Text("Content", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -143,8 +146,8 @@ class Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.PEOPLE_OUTLINE_ROUNDED), 
                     selected_icon=ft.Icon(ft.Icons.PEOPLE_ROUNDED, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="characters", label_content=ft.Text("Characters", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    padding=ft.Padding.only(top=10, bottom=10),
+                    data="characters", label=ft.Text("Characters", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -158,8 +161,8 @@ class Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.TIMELINE_ROUNDED, scale=1.2), 
                     selected_icon=ft.Icon(ft.Icons.TIMELINE_OUTLINED, color=ft.Colors.PRIMARY, scale=1.2),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="timelines", label_content=ft.Text("Timelines", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    padding=ft.Padding.only(top=10, bottom=10),
+                    data="timelines", label=ft.Text("Timelines", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -173,8 +176,8 @@ class Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.PUBLIC_OUTLINED), 
                     selected_icon=ft.Icon(ft.Icons.PUBLIC, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="world_building", label_content=ft.Text("World Building", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    padding=ft.Padding.only(top=10, bottom=10),
+                    data="world_building", label=ft.Text("World Building", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -189,8 +192,8 @@ class Workspaces_Rail(ft.Container):
                     icon=ft.Icon(ft.Icons.DRAW_OUTLINED), 
                     #icon=ft.Icons.BRUSH_OUTLINED,
                     selected_icon=ft.Icon(ft.Icons.DRAW_ROUNDED, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="canvas", label_content=ft.Text("Canvas", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    padding=ft.Padding.only(top=10, bottom=10),
+                    data="canvas", label=ft.Text("Canvas", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -204,8 +207,8 @@ class Workspaces_Rail(ft.Container):
                 ft.NavigationRailDestination(
                     icon=ft.Icon(ft.Icons.EVENT_NOTE_OUTLINED),
                     selected_icon=ft.Icon(ft.Icons.EVENT_NOTE, color=ft.Colors.PRIMARY),
-                    padding=ft.padding.only(top=10, bottom=10),
-                    data="planning", label_content=ft.Text("Planning", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
+                    padding=ft.Padding.only(top=10, bottom=10),
+                    data="planning", label=ft.Text("Planning", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE),
                 ),
             ],
         )
@@ -248,12 +251,12 @@ class Workspaces_Rail(ft.Container):
             self.width = 50     # Make the rail less wide
             
             # Remove our labels below the icons
-            content_rail.destinations[0].label_content = None
-            characters_rail.destinations[0].label_content = None
-            timelines_rail.destinations[0].label_content = None
-            world_building_rail.destinations[0].label_content = None
-            canvas_rail.destinations[0].label_content = None
-            planning_rail.destinations[0].label_content = None
+            content_rail.destinations[0].label = ""
+            characters_rail.destinations[0].label = ""
+            timelines_rail.destinations[0].label = ""
+            world_building_rail.destinations[0].label = ""
+            canvas_rail.destinations[0].label = ""
+            planning_rail.destinations[0].label = ""
 
             # Set our collapsed icon buttons icon depending on collapsed state
             collapse_icon = ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT_ROUNDED

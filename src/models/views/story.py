@@ -46,7 +46,7 @@ class Story(ft.View):
                 'title': self.title,
                 'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
                 'tag': "story",
-                'selected_rail': "characters",
+                'selected_rail': "content",
                 'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
                 'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
                 'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),

@@ -76,12 +76,6 @@ class Settings(ft.View):
         ''' Saves our current data to the json file '''
 
         try:
-
-            # Set our file path
-            
-
-            # Create the directory if it doesn't exist. Catches errors from users deleting folders
-            #os.makedirs(self.file_path, exist_ok=True)
             
             # Save the data to the file (creates file if doesnt exist)
             with open(self.file_path, "w", encoding='utf-8') as f:   
@@ -178,7 +172,7 @@ class Settings(ft.View):
             label="Theme Color",
             capitalization= ft.TextCapitalization.SENTENCES,    # Capitalize our options
             options=_get_theme_color_options(),
-            on_change=_set_theme_color,
+            on_select=_set_theme_color,
             value=self.data.get('theme_color', "blue"),
             text_style=ft.TextStyle(weight=ft.FontWeight.BOLD),
             color=self.data.get('theme_color', None),
@@ -219,7 +213,7 @@ class Settings(ft.View):
         self.theme_icon = ft.Icons.DARK_MODE if self.p.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.LIGHT_MODE
 
         # Button that changes the theme from dark or light when clicked
-        self.theme_button = ft.TextButton(text="Toggle theme mode", icon=self.theme_icon, on_click=toggle_theme)
+        self.theme_button = ft.TextButton(content="Toggle theme mode", icon=self.theme_icon, on_click=toggle_theme)
         
         # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
         content=ft.Column(
@@ -340,28 +334,28 @@ class Settings(ft.View):
                 ft.NavigationRailDestination(
                     icon=ft.Icons.COLOR_LENS_OUTLINED,
                     selected_icon=ft.Icon(ft.Icons.COLOR_LENS_ROUNDED, color=ft.Colors.PRIMARY),
-                    label="Appearance",
-                    label_content=ft.Container(ft.Text("Appearance", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
+                    #label="Appearance",
+                    label=ft.Container(ft.Text("Appearance", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.Margin.only(bottom=20))
                 ),
                 ft.NavigationRailDestination(
                     icon=ft.Icons.SETTINGS_OUTLINED,
                     selected_icon=ft.Icon(ft.Icons.SETTINGS, color=ft.Colors.PRIMARY),
-                    label="App Settings",
-                    label_content=ft.Container(ft.Text("App Settings", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
+                    #label="App Settings",
+                    label=ft.Container(ft.Text("App Settings", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.Margin.only(bottom=20))
                 ),
                 ft.NavigationRailDestination(
                     icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
                     selected_icon=ft.Icon(ft.Icons.ACCOUNT_CIRCLE_ROUNDED, color=ft.Colors.PRIMARY),
-                    label="Account",
-                    label_content=ft.Container(ft.Text("Account", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.margin.only(bottom=20))
+                    #label="Account",
+                    label=ft.Container(ft.Text("Account", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE), margin=ft.Margin.only(bottom=20))
                 ),
                 ft.NavigationRailDestination(
                     icon=ft.Icons.MENU_BOOK_OUTLINED,
                     selected_icon=ft.Icon(ft.Icons.MENU_BOOK, color=ft.Colors.PRIMARY),
-                    label="Story Settings",
+                    #label="Story Settings",
                     disabled=self.story is None,   # Disable if no story is loaded
-                    label_content=ft.Container(
-                        margin=ft.margin.only(bottom=20),
+                    label=ft.Container(
+                        margin=ft.Margin.only(bottom=20),
                         content=ft.Text(
                             "Story Settings", no_wrap=True, theme_style=ft.TextThemeStyle.LABEL_LARGE,
                             color=ft.Colors.OUTLINE if self.story is None else None
@@ -373,15 +367,15 @@ class Settings(ft.View):
 
         nav_rail_container = ft.Container(
             bgcolor=ft.Colors.with_opacity(.5, ft.Colors.SURFACE),
-            border_radius=ft.border_radius.only(top_left=20, bottom_left=20),
-            padding=ft.padding.all(20),
+            border_radius=ft.BorderRadius.only(top_left=20, bottom_left=20),
+            padding=ft.Padding.all(20),
             content=nav_rail,
         )
 
         # Build the body of appearance view
         self.body_container = ft.Container(
             expand=True, 
-            padding=ft.padding.all(20),
+            padding=ft.Padding.all(20),
             content=self._load_appearance_settings()        # Default to appearance settings when settings are first opened
         )
 
@@ -397,7 +391,7 @@ class Settings(ft.View):
                     ft.Container(
                         expand=True,
                         gradient=dark_gradient, border_radius=20,
-                        margin=ft.margin.all(10),
+                        margin=ft.Margin.all(10),
                         content=ft.Row(
                             controls=[
                                 nav_rail_container,

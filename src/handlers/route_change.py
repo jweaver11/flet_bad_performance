@@ -13,7 +13,6 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
 
     # Clear our views and any existing controls
     page.views.clear()
-    page.controls.clear()
 
     # If our route is the home page, we just need to load the home view and return
     if page.route == "/":
