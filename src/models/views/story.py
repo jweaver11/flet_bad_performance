@@ -29,7 +29,7 @@ class Story(ft.View):
         # Parent constructor
         super().__init__(
             route=f"/{title.title()}",                                      # Sets our route for our new story
-            padding=ft.padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
+            padding=ft.Padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
             spacing=0,                                                      # No spacing between menubar and rest of page
         )  
 
@@ -1027,7 +1027,7 @@ class Story(ft.View):
                 
                 # Thin vertical divider, which is what the app will actually drag
                 content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
-                padding=ft.padding.only(right=8),  # Push the 2px divider ^ to the right side
+                padding=ft.Padding.only(right=8),  # Push the 2px divider ^ to the right side
             ),
             on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
             on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
