@@ -231,7 +231,7 @@ class Canvas(Widget):
         safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
         safe_paint_settings['style'] = safe_stroke
 
-        print(safe_paint_settings)
+        #print(safe_paint_settings)
 
         # Update state x and y coordinates
         self.state.x, self.state.y = e.local_x, e.local_y
