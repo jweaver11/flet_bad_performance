@@ -5,7 +5,7 @@ from models.views.story import Story
 from ui.rails.rail import Rail
 from styles.menu_option_style import Menu_Option_Style
 import math
-from flet_contrib.color_picker import ColorPicker
+#from flet_contrib.color_picker import ColorPicker
 from models.app import app
 from handlers.new_canvas_alert_dlg import new_canvas_alert_dlg
 
@@ -39,7 +39,7 @@ class Canvas_Rail(Rail):
 
         # Color picker for changing brush color
         color_only = self.story.data.get('paint_settings', {}).get('color', "#000000").split(",", 1)[0]     # Set color without opacity for the color picker
-        self.color_picker = ColorPicker(color=color_only)   # Set our color pickers color 
+        #self.color_picker = ColorPicker(color=color_only)   # Set our color pickers color 
 
         self.color_picker_button = ft.PopupMenuButton(
             icon=ft.Icons.COLOR_LENS_OUTLINED, tooltip="The color of your brush strokes.",
@@ -51,7 +51,7 @@ class Canvas_Rail(Rail):
                     disabled=True,
                     content=ft.Container(
                         padding=ft.Padding(left=10, right=10, top=10, bottom=20),
-                        content=self.color_picker,     
+                        #content=self.color_picker,     
                     ),
                     
                 )

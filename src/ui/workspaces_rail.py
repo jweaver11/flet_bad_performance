@@ -3,7 +3,7 @@ This object is stored in app.all_workspaces_rail.
 Handles new workspace selections, re-ordering, collapsing, and expanding the rail. '''
 
 import flet as ft
-
+import asyncio
 from models.views.story import Story
 
 # Class so we can store our all workspaces rail as an object inside of app
@@ -30,7 +30,7 @@ class Workspaces_Rail(ft.Container):
     
 
     # Called whenever we select a new workspace selector rail
-    def on_workspace_change(self, e, story: Story):
+    async def on_workspace_change(self, e, story: Story):
         ''' Changes our selected workspace in settings and for our object.
         Applies the correct active rail to match the selection '''
         
@@ -58,7 +58,7 @@ class Workspaces_Rail(ft.Container):
         self.p.update()
 
     # Called by clicking button on bottom right of rail
-    def toggle_collapse_rail(self, e, story: Story):
+    async def toggle_collapse_rail(self, e, story: Story):
         ''' Collapses or expands the rail, and saves the state in settings '''
         from models.app import app    # Always grabs updated reference when collapsing/expanding
 
@@ -75,7 +75,7 @@ class Workspaces_Rail(ft.Container):
 
 
     # Called by clicking re-order rail button in the settings.
-    def toggle_reorder_rail(self, story: Story, value: bool = None):
+    async def toggle_reorder_rail(self, story: Story, value: bool = None):
         ''' Toggles the reorderable state of the rail, and saves the state in settings '''
         from models.app import app    # Always grabs updated reference when re-ordering
 
@@ -94,7 +94,7 @@ class Workspaces_Rail(ft.Container):
         self.reload_rail(story)  # Reload the rail to apply changes
 
     # Called whenever the rail is reordered
-    def handle_rail_reorder(self, e: ft.OnReorderEvent, story: Story):
+    async def handle_rail_reorder(self, e: ft.OnReorderEvent, story: Story):
         ''' Reorders our list based on the drag and drop, saves the new order in settings '''
         from models.app import app    # Always grabs updated reference when re-ordering
 
@@ -270,7 +270,7 @@ class Workspaces_Rail(ft.Container):
         # Set our collapsed icon button using our defined icon above
         collapse_icon_button = ft.IconButton(
             icon=collapse_icon,
-            on_click=lambda e: self.toggle_collapse_rail(e, story),
+            on_click=lambda e: asyncio.create_task(self.toggle_collapse_rail(e, story)),
         )
 
         # Sets our content as a column. This will fill our width and hold...

@@ -14,8 +14,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     # Clear our views and any existing controls
     page.views.clear()
 
-    
-    # TODO: Set as match
+
     match page.route:
         case "/":
             # Append the view manually since its just a function to return the view
@@ -38,7 +37,6 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
             return
         case _:
             # Otherwise its a story route, so we need to find which one it is      
-            # new_story = None    # Set new story to none intially to handle routes that don't match any stories
 
             # Run through our stories and see which ones route matches our new route
             for story in app.stories.values():
@@ -48,26 +46,25 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
                     app.settings.data['active_story'] = story.route
                     app.settings.story = story
                     app.settings.save_dict()
-                    break
+
+
+                    new_story.startup()
+                    app.settings.story = new_story  # Gives our settings widget the story reference it needs
+                    page.views.append(new_story)
+                    page.update() 
+                    return
                 
             
-            # If we have a story route that matches our new route, load it to the page views
-            if new_story is not None:
-                
-                new_story.startup()
+            
 
-                app.settings.story = new_story  # Gives our settings widget the story reference it needs
-                page.views.append(new_story)
-
-            # Otherwise, give us a blank page
-            else:
-                page.views.append(create_home_view(page))
-                page.update()
-                page.show_dialog(Snack_Bar(f"Error loading story for route: {page.route}"))
+            # If theres an error loading the story, go to home view
+            page.views.append(create_home_view(page))
+            page.update()
+            page.show_dialog(Snack_Bar(f"Error loading story for route: {page.route}"))
                 
                     
             
-            page.update() 
+            
         
 
     

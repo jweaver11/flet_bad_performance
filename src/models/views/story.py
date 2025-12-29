@@ -997,14 +997,14 @@ class Story(ft.View):
         self.workspace.reload_workspace()  # Load our workspace here instead of in the workspace constructor
 
         # Called when hovering over resizer to right of the active rail
-        def show_horizontal_cursor(e: ft.HoverEvent):
+        async def show_horizontal_cursor(e: ft.HoverEvent):
             ''' Changes the cursor to horizontal when hovering over the resizer '''
 
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
             e.control.update()
 
         # Called when resizing the active rail by dragging the resizer
-        def move_active_rail_divider(e: ft.DragUpdateEvent):
+        async def move_active_rail_divider(e: ft.DragUpdateEvent):
             ''' Responsible for altering the width of the active rail '''
 
             if (e.local_delta.x > 0 and self.active_rail.width < page.width/2) or (e.local_delta.x < 0 and self.active_rail.width > 100):
@@ -1013,7 +1013,7 @@ class Story(ft.View):
             page.update()   # Apply our changes to the rest of the page
 
         # Called when app stops dragging the resizer to resize the active rail
-        def save_active_rail_width(e: ft.DragEndEvent):
+        async def save_active_rail_width(e: ft.DragEndEvent):
             ''' Saves our new width that will be loaded next time app opens the app '''
 
             app.settings.data['active_rail_width'] = self.active_rail.width
@@ -1063,7 +1063,7 @@ class Story(ft.View):
                 self.active_rail,    # Rail for the selected workspace
                 active_rail_resizer,   # Divider between rail and work area
                 
-                workspace_gd,    # Work area for pagelets
+                #workspace_gd,    # Work area for pagelets
             ],
         )
 
