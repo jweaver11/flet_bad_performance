@@ -36,4 +36,5 @@ def main(page: ft.Page):
 
 
 # Runs the app
-ft.run(main)
+if __name__ == "__main__":
+    ft.run(main)

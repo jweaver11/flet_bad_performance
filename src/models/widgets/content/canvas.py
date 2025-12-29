@@ -97,8 +97,8 @@ class Canvas(Widget):
         self.canvas_container = ft.Container(
             content=self.canvas, width=2000, height=1000,
             expand=True, clip_behavior=ft.ClipBehavior.HARD_EDGE,
-            margin=ft.margin.all(20), bgcolor=ft.Colors.SURFACE if bgcolor is None else bgcolor,
-            border=ft.border.all(2, ft.Colors.OUTLINE_VARIANT),
+            margin=ft.Margin.all(20), bgcolor=ft.Colors.SURFACE if bgcolor is None else bgcolor,
+            border=ft.Border.all(2, ft.Colors.OUTLINE_VARIANT),
             #aspect_ratio=1/2,
             # Sets bgcolor or image based on canvas settings, and aspect ratio
         )
@@ -460,9 +460,9 @@ class Canvas(Widget):
 
         self.canvas_container.content = self.canvas
 
-        self.canvas_container.image = ft.DecorationImage(self.data.get('canvas_meta', {}).get('bgimage_path', ""), fit=ft.ImageFit.COVER) if self.data['canvas_meta'].get('bgimage_path', "") != "" else None
+        self.canvas_container.image = ft.DecorationImage(self.data.get('canvas_meta', {}).get('bgimage_path', ""), fit=ft.BoxFit.COVER) if self.data['canvas_meta'].get('bgimage_path', "") != "" else None
 
-        self.body_container.alignment = ft.alignment.center
+        self.body_container.alignment = ft.Alignment.CENTER
 
 
         self.body_container.content = self.interactive_viewer

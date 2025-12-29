@@ -561,8 +561,8 @@ class Timeline(Widget):
             padding=None,
             #expand=True,
             width=170,
-            border=ft.border.all(1, ft.Colors.OUTLINE),
-            border_radius=ft.border_radius.all(6),
+            border=ft.Border.all(1, ft.Colors.OUTLINE),
+            border_radius=ft.BorderRadius.all(6),
             content=ft.ExpansionTile(
                 expand=True,
                 on_change=lambda e: self.change_data(**{'plot_points_filter_dropdown_expanded': e.control.expand}),
@@ -583,8 +583,8 @@ class Timeline(Widget):
             padding=None,
             #expand=True,
             width=170,
-            border=ft.border.all(1, ft.Colors.OUTLINE),
-            border_radius=ft.border_radius.all(6),
+            border=ft.Border.all(1, ft.Colors.OUTLINE),
+            border_radius=ft.BorderRadius.all(6),
             content=ft.ExpansionTile(
                 expand=True,
                 on_change=lambda e: self.change_data(**{'arcs_filter_dropdown_expanded': e.control.expand}),

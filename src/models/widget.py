@@ -32,10 +32,10 @@ class Widget(ft.Container):
         super().__init__(
             expand=True, 
             data=data,                              # Sets our data. 
-            border_radius=ft.border_radius.all(10),
+            border_radius=ft.BorderRadius.all(10),
             gradient=dark_gradient,
-            margin=ft.margin.all(0),
-            padding=ft.padding.only(top=0, bottom=8, left=8, right=8),
+            margin=ft.Margin.all(0),
+            padding=ft.Padding.only(top=0, bottom=8, left=8, right=8),
         )
 
     

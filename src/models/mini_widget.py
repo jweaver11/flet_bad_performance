@@ -30,9 +30,9 @@ class Mini_Widget(ft.Container):
         # Parent constructor
         super().__init__(
             expand=4,
-            border_radius=ft.border_radius.all(10),
-            border=ft.border.all(2, ft.Colors.SECONDARY_CONTAINER),
-            padding=ft.padding.all(8),
+            border_radius=ft.BorderRadius.all(10),
+            border=ft.Border.all(2, ft.Colors.SECONDARY_CONTAINER),
+            padding=ft.Padding.all(8),
             data=data,     
             bgcolor=ft.Colors.with_opacity(.7, ft.Colors.SURFACE),
             blur=5,

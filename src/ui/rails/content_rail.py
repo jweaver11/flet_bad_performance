@@ -50,7 +50,7 @@ class Content_Rail(Rail):
         # Close the menu (if ones is open), which will update the page as well
         self.story.close_menu()   
 
-        self.p.open(new_canvas_alert_dlg(self.p, self.story))
+        self.p.show_dialog(new_canvas_alert_dlg(self.p, self.story))
         self.p.update()
         
     # New notes

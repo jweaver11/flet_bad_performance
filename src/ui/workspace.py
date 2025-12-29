@@ -10,6 +10,8 @@ from models.app import app
 from models.views.story import Story
 import json
 from styles.colors import dark_gradient
+from styles.snack_bar import Snack_Bar
+
 
 # Our workspace object that is stored in our story object
 class Workspace(ft.Container):
@@ -36,8 +38,6 @@ class Workspace(ft.Container):
         self.right_pin = ft.Column(spacing=10, width=story.data['right_pin_width'], controls=[])
         self.bottom_pin = ft.Row(spacing=10, height=story.data['bottom_pin_height'], controls=[])
 
-        # Add our settings to the main pin whenver a new story is loaded or created
-        self.main_pin.controls.append(app.settings)
 
         # Our master row that holds all our widgets
         self.widgets = ft.Row(spacing=0, expand=True, controls=[])
@@ -169,14 +169,9 @@ class Workspace(ft.Container):
 
         self.remove_drag_targets()  # Remove our drag targets from the stack, since we have completed our drag
 
-        # Load our event data
-        event_data = json.loads(e.data)
-        
-        # Grab our draggable from the event
-        draggable = e.page.get_control(event_data.get("src_id"))
             
         # Grab our key and set the widget
-        widget_key = draggable.data
+        widget_key = e.src.data
 
         widget = None
 
@@ -186,7 +181,7 @@ class Workspace(ft.Container):
                 break
 
         if widget is None:
-            print("Error: Widget not found for drag accept")
+            self.p.show_dialog(Snack_Bar("Error moving widget"))
             return
 
         old_pin_location = widget.data['pin_location']
@@ -342,27 +337,15 @@ class Workspace(ft.Container):
             e.control.update()
         def show_horizontal_cursor(e: ft.HoverEvent):
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-            e.control.update()
-
-
-        # Rendering adds dividers between each widget. So if we remove old ones here
-        self.top_pin.controls = [control for control in self.top_pin.controls if type(control) != ft.GestureDetector]
-        self.left_pin.controls = [control for control in self.left_pin.controls if type(control) != ft.GestureDetector]
-        self.right_pin.controls = [control for control in self.right_pin.controls if type(control) != ft.GestureDetector]
-        self.bottom_pin.controls = [control for control in self.bottom_pin.controls if type(control) != ft.GestureDetector]
-
-        
-
-        
-        
+            e.control.update()        
 
 
         # Method called when our divider (inside a gesture detector) is dragged
         # Updates the size of our pin in the story object
         def move_top_pin_divider(e: ft.DragUpdateEvent):
             #print("move top pin divider called")
-            if (e.delta_y > 0 and self.top_pin.height < self.p.height/2) or (e.delta_y < 0 and self.top_pin.height >= self.minimum_pin_height):
-                self.top_pin.height += e.delta_y
+            if (e.local_delta.y > 0 and self.top_pin.height < self.p.height/2) or (e.local_delta.y < 0 and self.top_pin.height >= self.minimum_pin_height):
+                self.top_pin.height += e.local_delta.y
                 self.top_pin_drag_target.content.height = self.top_pin.height  # Update the drag target height to match the pin height
             #formatted_top_pin.update()
             #self.widgets.update() # Update the main pin, as it is affected by all pins resizing
@@ -398,11 +381,13 @@ class Workspace(ft.Container):
             drag_interval=10,
         )
 
+        
         # Left pin reisizer method and variable
         def move_left_pin_divider(e: ft.DragUpdateEvent):
             #print("move left pin divider called")
-            if (e.delta_x > 0 and self.left_pin.width < self.p.width/2) or (e.delta_x < 0 and self.left_pin.width >= self.minimum_pin_width):
-                self.left_pin.width += e.delta_x
+            #print(e.local_delta)
+            if (e.local_delta.x > 0 and self.left_pin.width < self.p.width/2) or (e.local_delta.x < 0 and self.left_pin.width >= self.minimum_pin_width):
+                self.left_pin.width += e.local_delta.x
             #formatted_left_pin.update()
             #self.widgets.update()
             #self.master_stack.update()
@@ -436,8 +421,8 @@ class Workspace(ft.Container):
         # Right pin resizer method and variable
         def move_right_pin_divider(e: ft.DragUpdateEvent):
             #print("move right pin divider called")
-            if (e.delta_x < 0 and self.right_pin.width < self.p.width/2) or (e.delta_x > 0 and self.right_pin.width >= self.minimum_pin_width):
-                self.right_pin.width -= e.delta_x
+            if (e.local_delta.x < 0 and self.right_pin.width < self.p.width/2) or (e.local_delta.x > 0 and self.right_pin.width >= self.minimum_pin_width):
+                self.right_pin.width -= e.local_delta.x
             #formatted_right_pin.update()
             #self.widgets.update()
             #self.master_stack.update()
@@ -469,8 +454,8 @@ class Workspace(ft.Container):
         # Bottom pin resizer method and variable
         def move_bottom_pin_divider(e: ft.DragUpdateEvent):
             #print("move bottom pin divider called")
-            if (e.delta_y < 0 and self.bottom_pin.height < self.p.height/2) or (e.delta_y > 0 and self.bottom_pin.height >= self.minimum_pin_height):
-                self.bottom_pin.height -= e.delta_y
+            if (e.local_delta.y < 0 and self.bottom_pin.height < self.p.height/2) or (e.local_delta.y > 0 and self.bottom_pin.height >= self.minimum_pin_height):
+                self.bottom_pin.height -= e.local_delta.y
             #formatted_bottom_pin.update()
             #self.widgets.update()
             #self.master_stack.update()
@@ -533,21 +518,24 @@ class Workspace(ft.Container):
             self.main_pin_tabs = ft.Tabs(
                 animation_duration=0,
                 on_change=main_pin_tab_change,
-                expand=True,  # Layout engine breaks Tabs inside of Columns if this expand is not set
-                #divider_color=ft.Colors.TRANSPARENT,
-                #padding=ft.padding.all(0),
-                #label_padding=ft.padding.only(left=6, right=6, top=0, bottom=0),
-                #mouse_cursor=ft.MouseCursor.BASIC,
+                expand=True, 
+                
                 length=1,
-                content=ft.Text("Workspace")    # Gives our tab control here   
+                content=ft.Column([
+                    ft.TabBar(
+                        tabs=[widget.tab for widget in visible_main_controls],
+                        divider_color=ft.Colors.TRANSPARENT,
+                        padding=ft.Padding.all(0),
+                        label_padding=ft.Padding.only(left=6, right=6, top=0, bottom=0),
+                        mouse_cursor=ft.MouseCursor.BASIC,
+                    ),
+                    ft.TabBarView(
+                        expand=True,
+                        controls=[widget.body_container for widget in visible_main_controls],
+                    ),
+                ]),    # Gives our tab control here   
             )
-            for widget in visible_main_controls:
-                self.main_pin_tabs.content = widget.tab
-                #print("Added tab for widget:", widget.data.get('title', 'Untitled'))
-                # Sets the selected tab to the active one in the main pin
-                #if widget.data['is_active_tab']:
-                    #self.main_pin_tabs.selected_index = self.main_pin_tabs.tabs.index(widget.tab)
-                    #self.main_pin_tabs.indicator_color =  ft.Colors.with_opacity(0.8, widget.data.get('color', ft.Colors.PRIMARY))
+            
                     
 
             # Stick it in a container for styling
@@ -560,7 +548,6 @@ class Workspace(ft.Container):
                 gradient=dark_gradient,
                 animate=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
                 margin=ft.Margin.all(0),
-                #padding=ft.padding.all(8),
                 padding=ft.Padding.only(top=0, bottom=8, left=8, right=8),
                 content=self.main_pin_tabs
                 )
@@ -644,8 +631,8 @@ class Workspace(ft.Container):
                 expand=True, spacing=0, 
                 controls=[
                     formatted_top_pin,    # formatted top pin
-                    #self.main_pin,     # main work area with widgets
-                    formatted_main_pin,   # formatted main pin
+                    #formatted_main_pin,   # formatted main pin
+                    self.main_pin_tabs,   # main pin as tab control
                     formatted_bottom_pin,     # formatted bottom pin
 
             ]),
