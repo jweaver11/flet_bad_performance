@@ -8,6 +8,7 @@ from models.app import app
 from models.views.story import Story
 from handlers.check_story_unique import story_is_unique
 from styles.snack_bar import Snack_Bar
+import asyncio
 
 
 
@@ -37,7 +38,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
             ''' Creates a new story with the given title '''
 
             # Import our variable if it is unique or nah
-            nonlocal is_unique
+            nonlocal is_unique 
 
             if isinstance(e, ft.TextField):
                 #print("Received the text field. title is e.value")
@@ -56,7 +57,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
             # Check if the title is unique
             if is_unique:
                 #print("title is unique, story being created: ", title)
-                app.create_new_story(title, page, "default") # Needs the story object
+                asyncio.create_task(app.create_new_story(title, page, "default")) # Needs the story object
                 dlg.open = False
                 page.update()
             else:
@@ -183,6 +184,10 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
         open_button = ft.TextButton("Open", on_click=open_selected_story, disabled=True)
 
+        def _close_dialog(e):
+            dlg.open = False
+            page.update()
+
 
         # Our alert dialog that pops up when file -> open is clicked
         dlg = ft.AlertDialog(
@@ -198,7 +203,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 on_change=change_selected_story
             ),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: page.close_dialog(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("Cancel", on_click=_close_dialog, style=ft.ButtonStyle(color=ft.Colors.ERROR)),
                 open_button,
             ]
         )
