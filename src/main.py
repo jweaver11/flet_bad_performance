@@ -7,6 +7,7 @@ import flet as ft
 from models.app import app
 from handlers.route_change import route_change
 from models.views.home import create_home_view
+import asyncio
 
 
 
@@ -21,7 +22,7 @@ def main(page: ft.Page):
 
     # Load settings and previous story (if one exists)
     app.load_settings(page)             
-    app.load_previous_story(page)       # If a previous story was loaded, we load its route/view here
+    asyncio.create_task(app.load_previous_story(page))       # If a previous story was loaded, we load its route/view here
 
     print(page.route)
 

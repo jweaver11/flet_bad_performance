@@ -84,7 +84,7 @@ class App:
 
 
     # Called on app startup in main
-    def load_previous_story(self, page: ft.Page) -> bool:
+    async def load_previous_story(self, page: ft.Page) -> bool:
         ''' Loads our saved stories from the json files in story folders within the stories directory. If none exist, do nothing '''
         
         from constants import data_paths
@@ -131,10 +131,14 @@ class App:
 
         # Initialize and load all our stories data and UI elements
         for story in app.stories.values():
+            
             # Sets our active story to the page route. The route change function will load the stories data and UI
-            if story.title == app.settings.data.get('active_story', None):
+            if story.route == app.settings.data.get('active_story', None):
+                print("Loading previous story: ", story.title)
                 app.settings.story = story  # Gives our settings widget the story reference it needs
-                page.route = story.route    # This will call our route change function and set our story view
+                #page.route = story.route    # This will call our route change function and set our story view
+
+                await page.push_route(story.route)
 
                 page.update()
                 return True
@@ -147,16 +151,23 @@ class App:
     
     
     # Called when app creates a new story. Accepts our title, page reference, a template, and a type
-    def create_new_story(self, title: str, page: ft.Page, template: str) -> Story:
+    async def create_new_story(self, title: str, page: ft.Page, template: str):
         ''' Creates the new story object and has it run its 'startup' method. Changes route so our view displays the new story '''
 
         # TODO: Add a type to accept for novel/comic
+
+        story = Story(title.title(), page, data=None, template=template)
         
         # Create a new story object and add it to our stories dict
-        self.stories[title.title()] = Story(title.title(), page, data=None, template=template)
+        self.stories[title.title()] = story
 
         # Opens this new story as the active one on screen
-        page.route = self.stories[title.title()].route
+        await page.push_route(story.route)
+        self.settings.data['active_story'] = story.route
+        self.settings.story = story
+        self.settings.save_dict()
+
+        print("Page Route after create new story: ", page.route)
 
         
     

@@ -163,21 +163,22 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
 
         # Called when the 'open' button is clicked in the bottom right of the dialog
-        def open_selected_story(e):
+        async def open_selected_story(e):
             ''' Changes the route to the selected story '''
 
-            #print("Open button clicked, selected story is: ", selected_story)
 
             if selected_story is not None:
                 print("Opening story: ", selected_story)
-                page.go(app.stories[selected_story].route)
+                await page.push_route(app.stories[selected_story].route)
                 app.settings.story = app.stories[selected_story]  # Gives our settings widget the story reference it needs
-                page.close(dlg)
+                
+                dlg.open = False
                 page.update()
             else:
                 print("No story selected")
 
-            page.close(dlg)
+           
+            dlg.open = False
             page.update()
 
         open_button = ft.TextButton("Open", on_click=open_selected_story, disabled=True)
@@ -197,7 +198,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 on_change=change_selected_story
             ),
             actions=[
-                ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
+                ft.TextButton("Cancel", on_click=lambda e: page.close_dialog(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)),
                 open_button,
             ]
         )

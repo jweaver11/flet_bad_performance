@@ -24,16 +24,16 @@ class Story(ft.View):
         data: dict=None,        # Data to load our story with (if any)
         template: str=None,     # Template to use when creating new story (sci-fi, fantasy, etc.)
         type: str=None          # Type of story (novel, comic, etc.)
-    ):
+    ): 
         
         # Parent constructor
         super().__init__(
-            route=f"/{title.title()}",                                      # Sets our route for our new story
+            route=os.path.normpath(os.path.normcase(f"\{title.lower().replace(' ', "_")}")), # Not working
             padding=ft.Padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
             spacing=0,                                                      # No spacing between menubar and rest of page
         )  
 
-        self.title = title.title()      # Gives our story a title when its created
+        self.title = title      # Gives our story a title when its created
         self.p = page                   # Reference to our page object for updating UI elements
         self.data = data                # Sets our data (if any) passed in. New stories just have none
         self.template = template        # Template for our story (sci-fi, fantasy, etc.)
@@ -44,6 +44,7 @@ class Story(ft.View):
             self,           # Pass in our own data so the function can see the actual data we loaded
             {
                 'title': self.title,
+                'route': self.route,
                 'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
                 'tag': "story",
                 'selected_rail': "content",

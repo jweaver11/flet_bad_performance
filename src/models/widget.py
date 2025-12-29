@@ -71,11 +71,11 @@ class Widget(ft.Container):
         self.focused = False
 
         # UI ELEMENTS - Tab
-        self.tabs: ft.Tabs = ft.Tabs() # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
-        self.tab: ft.Tab = ft.Tab()  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
-        self.icon: ft.Icon = ft.Icon()
-        self.tab_text: ft.Text = ft.Text()
-        self.hide_tab_icon_button: ft.IconButton = ft.IconButton()    # 'X' icon button to hide widget from workspace'
+        self.tabs: ft.Tabs = None # Tabs control to hold our tab. We only have one tab, but this is needed for it to render. Nests in self.content
+        self.tab: ft.Tab = None  # Tab that holds our title and hide icon. Nests inside of a ft.Tabs control
+        self.icon: ft.Icon = None
+        self.tab_text: ft.Text = None
+        self.hide_tab_icon_button: ft.IconButton = None    # 'X' icon button to hide widget from workspace'
 
         # UI ELEMENTS - Body
 
@@ -410,18 +410,7 @@ class Widget(ft.Container):
             
         )
 
-        # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
-        self.tabs = ft.Tabs(
-            selected_index=0,
-            animation_duration=0,
-            #divider_color=ft.Colors.TRANSPARENT,
-            padding=ft.padding.all(0),
-            label_padding=ft.padding.all(0),
-            mouse_cursor=ft.MouseCursor.BASIC,
-            #indicator_color = "transparent",
-            indicator_color = ft.Colors.with_opacity(0.7, self.data.get('color', ft.Colors.PRIMARY)),
-            divider_color=ft.Colors.TRANSPARENT,
-        )
+        
 
         # Our icon button that will hide the widget when clicked in the workspace
         self.hide_tab_icon_button = ft.IconButton(    # Icon to hide the tab from the workspace area
@@ -444,7 +433,7 @@ class Widget(ft.Container):
             
 
             # Content of the tab itself. Has widgets name and hide widget icon, and functionality for dragging
-            tab_content=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
+            label=ft.Draggable(   # Draggable is the control so we can drag and drop to different pin locations
                 group="widgets",    # Group for draggables (and receiving drag targets) to accept each other
                 data=self.data['key'],  # Pass ourself through the data (of our tab, NOT our object) so we can move ourself around
 
@@ -553,13 +542,27 @@ class Widget(ft.Container):
             header_container,
             self.master_stack
         ])   
+
+        ft.Tab()
+
+        # Initialize our tabs control that will hold our tab. We only have one tab, but this is needed for it to render
+        self.tabs = ft.Tabs(
+            selected_index=0,
+            animation_duration=0,
+            length=1,
+            content=self.tab
+            #divider_color=ft.Colors.TRANSPARENT,
+            #indicator_color = "transparent",
+            #indicator_color = ft.Colors.with_opacity(0.7, self.data.get('color', ft.Colors.PRIMARY)),
+            #divider_color=ft.Colors.TRANSPARENT,
+        )
             
         
         # BUILD OUR TAB CONTENT - Our tab content holds the row of our body and mini widgets containers
-        self.tab.content = col  # We add this in combo with our 'tabs' later
+        #self.tab.content = col  # We add this in combo with our 'tabs' later
         
         # Add our tab to our tabs control so it will render. Set our widgets content to our tabs control and update the page
-        self.tabs.tabs = [self.tab]
+        #self.tabs.tabs = [self.tab]
 
         self.content = self.tabs
 

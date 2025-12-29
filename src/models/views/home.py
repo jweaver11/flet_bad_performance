@@ -2,6 +2,7 @@ import flet as ft
 from ui.menu_bar import create_menu_bar
 from styles.colors import dark_gradient
 from handlers.check_story_unique import story_is_unique
+import asyncio
 
 
 # Called when creating our home view (No stories exist or none active)
@@ -38,7 +39,7 @@ def create_home_view(page: ft.Page) -> ft.View:
             else:
                 title = e.control.value
 
-            print(title)
+            
 
             for story in app.stories.values():
                 if story.title == title:
@@ -48,9 +49,10 @@ def create_home_view(page: ft.Page) -> ft.View:
             # Check if the title is unique
             if is_unique:
                 #print("title is unique, story being created: ", title)
-                app.create_new_story(title, page, "default") # Needs the story object
                 dlg.open = False
                 page.update()
+                asyncio.create_task(app.create_new_story(title, page, "default")) # Needs the story object
+                
             else:
                 #print("Title not unique, no story created")
                 story_title_field.error_text = "Title must be unique"
@@ -89,7 +91,7 @@ def create_home_view(page: ft.Page) -> ft.View:
         dlg = ft.AlertDialog(
 
             # Title of our dialog
-            title=ft.Text("Create New Story"),
+            title=ft.Text("Create New Story", theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM, weight=ft.FontWeight.BOLD),
 
             # Main content is text box for user to input story title
             content=story_title_field,
@@ -103,8 +105,8 @@ def create_home_view(page: ft.Page) -> ft.View:
 
         # Open our dialog in the overlay
         dlg.open = True
-        page.overlay.append(dlg)
-        page.update()
+        page.show_dialog(dlg)
+        #page.update()
 
 
     return ft.View(
@@ -119,9 +121,14 @@ def create_home_view(page: ft.Page) -> ft.View:
                 alignment=ft.Alignment.CENTER,
                 gradient=dark_gradient,
                 content=ft.FloatingActionButton(
-                    content=ft.Row([ft.Container(expand=True), ft.Icon(ft.Icons.ADD_OUTLINED), ft.Text("Create New Story", theme_style=ft.TextThemeStyle.BODY_LARGE), ft.Container(expand=True)], alignment=ft.Alignment.CENTER),
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.ADD_OUTLINED, size=30), 
+                        ft.Text("Create New Story", theme_style=ft.TextThemeStyle.TITLE_LARGE, weight=ft.FontWeight.BOLD), 
+                        ], 
+                        alignment=ft.MainAxisAlignment.SPACE_EVENLY
+                    ),
                     on_click=create_new_story_button_clicked,
-                    width=200,
+                    width=300,
                     height=100,
                     shape=ft.RoundedRectangleBorder(radius=10),  
                 ),

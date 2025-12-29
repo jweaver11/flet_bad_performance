@@ -568,7 +568,7 @@ class Timeline(Widget):
                 on_change=lambda e: self.change_data(**{'plot_points_filter_dropdown_expanded': e.control.expand}),
                 title=ft.Text("Plot Point Filters", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE), 
                 dense=True,
-                initially_expanded=self.data.get('plot_points_filter_dropdown_expanded', True),
+                expanded=self.data.get('plot_points_filter_dropdown_expanded', True),
                 visual_density=ft.VisualDensity.COMPACT,
                 tile_padding=ft.Padding(6, 0, 0, 0),      # If no leading icon, give us small indentation
                 maintain_state=True,
@@ -590,7 +590,7 @@ class Timeline(Widget):
                 on_change=lambda e: self.change_data(**{'arcs_filter_dropdown_expanded': e.control.expand}),
                 title=ft.Text("Arcs Filters", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE), 
                 dense=True,
-                initially_expanded=self.data.get('arcs_filter_dropdown_expanded', True),
+                expanded=self.data.get('arcs_filter_dropdown_expanded', True),
                 visual_density=ft.VisualDensity.COMPACT,
                 tile_padding=ft.Padding(6, 0, 0, 0),      # If no leading icon, give us small indentation
                 maintain_state=True,

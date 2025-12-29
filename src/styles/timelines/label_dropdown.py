@@ -268,7 +268,7 @@ class Label_Dropdown(ft.GestureDetector):
                 #ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
             #]),
             dense=True,
-            initially_expanded=self.is_expanded,
+            expanded=self.is_expanded,
             visual_density=ft.VisualDensity.COMPACT,
             tile_padding=ft.Padding(6, 0, 0, 0),      # If no leading icon, give us small indentation
             #tile_padding=ft.Padding(0, 0, 0, 0),      # If leading icon, no indentation

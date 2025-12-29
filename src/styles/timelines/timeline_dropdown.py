@@ -471,7 +471,7 @@ class Timeline_Dropdown(ft.GestureDetector):
         self.expansion_tile = ft.ExpansionTile(
             title=ft.Text(value=self.title, weight=ft.FontWeight.BOLD, text_align="left"),
             dense=True,
-            initially_expanded=self.is_expanded,
+            expanded=self.is_expanded,
             visual_density=ft.VisualDensity.COMPACT,
             tile_padding=ft.Padding(6, 0, 0, 0),      # If no leading icon, give us small indentation
             controls_padding=ft.Padding(10, 0, 0, 0),       # Keeps all sub children indented

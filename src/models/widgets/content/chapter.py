@@ -3,7 +3,7 @@ from models.views.story import Story
 from models.widget import Widget
 from handlers.verify_data import verify_data
 from styles.menu_option_style import Menu_Option_Style
-from flet_quill import FletQuill
+#from flet_quill import FletQuill
 
 
 # Class that holds our text chapter objects
@@ -111,22 +111,7 @@ class Chapter(Widget):
         self.body_container.content = ft.Column(
             expand=True,
             controls=[
-                FletQuill(
-                    file_path=f"{self.directory_path}/{self.title}_text.json",
-
-                    #border_visible=True,
-                    #border_width=1.0,       # Defaults to 1.0
-
-                    # Set paddings around the editor. Defaults to 10.0
-                    #padding_left=72.0,
-                    #padding_top=72.0,
-                    #padding_right=72.0,
-                    #padding_bottom=72.0,
-
-                    #aspect_ratio=8.5/11.0,  # paper-like ratio
-
-                    #show_toolbar_divider=False,  # Show divider below toolbar
-                )
+                #FletQuill()
             ]
         )
         
