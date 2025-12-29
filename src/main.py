@@ -26,6 +26,8 @@ def main(page: ft.Page):
     app.load_settings(page)             
     app.load_previous_story(page)       # If a previous story was loaded, we load its route/view here
 
+    print("Initial route:", page.route)
+
     # If route is default/home (No story was loaded), create a view for that
     if page.route == "/":
         

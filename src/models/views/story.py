@@ -12,6 +12,7 @@ import json
 from constants import data_paths
 from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
+from handlers.safe_string_checker import return_safe_name
 
 
 class Story(ft.View):
@@ -28,7 +29,7 @@ class Story(ft.View):
         
         # Parent constructor
         super().__init__(
-            route=f"/{title.title()}",                                      # Sets our route for our new story
+            route=return_safe_name(f"/{title}"),    # Sets our route for our new story
             padding=ft.padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
             spacing=0,                                                      # No spacing between menubar and rest of page
         )  
@@ -44,15 +45,15 @@ class Story(ft.View):
             self,           # Pass in our own data so the function can see the actual data we loaded
             {
                 'title': self.title,
-                'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
+                'directory_path': os.path.join(data_paths.stories_directory_path, self.route),
                 'tag': "story",
                 'selected_rail': "characters",
-                'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
-                'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
-                'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
-                'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
-                'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
-                'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
+                'content_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "content"),
+                'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "characters"),
+                'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "timelines"),
+                'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "world_building"),
+                'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "world_building", "maps"),
+                'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "planning"),
                 'top_pin_height': 200,
                 'left_pin_width': 230,
                 'main_pin_height': int,
@@ -102,6 +103,7 @@ class Story(ft.View):
                 }
             },
         )
+        
         
 
         # Stories have required structures as well, so we verify they exist or we will error out
@@ -175,10 +177,10 @@ class Story(ft.View):
 
         try:
             # Makes sure our directory path is always right. 
-            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
+            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.route)
                 
             # Our file path we store our data in
-            file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+            file_path = os.path.join(self.data['directory_path'], f"{self.route}.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.data['directory_path'], exist_ok=True)
@@ -237,7 +239,7 @@ class Story(ft.View):
             is_new_story = self.data.get('is_new_story', True)
 
             # Sets our path to our story folder
-            directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+            directory_path = os.path.join(data_paths.stories_directory_path, self.route)
 
             # Set our workspace folder structure inside our story folder
             required_story_folders = [
@@ -457,6 +459,9 @@ class Story(ft.View):
         from models.widgets.content.note import Note
         from models.widgets.content.chapter import Chapter
         from models.widgets.content.canvas import Canvas
+
+        print("Content directory path:\n\n___________________________________")
+        print(self.data.get('content_directory_path'))
 
         # Check if the characters folder exists. Creates it if it doesn't. Exists in case people delete this folder
         if not os.path.exists(self.data['content_directory_path']):

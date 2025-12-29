@@ -130,7 +130,7 @@ class App:
         # Initialize and load all our stories data and UI elements
         for story in app.stories.values():
             # Sets our active story to the page route. The route change function will load the stories data and UI
-            if story.title == app.settings.data.get('active_story', None):
+            if story.route == app.settings.data.get('active_story', None):
                 app.settings.story = story  # Gives our settings widget the story reference it needs
                 page.route = story.route    # This will call our route change function and set our story view
 
@@ -148,11 +148,18 @@ class App:
 
         # TODO: Add a type to accept for novel/comic
         
+        story = Story(title.title(), page, data=None, template=template)
+        
         # Create a new story object and add it to our stories dict
-        self.stories[title.title()] = Story(title.title(), page, data=None, template=template)
+        self.stories[title.title()] = story
+
+        print("new story route:", story.route)
 
         # Opens this new story as the active one on screen
-        page.route = self.stories[title.title()].route
+        page.go(story.route)
+        self.settings.data['active_story'] = story.route
+        self.settings.story = story
+        self.settings.save_dict()
 
         
     

@@ -15,6 +15,8 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     # Clear our views and any existing controls
     page.views.clear()
 
+    print("Changing route to:", page.route)
+
 
     match page.route:
         case "/":
