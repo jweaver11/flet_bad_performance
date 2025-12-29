@@ -8,16 +8,24 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     from models.app import app
     from models.views.home import create_home_view
 
+    print(f"Route change to: {e.route}")
+
     # Grabs our page from the event for easier reference
     page: ft.Page = e.page
 
     # Clear our views and any existing controls
     page.views.clear()
 
+    # TODO: Set as match
+    #match page.route:
+        #case "src_over":
+            #return "None"
+
     # If our route is the home page, we just need to load the home view and return
     if page.route == "/":
 
         # Append the view manually since its just a function to return the view
+        print("Loading home view")
         page.views.append(create_home_view(page))
         page.update()
         return
@@ -27,6 +35,11 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
 
         app.settings.reload_settings()
         page.views.append(app.settings)
+        page.update()
+        return
+    
+    elif page.route == "/loading":
+        page.views.append(ft.View([ft.Text("Loading view here", expand=True)], "/loading"))
         page.update()
         return
 
@@ -49,7 +62,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
         # If we have a story route that matches our new route, load it to the page views
         if new_story is not None:
             
-            
+            print("Running story startup")
             new_story.startup()
 
             app.settings.story = new_story  # Gives our settings widget the story reference it needs
@@ -64,3 +77,6 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
                 
         
         page.update()
+
+    
+

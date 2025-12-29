@@ -7,7 +7,7 @@ import flet as ft
 import os
 import json
 from models.widget import Widget
-
+import asyncio
 
 class App:
 
@@ -140,6 +140,7 @@ class App:
                 
             
         # Give us home view if no stories were active
+        print("Page route is: ", page.route)
         await page.push_route("/")
         
 

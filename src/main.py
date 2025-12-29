@@ -13,7 +13,7 @@ import asyncio
 # Main function
 def main(page: ft.Page):
 
-    
+    page.route = "/loading"
     page.views.append(ft.View([ft.Text("Loading view here", expand=True)], "/loading"))
     page.update()
 
@@ -23,7 +23,7 @@ def main(page: ft.Page):
 
     # Load settings and previous story (if one exists)
     app.load_settings(page)             
-    asyncio.create_task(app.load_previous_story(page))       # If a previous story was loaded, we load its route/view here
+    asyncio.create_task(app.load_previous_story(page))    # If a previous story was loaded, we load its route/view here
 
 
     
