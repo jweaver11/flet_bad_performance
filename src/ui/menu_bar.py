@@ -117,7 +117,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
         dlg.actions.insert(0, ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)))
 
         # Open our dialog in the overlay
-        page.open(dlg)
+        page.show_dialog(dlg)
 
 
     # Called when file -> open is clicked
@@ -203,7 +203,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
         )
 
         # Opens our dialog
-        page.open(dlg)
+        page.show_dialog(dlg)
 
     async def _settings_clicked(e):
         ''' Goes to the settings page '''
@@ -308,7 +308,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 ft.Container(expand=True),  # empty space in middle of menubar
                 # Fix broken widgets button
 
-                ft.IconButton(ft.Icons.BUG_REPORT_OUTLINED, tooltip="Test Snackbar", on_click=lambda e: page.open(Snack_Bar("This is a test snackbar!"))),
+                ft.IconButton(ft.Icons.BUG_REPORT_OUTLINED, tooltip="Test Snackbar", on_click=lambda e: page.show_dialog(Snack_Bar("This is a test snackbar!"))),
                 ft.IconButton(icon=ft.Icons.HOME_OUTLINED, on_click=_home_clicked, tooltip="Home"),  # Temp for testing
                 ft.IconButton(icon=ft.Icons.BUILD_ROUNDED, on_click=lambda e: story.workspace.remove_drag_targets(), tooltip="Click if broken"),
                 ft.TextButton("Feedback"),  # Feedback button
