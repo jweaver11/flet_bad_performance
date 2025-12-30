@@ -435,7 +435,8 @@ class Canvas_Rail(Rail):
                 ft.Row([self.color_picker_button, paint_style], alignment=ft.MainAxisAlignment.SPACE_EVENLY),
 
                 # Checkbox erase mode - set color to transparent and blendmode.clear?
-                # Add shapes button. Path will use paint.style.paintingstyle fill or stroke.
+                # Add shapes and shapefill drawing modes. Path will use paint.style.paintingstyle fill or stroke.
+                # Add shadow effect option for paths
 
                 ft.Row([ft.Text("Size", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
                 ft.Row([ft.Text("Opacity", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_opacity]),

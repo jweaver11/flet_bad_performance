@@ -13,9 +13,6 @@ class Workspaces_Rail(ft.Container):
     def __init__(self, page: ft.Page, story: Story = None):
 
         self.p = page   # Page reference
-
-        # Sets our selected rail based on the active story's saved data
-        self.selected_rail = story.data['selected_rail'] if story is not None else "content"    # Catch no story errors
        
         # Style our rail (container)
         super().__init__(
@@ -38,7 +35,6 @@ class Workspaces_Rail(ft.Container):
         if story is not None:   # Make objects later, rather than return functions
             story.data['selected_rail'] = e.control.destinations[0].data
             story.save_dict()
-            self.selected_rail = story.data['selected_rail']
 
             # Has the active rail grab its new selection
             story.active_rail.display_active_rail(story) 
@@ -114,6 +110,8 @@ class Workspaces_Rail(ft.Container):
 
         # Holds our list of controls that we will add in the rail later
         workspaces_rail = []
+
+        selected_rail = story.data.get('selected_rail', 'content') if story is not None else "content"
 
         # Creates our rails for each workspace selection, that get added to the workspaces_rail list
         content_rail = ft.NavigationRail(
@@ -211,17 +209,17 @@ class Workspaces_Rail(ft.Container):
         )
 
         # Reads our selected workspace from ourself, and toggles the correct workspace selection icon
-        if self.selected_rail == "content":
+        if selected_rail == "content":
             content_rail.selected_index = 0    # Selects first destination in destination list (cuz there is only one)
-        elif self.selected_rail == "characters":
+        elif selected_rail == "characters":
             characters_rail.selected_index = 0
-        elif self.selected_rail == "timelines":
+        elif selected_rail == "timelines":
             timelines_rail.selected_index = 0
-        elif self.selected_rail == "world_building":
+        elif selected_rail == "world_building":
             world_building_rail.selected_index = 0
-        elif self.selected_rail == "canvas":
+        elif selected_rail == "canvas":
             canvas_rail.selected_index = 0
-        elif self.selected_rail == "planning":
+        elif selected_rail == "planning":
             planning_rail.selected_index = 0
 
 
