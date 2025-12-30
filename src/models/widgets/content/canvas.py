@@ -179,6 +179,10 @@ class Canvas(Widget):
             # Make a copy of our paint settings to modify for drawing
             safe_paint_settings = path.get('paint', {}).copy()
 
+            # If in erase mode, we have to set blur_image to 0 and
+            if safe_paint_settings.get('blend_mode', 'src_over') == 'clear':
+                safe_paint_settings['blur_image'] = 0
+
             # Set stroke or fill based on custom styles
             safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
             safe_paint_settings['style'] = safe_stroke
@@ -195,6 +199,7 @@ class Canvas(Widget):
                 # Lineto jjust has x and y
                 elif element['type'] == 'lineto':
                     new_path.elements.append(cv.Path.LineTo(element['x'], element['y']))
+                        
 
                 # QuadraticTo has cp1x, cp1y, x, y, w
                 elif element['type'] == 'arcto':
@@ -225,8 +230,6 @@ class Canvas(Widget):
             points=[(e.local_x, e.local_y)],
             paint=ft.Paint(**self.story.data.get('paint_settings', {})),
         )
-
-        print(point.paint.__dict__)
         
         # Add point to the canvas and our state data
         self.canvas.shapes.append(point)
@@ -253,11 +256,20 @@ class Canvas(Widget):
         # Make a copy of our paint settings to modify it, since some of the styles are not built in
         safe_paint_settings = self.story.data.get('paint_settings', {}).copy()
 
+        # Copy of our paint settings for our state tracking and data storage (only erase mode needs this)
+        state_paint_settings = self.story.data.get('paint_settings', {}).copy()
+
         # Set either stroke or fill based on custom styles
         safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
         safe_paint_settings['style'] = safe_stroke
 
-        #print(safe_paint_settings)
+        # Check if we're in erase mode or not. If we are, set blend mode to clear and blur image to 0
+        if self.story.data.get('canvas_settings', {}).get('erase_mode', False):
+            safe_paint_settings['blend_mode'] = "clear"
+            safe_paint_settings['blur_image'] = 0
+            state_paint_settings['blend_mode'] = "clear"
+            state_paint_settings['blur_image'] = 0
+        
 
         # Update state x and y coordinates
         self.state.x, self.state.y = e.local_x, e.local_y
@@ -265,7 +277,9 @@ class Canvas(Widget):
         # Clear and set our current path and state to match it
         self.current_path = cv.Path(elements=[], paint=ft.Paint(**safe_paint_settings))
         self.state.paths.clear()
-        self.state.paths.append({'elements': list(), 'paint': self.story.data.get('paint_settings')})
+        self.state.paths.append({'elements': list(), 'paint': state_paint_settings})
+
+        print("Blend mode added to state.paths: ", self.story.data.get('paint_settings', {}).get('blend_mode', 'src_over'))
 
         # Set move to element at our starting position that the mouse is at for the path to start from
         move_to_element = cv.Path.MoveTo(e.local_x, e.local_y)
@@ -311,6 +325,8 @@ class Canvas(Widget):
         
         # Grab our style so we can compare it
         style = str(self.story.data.get('paint_settings', {}).get('style', 'stroke'))
+
+        
 
 
         # Handle lineto (Straight lines). Grab the element we created on start drawing, update its data
@@ -399,8 +415,8 @@ class Canvas(Widget):
         self.state.paths.clear()
         self.state.points.clear()
 
-        print("Length of canvas paths data: ", len(self.data['canvas']['paths']))
-        print("Number of elements in all paths: ", sum(len(p['elements']) for p in self.data['canvas']['paths']))
+        #print("Length of canvas paths data: ", len(self.data['canvas']['paths']))
+        #print("Number of elements in all paths: ", sum(len(p['elements']) for p in self.data['canvas']['paths']))
 
 
     # Called when the canvas control is resized

@@ -99,10 +99,13 @@ class Story(ft.View):
 
                 # Other canvas related settings that are not technically paint
                 'canvas_settings':{
+                    'erase_mode': False,               # Whether we're in erase mode or not
                     'stroke_dash_pattern': [10, 15],
                 }
             },
         )
+
+        
         
         
 
@@ -141,7 +144,6 @@ class Story(ft.View):
     # Called from main when our program starts up. Needs a page reference, thats why not called here
     def startup(self):
 
-        # Loads our content objects from storage into our story object. Includes chapters and images
         # This also loads our canvas board images here, since they can be opened in either workspace
         self.load_content()
 
@@ -459,9 +461,6 @@ class Story(ft.View):
         from models.widgets.content.note import Note
         from models.widgets.content.chapter import Chapter
         from models.widgets.content.canvas import Canvas
-
-        print("Content directory path:\n\n___________________________________")
-        print(self.data.get('content_directory_path'))
 
         # Check if the characters folder exists. Creates it if it doesn't. Exists in case people delete this folder
         if not os.path.exists(self.data['content_directory_path']):

@@ -92,7 +92,6 @@ class Canvas_Rail(Rail):
         
         color_with_opacity = f"{selected_color},{opacity}"
         
-
         self.story.data['paint_settings']['color'] = color_with_opacity
         
         self.story.save_dict()
@@ -105,69 +104,42 @@ class Canvas_Rail(Rail):
     def _set_blend_mode_label(self) -> str:
         ''' Returns the label for the current blend mode. '''
 
-        mode = str(self.story.data.get('paint_settings', {}).get('blend_mode', 'src_over'))
+        mode = self.story.data.get('paint_settings', {}).get('blend_mode', 'src_over')
+        # 
+        if mode is None:
+            return "None"
+        
         match mode:
-            case "src_over":
-                return "None"
-            case "clear":
-                return "Clear"
-            case "color":
-                return "Color"
-            case "color_burn":
-                return "Color Burn"
-            case "color_dodge":
-                return "Color Dodge"
-            case "darken":
-                return "Darken"
-            case "difference":
-                return "Difference"
-            case "dst":
-                return "Destination"
-            case "dst_a_top":
-                return "Destination Atop Source"
-            case "dst_in":
-                return "Destination In"
-            case "dst_out":
-                return "Destination Out"
-            case "dst_over":
-                return "Destination Over"
-            case "exclusion":
-                return "Exclusion"
-            case "hard_light":
-                return "Hard Light"
-            case "hue":
-                return "Hue"
-            case "lighten":
-                return "Lighten"
-            case "luminosity":
-                return "Luminosity"
-            case "modulate":
-                return "Modulate"
-            case "multiply":
-                return "Multiply"
-            case "overlay":
-                return "Overlay"
-            case "plus":
-                return "Plus"
-            case "saturation":
-                return "Saturation"
-            case "screen":
-                return "Screen"
-            case "soft_light":
-                return "Soft Light"
-            case "src":
-                return "Source"
-            case "src_a_top":
-                return "Source Atop Destination"
-            case "src_in":
-                return "Source In"
-            case "src_out":
-                return "Source Out"
-            case "xor":
-                return "XOR"
+            case "src_over": return "None"
+            case "color": return "Color"
+            case "color_burn": return "Color Burn"
+            case "color_dodge": return "Color Dodge"
+            case "darken": return "Darken"
+            case "difference": return "Difference"
+            case "dst": return "Destination"
+            case "dst_a_top": return "Destination Atop Source"
+            case "dst_in": return "Destination In"
+            case "dst_out": return "Destination Out"
+            case "dst_over": return "Destination Over"
+            case "exclusion": return "Exclusion"
+            case "hard_light": return "Hard Light"
+            case "hue": return "Hue"
+            case "lighten": return "Lighten"
+            case "luminosity": return "Luminosity"
+            case "modulate": return "Modulate"
+            case "multiply": return "Multiply"
+            case "overlay": return "Overlay"
+            case "plus": return "Plus"
+            case "saturation": return "Saturation"
+            case "screen": return "Screen"
+            case "soft_light": return "Soft Light"
+            case "src": return "Source"
+            case "src_a_top": return "Source Atop Destination"
+            case "src_in": return "Source In"
+            case "src_out": return "Source Out"
+            case "xor": return "XOR"
             
-            case _:
-                return mode.replace("_", " ").title()
+            case _: return mode.replace("_", " ").title()
 
 
 
@@ -210,6 +182,11 @@ class Canvas_Rail(Rail):
             self.story.data['paint_settings']['style'] = new_style      # Update the data
             self.story.save_dict()
             self.p.update()     # Update the page
+
+        # Called when changing paint erase mode
+        def _paint_erase_mode_changed(e):
+            self.story.data['canvas_settings']['erase_mode'] = e.control.value    # Update if we're in erase mode or not
+            self.story.save_dict()
 
         # Called when changing paint dash pattern usage
         def _paint_dash_pattern_changed(e):
@@ -254,23 +231,28 @@ class Canvas_Rail(Rail):
             self.story.save_dict()
             self.p.update()
 
+        # Called when changing paint stroke blur
         def _paint_stroke_blur_changed(e):
-            new_stroke_blur = int(e.control.value)
-            print("New stroke blur:", new_stroke_blur)
-            self.story.data['paint_settings']['blur_image'] = new_stroke_blur
+            self.story.data['paint_settings']['blur_image'] = int(e.control.value)
             self.story.save_dict()
+            
 
         def _paint_blend_mode_changed(e):
             mode = e.control.data
+            print(mode)
 
-            if mode == "src_over":
+            # Set the icon
+            if mode is None:
                 self.paint_blend_mode.icon = ft.Icons.BLUR_OFF_OUTLINED
-                self.story.data['paint_settings']['blend_mode'] = "src_over"
+                print("Mode is none")
+                
             else:
                 self.paint_blend_mode.icon = ft.Icons.BLUR_ON_OUTLINED
-                self.story.data['paint_settings']['blend_mode'] = mode
 
+            # Set the new mode and label
+            self.story.data['paint_settings']['blend_mode'] = mode
             self.paint_blend_mode_label.value = f"Blend Mode: {self._set_blend_mode_label()}"
+
             self.story.save_dict()
             self.p.update()
 
@@ -298,6 +280,10 @@ class Canvas_Rail(Rail):
             on_change_end=_paint_width_changed
         )
 
+        paint_erase_mode = ft.Checkbox(
+            on_change=_paint_erase_mode_changed, value=self.story.data.get('canvas_settings', {}).get('erase_mode', False)
+        )
+
         # Paint style (Stroke, dash, fill, etc.)
         if self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'stroke':
             paint_style_icon = ft.Icons.BRUSH_OUTLINED
@@ -307,7 +293,6 @@ class Canvas_Rail(Rail):
             paint_style_icon = ft.Icons.GESTURE_OUTLINED
         elif self.story.data.get('paint_settings', {}).get('style', 'stroke') == 'arcto':
             paint_style_icon = ft.Icons.AUTORENEW_OUTLINED
-        
         
         else:
             paint_style_icon = ft.Icons.BRUSH_OUTLINED
@@ -376,16 +361,16 @@ class Canvas_Rail(Rail):
             on_change_end=_paint_stroke_blur_changed  
         )
 
-        if self.story.data.get('paint_settings', {}).get('blend_mode', '') != 'src_over':
+        if self.story.data.get('paint_settings', {}).get('blend_mode', None) is None:
             paint_blend_mode_icon = ft.Icons.BLUR_ON_OUTLINED
         else:
             paint_blend_mode_icon = ft.Icons.BLUR_OFF_OUTLINED
+
         self.paint_blend_mode = ft.PopupMenuButton(
             icon=paint_blend_mode_icon,
             tooltip="The blend mode of your brush strokes.", menu_padding=ft.padding.all(0),
             items=[
-                ft.PopupMenuItem(text="None", icon=ft.Icons.BLUR_OFF_OUTLINED, on_click=_paint_blend_mode_changed, data="src_over", tooltip="No blend mode"),
-                ft.PopupMenuItem(text="Clear", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="clear", tooltip="Drop both the source and destination images, leaving nothing"),
+                ft.PopupMenuItem(text="None", icon=ft.Icons.BLUR_OFF_OUTLINED, on_click=_paint_blend_mode_changed, data=None, tooltip="No blend mode"),
                 ft.PopupMenuItem(text="Color", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="color", tooltip="Take the hue and saturation of the source image, and the luminosity of the destination image"),
                 ft.PopupMenuItem(text="Color Burn", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="color_burn", tooltip="Divide the inverse of the destination by the source, and inverse the result"),
                 ft.PopupMenuItem(text="Color Dodge", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="color_dodge", tooltip="Divide the destination by the inverse of the source"),
@@ -412,7 +397,6 @@ class Canvas_Rail(Rail):
                 ft.PopupMenuItem(text="Soure Atop Destination", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="src_a_top", tooltip="Composite the source image over the destination image, but only where it overlaps the destination"),
                 ft.PopupMenuItem(text="Source In", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="src_in", tooltip="Show the source image, but only where the two images overlap. The destination image is not rendered, it is treated merely as a mask. The color channels of the destination are ignored, only the opacity has an effect"),
                 ft.PopupMenuItem(text="Source Out", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="src_out", tooltip="Show the source image, but only where the two images do not overlap. The destination image is not rendered, it is treated merely as a mask. The color channels of the destination are ignored, only the opacity has an effect"),
-                ft.PopupMenuItem(text="Src Over", icon=ft.Icons.BLUR_OFF_OUTLINED, on_click=_paint_blend_mode_changed, data="src_over", tooltip="Composite the source image over the destination image. This is the default value"),
                 ft.PopupMenuItem(text="XOR", icon=ft.Icons.BLUR_ON_OUTLINED, on_click=_paint_blend_mode_changed, data="xor", tooltip="Apply a bitwise xor operator to the source and destination images. This leaves transparency where they would overlap"),
             ]
         )
@@ -440,6 +424,7 @@ class Canvas_Rail(Rail):
 
                 ft.Row([ft.Text("Size", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_width]),
                 ft.Row([ft.Text("Opacity", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_opacity]),
+                ft.Row([ft.Text("Erase Mode", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_erase_mode]),
                 ft.Row([ft.Text("Stroke Cap Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_cap]),
                 ft.Container(height=10),   # Spacer
                 ft.Row([ft.Text("Stroke Join Shape", theme_style=ft.TextThemeStyle.LABEL_LARGE), paint_stroke_join]),
