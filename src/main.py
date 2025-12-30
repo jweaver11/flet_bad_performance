@@ -15,14 +15,14 @@ def main(page: ft.Page):
 
     
 
-    async def show_horizontal_cursor(e: ft.HoverEvent):
+    def show_horizontal_cursor(e: ft.HoverEvent):
         ''' Changes the cursor to horizontal when hovering over the resizer '''
 
         e.control.mouse_cursor = ft.MouseCursor.RESIZE_UP_DOWN
         e.control.update()
 
         # Called when resizing the active rail by dragging the resizer
-    async def move_active_rail_divider(e: ft.DragUpdateEvent):
+    def move_active_rail_divider(e: ft.DragUpdateEvent):
         ''' Responsible for altering the width of the active rail '''
 
         cont.height = cont.height + int(e.local_delta.y)     

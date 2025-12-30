@@ -1060,8 +1060,8 @@ class Story(ft.View):
                 self.workspaces_rail,  # Main rail of all available workspaces
                 ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),     
                 
-                self.active_rail,    # Rail for the selected workspace
-                active_rail_resizer,   # Divider between rail and work area
+                #self.active_rail,    # Rail for the selected workspace
+                #active_rail_resizer,   # Divider between rail and work area
                 
                 #workspace_gd,    # Work area for pagelets
             ],

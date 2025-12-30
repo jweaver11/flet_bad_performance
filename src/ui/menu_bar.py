@@ -27,7 +27,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
 
     # Called when file -> new is clicked
-    def handle_create_new_story_clicked(e):
+    async def handle_create_new_story_clicked(e):
         ''' Opens a dialog to create a new story. Checks story is unique or not '''
 
 
@@ -68,7 +68,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
 
         # Called everytime the user enters a new letter in the text box
-        def textbox_value_changed(e):
+        async def textbox_value_changed(e):
             ''' Called when the text in the text box changes '''
 
             nonlocal is_unique
@@ -122,7 +122,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
 
     # Called when file -> open is clicked
-    def handle_file_open_click(e):
+    async def handle_file_open_click(e):
         ''' Opens a dialog to open an existing story '''
 
         #print("Open Story Clicked")
@@ -184,7 +184,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
         open_button = ft.TextButton("Open", on_click=open_selected_story, disabled=True)
 
-        def _close_dialog(e):
+        async def _close_dialog(e):
             dlg.open = False
             page.update()
 
@@ -224,7 +224,8 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
     menubar_style = ft.ButtonStyle(
         bgcolor={ft.ControlState.HOVERED: ft.Colors.TRANSPARENT},
         shape=ft.RoundedRectangleBorder(radius=10),
-        color=ft.Colors.PRIMARY
+        color=ft.Colors.PRIMARY,
+        visual_density=ft.VisualDensity.COMPACT
     )
 
     # Create our menu bar with submenu items
@@ -245,6 +246,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                     content=ft.Text("File", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),     # Content of subment button
                     alignment=ft.Alignment.CENTER
                 ), 
+                menu_style=ft.MenuStyle(padding=ft.Padding.all(0)),    # Styling for the submenu,
                 style=menubar_style,    # styling for the button
                 on_open=handle_submenu_open,    # Handle when a submenu is opened
                 on_close=handle_submenu_close,  # Handle when a submenu is closed
