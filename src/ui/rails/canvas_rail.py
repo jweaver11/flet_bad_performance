@@ -176,6 +176,8 @@ class Canvas_Rail(Rail):
                 e.control.parent.icon = ft.Icons.HORIZONTAL_RULE
             elif new_style == "fill":
                 e.control.parent.icon = ft.Icons.GESTURE_OUTLINED
+            elif new_style == "arc":
+                e.control.parent.icon = ft.Icons.AUTORENEW_OUTLINED
             elif new_style == "arcto":
                 e.control.parent.icon = ft.Icons.AUTORENEW_OUTLINED
             
@@ -308,7 +310,8 @@ class Canvas_Rail(Rail):
                 ft.PopupMenuItem(text="Stroke", data="stroke", icon=ft.Icons.BRUSH_OUTLINED, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Line", data="lineto", icon=ft.Icons.HORIZONTAL_RULE, on_click=_paint_style_changed),
                 ft.PopupMenuItem(text="Lasso Fill", data="fill", icon=ft.Icons.GESTURE_OUTLINED, on_click=_paint_style_changed),
-                ft.PopupMenuItem(text="Arc", data="arcto", icon=ft.Icons.AUTORENEW_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Arc", data="arc", icon=ft.Icons.AUTORENEW_OUTLINED, on_click=_paint_style_changed),
+                ft.PopupMenuItem(text="Half Circle", data="arcto", icon=ft.Icons.AUTORENEW_OUTLINED, on_click=_paint_style_changed),
             ]
         )
 
@@ -418,7 +421,6 @@ class Canvas_Rail(Rail):
                 ft.Row([ft.Text("Brush Settings: ", theme_style=ft.TextThemeStyle.TITLE_MEDIUM, weight=ft.FontWeight.BOLD)], alignment=ft.MainAxisAlignment.CENTER),
                 ft.Row([self.color_picker_button, paint_style], alignment=ft.MainAxisAlignment.SPACE_EVENLY),
 
-                # Checkbox erase mode - set color to transparent and blendmode.clear?
                 # Add shapes and shapefill drawing modes. Path will use paint.style.paintingstyle fill or stroke.
                 # Add shadow effect option for paths
 

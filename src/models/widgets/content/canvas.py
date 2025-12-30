@@ -23,6 +23,7 @@ from styles.snack_bar import Snack_Bar
 from models.state import State
 import flet.canvas as cv
 from threading import Thread
+import math
 #from PIL import Image, ImageDraw
 
 
@@ -94,8 +95,7 @@ class Canvas(Widget):
             on_resize=self.on_canvas_resize, resize_interval=100,
         )
 
-
-        self.canvases_list = [self.canvas]  # Not used
+        self.canvases_list = [self.canvas]  # Not used, but may be for layering
 
         self.canvas_container = ft.Container(
             width=2000, height=1000,
@@ -279,8 +279,6 @@ class Canvas(Widget):
         self.state.paths.clear()
         self.state.paths.append({'elements': list(), 'paint': state_paint_settings})
 
-        print("Blend mode added to state.paths: ", self.story.data.get('paint_settings', {}).get('blend_mode', 'src_over'))
-
         # Set move to element at our starting position that the mouse is at for the path to start from
         move_to_element = cv.Path.MoveTo(e.local_x, e.local_y)
 
@@ -295,6 +293,19 @@ class Canvas(Widget):
             line_element = cv.Path.LineTo(e.local_x, e.local_y)
             self.current_path.elements.append(line_element)
             self.state.paths[0]['elements'].append((line_element.__dict__))
+
+        elif style == "arc":
+            arc_element = cv.Path.Arc(
+                width=20,
+                height=20,
+                
+                x=e.local_x,
+                y=e.local_y,
+                start_angle=math.pi,
+                sweep_angle=-math.pi,
+            )
+            self.current_path.elements.append(arc_element)
+            self.state.paths[0]['elements'].append((arc_element.__dict__))
 
         # Else if we're using arcto, add that element to the current path and state right away
         elif style == 'arcto' or style == 'arctofill':
@@ -326,8 +337,6 @@ class Canvas(Widget):
         # Grab our style so we can compare it
         style = str(self.story.data.get('paint_settings', {}).get('style', 'stroke'))
 
-        
-
 
         # Handle lineto (Straight lines). Grab the element we created on start drawing, update its data
         if style == "lineto":
@@ -343,6 +352,38 @@ class Canvas(Widget):
             # Update the dict to match
             line_dict['x'] = line_element.x
             line_dict['y'] = line_element.y
+
+            # Update the page and return early
+            try:
+                # Page reference gets lost after dragging widget to new canvas, so we reset it and update
+                self.canvas.page = self.p
+                self.canvas.update()
+            except Exception as ex:
+                self.p.update()
+            return
+        
+        if style == "arc" or style == "arcfill":
+            
+            # Set the element and its data
+            arc_element = self.current_path.elements[-1]
+            arc_dict = arc_element.__dict__
+
+        
+
+            # Swap directions of arc depending if we drag up or down from starting point
+            if e.local_y - self.state.y >= 0:   # Dragging down
+                arc_element.sweep_angle = math.pi
+                arc_element.height = abs(e.local_y - self.state.y) * 2
+                
+            else:       # Dragging up
+                arc_element.sweep_angle = -math.pi
+                arc_element.height = abs(e.local_y - self.state.y) 
+                
+
+            arc_element.width = abs(e.local_x - self.state.x) 
+        
+
+            print("Arc width and height: ", arc_element.width, arc_element.height)
 
             # Update the page and return early
             try:
