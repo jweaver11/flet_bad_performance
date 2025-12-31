@@ -1002,7 +1002,7 @@ class Story(ft.View):
             ''' Changes the cursor to horizontal when hovering over the resizer '''
 
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-            e.control.update()
+            #e.control.update()
 
         # Called when resizing the active rail by dragging the resizer
         async def move_active_rail_divider(e: ft.DragUpdateEvent):
@@ -1011,7 +1011,8 @@ class Story(ft.View):
             if (e.local_delta.x > 0 and self.active_rail.width < page.width/2) or (e.local_delta.x < 0 and self.active_rail.width > 100):
                 self.active_rail.width = self.active_rail.width + int(e.local_delta.x)    # Apply the change to our rail
                 
-            self.active_rail.update()
+            
+            #page.update()   # Not needed flet 0.80.0+
 
         # Called when app stops dragging the resizer to resize the active rail
         async def save_active_rail_width(e: ft.DragEndEvent):
@@ -1037,21 +1038,6 @@ class Story(ft.View):
             drag_interval=10,
         )
 
-        # Called when mouse exits workspace area
-        def exit_workspace():
-            ''' Makes sure our drag targets are removed when mouse leaves workspace '''
-            self.workspace.remove_drag_targets()
-           
-
-        # Add gd with on_enter
-        # is_dragging, drag_completed
-        workspace_gd = ft.GestureDetector(
-            content=self.workspace,
-            expand=True,
-            on_exit=lambda e: exit_workspace(), 
-        )
-
-
         # Save our 2 rails, divers, and our workspace container in a row
         row = ft.Row(
             spacing=0,  # No space between elements
@@ -1064,7 +1050,7 @@ class Story(ft.View):
                 self.active_rail,    # Rail for the selected workspace
                 active_rail_resizer,   # Divider between rail and work area
                 
-                workspace_gd,    # Work area for pagelets
+                #workspace_gd,    # Work area for pagelets
             ],
         )
 
