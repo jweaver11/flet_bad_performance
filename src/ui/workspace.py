@@ -510,6 +510,7 @@ class Workspace(ft.Container):
         visible_main_controls = [control for control in self.main_pin.controls if getattr(control, 'visible', True)]
         #print(f"Visible main pin controls: {len(visible_main_controls)}")
         if len(visible_main_controls) > 1:
+            print("More than 1 pin in main pin")
 
 
             # PC: Save tabs as variable, change active color to match widget color when tab change
@@ -551,11 +552,14 @@ class Workspace(ft.Container):
                 padding=ft.Padding.only(top=0, bottom=8, left=8, right=8),
                 content=self.main_pin_tabs
                 )
+            
+            formatted_main_pin = self.main_pin
 
             #print(len(tabs.tabs), " tabs added to main pin")
 
         else:
-            formatted_main_pin = self.main_pin
+
+            formatted_main_pin = visible_main_controls[0] if len(visible_main_controls) == 1 else ft.Container(expand=True)
 
         
         # Formatted pin locations that hold our pins, and our resizer gesture detectors.
@@ -631,7 +635,7 @@ class Workspace(ft.Container):
                 expand=True, spacing=0, 
                 controls=[
                     formatted_top_pin,    # formatted top pin
-                    #formatted_main_pin,   # formatted main pin
+                    formatted_main_pin,   # formatted main pin
                     #self.main_pin_tabs,   # main pin as tab control
                     formatted_bottom_pin,     # formatted bottom pin
 
