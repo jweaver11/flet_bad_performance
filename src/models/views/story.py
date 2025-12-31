@@ -12,6 +12,7 @@ import json
 from constants import data_paths
 from handlers.verify_data import verify_data
 from styles.snack_bar import Snack_Bar
+from handlers.safe_string_checker import return_safe_name
 
 
 class Story(ft.View):
@@ -28,7 +29,7 @@ class Story(ft.View):
         
         # Parent constructor
         super().__init__(
-            route=os.path.normpath(os.path.normcase(f"\{title}".lower().replace(' ', "_"))), # Not working
+            route=return_safe_name(f"/{title}"), # Not working
             padding=ft.Padding.only(top=0, left=0, right=0, bottom=0),      # No padding for the page
             spacing=0,                                                      # No spacing between menubar and rest of page
         )  
@@ -45,15 +46,15 @@ class Story(ft.View):
             {
                 'title': self.title,
                 'route': self.route,
-                'directory_path': os.path.join(data_paths.stories_directory_path, self.title),
+                'directory_path': os.path.join(data_paths.stories_directory_path, self.route),
                 'tag': "story",
                 'selected_rail': "content",
-                'content_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "content"),
-                'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "characters"),
-                'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "timelines"),
-                'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building"),
-                'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "world_building", "maps"),
-                'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.title, "planning"),
+                'content_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "content"),
+                'characters_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "characters"),
+                'timelines_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "timelines"),
+                'world_building_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "world_building"),
+                'maps_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "world_building", "maps"),
+                'planning_directory_path': os.path.join(data_paths.stories_directory_path, self.route, "planning"),
                 'top_pin_height': 200,
                 'left_pin_width': 230,
                 'main_pin_height': int,
@@ -176,10 +177,10 @@ class Story(ft.View):
 
         try:
             # Makes sure our directory path is always right. 
-            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.title)
+            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.route)
                 
             # Our file path we store our data in
-            file_path = os.path.join(self.data['directory_path'], f"{self.title}.json")
+            file_path = os.path.join(self.data['directory_path'], f"{self.route}.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
             os.makedirs(self.data['directory_path'], exist_ok=True)
@@ -997,23 +998,24 @@ class Story(ft.View):
         self.workspace.reload_workspace()  # Load our workspace here instead of in the workspace constructor
 
         # Called when hovering over resizer to right of the active rail
-        async def show_horizontal_cursor(e: ft.HoverEvent):
+        def show_horizontal_cursor(e: ft.HoverEvent):
             ''' Changes the cursor to horizontal when hovering over the resizer '''
 
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
             e.control.update()
 
         # Called when resizing the active rail by dragging the resizer
-        async def move_active_rail_divider(e: ft.DragUpdateEvent):
+        def move_active_rail_divider(e: ft.DragUpdateEvent):
             ''' Responsible for altering the width of the active rail '''
 
             if (e.local_delta.x > 0 and self.active_rail.width < page.width/2) or (e.local_delta.x < 0 and self.active_rail.width > 100):
                 self.active_rail.width = self.active_rail.width + int(e.local_delta.x)    # Apply the change to our rail
                 
-            page.update()   # Apply our changes to the rest of the page
+            self.active_rail.update()
+            #page.update()   # Apply our changes to the rest of the page
 
         # Called when app stops dragging the resizer to resize the active rail
-        async def save_active_rail_width(e: ft.DragEndEvent):
+        def save_active_rail_width(e: ft.DragEndEvent):
             ''' Saves our new width that will be loaded next time app opens the app '''
 
             app.settings.data['active_rail_width'] = self.active_rail.width
@@ -1060,10 +1062,10 @@ class Story(ft.View):
                 self.workspaces_rail,  # Main rail of all available workspaces
                 ft.VerticalDivider(width=2, thickness=2, color=ft.Colors.OUTLINE_VARIANT),     
                 
-                #self.active_rail,    # Rail for the selected workspace
-                #active_rail_resizer,   # Divider between rail and work area
+                self.active_rail,    # Rail for the selected workspace
+                active_rail_resizer,   # Divider between rail and work area
                 
-                #workspace_gd,    # Work area for pagelets
+                workspace_gd,    # Work area for pagelets
             ],
         )
 
@@ -1076,7 +1078,7 @@ class Story(ft.View):
         )
 
         # Views render like columns, so we add elements top-down
-        self.controls = [self.menubar, row]
+        self.controls = [self.menubar, gd]
 
         page.update()
 

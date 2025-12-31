@@ -10,6 +10,8 @@ from models.views.loading import create_loading_view
 import asyncio
 from ui.workspaces_rail import Workspaces_Rail
 
+ft.context.disable_auto_update()
+
 # Main function
 def main(page: ft.Page):
 
