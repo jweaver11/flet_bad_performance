@@ -15,12 +15,7 @@ import asyncio
 # Called in main to create menu bar if no story exists, or by a story to create menu bar for that story
 def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
 
-    def handle_submenu_open(e):
-        pass
-    def handle_submenu_close(e):
-        pass
-    def handle_submenu_hover(e):
-        pass
+    
     def handle_delete_click(e):
         # Should pop open dialog to confirm deletion, warning that it cannot be undone
         pass
@@ -30,6 +25,9 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
     async def handle_create_new_story_clicked(e):
         ''' Opens a dialog to create a new story. Checks story is unique or not '''
 
+        async def _close_dialog(e):
+            dlg.open = False
+            page.update()
 
         # Variable to track if the title is unique
         is_unique = True
@@ -115,7 +113,7 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
         )
         
         # Add cancel button. Sometimes adding it ^^ first breaks and idk y
-        dlg.actions.insert(0, ft.TextButton("Cancel", on_click=lambda e: page.close(dlg), style=ft.ButtonStyle(color=ft.Colors.ERROR)))
+        dlg.actions.insert(0, ft.TextButton("Cancel", on_click=_close_dialog, style=ft.ButtonStyle(color=ft.Colors.ERROR)))
 
         # Open our dialog in the overlay
         page.show_dialog(dlg)
@@ -248,9 +246,6 @@ def create_menu_bar(page: ft.Page, story: Story = None) -> ft.Container:
                 ), 
                 menu_style=ft.MenuStyle(padding=ft.Padding.all(0)),    # Styling for the submenu,
                 style=menubar_style,    # styling for the button
-                on_open=handle_submenu_open,    # Handle when a submenu is opened
-                on_close=handle_submenu_close,  # Handle when a submenu is closed
-                on_hover=handle_submenu_hover,  # Handle when a submenu is hovered
                 controls=[      # The options shown inside of our button
                     ft.MenuItemButton(
                         content=ft.Text("New Story", weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE,),

@@ -240,6 +240,9 @@ class Settings(ft.View):
     def _load_app_settings(self):
         ''' Loads our app settings view '''
 
+        async def _settings_clicked(e):
+            await self.p.push_route(self.story.route if self.story is not None else "/")
+
         # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
         content=ft.Column(
             spacing=20,
@@ -248,7 +251,7 @@ class Settings(ft.View):
                     ft.Text("Application Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
                     ft.Container(expand=True),   # Spacer to push title to left
                     ft.IconButton(
-                        ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
+                        ft.Icons.CLOSE_OUTLINED, on_click=_settings_clicked, 
                         scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT
                     )
                 ]),
@@ -268,6 +271,9 @@ class Settings(ft.View):
     def _load_account_settings(self):
         ''' Loads our account settings view '''
 
+        async def _settings_clicked(e):
+            await self.p.push_route(self.story.route if self.story is not None else "/")
+
         # Sets our widgets content. May need a 'reload_widget' method later, but for now this works
         content=ft.Column(
             spacing=20,
@@ -276,7 +282,7 @@ class Settings(ft.View):
                     ft.Text("Account Settings", theme_style=ft.TextThemeStyle.HEADLINE_LARGE),
                     ft.Container(expand=True),   # Spacer to push title to left
                     ft.IconButton(
-                        ft.Icons.CLOSE_OUTLINED, on_click=lambda e: self.p.go(self.story.route if self.story is not None else "/"), 
+                        ft.Icons.CLOSE_OUTLINED, on_click=_settings_clicked, 
                         scale=1.5, icon_color=ft.Colors.ON_SURFACE_VARIANT
                     )
                 ]),

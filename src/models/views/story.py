@@ -1007,7 +1007,7 @@ class Story(ft.View):
             ''' Changes the cursor to horizontal when hovering over the resizer '''
 
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
-            #e.control.update()
+            e.control.update()
 
         # Called when resizing the active rail by dragging the resizer
         async def move_active_rail_divider(e: ft.DragUpdateEvent):
@@ -1054,7 +1054,7 @@ class Story(ft.View):
                 self.active_rail,    # Rail for the selected workspace
                 active_rail_resizer,   # Divider between rail and work area
                 
-                #workspace_gd,    # Work area for pagelets
+                self.workspace,    # Work area for ouur widgets
             ],
         )
 

@@ -3,7 +3,7 @@ from models.views.story import Story
 from styles.snack_bar import Snack_Bar
 
 # Called whenever a new story is laoded
-def route_change(e: ft.RouteChangeEvent) -> Story:
+async def route_change(e: ft.RouteChangeEvent) -> Story:
     ''' Handles changing our page view based on the new route '''
     from models.app import app
     from models.views.home import create_home_view

@@ -14,6 +14,7 @@ ft.context.disable_auto_update()
 # Main function
 def main(page: ft.Page):
 
+
     # Set loading view here if we want to use one
     # Our loading view while we setup the app
     page.views.append(create_loading_view(page))
