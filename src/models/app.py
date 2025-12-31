@@ -134,7 +134,6 @@ class App:
             
             # Sets our active story to the page route. The route change function will load the stories data and UI
             if story.route == app.settings.data.get('active_story', None):
-                #print("Loading previous story: ", story.title)
                 app.settings.story = story  # Gives our settings widget the story reference it needs
                 await page.push_route(story.route)
                 return
@@ -152,11 +151,11 @@ class App:
         ''' Creates the new story object and has it run its 'startup' method. Changes route so our view displays the new story '''
 
         # TODO: Add a type to accept for novel/comic
-
+        
         story = Story(title.title(), page, data=None, template=template)
         
         # Create a new story object and add it to our stories dict
-        self.stories[title.title()] = story
+        self.stories[title.title()] = Story(title.title(), page, data=None, template=template)
 
         # Opens this new story as the active one on screen
         await page.push_route(story.route)

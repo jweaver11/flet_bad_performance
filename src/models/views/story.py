@@ -100,10 +100,14 @@ class Story(ft.View):
 
                 # Other canvas related settings that are not technically paint
                 'canvas_settings':{
+                    'erase_mode': False,               # Whether we're in erase mode or not
                     'stroke_dash_pattern': [10, 15],
                 }
             },
         )
+
+        
+        
         
 
         # Stories have required structures as well, so we verify they exist or we will error out
@@ -141,7 +145,6 @@ class Story(ft.View):
     # Called from main when our program starts up. Needs a page reference, thats why not called here
     def startup(self):
 
-        # Loads our content objects from storage into our story object. Includes chapters and images
         # This also loads our canvas board images here, since they can be opened in either workspace
         self.load_content()
 
@@ -178,8 +181,10 @@ class Story(ft.View):
         try:
             # Makes sure our directory path is always right. 
             self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.route)
+            self.data['directory_path'] = os.path.join(data_paths.stories_directory_path, self.route)
                 
             # Our file path we store our data in
+            file_path = os.path.join(self.data['directory_path'], f"{self.route}.json")
             file_path = os.path.join(self.data['directory_path'], f"{self.route}.json")
 
             # Create the directory if it doesn't exist. Catches errors from users deleting folders
@@ -239,7 +244,7 @@ class Story(ft.View):
             is_new_story = self.data.get('is_new_story', True)
 
             # Sets our path to our story folder
-            directory_path = os.path.join(data_paths.stories_directory_path, self.title)
+            directory_path = os.path.join(data_paths.stories_directory_path, self.route)
 
             # Set our workspace folder structure inside our story folder
             required_story_folders = [

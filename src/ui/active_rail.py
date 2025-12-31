@@ -49,39 +49,36 @@ class Active_Rail(ft.Container):
     def display_active_rail(self, story: Story):
         ''' Reloads the active rail based on the selected workspace in workspaces_rail '''
 
-        try:
+       
+        # Give us the correct rail based on our selected workspace
+        if story.data.get('selected_rail', "content") == "content":
+            self.content = self.content_rail
 
-            # Give us the correct rail based on our selected workspace
-            if story.workspaces_rail.selected_rail == "content":
-                self.content = self.content_rail
+        elif story.data.get('selected_rail', "content") == "characters":
+            self.content = self.characters_rail
 
-            elif story.workspaces_rail.selected_rail == "characters":
-                self.content = self.characters_rail
+        elif story.data.get('selected_rail', "content") == "timelines":
+            self.content = self.timelines_rail
 
-            elif story.workspaces_rail.selected_rail == "timelines":
-                self.content = self.timelines_rail
+            # Make sure our timeline is shown if there is only one
+            if len(self.story.timelines) == 1:
+                for tl in self.story.timelines.values():
+                    tl.toggle_visibility(value=True)
 
-                # Make sure our timeline is shown if there is only one
-                if len(self.story.timelines) == 1:
-                    for tl in self.story.timelines.values():
-                        tl.toggle_visibility(value=True)
+        elif story.data.get('selected_rail', "content") == "world_building":
+            self.content = self.world_building_rail
 
-            elif story.workspaces_rail.selected_rail == "world_building":
-                self.content = self.world_building_rail
+        elif story.data.get('selected_rail', "content") == "canvas":
+            self.content = self.canvas_rail
 
-            elif story.workspaces_rail.selected_rail == "canvas":
-                self.content = self.canvas_rail
+        elif story.data.get('selected_rail', "content") == "planning":
+            self.content = self.planning_rail
 
-            elif story.workspaces_rail.selected_rail == "planning":
-                self.content = self.planning_rail
+        else:
+            # Default to the content rail
+            self.content = self.content_rail
 
-            else:
-                # Default to the content rail
-                self.content = self.content_rail
+        # Update the page to reflect changes
+        self.p.update()
 
-            # Update the page to reflect changes
-            self.p.update()
-
-        # Errors
-        except Exception as e:
-            print(f"Error displaying active rail: {e}")
+       

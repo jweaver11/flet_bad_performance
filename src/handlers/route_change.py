@@ -7,6 +7,7 @@ def route_change(e: ft.RouteChangeEvent) -> Story:
     ''' Handles changing our page view based on the new route '''
     from models.app import app
     from models.views.home import create_home_view
+    from models.views.loading import create_loading_view
 
     # Grabs our page from the event for easier reference
     page: ft.Page = e.page

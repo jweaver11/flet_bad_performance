@@ -139,9 +139,18 @@ def new_canvas_alert_dlg(page: ft.Page, story: Story, directory_path: str=None) 
             data=canvas_data
         )
 
+        story.data['selected_rail'] = 'canvas'
+        story.save_dict()
+        story.workspaces_rail.reload_rail(story)
+        story.active_rail.display_active_rail(story)
+
         # Build the canvas here
         alert_dialog.open = False
+
+
         page.update()
+
+
 
     canvas_data = {'width': None, 'height': None, 'aspect_ratio': None}       # Data we will pass set to pass in whenever a different template is selected
 

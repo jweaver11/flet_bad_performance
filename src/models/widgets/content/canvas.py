@@ -8,11 +8,11 @@ Maps are widgets that have their own drawing canvas, and info display. they can 
 # Option for transparent background/no brackground
 # Option to upload image as background
 # Option to export canvas as image file (png, jpg, etc). Option to change how image fits on canvas (stretch, fit, fill, tile, center, etc)
-# Add ft.DecorationImage options to the canvas container for background images
+# Add ft.DecorationImage options to the canvas container for background images??
 # Add color_filter for both decoration image and container ?
 # Fill tool??
 
-
+from flet_contrib.color_picker import ColorPicker
 import os
 import json
 import flet as ft
@@ -23,6 +23,7 @@ from styles.snack_bar import Snack_Bar
 from models.state import State
 import flet.canvas as cv
 from threading import Thread
+import math
 #from PIL import Image, ImageDraw
 
 
@@ -35,8 +36,6 @@ class Canvas(Widget):
         directory_path: str, 
         story: Story, 
         data: dict = None,
-        bgcolor: str = None,
-        bgimage_path: str = None,
     ):
         
         # Parent constructor
@@ -59,14 +58,19 @@ class Canvas(Widget):
                     "width": int,
                     "height": int,
                     "aspect_ratio": float,
-                    "bgcolor": bgcolor,
-                    "bgimage_path": bgimage_path,
+                    "bgcolor": "#000000,1.0",             # The color we're using for background of canvas. Ignored if bgimage_path is set. Start black
+                    "bgimage_path": str,        # Path to background image for canvas
                 },     
 
-                #"canvas": list,          # Stores our drawing data
+                # Store our drawing data to load/save
                 "canvas": {
-                    'paths': list,
-                    'points': list,
+                    'paths': list,      # All our shapes, lines, dashed lines, curves, etc.
+                    'shadow_paths': list,   # All paths but with shadows
+                    'points': list,     # All our points
+                    'bgcolor': {        # Background color info
+                        'color': None,
+                        'blend_mode': "src_over",
+                    },
                 },
             },
         )
@@ -85,36 +89,46 @@ class Canvas(Widget):
                 on_pan_update=self.is_drawing,
                 on_pan_end=lambda e: self.save_canvas(),
                 on_tap_up=self.add_point,      # Handles so we can add points
-                drag_interval=20,
+                #drag_interval=10,
             ),
             expand=True,
             on_resize=self.on_canvas_resize, resize_interval=100,
         )
 
-
-        
+        self.canvases_list = [self.canvas]  # Not used, but may be for layering
 
         self.canvas_container = ft.Container(
-            content=self.canvas, width=2000, height=1000,
+            width=2000, height=1000,
             expand=True, clip_behavior=ft.ClipBehavior.HARD_EDGE,
-            margin=ft.Margin.all(20), bgcolor=ft.Colors.SURFACE if bgcolor is None else bgcolor,
+            #margin=ft.Margin.all(20), bgcolor=ft.Colors.SURFACE if bgcolor is None else bgcolor,
             border=ft.Border.all(2, ft.Colors.OUTLINE_VARIANT),
             #aspect_ratio=1/2,
+            #content=ft.Stack(self.canvases_list),
+            content=self.canvas
+            
             # Sets bgcolor or image based on canvas settings, and aspect ratio
         )
 
 
-        
-
-        #self.information_display: Drawing_Information_Display = Drawing_Information_Display()
-        #self.mini_widgets.append(self.information_display)
-
-        # Add notes to drawings??
+        # Other UI elements
+        self.header = ft.Row([
+            ft.PopupMenuButton(
+                icon=ft.Icons.IMAGE_ASPECT_RATIO_OUTLINED, tooltip="Set the background of your canvas. If one is set, it will be exported with the canvas",
+                menu_padding=ft.padding.all(0), 
+                #on_cancel=self._set_color,
+                items=[
+                    ft.PopupMenuItem("None", on_click=self._set_canvas_background, tooltip="No background"),
+                    ft.PopupMenuItem("Color", on_click=self._set_canvas_background, tooltip="Set a solid color background"),
+                    ft.PopupMenuItem("Image", on_click=self._set_canvas_background, tooltip="Set an image as the background"),
+                ]
+            ),
+            # Show Notes/comments toggle
+        ])
 
 
         self.interactive_viewer = ft.InteractiveViewer(content=self.canvas_container)
 
-        self.current_path = cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
+        self.current_path= cv.Path(elements=[], paint=ft.Paint(**self.story.data.get('paint_settings', {})))
        
         # Load our drawing/display
         self.load_canvas()
@@ -128,8 +142,19 @@ class Canvas(Widget):
     def load_canvas(self):
         """Loads our drawing from our saved map drawing file."""
 
+        # Clear our canvas, and load our shapes stored in data
+        self.canvas.shapes.clear()
         shapes = self.data.get('canvas', {})
 
+        # Load our background color if we have one
+        bgcolor = self.data.get('canvas', {}).get('bgcolor', None)
+        if bgcolor is not None:
+            self.canvas.shapes.append(
+                cv.Color(       # Can use effects here as well
+                    color=bgcolor.get('color', 'surface'),
+                    blend_mode=bgcolor.get('blend_mode', 'src_over'),
+                )
+            )
 
         # Loading points
         for point in shapes.get('points', []):
@@ -142,7 +167,7 @@ class Canvas(Widget):
                 )
             )
 
-        # Loading paths
+        # Loading our paths, which most of the drawing
         for path in shapes.get('paths', []):
             
             elements = path.get('elements', [])         # List of the elements in this path
@@ -153,6 +178,10 @@ class Canvas(Widget):
 
             # Make a copy of our paint settings to modify for drawing
             safe_paint_settings = path.get('paint', {}).copy()
+
+            # If in erase mode, we have to set blur_image to 0 and
+            if safe_paint_settings.get('blend_mode', 'src_over') == 'clear':
+                safe_paint_settings['blur_image'] = 0
 
             # Set stroke or fill based on custom styles
             safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
@@ -170,6 +199,7 @@ class Canvas(Widget):
                 # Lineto jjust has x and y
                 elif element['type'] == 'lineto':
                     new_path.elements.append(cv.Path.LineTo(element['x'], element['y']))
+                        
 
                 # QuadraticTo has cp1x, cp1y, x, y, w
                 elif element['type'] == 'arcto':
@@ -189,15 +219,13 @@ class Canvas(Widget):
                     self.p.open(Snack_Bar(f"Error loading {self.title}"))
 
             self.canvas.shapes.append(new_path)
- 
-
-         
+    
 
     # Called when we click the canvas and don't initiate a drag
     async def add_point(self, e: ft.TapEvent):
         ''' Adds a point to the canvas if we just clicked and didn't initiate a drag '''
 
-         # Create the point using our paint settings and point mode
+        # Create the point using our paint settings and point mode
         point = cv.Points(
             points=[(e.local_x, e.local_y)],
             paint=ft.Paint(**self.story.data.get('paint_settings', {})),
@@ -210,6 +238,7 @@ class Canvas(Widget):
         # After dragging canvas widget, it loses page reference and can't update
         try:
             self.canvas.update()
+            
         except Exception as ex:
             self.p.update()
             
@@ -219,7 +248,7 @@ class Canvas(Widget):
         
     # Called when we start drawing on the canvas
     async def start_drawing(self, e: ft.DragStartEvent):
-        ''' Set our initial starting x and y coordinates for the line we're drawing '''
+        ''' Set our initial starting x and y coordinates for the element we're drawing '''
 
         # Grab our style so we can compare it
         style = str(self.story.data.get('paint_settings', {}).get('style', 'stroke'))
@@ -227,11 +256,20 @@ class Canvas(Widget):
         # Make a copy of our paint settings to modify it, since some of the styles are not built in
         safe_paint_settings = self.story.data.get('paint_settings', {}).copy()
 
+        # Copy of our paint settings for our state tracking and data storage (only erase mode needs this)
+        state_paint_settings = self.story.data.get('paint_settings', {}).copy()
+
         # Set either stroke or fill based on custom styles
         safe_stroke = 'fill' if style.endswith('fill') else 'stroke'
         safe_paint_settings['style'] = safe_stroke
 
-        #print(safe_paint_settings)
+        # Check if we're in erase mode or not. If we are, set blend mode to clear and blur image to 0
+        if self.story.data.get('canvas_settings', {}).get('erase_mode', False):
+            safe_paint_settings['blend_mode'] = "clear"
+            safe_paint_settings['blur_image'] = 0
+            state_paint_settings['blend_mode'] = "clear"
+            state_paint_settings['blur_image'] = 0
+        
 
         # Update state x and y coordinates
         self.state.x, self.state.y = e.local_x, e.local_y
@@ -239,7 +277,7 @@ class Canvas(Widget):
         # Clear and set our current path and state to match it
         self.current_path = cv.Path(elements=[], paint=ft.Paint(**safe_paint_settings))
         self.state.paths.clear()
-        self.state.paths.append({'elements': list(), 'paint': self.story.data.get('paint_settings')})
+        self.state.paths.append({'elements': list(), 'paint': state_paint_settings})
 
         # Set move to element at our starting position that the mouse is at for the path to start from
         move_to_element = cv.Path.MoveTo(e.local_x, e.local_y)
@@ -255,6 +293,19 @@ class Canvas(Widget):
             line_element = cv.Path.LineTo(e.local_x, e.local_y)
             self.current_path.elements.append(line_element)
             self.state.paths[0]['elements'].append((line_element.__dict__))
+
+        elif style == "arc":
+            arc_element = cv.Path.Arc(
+                width=20,
+                height=20,
+                
+                x=e.local_x,
+                y=e.local_y,
+                start_angle=math.pi,
+                sweep_angle=-math.pi,
+            )
+            self.current_path.elements.append(arc_element)
+            self.state.paths[0]['elements'].append((arc_element.__dict__))
 
         # Else if we're using arcto, add that element to the current path and state right away
         elif style == 'arcto' or style == 'arctofill':
@@ -304,6 +355,40 @@ class Canvas(Widget):
 
             # Update the page and return early
             try:
+                # Page reference gets lost after dragging widget to new canvas, so we reset it and update
+                self.canvas.page = self.p
+                self.canvas.update()
+            except Exception as ex:
+                self.p.update()
+            return
+        
+        if style == "arc" or style == "arcfill":
+            
+            # Set the element and its data
+            arc_element = self.current_path.elements[-1]
+            arc_dict = arc_element.__dict__
+
+        
+
+            # Swap directions of arc depending if we drag up or down from starting point
+            if e.local_y - self.state.y >= 0:   # Dragging down
+                arc_element.sweep_angle = math.pi
+                arc_element.height = abs(e.local_y - self.state.y) * 2
+                
+            else:       # Dragging up
+                arc_element.sweep_angle = -math.pi
+                arc_element.height = abs(e.local_y - self.state.y) 
+                
+
+            arc_element.width = abs(e.local_x - self.state.x) 
+        
+
+            print("Arc width and height: ", arc_element.width, arc_element.height)
+
+            # Update the page and return early
+            try:
+                # Page reference gets lost after dragging widget to new canvas, so we reset it and update
+                self.canvas.page = self.p
                 self.canvas.update()
             except Exception as ex:
                 self.p.update()
@@ -324,6 +409,8 @@ class Canvas(Widget):
 
             # Update the page and return early
             try:
+                # Page reference gets lost after dragging widget to new canvas, so we reset it and update
+                self.canvas.page = self.p
                 self.canvas.update()
             except Exception as ex:
                 self.p.update()
@@ -342,6 +429,8 @@ class Canvas(Widget):
 
             # After dragging canvas widget, it loses page reference and can't update
             try:
+                # Page reference gets lost after dragging widget to new canvas, so we reset it and update
+                self.canvas.page = self.p
                 self.canvas.update()
             except Exception as ex:
                 self.p.update()
@@ -355,7 +444,6 @@ class Canvas(Widget):
     def save_canvas(self):
         """ Saves our paths to our canvas data for storage """
         
-        
         # Add on to what we already have
         if self.state.paths:
             self.data['canvas']['paths'].extend(self.state.paths)
@@ -368,11 +456,43 @@ class Canvas(Widget):
         self.state.paths.clear()
         self.state.points.clear()
 
+        #print("Length of canvas paths data: ", len(self.data['canvas']['paths']))
+        #print("Number of elements in all paths: ", sum(len(p['elements']) for p in self.data['canvas']['paths']))
+
 
     # Called when the canvas control is resized
     async def on_canvas_resize(self, e: ft.ControlEvent):
         """Rescales stored drawing coordinates to match the new canvas size."""
+        print(e.height, e.width)
         pass
+
+    def _set_canvas_background(self, e):
+        """Sets the canvas background based on menu selection."""
+
+        cp = ColorPicker()
+
+        choice = e.control.text
+
+        if choice == "None":
+            # Clear background
+            self.data['canvas_meta']['bgimage_path'] = str()
+            self.data['canvas_meta']['bgcolor'] = None
+
+            #self.canvas.image = None       # New flet has image, not here tho
+            # Remove bgcolor shape here
+
+            self.save_dict()
+            self.p.update()
+
+
+        elif choice == "Color":
+            pass
+            # Pop up color picker with opacity slider to the right of it
+            # When hitting apply, set the data and color
+
+        elif choice == "Image":
+            pass
+            # Open file dialog to select image
 
 
     # NOT TESTED ----------------------------------
@@ -459,13 +579,14 @@ class Canvas(Widget):
         self.reload_tab()
 
         self.canvas_container.content = self.canvas
+        
 
         self.canvas_container.image = ft.DecorationImage(self.data.get('canvas_meta', {}).get('bgimage_path', ""), fit=ft.BoxFit.COVER) if self.data['canvas_meta'].get('bgimage_path', "") != "" else None
 
         self.body_container.alignment = ft.Alignment.CENTER
 
 
-        self.body_container.content = self.interactive_viewer
+        self.body_container.content = ft.Column([self.header, ft.Divider(thickness=2, height=2), self.interactive_viewer], spacing=0)
 
         self._render_widget()
 
