@@ -1011,8 +1011,7 @@ class Story(ft.View):
             if (e.local_delta.x > 0 and self.active_rail.width < page.width/2) or (e.local_delta.x < 0 and self.active_rail.width > 100):
                 self.active_rail.width = self.active_rail.width + int(e.local_delta.x)    # Apply the change to our rail
                 
-            
-            #page.update()   # Not needed flet 0.80.0+
+            self.active_rail.update()
 
         # Called when app stops dragging the resizer to resize the active rail
         async def save_active_rail_width(e: ft.DragEndEvent):
