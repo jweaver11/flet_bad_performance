@@ -79,6 +79,9 @@ class Active_Rail(ft.Container):
             self.content = self.content_rail
 
         # Update the page to reflect changes
-        self.p.update()
+        try:
+            self.update()
+        except:
+            self.p.update()
 
        

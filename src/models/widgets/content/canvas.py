@@ -12,7 +12,7 @@ Maps are widgets that have their own drawing canvas, and info display. they can 
 # Add color_filter for both decoration image and container ?
 # Fill tool??
 
-from flet_contrib.color_picker import ColorPicker
+#from flet_contrib.color_picker import ColorPicker
 import os
 import json
 import flet as ft
@@ -469,7 +469,7 @@ class Canvas(Widget):
     def _set_canvas_background(self, e):
         """Sets the canvas background based on menu selection."""
 
-        cp = ColorPicker()
+        #cp = ColorPicker()
 
         choice = e.control.text
 
