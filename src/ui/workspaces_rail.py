@@ -51,7 +51,8 @@ class Workspaces_Rail(ft.Container):
             
             #story.active_rail.content = ft.Text("No active rail")
 
-        self.p.update()
+        #self.p.update()
+        self.update()
 
     # Called by clicking button on bottom right of rail
     def toggle_collapse_rail(self, e, story: Story):
@@ -315,6 +316,10 @@ class Workspaces_Rail(ft.Container):
             ]), 
         )
 
-        self.p.update() # Update the page to show our changes
+        try:
+        #self.p.update() # Update the page to show our changes
+            self.update()
+        except:
+            self.p.update()
         
         

@@ -136,8 +136,10 @@ class Workspace(ft.Container):
         if len(visible_bottom_pin_controls) == 0:
             self.bottom_pin_drag_target.content.height = self.minimum_pin_height
         
-
-        self.p.update()
+        try:
+            self.pin_drag_targets.update()
+        except:
+            self.p.update()
 
     # Called whenever a drag target accepts a draggable
     def remove_drag_targets(self):
