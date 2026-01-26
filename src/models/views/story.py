@@ -1003,14 +1003,14 @@ class Story(ft.View):
         self.workspace.reload_workspace()  # Load our workspace here instead of in the workspace constructor
 
         # Called when hovering over resizer to right of the active rail
-        async def show_horizontal_cursor(e: ft.HoverEvent):
+        def show_horizontal_cursor(e: ft.HoverEvent):
             ''' Changes the cursor to horizontal when hovering over the resizer '''
 
             e.control.mouse_cursor = ft.MouseCursor.RESIZE_LEFT_RIGHT
             e.control.update()
 
         # Called when resizing the active rail by dragging the resizer
-        async def move_active_rail_divider(e: ft.DragUpdateEvent):
+        def move_active_rail_divider(e: ft.DragUpdateEvent):
             ''' Responsible for altering the width of the active rail '''
 
             if (e.local_delta.x > 0 and self.active_rail.width < page.width/2) or (e.local_delta.x < 0 and self.active_rail.width > 100):
@@ -1019,7 +1019,7 @@ class Story(ft.View):
             self.active_rail.update()
 
         # Called when app stops dragging the resizer to resize the active rail
-        async def save_active_rail_width(e: ft.DragEndEvent):
+        def save_active_rail_width(e: ft.DragEndEvent):
             ''' Saves our new width that will be loaded next time app opens the app '''
 
             app.settings.data['active_rail_width'] = self.active_rail.width
@@ -1036,9 +1036,9 @@ class Story(ft.View):
                 content=ft.VerticalDivider(thickness=2, width=2, color=ft.Colors.OUTLINE_VARIANT),     # Original
                 padding=ft.Padding.only(right=8),  # Push the 2px divider ^ to the right side
             ),
-            on_hover=show_horizontal_cursor,    # Change our cursor to horizontal when hovering over the resizer
-            on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
-            on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
+            on_hover=lambda e: show_horizontal_cursor(e),    # Change our cursor to horizontal when hovering over the resizer
+            on_pan_update=lambda e: move_active_rail_divider(e), # Resize the active rail as app is dragging
+            on_pan_end=lambda e: save_active_rail_width(e),  # Save the resize when app is done dragging
             drag_interval=10,
         )
 

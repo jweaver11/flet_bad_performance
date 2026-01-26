@@ -328,7 +328,7 @@ class Widget(ft.Container):
 
 
     # Called when app clicks the hide icon in the tab
-    async def toggle_visibility(self, e=None, value: bool=None):
+    def toggle_visibility(self, e=None, value: bool=None):
         ''' Hides the widget from our workspace and updates the json to reflect the change '''
 
         # If we want to specify we're visible or not, we can pass it in

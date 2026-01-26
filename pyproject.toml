@@ -9,7 +9,6 @@ authors = [
     { name = "Cory Malichar", email = "nunyabusiness@gmail.com" }
 ]
 dependencies = [
-  "flet-quill @ git+https://github.com/jweaver11/flet_quill",
   "flet-contrib",
   "flet>=0.80.0"
 ]
