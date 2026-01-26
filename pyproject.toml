@@ -9,12 +9,7 @@ authors = [
     { name = "Cory Malichar", email = "nunyabusiness@gmail.com" }
 ]
 dependencies = [
-<<<<<<< HEAD
-  "flet-contrib",
-  "flet>=0.80.0"
-=======
   "flet>=0.80.2"
->>>>>>> be36c857f1789c4c2a3eba0c97742caec140c9c0
 ]
 
 [tool.flet]
