@@ -100,6 +100,9 @@ class Widget(ft.Container):
         # Called at end of constructor for all child widgets to build their view (not here tho since we're not on page yet)
         #self.reload_widget()
 
+    def is_isolated(self) -> bool:  
+        return True
+
     # Called whenever there are changes in our data
     def save_dict(self):
         ''' Saves our current data to the json file '''
@@ -335,19 +338,24 @@ class Widget(ft.Container):
         if value is not None:
             self.data['visible'] = value
             self.visible = value
+            self.tab.visible = value
         
         else:
             # Change our visibility data, save it, then apply it
             self.data['visible'] = not self.data['visible']
             self.visible = self.data['visible']
+            self.tab.visible = self.data['visible']
+
+        
 
         # Save our changes and reload the UI
         self.save_dict()
-        self.reload_widget()
+        #self.reload_widget()
+        self.p.update()
 
         # Protect first launch
-        if self.story.workspace is not None:
-            self.story.workspace.reload_workspace()
+        #if self.story.workspace is not None:
+            #self.story.workspace.reload_workspace()
 
     # Called when right clicking our tab
     def get_menu_options(self) -> list[ft.Control]:

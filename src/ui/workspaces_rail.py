@@ -21,8 +21,13 @@ class Workspaces_Rail(ft.Container):
             animate=ft.Animation(500, ft.AnimationCurve.FAST_LINEAR_TO_SLOW_EASE_IN),
         )
 
+        self.is_first_launch = True
+
         # Build our rail on start
         self.reload_rail(story)
+
+    def is_isolated(self) -> bool:  
+        return True
 
     
 
@@ -316,10 +321,10 @@ class Workspaces_Rail(ft.Container):
             ]), 
         )
 
-        try:
-        #self.p.update() # Update the page to show our changes
-            self.update()
-        except:
-            self.p.update()
+        if self.is_first_launch:
+            self.is_first_launch = False
+            return
+        self.update()
+        
         
         

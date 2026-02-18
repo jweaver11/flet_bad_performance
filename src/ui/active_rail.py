@@ -44,6 +44,9 @@ class Active_Rail(ft.Container):
         # All other rails have reload rail functions, but this one just displays the correct one
         self.display_active_rail(story)
 
+    def is_isolated(self) -> bool:  
+        return True
+
         
     # Called when other workspaces are selected
     def display_active_rail(self, story: Story):

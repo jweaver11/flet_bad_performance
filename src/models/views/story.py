@@ -1046,7 +1046,7 @@ class Story(ft.View):
             on_exit=hide_horizontal_cursor,     # Change our cursor back to default when not hovering
             on_pan_update=move_active_rail_divider, # Resize the active rail as app is dragging
             on_pan_end=save_active_rail_width,  # Save the resize when app is done dragging
-            drag_interval=10,
+            drag_interval=20,
         )
 
         # Save our 2 rails, divers, and our workspace container in a row

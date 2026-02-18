@@ -139,7 +139,7 @@ class Workspace(ft.Container):
         try:
             self.pin_drag_targets.update()
         except:
-            self.p.update()
+            self.update()
 
     # Called whenever a drag target accepts a draggable
     def remove_drag_targets(self):
@@ -352,7 +352,7 @@ class Workspace(ft.Container):
             #formatted_top_pin.update()
             #self.widgets.update() # Update the main pin, as it is affected by all pins resizing
             #self.master_stack.update()
-            self.p.update()
+            self.update()
         def save_top_pin_height(e: ft.DragEndEvent):
             #print("save top pin height called")
             self.story.data['top_pin_height'] = self.top_pin.height
@@ -393,7 +393,7 @@ class Workspace(ft.Container):
             #formatted_left_pin.update()
             #self.widgets.update()
             #self.master_stack.update()
-            self.p.update()
+            self.update()
         def save_left_pin_width(e: ft.DragEndEvent):
             #print("save left pin width called")
             self.story.data['left_pin_width'] = self.left_pin.width
@@ -428,7 +428,7 @@ class Workspace(ft.Container):
             #formatted_right_pin.update()
             #self.widgets.update()
             #self.master_stack.update()
-            self.p.update()
+            self.update()
         def save_right_pin_width(e: ft.DragEndEvent):
             print("save right pin width called")    
             self.story.data['right_pin_width'] = self.right_pin.width
@@ -461,7 +461,7 @@ class Workspace(ft.Container):
             #formatted_bottom_pin.update()
             #self.widgets.update()
             #self.master_stack.update()
-            self.p.update()
+            self.update()
         def save_bottom_pin_height(e: ft.DragEndEvent):
             print("save bottom pin height called")
             self.story.data['bottom_pin_height'] = self.bottom_pin.height
@@ -504,7 +504,7 @@ class Workspace(ft.Container):
                 # Save the data. This allows for selected main pin tabs to save between sessions
                 widget.save_dict()
 
-            self.p.update()
+            self.update()
 
 
 
@@ -649,7 +649,10 @@ class Workspace(ft.Container):
         self.content = self.master_stack
 
         # Finally update the UI
-        self.p.update()
+        try: 
+            self.update()
+        except:
+            self.p.update()
 
 
         
