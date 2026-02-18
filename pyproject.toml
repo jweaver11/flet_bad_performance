@@ -9,7 +9,7 @@ authors = [
     { name = "Cory Malichar", email = "nunyabusiness@gmail.com" }
 ]
 dependencies = [
-  "flet>=0.80.2"
+  "flet>=0.80.5"
 ]
 
 [tool.flet]
@@ -32,7 +32,7 @@ path = "src"
 
 [tool.uv]
 dev-dependencies = [
-    "flet[all]==0.80.0",
+    "flet[all]==0.80.5",
 ]
 
 [tool.poetry]
